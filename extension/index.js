@@ -25,46 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { useState } from 'preact/hooks'
-import { useMeta, useTitle } from 'hoofd/preact'
-import Router from 'preact-router'
-
-import Layout from './Layout'
-import Home from './Home'
-import Docs from './Docs'
-import Notice from './Legal/Notice'
-import Privacy from './Legal/Privacy'
-
-import { Routes } from '@constants'
-import '@styles/main.scss'
-
-interface RootProps {
-  url?: string
-}
-
-function Root (props: RootProps) {
-  const [ url, setUrl ] = useState(props.url || location.pathname)
-  useTitle(url === '/' ? 'PronounDB' : '%s • PronounDB', url !== '/')
-
-  // useMeta({ name: 'og:image', content: avatar })
-  useMeta({ name: 'og:title', content: 'PronounDB' })
-  useMeta({ name: 'og:site_name', content: 'PronounDB' })
-  useMeta({ name: 'og:description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  useMeta({ name: 'description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  // useLink({ rel: 'shortcut icon', href: avatar })
-
-  return (
-    <Layout>
-      <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
-        <Home path={Routes.HOME}/>
-        <Docs path={Routes.DOCS}/>
-        <Notice path={Routes.LEGAL}/>
-        <Privacy path={Routes.PRIVACY}/>
-      </Router>
-    </Layout>
-  )
-}
-
-Root.displayName = 'Root'
-export default Root
+import './modules/github'
+import './modules/discord'
+import './modules/twitch'
+import './modules/twitter'

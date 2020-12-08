@@ -25,46 +25,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { useState } from 'preact/hooks'
-import { useMeta, useTitle } from 'hoofd/preact'
-import Router from 'preact-router'
+import { fetchPronouns } from '../fetch'
+import { h, css } from '../util'
 
-import Layout from './Layout'
-import Home from './Home'
-import Docs from './Docs'
-import Notice from './Legal/Notice'
-import Privacy from './Legal/Privacy'
+function makeChatBadge (pronouns) {
+  const style = css({
+    display: 'inline-block',
+    borderRadius: 'var(--border-radius-medium)',
+    backgroundColor: 'var(--color-background-button-secondary-default)',
+    color: 'var(--color-text-button-secondary)',
+    lineHeight: '1.8rem',
+    position: 'relative',
+    bottom: '-1px',
+    marginRight: '4px',
+    padding: '0 2px'
+  })
 
-import { Routes } from '@constants'
-import '@styles/main.scss'
-
-interface RootProps {
-  url?: string
+  return h('span', { style }, pronouns)
 }
 
-function Root (props: RootProps) {
-  const [ url, setUrl ] = useState(props.url || location.pathname)
-  useTitle(url === '/' ? 'PronounDB' : '%s • PronounDB', url !== '/')
-
-  // useMeta({ name: 'og:image', content: avatar })
-  useMeta({ name: 'og:title', content: 'PronounDB' })
-  useMeta({ name: 'og:site_name', content: 'PronounDB' })
-  useMeta({ name: 'og:description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  useMeta({ name: 'description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  // useLink({ rel: 'shortcut icon', href: avatar })
-
-  return (
-    <Layout>
-      <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
-        <Home path={Routes.HOME}/>
-        <Docs path={Routes.DOCS}/>
-        <Notice path={Routes.LEGAL}/>
-        <Privacy path={Routes.PRIVACY}/>
-      </Router>
-    </Layout>
-  )
+async function injectChatLine (line) {
+  const reactKey = Object.keys(line).find(k => k.startsWith('__reactInternalInstance'))
+  const pronouns = await fetchPronouns('twitch', line[reactKey].return.memoizedProps.message.user.userID)
+  if (pronouns) {
+    const username = line.querySelector('.chat-line__username-container')
+    username.parentNode.insertBefore(makeChatBadge(pronouns), username)
+  }
 }
 
-Root.displayName = 'Root'
-export default Root
+function handleMutation (nodes) {
+  for (const { target, addedNodes } of nodes) {
+    if (target.classList?.contains('chat-scrollable-area__message-container')) {
+      for (const added of addedNodes) {
+        if (added.classList?.contains('chat-line__message')) {
+          injectChatLine(added)
+        }
+      }
+    }
+  }
+}
+
+function inject () {
+  // todo: consider injecting in the React component for chat lines rather than relying on a MO
+  const observer = new MutationObserver(handleMutation)
+  observer.observe(document, { childList: true, subtree: true })
+}
+
+if (/(^|\.)twitch\.tv$/.test(location.hostname)) {
+  inject()
+}

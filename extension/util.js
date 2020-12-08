@@ -25,46 +25,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { useState } from 'preact/hooks'
-import { useMeta, useTitle } from 'hoofd/preact'
-import Router from 'preact-router'
+export function h (tag, props, ...child) {
+  const e = document.createElement(tag)
+  if (props) {
+    for (const key in props) {
+      if (Object.prototype.hasOwnProperty.call(props, key)) {
+        e.setAttribute(key, String(props[key]))
+      }
+    }
+  }
 
-import Layout from './Layout'
-import Home from './Home'
-import Docs from './Docs'
-import Notice from './Legal/Notice'
-import Privacy from './Legal/Privacy'
+  for (const c of child) {
+    if (!c) continue
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
+  }
 
-import { Routes } from '@constants'
-import '@styles/main.scss'
-
-interface RootProps {
-  url?: string
+  return e
 }
 
-function Root (props: RootProps) {
-  const [ url, setUrl ] = useState(props.url || location.pathname)
-  useTitle(url === '/' ? 'PronounDB' : '%s • PronounDB', url !== '/')
-
-  // useMeta({ name: 'og:image', content: avatar })
-  useMeta({ name: 'og:title', content: 'PronounDB' })
-  useMeta({ name: 'og:site_name', content: 'PronounDB' })
-  useMeta({ name: 'og:description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  useMeta({ name: 'description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  // useLink({ rel: 'shortcut icon', href: avatar })
-
-  return (
-    <Layout>
-      <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
-        <Home path={Routes.HOME}/>
-        <Docs path={Routes.DOCS}/>
-        <Notice path={Routes.LEGAL}/>
-        <Privacy path={Routes.PRIVACY}/>
-      </Router>
-    </Layout>
-  )
+export function css (style) {
+  let res = ''
+  for (const prop in style) {
+    if (Object.prototype.hasOwnProperty.call(style, prop)) {
+      res += `${prop.replace(/[A-Z]/g, s => `-${s.toLowerCase()}`)}:${style[prop]};`
+    }
+  }
+  return res
 }
 
-Root.displayName = 'Root'
-export default Root
+export function sleep (ms) {
+  return new Promise(res => setTimeout(res, ms))
+}

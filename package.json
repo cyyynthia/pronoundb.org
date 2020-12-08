@@ -9,8 +9,8 @@
   "scripts": {
     "web:dev": "cross-env NODE_ENV=development webpack serve --config frontend/webpack.config.js",
     "web:build": "cross-env NODE_ENV=production webpack --config frontend/webpack.config.js",
-    "ext:dev": "microbundle watch -i extension/src/index.js --no-compress --external none --sourcemap false -f iife -o ext/script.js",
-    "ext:build": "microbundle build -i extension/src/index.js --no-compress --external none --sourcemap false -f iife -o ext/script.js"
+    "ext:dev": "microbundle watch -i extension/index.js --no-compress --external none --sourcemap false -f iife -o ext/script.js",
+    "ext:build": "microbundle build -i extension/index.js --no-compress --external none --sourcemap false -f iife -o ext/script.js"
   },
   "dependencies": {
     "fastify": "^3.9.1",

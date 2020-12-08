@@ -25,8 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h, Fragment } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import { h } from 'preact'
 import type { RoutableProps } from 'preact-router'
 
 import style from '@styles/home.scss'
