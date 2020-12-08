@@ -1,0 +1,43 @@
+.container {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.header, .footer {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  a + a {
+    margin-left: 16px;
+  }
+}
+
+.title {
+  font-weight: bold;
+  font-size: 28px;
+
+  a {
+    color: inherit;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  padding: 24px;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.footer {
+  color: var(--text-secondary);
+}

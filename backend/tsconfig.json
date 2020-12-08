@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "alwaysStrict": true,
+    "strictNullChecks": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true, 
+    "strictPropertyInitialization": true,
+  
+    "noEmitOnError": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "allowUnreachableCode": false,
+    "allowJs": false,
+
+    "lib": [ "es2020.string", "es2020.bigint", "es2019.object" ],
+
+    "target": "es6",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "outDir": "../build"
+  },
+  "include": [ "./**/*" ]
+}

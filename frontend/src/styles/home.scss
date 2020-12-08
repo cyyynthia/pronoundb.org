@@ -1,0 +1,33 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  font-size: 34px;
+  margin-top: 64px;
+  margin-bottom: 32px;
+}
+
+.subtitle {
+  font-size: 26px;
+}
+
+.buttons {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.button {
+  padding: 8px 16px;
+  background-color: var(--background-secondary);
+  border: 1px var(--background-tertiary) solid;
+  border-radius: 3px;
+  font-size: 20px;
+  margin: 8px;
+}
