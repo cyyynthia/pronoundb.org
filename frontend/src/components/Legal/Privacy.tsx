@@ -29,14 +29,12 @@ import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-import mainStyles from '@styles/main.scss'
-
 function Privacy (_: RoutableProps) {
   useTitle('Privacy Policy')
 
   return (
-    <div className={mainStyles.justified}>
-      <div className={mainStyles.context}>Legal</div>
+    <div className='justified'>
+      <div className='page-context'>Legal</div>
       <h2>Privacy Policy</h2>
       <p>Last edited: December 8, 2020</p>
 

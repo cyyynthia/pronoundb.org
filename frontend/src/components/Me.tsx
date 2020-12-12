@@ -25,65 +25,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-.container {
-  width: 80%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto;
+import { h } from 'preact'
+import { useTitle } from 'hoofd/preact'
+import type { RoutableProps } from 'preact-router'
+
+import { Endpoints } from '@constants'
+
+interface OAuthProps extends RoutableProps {
+  intent: 'login' | 'register' | 'link'
 }
 
-.header, .footer {
-  padding: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  a + a, a + .link {
-    margin-left: 16px;
-  }
+const IntentTitles = {
+  login: 'Login to your account',
+  register: 'Register an account',
+  link: 'Link another account'
 }
 
-.title {
-  font-weight: bold;
-  font-size: 28px;
+function OAuth (props: OAuthProps) {
+  useTitle(IntentTitles[props.intent])
 
-  a {
-    color: inherit;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
+  return (
+    <div>
+      <h2>My account</h2>
+      <p>
+        Hi there! You can manage the accounts you've linked to PronounDB, as well as changing your pronouns if you feel
+        like it.
+      </p>
+      
+      <h3>Delete your account</h3>
+      <p>
+        Want to delete your account? That's fine, I won't blame you. You can delete your account at any time by
+        pressing the button below. Be careful, the action is immediate and irreversible!
+      </p>
+      <button onClick={() => void 0} className='link red'>Delete my account</button>
+    </div>
+  )
 }
 
-.link {
-  appearance: none;
-  background: none;
-  border: 0;
-  font: inherit;
-  color: var(--blue);
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.error {
-  color: #ff2e2e;
-  font-size: 18px;
-  text-align: center;
-}
-
-.content {
-  flex: 1;
-  width: 100%;
-  padding: 24px;
-  max-width: 1024px;
-  margin: 0 auto;
-}
-
-.footer {
-  color: var(--text-secondary);
-}
+OAuth.displayName = 'OAuth'
+export default OAuth

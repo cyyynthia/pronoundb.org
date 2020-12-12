@@ -29,8 +29,6 @@ import { h, Fragment } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-import mainStyles from '@styles/main.scss'
-
 const Supported = () => (
   <Fragment>
     <code>discord</code>{', '}
@@ -45,7 +43,7 @@ function Docs (_: RoutableProps) {
 
   return (
     <div>
-      <div className={mainStyles.context}>Developers</div>
+      <div className='page-context'>Developers</div>
       <h2>API Documentation</h2>
       <h3>Lookup an account</h3>
       <div>

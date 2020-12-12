@@ -27,13 +27,7 @@
 
 declare const COMMIT_HASH: string
 
-declare module '*.scss' {
-  let classes: Readonly<Record<string, string>>
-  export default classes
-}
-
 declare module '@assets/*' {
   let asset: string
   export default asset
 }
-

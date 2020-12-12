@@ -33,6 +33,7 @@
   --text-secondary: #666;
   --blue: #007ac0;
   --pink: #f49898;
+  --red: #ff2e2e;
   --pink-dark: #bb6570;
 }
 
@@ -48,7 +49,7 @@
 
 * { box-sizing: border-box; }
 
-html, body, :global(#react-root) {
+html, body, #react-root {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -63,7 +64,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-bottom: 16px;
 }
 
-a {
+a, .link {
   color: var(--blue);
   text-decoration: none;
 
@@ -80,7 +81,7 @@ code {
   border-radius: 2px;
 }
 
-.context {
+.page-context {
   text-transform: uppercase;
   letter-spacing: 8;
   font-weight: 800;
@@ -92,4 +93,107 @@ code {
 
 .justified {
   text-align: justify;
+}
+
+.error {
+  font-size: 18px;
+  text-align: center;
+}
+
+.red {
+  color: var(--red);
+}
+
+/* Layout */
+.container {
+  width: 80%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+}
+
+.header, .footer {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  a + a, a + .link {
+    margin-left: 16px;
+  }
+}
+
+.site-name {
+  font-weight: bold;
+  font-size: 28px;
+
+  a {
+    color: inherit;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+.link {
+  appearance: none;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--blue);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.page-content {
+  flex: 1;
+  width: 100%;
+  padding: 24px;
+  max-width: 1024px;
+  margin: 0 auto;
+}
+
+.footer {
+  color: var(--text-secondary);
+}
+
+
+.homepage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .title {
+    font-size: 34px;
+    margin-top: 64px;
+    margin-bottom: 32px;
+  }
+
+  .subtitle {
+    font-size: 26px;
+  }
+
+  .supports {
+    margin-top: 24px;
+    font-size: 18px;
+  }
+
+  .links {
+    margin-top: 32px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .link {
+    font-size: 20px;
+    margin: 8px 32px;
+  }
 }

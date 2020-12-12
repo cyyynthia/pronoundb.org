@@ -30,25 +30,23 @@ import type { RoutableProps } from 'preact-router'
 
 import { Routes } from '@constants'
 
-import style from '@styles/home.scss'
-
 function Home (_: RoutableProps) {
   return (
-    <div className={style.container}>
-      <div className={style.title}>Know how to refer to your peers over the Internet</div>
-      <div className={style.subtitle}>
+    <div className='homepage'>
+      <div className='title'>Know how to refer to your peers over the Internet</div>
+      <div className='subtitle'>
         Stop struggling to remember how you should refer to that person. PronounDB makes it easy for people to share
         and lookup each other's pronouns, to avoid the critical mistake of mis-gendering people online.
       </div>
-      <div className={style.supports}>
+      <div className='supports'>
         PronounDB supports a <a href='#'>wide variety of services</a>, and integrates smoothly with their designs, as
         if it was always here. Plus, it's open-source, so everyone can contribute and add supports for new platforms!
       </div>
-      <div className={style.links}>
-        <a href={Routes.CHROME_EXT} className={style.link} target='_blank' rel='noreferrer'>
+      <div className='links'>
+        <a href={Routes.CHROME_EXT} className='link' target='_blank' rel='noreferrer'>
           Get the extension
         </a>
-        <a href={Routes.FIREFOX_ADDON} className={style.link} target='_blank' rel='noreferrer'>
+        <a href={Routes.FIREFOX_ADDON} className='link' target='_blank' rel='noreferrer'>
           Get the addon
         </a>
       </div>

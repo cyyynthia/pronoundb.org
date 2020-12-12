@@ -31,8 +31,6 @@ import type { RoutableProps } from 'preact-router'
 
 import { Endpoints } from '@constants'
 
-import mainStyles from '@styles/main.scss'
-
 interface OAuthProps extends RoutableProps {
   intent: 'login' | 'register' | 'link'
 }
@@ -48,7 +46,7 @@ function OAuth (props: OAuthProps) {
 
   return (
     <div>
-      <div className={mainStyles.context}>Authentication</div>
+      <div className='page-context'>Authentication</div>
       <h2>{IntentTitles[props.intent]}</h2>
       <p>Select an authentication provider. You will be redirected to the platform you selected to perform the authentication.</p>
       {props.intent === 'register' && <p>Make sure to select an account you already linked on PronounDB.</p>}

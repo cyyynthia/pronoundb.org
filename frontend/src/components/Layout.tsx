@@ -26,12 +26,11 @@
  */
 
 import { h } from 'preact'
+import { useContext } from 'preact/hooks'
 import type { ComponentChildren } from 'preact'
 
-import { Routes } from '@constants'
-import style from '@styles/layout.scss'
-import { useContext } from 'preact/hooks'
 import { Ctx } from './AppContext'
+import { Routes } from '@constants'
 
 interface LayoutProps {
   children: ComponentChildren
@@ -49,23 +48,23 @@ function Layout (props: LayoutProps) {
   const { user, logout, error } = useContext(Ctx)
 
   return (
-    <div className={style.container}>
-      <header className={style.header}>
-        <div className={style.title}>
+    <div className='container'>
+      <header className='header'>
+        <div className='site-name'>
           <a href={Routes.HOME}>PronounDB</a>
         </div>
-        <div className={style.links}>
+        <div className='nav-links'>
           {!user && <a href={Routes.LOGIN}>Login</a>}
           {!user && <a href={Routes.REGISTER}>Create account</a>}
           {user && <a href={Routes.ME}>My account</a>}
-          {user && <button className={style.link} onClick={logout}>Logout</button>}
+          {user && <button className='link' onClick={logout}>Logout</button>}
         </div>
       </header>
-      <main className={style.content}>
-        {typeof error === 'number' && <div className={style.error}>{ERRORS[error]}</div>}
+      <main className='page-content'>
+        {typeof error === 'number' && <div className='error red'>{ERRORS[error]}</div>}
         {props.children}
       </main>
-      <footer className={style.footer}>
+      <footer className='footer'>
         <div>
           Copyright &copy; {new Date().getFullYear()} Cynthia K. Rey
         </div>

@@ -29,14 +29,12 @@ import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-import mainStyles from '@styles/main.scss'
-
 function Notice (_: RoutableProps) {
   useTitle('Legal Notice')
 
   return (
     <div>
-      <div className={mainStyles.context}>Legal</div>
+      <div className='page-context'>Legal</div>
       <h2>Legal notice</h2>
       <p>
         Complying with the article 6 of French law No. 2004-575 of June 21, 2004 for Confidence in the Digital Economy

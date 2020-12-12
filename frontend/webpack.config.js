@@ -90,35 +90,13 @@ const baseConfig = {
         test: /\.s?css$/,
         use: [
           IS_DEV ? 'style-loader' : MiniCSS.loader,
-          {
-            loader: 'css-loader',
-            options: {
-              modules: {
-                exportLocalsConvention: 'camelCaseOnly',
-                localIdentName: '[local]-[hash:7]'
-              }
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: { postcssOptions: { plugins: [ 'autoprefixer' ] } }
-          },
-          'sass-loader'
-        ],
-        exclude: [ /node_modules/ ]
-      },
-      {
-        test: /\.s?css$/,
-        use: [
-          MiniCSS.loader,
           'css-loader',
           {
             loader: 'postcss-loader',
             options: { postcssOptions: { plugins: [ 'autoprefixer' ] } }
           },
           'sass-loader'
-        ],
-        include: [ /node_modules/ ]
+        ]
       },
       {
         test: /\.(svg|mp4|webm|woff2?|eot|ttf|otf|wav|ico)$/,
