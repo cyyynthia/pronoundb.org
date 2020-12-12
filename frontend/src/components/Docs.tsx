@@ -29,14 +29,14 @@ import { h, Fragment } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-const Supported = () => (
-  <Fragment>
-    <code>discord</code>{', '}
-    <code>github</code>{', '}
-    <code>twitch</code>{', or '}
-    <code>twitter</code>
-  </Fragment>
-)
+import { Supported, Pronouns } from '@shared'
+
+const SupportedFragment = () => {
+ const items = Supported.map(s => [ <code>{s}</code>, ', ' ])
+ items[items.length - 2][1] = ', or '
+ items[items.length - 1][1] = ''
+ return h(Fragment, null, ...items)
+}
 
 function Docs (_: RoutableProps) {
   useTitle('API Docs')
@@ -45,11 +45,22 @@ function Docs (_: RoutableProps) {
     <div>
       <div className='page-context'>Developers</div>
       <h2>API Documentation</h2>
+      <h3>Types</h3>
+      <div>
+        <b>Platform:</b> <SupportedFragment/>
+      </div>
+      <div>
+        <b>Pronouns:</b> Short identifier for a set of pronouns. Here are the valid identifiers:
+        <ul>
+          <li><code>unspecified</code>: Unspecified</li>
+          {Object.entries(Pronouns).map(([ id, pronouns ]) => <li key={id}><code>{id}</code>: {pronouns}</li>)}
+        </ul>
+      </div>
       <h3>Lookup an account</h3>
       <div>
         <p>GET /api/v1/lookup?platform=&lt;platform&gt;&amp;id=&lt;id&gt;</p>
         <ul>
-          <li><b>platform</b>: Either <Supported/></li>
+          <li><b>platform</b>: Either <SupportedFragment/></li>
           <li><b>id</b>: Account ID (not the username!)</li>
         </ul>
       </div>
@@ -59,7 +70,7 @@ function Docs (_: RoutableProps) {
         <p>GET /api/v1/lookup-bulk?platform=&lt;platform&gt;&amp;ids=&lt;ids&gt;</p>
         <p>Note: you can only lookup multiple account for a single platform.</p>
         <ul>
-          <li><b>platform</b>: Either <Supported/></li>
+          <li><b>platform</b>: Either <SupportedFragment/></li>
           <li><b>ids</b>: Comma-separated Account IDs, will be cropped to 50 max</li>
         </ul>
       </div>

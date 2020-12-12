@@ -25,7 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export type Supported = 'discord' | 'github' | 'twitch' | 'twitter'
+export type Platforms = 'discord' | 'github' | 'twitch' | 'twitter'
+
+export const Supported = [ 'discord', 'github', 'twitch', 'twitter' ]
 
 // Contributors: please keep the list sorted alphabetically.
 export const Pronouns = Object.freeze({

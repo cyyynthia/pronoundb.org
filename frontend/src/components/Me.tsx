@@ -35,7 +35,7 @@ import { Pronouns, PlatformNames } from '@shared'
 
 function Me () {
   useTitle('My account')
-  const { user, logout, setPronouns } = useContext(Ctx)
+  const { user, logout, setPronouns, unlinkAccount } = useContext(Ctx)
   const deleteAccount = useCallback(function () {
     if (confirm('Are you sure? This action is irreversible!')) {
       fetch(Endpoints.SELF, { method: 'DELETE' }).then(() => logout())
@@ -46,6 +46,11 @@ function Me () {
     fetch(Endpoints.SELF, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pronouns: p }) })
     setPronouns(p)
   }, [ setPronouns ])
+
+  const unlinkExternal = useCallback(function (platform: string, id: string) {
+    fetch(Endpoints.CONNECTION(platform, id), { method: 'DELETE' })
+    unlinkAccount(platform, id)
+  }, [ unlinkAccount ])
 
   if (!user) return null
 
@@ -70,7 +75,7 @@ function Me () {
           <li key={account.id}>
             {PlatformNames[account.platform]}: <b>{account.name}</b>{' - '}
             {user.accounts.length > 1
-              ? <button className='link' onClick={() => void 0}>Unlink</button>
+              ? <button className='link' onClick={() => unlinkExternal(account.platform, account.id)}>Unlink</button>
               : <i>Cannot unlink your only linked account.</i>}
           </li>
         ))}

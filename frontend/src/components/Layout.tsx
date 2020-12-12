@@ -38,7 +38,7 @@ interface LayoutProps {
 
 const ERRORS = [
   'Something went wrong!',
-  'Could not authenticate you with the external service due to an error.',
+  'Could not authenticate you with the external platform due to an error.',
   'No account was found, did you mean to create an account?',
   'This account already exists, did you mean to login?',
   'This account has already been linked to another account.'

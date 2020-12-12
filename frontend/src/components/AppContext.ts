@@ -32,14 +32,15 @@ import type { ComponentChildren } from 'preact'
 import useCookie from '../useCookie'
 
 import { Endpoints } from '@constants'
-import { Supported } from '@shared'
+import { Platforms } from '@shared'
 
-interface Account { platform: Supported, id: string, name: string }
+interface Account { platform: Platforms, id: string, name: string }
 interface User { pronouns: string, accounts: Account[] }
 interface AppContextValue {
   user: User | false | null
   error?: number | null
   setPronouns: (pronouns: string) => void
+  unlinkAccount: (platform: string, id: string) => void
   logout: () => void
 }
 
@@ -49,7 +50,13 @@ interface AppContextProps {
   children: ComponentChildren
 }
 
-export const Ctx = createContext<AppContextValue>({ user: null, error: null, setPronouns: () => void 0, logout: () => void 0 })
+export const Ctx = createContext<AppContextValue>({
+  user: null,
+  error: null,
+  setPronouns: () => void 0,
+  unlinkAccount: () => void 0,
+  logout: () => void 0
+})
 Ctx.displayName = 'AppContext'
 
 function AppContext (props: AppContextProps) {
@@ -87,7 +94,16 @@ function AppContext (props: AppContextProps) {
     }
   }, [ props.url, error ])
 
-  return h(Ctx.Provider, { value: { user, error, setPronouns: p => setUser({ ...user, pronouns: p } as User), logout: () => setToken(null, -1) }, children: props.children })
+  return h(Ctx.Provider, {
+    value: {
+      user,
+      error, 
+      setPronouns: p => user && setUser({ ...user, pronouns: p }),
+      unlinkAccount: (p, i) => user && setUser({ ...user, accounts: user.accounts.filter(a => a.platform !== p || a.id !== i) }),
+      logout: () => setToken(null, -1)
+    },
+    children: props.children
+  })
 }
 
 AppContext.displayName = 'AppContextWrapper'

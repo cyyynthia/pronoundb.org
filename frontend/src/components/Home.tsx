@@ -39,7 +39,7 @@ function Home (_: RoutableProps) {
         and lookup each other's pronouns, to avoid the critical mistake of mis-gendering people online.
       </div>
       <div className='supports'>
-        PronounDB supports a <a href='#'>wide variety of services</a>, and integrates smoothly with their designs, as
+        PronounDB supports a <a href='#'>wide variety of platforms</a>, and integrates smoothly with their designs, as
         if it was always here. Plus, it's open-source, so everyone can contribute and add supports for new platforms!
       </div>
       <div className='links'>

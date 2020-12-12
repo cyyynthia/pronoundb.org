@@ -41,5 +41,6 @@ export const Routes = Object.freeze({
 
 export const Endpoints = Object.freeze({
   OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
-  SELF: '/api/v1/accounts/me'
+  SELF: '/api/v1/accounts/me',
+  CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`
 })

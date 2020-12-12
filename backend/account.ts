@@ -26,11 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Pronouns } from '../extension/shared'
-
-// POST /me
-// DELETE /delete
-// DELETE /connections/<id>
+import { Pronouns, Supported } from '../extension/shared'
 
 function getMe (request: FastifyRequest, reply: FastifyReply) {
   const user = (request as any).user
@@ -40,7 +36,7 @@ function getMe (request: FastifyRequest, reply: FastifyReply) {
   })
 }
 
-function updateMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function updateMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   if (typeof request.body !== 'object' && !Object.prototype.hasOwnProperty.call(request.body, 'pronouns')) {
     reply.code(400).send({ error: 400, message: 'Invalid form body' })
     return
@@ -52,12 +48,31 @@ function updateMe (this: FastifyInstance, request: FastifyRequest, reply: Fastif
     return
   }
 
-  this.mongo.db.collection('accounts').updateOne({ _id: this.mongo.ObjectId((request as any).user._id) }, { $set: { pronouns }})
+  await this.mongo.db.collection('accounts').updateOne({ _id: this.mongo.ObjectId((request as any).user._id) }, { $set: { pronouns } })
   reply.code(204).send()
 }
 
-function deleteMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  this.mongo.db.collection('accounts').deleteOne({ _id: this.mongo.ObjectId((request as any).user._id) })
+async function deleteMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  await this.mongo.db.collection('accounts').deleteOne({ _id: this.mongo.ObjectId((request as any).user._id) })
+  reply.code(204).send()
+}
+
+async function deleteConnection (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  const query = request.query as Record<string, string>
+  if (!Supported.includes(query.platform)) {
+    reply.code(400).send({ error: 400, message: 'Unsupported platform' })
+    return
+  }
+
+  if (typeof query.id !== 'string') {
+    reply.code(400).send({ error: 400, message: 'Invalid ID' })
+    return
+  }
+
+  await this.mongo.db.collection('accounts').updateOne(
+    { _id: this.mongo.ObjectId((request as any).user._id) },
+    { $pull: { accounts: { platform: query.platform, id: query.id } } }
+  )
   reply.code(204).send()
 }
 
@@ -65,4 +80,5 @@ export default async function (fastify: FastifyInstance) {
   fastify.get('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, getMe)
   fastify.post('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, updateMe)
   fastify.delete('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteMe)
+  fastify.delete('/me/connection', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteConnection)
 }

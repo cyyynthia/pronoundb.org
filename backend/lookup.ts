@@ -25,11 +25,64 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { Supported } from '../extension/shared'
 
-// /lookup?platform=<platform>&id=<id>
-// /lookup-bulk?platform=<platform>&ids=<ids>
+async function lookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  const query = request.query as Record<string, string>
+  if (!Supported.includes(query.platform)) {
+    reply.code(400).send({ error: 400, message: 'Unsupported platform' })
+    return
+  }
+
+  if (typeof query.id !== 'string') {
+    reply.code(400).send({ error: 400, message: 'Invalid ID' })
+    return
+  }
+
+  const account = await this.mongo.db.collection('accounts').findOne(
+    { accounts: { $elemMatch: { platform: query.platform, id: query.id } } },
+    { accounts: 1, pronouns: 1 }
+  )
+  if (!account) {
+    reply.code(404).send({ error: 404, message: 'Not Found' })
+    return
+  }
+
+  reply.send({ pronouns: account.pronouns ?? 'unspecified' })
+}
+
+async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  const query = request.query as Record<string, string>
+  if (!Supported.includes(query.platform)) {
+    reply.code(400).send({ error: 400, message: 'Unsupported platform' })
+    return
+  }
+
+  if (typeof query.ids !== 'string') {
+    reply.code(400).send({ error: 400, message: 'Invalid ID' })
+    return
+  }
+
+  const ids = query.ids.split(',')
+  const accounts = await this.mongo.db.collection('accounts').find(
+    { accounts: { $elemMatch: { platform: query.platform, id: { $in: ids } } } },
+    { accounts: 1, pronouns: 1 }
+  ).toArray()
+
+  const res: Record<string, string> = {}
+  for (const account of accounts) {
+    for (const acc of account.accounts) {
+      if (ids.includes(acc.id)) {
+        res[acc.id] = account.pronouns ?? 'unspecified'
+      }
+    }
+  }
+
+  reply.send(res)
+}
 
 export default async function (fastify: FastifyInstance) {
-
+  fastify.get('/lookup', lookup)
+  fastify.get('/lookup-bulk', lookupBulk)
 }
