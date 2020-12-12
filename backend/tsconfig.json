@@ -20,7 +20,7 @@
     "target": "es6",
     "module": "commonjs",
     "esModuleInterop": true,
-    "outDir": "../build"
+    "outDir": "../dist/backend"
   },
   "include": [ "./**/*" ]
 }

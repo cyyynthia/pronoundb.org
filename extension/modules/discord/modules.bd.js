@@ -25,37 +25,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Plugin } from 'powercord/entities'
-import { React, getModule, getModuleByDisplayName } from 'powercord/webpack'
-import { inject as porkordInject, uninject as porkordUninject } from 'powercord/injector'
-import { get as porkordFetch } from 'powercord/http'
-
 import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
-fetchPronouns[symbolHttp] = porkordFetch
+fetchPronouns[symbolHttp] = () => null // todo
 
 const injections = []
 export function inject (mdl, meth, repl) {
-  const iid = `pronoundb-${mdl.constructor.displayName || mdl.constructor.name}-${meth}`
-  porkordInject(iid, mdl, meth, repl)
-  injections.push(iid)
+  injections.push(
+    BdApi.monkeyPatch(mdl, meth, {
+      after: ({ thisObject, methodArguments, returnValue }) => repl.call(thisObject, methodArguments, returnValue)
+    })
+  )
 }
 
 export function exporter (exp) {
-  class PronounDB extends Plugin {
-    startPlugin () {
+  class PronounDB {
+    getName () { return 'PronounDB' }
+    getVersion () { return '0.0.0-unknown' }
+    getAuthor () { return 'Cynthia' }
+    getDescription () { return 'PronounDB plugin for BetterDiscord - Shows other\'s people pronouns in chat, so your chances of mis-gendering them is low. Service by pronoundb.org' }
+
+    start () {
       exp({
-        get: (k, d) => this.settings.get(k, d),
-        set: (k, v) => this.settings.set(k, v)
+        get: (k, d) => BdApi.loadData(this.getName(), k) ?? d,
+        set: (k, v) => BdApi.saveData(this.getName(), k, v)
       })
     }
 
-    pluginWillUnload () {
-      injections.forEach(i => porkordUninject(i))
-      const MessageHeader = getModule([ 'MessageTimestamp' ], false)
-      if (MessageHeader?.default?.MessageHeader) {
-        MessageHeader.default = MessageHeader.default.MessageHeader
-      }
+    stop () {
+      injections.forEach(i => i())
+      const MessageHeader = BdApi.findModuleByProps('MessageTimestamp')
+      MessageHeader.default = MessageHeader.default.MessageHeader
     }
   }
 
@@ -63,18 +63,18 @@ export function exporter (exp) {
 }
 
 export async function getModules () {
-  const UserProfile = await getModuleByDisplayName('UserProfile')
-  const fnUserPopOut = await getModuleByDisplayName('UserPopout')
-  const FluxAppearance = await getModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
-  const MessageHeader = await getModule([ 'MessageTimestamp' ])
+  const UserProfile = BdApi.findModuleByDisplayName('UserProfile')
+  const fnUserPopOut = BdApi.findModuleByDisplayName('UserPopout')
+  const FluxAppearance = BdApi.findModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
+  const MessageHeader = BdApi.findModuleByProps('MessageTimestamp')
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
-    React,
+    React: BdApi.React,
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),
-    UserPopOut: extractUserPopOut(React, fnUserPopOut),
+    UserPopOut: extractUserPopOut(BdApi.React, fnUserPopOut),
     AppearanceSettings: extractFromFlux(FluxAppearance)
   }
 }

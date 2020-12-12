@@ -2,9 +2,7 @@
 .idea
 
 node_modules
-build
 dist
-ext
 *.nogit/
 *.nogit.*
 config.json

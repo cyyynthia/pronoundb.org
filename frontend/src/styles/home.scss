@@ -49,17 +49,13 @@
   font-size: 18px;
 }
 
-.buttons {
+.links {
   margin-top: 32px;
   display: flex;
   flex-wrap: wrap;
 }
 
-.button {
-  padding: 8px 16px;
-  background-color: var(--background-secondary);
-  border: 1px var(--background-tertiary) solid;
-  border-radius: 3px;
+.link {
   font-size: 20px;
-  margin: 8px;
+  margin: 8px 32px;
 }

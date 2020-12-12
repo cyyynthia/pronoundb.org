@@ -43,11 +43,11 @@ function Home (_: RoutableProps) {
         PronounDB supports a <a href='#'>wide variety of services</a>, and integrates smoothly with their designs, as
         if it was always here. Plus, it's open-source, so everyone can contribute and add supports for new platforms!
       </div>
-      <div className={style.buttons}>
-        <a href={Routes.CHROME_EXT} className={style.button} target='_blank' rel='noreferrer'>
+      <div className={style.links}>
+        <a href={Routes.CHROME_EXT} className={style.link} target='_blank' rel='noreferrer'>
           Get the extension
         </a>
-        <a href={Routes.FIREFOX_ADDON} className={style.button} target='_blank' rel='noreferrer'>
+        <a href={Routes.FIREFOX_ADDON} className={style.link} target='_blank' rel='noreferrer'>
           Get the addon
         </a>
       </div>

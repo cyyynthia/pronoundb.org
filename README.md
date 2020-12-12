@@ -1,4 +1,5 @@
 # PronounDB
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G71TSDF)<br>
 [![License](https://img.shields.io/github/license/cyyynthia/pronoundb.svg?style=flat-square)](https://github.com/cyyynthia/pronoundb/blob/mistress/LICENSE)
 
 A Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet, so
@@ -12,6 +13,7 @@ at and finds a balance between ease to find and doing too much.
  - GitHub
  - Discord (Web)
    - Exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
+   - Exists as a [plugin](https://cdn.cynthia.dev/ci/PronounDB.plugin.js) for [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp)
  - Twitter
  - Twitch
 
