@@ -7,3 +7,4 @@ dist
 ext
 *.nogit/
 *.nogit.*
+config.json

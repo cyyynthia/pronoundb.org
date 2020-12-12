@@ -11,6 +11,7 @@ at and finds a balance between ease to find and doing too much.
 ## Supported services
  - GitHub
  - Discord (Web)
+   - Exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
  - Twitter
  - Twitch
 

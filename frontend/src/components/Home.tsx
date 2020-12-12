@@ -39,6 +39,10 @@ function Home (_: RoutableProps) {
         Stop struggling to remember how you should refer to that person. PronounDB makes it easy for people to share
         and lookup each other's pronouns, to avoid the critical mistake of mis-gendering people online.
       </div>
+      <div className={style.supports}>
+        PronounDB supports a <a href='#'>wide variety of services</a>, and integrates smoothly with their designs, as
+        if it was always here. Plus, it's open-source, so everyone can contribute and add supports for new platforms!
+      </div>
       <div className={style.buttons}>
         <a href={Routes.CHROME_EXT} className={style.button} target='_blank' rel='noreferrer'>
           Get the extension

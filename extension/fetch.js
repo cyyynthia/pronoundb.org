@@ -25,6 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+export const symbolHttp = Symbol('pronoundb.http')
+
 export async function fetchPronouns (platform, id) {
   console.log('fetch:', id)
   return 'she/her'

@@ -40,7 +40,7 @@ function Layout (props: LayoutProps) {
     <div className={style.container}>
       <header className={style.header}>
         <div className={style.title}>
-          <a href='/'>PronounDB</a>
+          <a href={Routes.HOME}>PronounDB</a>
         </div>
         <div className={style.links}>
           <a href={Routes.LOGIN}>Login</a>
@@ -51,7 +51,9 @@ function Layout (props: LayoutProps) {
         {props.children}
       </main>
       <footer className={style.footer}>
-        <div>Copyright &copy; {new Date().getFullYear()} Cynthia K. Rey</div>
+        <div>
+          Copyright &copy; {new Date().getFullYear()} Cynthia K. Rey
+        </div>
         <div>
           <a href={Routes.DOCS}>API Docs</a>
           <a href={Routes.LEGAL}>Legal</a>
