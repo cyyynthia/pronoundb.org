@@ -34,7 +34,6 @@ import { Ctx } from './AppContext'
 
 function AuthBoundary (props: RoutableProps & { children: VNode }) {
   const { user } = useContext(Ctx)
-  console.log(user)
   useEffect(() => { if (user === false) route('/') }, [ user ])
   return user ? props.children : null
 }

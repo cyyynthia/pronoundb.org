@@ -34,13 +34,12 @@ import AppContext from './AppContext'
 import AuthBoundary from './AuthBoundary'
 import Layout from './Layout'
 import Home from './Home'
+import Me from './Me'
 import OAuth from './OAuth'
 import Docs from './Docs'
 import Notice from './Legal/Notice'
 import Privacy from './Legal/Privacy'
-
 import { Routes } from '@constants'
-import '@styles/main.scss'
 
 interface RootProps {
   url?: string
@@ -67,7 +66,7 @@ function Root (props: RootProps) {
           <OAuth path={Routes.REGISTER} intent='register'/>
 
           <AuthBoundary path={Routes.ME}>
-            <p>a</p>
+            <Me/>
           </AuthBoundary>
           <AuthBoundary path={Routes.LINK}>
             <OAuth intent='link'/>

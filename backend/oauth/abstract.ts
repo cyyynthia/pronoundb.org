@@ -35,7 +35,7 @@ const config = require('../../config.json')
 export interface Self { id: string, name: string }
 
 export interface OAuthDescriptor {
-  service: string
+  platform: string
   clientId: string
   clientSecret: string
   authorization: string
@@ -115,14 +115,14 @@ export default function (oauth: OAuthDescriptor) {
       }
 
       const user = await oauth.getSelf(accessToken)
-      const mongoAcc = { service: oauth.service, ...user }
+      const mongoAcc = { platform: oauth.platform, ...user }
       if (!user) {
         reply.redirect('/?error=1')
         return
       }
 
       let collection = fastify.mongo.db.collection('accounts')
-      let account = await collection.findOne({ 'accounts.id': user.id, 'accounts.service': oauth.service })
+      let account = await collection.findOne({ 'accounts.id': user.id, 'accounts.platform': oauth.platform })
       if (request.cookies.intent === 'link') {
         if (account) {
           reply.redirect('/me?error=4')

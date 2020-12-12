@@ -58,9 +58,9 @@ const baseConfig = {
     extensions: [ '.js', '.ts', '.tsx' ],
     alias: {
       '@components': join(SRC, 'components'),
-      '@styles': join(SRC, 'styles'),
       '@assets': join(SRC, 'assets'),
-      '@constants': join(SRC, 'constants.ts')
+      '@constants': join(SRC, 'constants.ts'),
+      '@shared': join(__dirname, '..', 'extension', 'shared.ts')
     }
   },
   module: {
@@ -68,7 +68,7 @@ const baseConfig = {
     rules: [
       {
         test: /\.(js|ts)x?/,
-        include: SRC,
+        exclude: /node_modules/,
         use: [
           {
             loader: 'babel-loader',

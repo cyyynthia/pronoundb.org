@@ -32,12 +32,15 @@ import type { ComponentChildren } from 'preact'
 import useCookie from '../useCookie'
 
 import { Endpoints } from '@constants'
+import { Supported } from '@shared'
 
-type User = { pronouns: number | null, accounts: string[] }
+interface Account { platform: Supported, id: string, name: string }
+interface User { pronouns: string, accounts: Account[] }
 interface AppContextValue {
   user: User | false | null
-  logout: () => void
   error?: number | null
+  setPronouns: (pronouns: string) => void
+  logout: () => void
 }
 
 interface AppContextProps {
@@ -46,7 +49,7 @@ interface AppContextProps {
   children: ComponentChildren
 }
 
-export const Ctx = createContext<AppContextValue>({ user: null, logout: () => void 0, error: null })
+export const Ctx = createContext<AppContextValue>({ user: null, error: null, setPronouns: () => void 0, logout: () => void 0 })
 Ctx.displayName = 'AppContext'
 
 function AppContext (props: AppContextProps) {
@@ -84,7 +87,7 @@ function AppContext (props: AppContextProps) {
     }
   }, [ props.url, error ])
 
-  return h(Ctx.Provider, { value: { user, error, logout: () => setToken(null, -1) }, children: props.children })
+  return h(Ctx.Provider, { value: { user, error, setPronouns: p => setUser({ ...user, pronouns: p } as User), logout: () => setToken(null, -1) }, children: props.children })
 }
 
 AppContext.displayName = 'AppContextWrapper'

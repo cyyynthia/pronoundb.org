@@ -19,9 +19,9 @@
     "baseUrl": "src",
     "paths": {
       "@components/*": [ "components/*" ],
-      "@styles/*": [ "styles/*" ],
       "@assets/*": [ "assets/*" ],
-      "@constants": [ "constants.ts" ]
+      "@constants": [ "constants.ts" ],
+      "@shared": [ "../../extension/shared.ts" ]
     },
 
     "jsx": "react",
@@ -33,5 +33,5 @@
     "module": "commonjs",
     "esModuleInterop": true
   },
-  "include": [ "src/**/*" ]
+  "include": [ "src/**/*", "../extension/shared.ts" ]
 }

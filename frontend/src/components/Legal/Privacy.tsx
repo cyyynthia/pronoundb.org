@@ -36,7 +36,7 @@ function Privacy (_: RoutableProps) {
     <div className='justified'>
       <div className='page-context'>Legal</div>
       <h2>Privacy Policy</h2>
-      <p>Last edited: December 8, 2020</p>
+      <p>Last edited: December 12, 2020</p>
 
       <p>
         pronoundb.org automatically collect various metadata sent by your web browser: IP address, browser information,
@@ -46,7 +46,8 @@ function Privacy (_: RoutableProps) {
       <p>
         pronoundb.org lets you connect to external accounts using the OAuth 2.0 authentication standard. When
         connecting, pronoundb.org will collect the external account's unique identifier, as well as the account
-        name. You may require the removal of this data directly on the website, by pressing the "Disconnect" button.
+        name. You may require the removal of this data directly on the website, by pressing the "Unlink" button
+        next to them, in "My account".
       </p>
       <p>
         pronoundb.org lets you submit some data through the website. All of the data you submit will be collected and

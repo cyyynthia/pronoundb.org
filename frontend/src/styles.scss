@@ -65,8 +65,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a, .link {
+  border: 0;
+  appearance: none;
+  background: none;
+  font: inherit;
   color: var(--blue);
+  cursor: pointer;
   text-decoration: none;
+  margin: 0;
+  padding: 0;
+  display: inline;
+  outline: none;
 
   &:hover {
     text-decoration: underline;
@@ -137,19 +146,6 @@ code {
   }
 }
 
-.link {
-  appearance: none;
-  background: none;
-  border: 0;
-  font: inherit;
-  color: var(--blue);
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 .page-content {
   flex: 1;
   width: 100%;
@@ -196,4 +192,14 @@ code {
     font-size: 20px;
     margin: 8px 32px;
   }
+}
+
+/* Forms */
+select {
+  padding: 4px 8px;
+  margin-bottom: 16px;
+  width: 100%;
+  outline: none;
+  font: inherit;
+  font-size: 14px;
 }

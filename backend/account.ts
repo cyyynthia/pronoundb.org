@@ -26,6 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { Pronouns } from '../extension/shared'
 
 // POST /me
 // DELETE /delete
@@ -34,11 +35,34 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 function getMe (request: FastifyRequest, reply: FastifyReply) {
   const user = (request as any).user
   reply.send({
-    pronouns: user.pronouns ?? null,
+    pronouns: user.pronouns ?? 'unspecified',
     accounts: user.accounts
   })
 }
 
+function updateMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  if (typeof request.body !== 'object' && !Object.prototype.hasOwnProperty.call(request.body, 'pronouns')) {
+    reply.code(400).send({ error: 400, message: 'Invalid form body' })
+    return
+  }
+
+  const pronouns = (request.body as Record<string, string>).pronouns
+  if (!Object.prototype.hasOwnProperty.call(Pronouns, pronouns)) {
+    reply.code(400).send({ error: 400, message: 'Invalid form body' })
+    return
+  }
+
+  this.mongo.db.collection('accounts').updateOne({ _id: this.mongo.ObjectId((request as any).user._id) }, { $set: { pronouns }})
+  reply.code(204).send()
+}
+
+function deleteMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  this.mongo.db.collection('accounts').deleteOne({ _id: this.mongo.ObjectId((request as any).user._id) })
+  reply.code(204).send()
+}
+
 export default async function (fastify: FastifyInstance) {
   fastify.get('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, getMe)
+  fastify.post('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, updateMe)
+  fastify.delete('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteMe)
 }

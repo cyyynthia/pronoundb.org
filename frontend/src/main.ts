@@ -30,6 +30,8 @@ import { h, render } from 'preact'
 import { route } from 'preact-router'
 import Root from '@components/Root'
 
+import './styles.scss'
+
 let error: number | null = null
 if (location.search) {
   const search = new URLSearchParams(location.search)

@@ -24,3 +24,32 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+export type Supported = 'discord' | 'github' | 'twitch' | 'twitter'
+
+// Contributors: please keep the list sorted alphabetically.
+export const Pronouns = Object.freeze({
+  avoid: 'Avoid, use my name',
+  hh: 'he/him',
+  hs: 'he/she',
+  ht: 'he/they',
+  sh: 'she/her',
+  st: 'she/they',
+  th: 'they/he',
+  ts: 'they/she',
+  tt: 'they/them',
+})
+
+export const PlatformNames = Object.freeze({
+  discord: 'Discord',
+  github: 'GitHub',
+  twitch: 'Twitch',
+  twitter: 'Twitter'
+})
+
+const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
+
+export const Endpoints = Object.freeze({
+  LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
+  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${ids.join(',')}`
+})

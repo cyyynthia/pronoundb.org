@@ -27,22 +27,27 @@
 
 import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
-import type { RoutableProps } from 'preact-router'
+import { useCallback, useContext } from 'preact/hooks'
 
-import { Endpoints } from '@constants'
+import { Ctx } from './AppContext'
+import { Endpoints, Routes } from '@constants'
+import { Pronouns, PlatformNames } from '@shared'
 
-interface OAuthProps extends RoutableProps {
-  intent: 'login' | 'register' | 'link'
-}
+function Me () {
+  useTitle('My account')
+  const { user, logout, setPronouns } = useContext(Ctx)
+  const deleteAccount = useCallback(function () {
+    if (confirm('Are you sure? This action is irreversible!')) {
+      fetch(Endpoints.SELF, { method: 'DELETE' }).then(() => logout())
+    }
+  }, [])
 
-const IntentTitles = {
-  login: 'Login to your account',
-  register: 'Register an account',
-  link: 'Link another account'
-}
+  const changePronouns = useCallback(function (p: string) {
+    fetch(Endpoints.SELF, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pronouns: p }) })
+    setPronouns(p)
+  }, [ setPronouns ])
 
-function OAuth (props: OAuthProps) {
-  useTitle(IntentTitles[props.intent])
+  if (!user) return null
 
   return (
     <div>
@@ -51,16 +56,35 @@ function OAuth (props: OAuthProps) {
         Hi there! You can manage the accounts you've linked to PronounDB, as well as changing your pronouns if you feel
         like it.
       </p>
-      
+      <h3>My pronouns</h3>
+      <p>
+        To avoid any form of biases, the list is sorted alphabetically. Your selection will be saved automatically.
+      </p>
+      <select value={user.pronouns} onChange={e => changePronouns((e.target as any).value)}>
+        <option value='unspecified'>Unspecified</option>
+        {Object.entries(Pronouns).map(([ id, pronouns ]) => <option key={id} value={id}>{pronouns}</option>)}
+      </select>
+      <h3>Linked accounts</h3>
+      <ul>
+        {user.accounts.map(account => (
+          <li key={account.id}>
+            {PlatformNames[account.platform]}: <b>{account.name}</b>{' - '}
+            {user.accounts.length > 1
+              ? <button className='link' onClick={() => void 0}>Unlink</button>
+              : <i>Cannot unlink your only linked account.</i>}
+          </li>
+        ))}
+        <li><a href={Routes.LINK}>Link a new account</a></li>
+      </ul>
       <h3>Delete your account</h3>
       <p>
         Want to delete your account? That's fine, I won't blame you. You can delete your account at any time by
         pressing the button below. Be careful, the action is immediate and irreversible!
       </p>
-      <button onClick={() => void 0} className='link red'>Delete my account</button>
+      <button onClick={deleteAccount} className='link red'>Delete my account</button>
     </div>
   )
 }
 
-OAuth.displayName = 'OAuth'
-export default OAuth
+Me.displayName = 'Me'
+export default Me

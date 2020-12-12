@@ -30,7 +30,6 @@ import { topics } from '../icons/twitter'
 import { h, css } from '../util'
 
 async function injectProfileHeader (header) {
-  console.dir(header)
   const pronouns = await fetchPronouns('twitter', null)
   if (pronouns) {
     const template = header.children[header.children.length - 1]
