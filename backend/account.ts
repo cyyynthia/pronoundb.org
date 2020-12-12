@@ -27,7 +27,6 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 
-// GET /me
 // POST /me
 // DELETE /delete
 // DELETE /connections/<id>

@@ -26,7 +26,7 @@
  */
 
 import { createContext, h } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
+import { useEffect, useMemo, useState } from 'preact/hooks'
 import type { ComponentChildren } from 'preact'
 
 import useCookie from '../useCookie'
@@ -41,6 +41,7 @@ interface AppContextValue {
 }
 
 interface AppContextProps {
+  url: string
   error?: number | null
   children: ComponentChildren
 }
@@ -49,6 +50,8 @@ export const Ctx = createContext<AppContextValue>({ user: null, logout: () => vo
 Ctx.displayName = 'AppContext'
 
 function AppContext (props: AppContextProps) {
+  const ogUrl = useMemo(() => props.url, [])
+  const [ error, setError ] = useState(props.error)
   const [ user, setUser ] = useState<User | false | null>(null)
   const [ token, setToken ] = useCookie('token')
 
@@ -70,7 +73,18 @@ function AppContext (props: AppContextProps) {
     }
   }, [ token, user ])
 
-  return h(Ctx.Provider, { value: { user, logout: () => setToken(null, -1), error: props.error }, children: props.children })
+  useEffect(() => {
+    if (error) {
+      if (ogUrl !== props.url) {
+        setError(null)
+        return
+      }
+      const timer = setTimeout(() => setError(null), 10e3)
+      return () => clearTimeout(timer)
+    }
+  }, [ props.url, error ])
+
+  return h(Ctx.Provider, { value: { user, error, logout: () => setToken(null, -1) }, children: props.children })
 }
 
 AppContext.displayName = 'AppContextWrapper'

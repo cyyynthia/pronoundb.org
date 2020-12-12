@@ -26,7 +26,6 @@
  */
 
 import { h } from 'preact'
-import { route } from 'preact-router'
 import type { ComponentChildren } from 'preact'
 
 import { Routes } from '@constants'
@@ -39,10 +38,11 @@ interface LayoutProps {
 }
 
 const ERRORS = [
-  'Something went wrong',
-  'Could not authenticate you with the external service due to an error',
+  'Something went wrong!',
+  'Could not authenticate you with the external service due to an error.',
   'No account was found, did you mean to create an account?',
-  'This account already exists, did you mean to login?'
+  'This account already exists, did you mean to login?',
+  'This account has already been linked to another account.'
 ]
 
 function Layout (props: LayoutProps) {

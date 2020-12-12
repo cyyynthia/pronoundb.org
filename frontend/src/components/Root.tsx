@@ -28,7 +28,7 @@
 import { h } from 'preact'
 import { useState } from 'preact/hooks'
 import { useMeta, useTitle } from 'hoofd/preact'
-import Router, { route } from 'preact-router'
+import Router from 'preact-router'
 
 import AppContext from './AppContext'
 import AuthBoundary from './AuthBoundary'
@@ -59,7 +59,7 @@ function Root (props: RootProps) {
   // useLink({ rel: 'shortcut icon', href: avatar })
 
   return (
-    <AppContext error={props.error}>
+    <AppContext url={url} error={props.error}>
       <Layout>
         <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
           <Home path={Routes.HOME}/>
@@ -72,6 +72,7 @@ function Root (props: RootProps) {
           <AuthBoundary path={Routes.LINK}>
             <OAuth intent='link'/>
           </AuthBoundary>
+
           <Docs path={Routes.DOCS}/>
           <Notice path={Routes.LEGAL}/>
           <Privacy path={Routes.PRIVACY}/>

@@ -29,7 +29,7 @@ import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-import { Endpoints, Routes } from '@constants'
+import { Endpoints } from '@constants'
 
 import mainStyles from '@styles/main.scss'
 
