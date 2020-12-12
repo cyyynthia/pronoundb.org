@@ -14,6 +14,7 @@
     "noImplicitAny": true,
     "allowUnreachableCode": false,
     "allowJs": false,
+    "skipLibCheck": true,
 
     "lib": [ "es2020.string", "es2020.bigint", "es2019.object" ],
 

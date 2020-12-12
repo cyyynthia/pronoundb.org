@@ -40,7 +40,7 @@ const { DefinePlugin, HotModuleReplacementPlugin, optimize: { LimitChunkCountPlu
 const COMMIT_HASH = require('child_process').execSync('git rev-parse HEAD').toString().trim()
 const IS_DEV = process.env.NODE_ENV === 'development'
 const SRC = join(__dirname, 'src')
-const OUT = join(__dirname, 'dist', 'web')
+const OUT = join(__dirname, '..', 'dist', 'backend', 'dist')
 
 const baseConfig = {
   mode: IS_DEV ? 'development' : 'production',
@@ -161,7 +161,7 @@ const baseConfig = {
   },
   plugins: [
     new DefinePlugin({ 'process.env.BUILD_SIDE': JSON.stringify('client') }),
-    new Manifest({ writeToFileEmit: true, fileName: join(__dirname, 'dist', 'manifest.webpack.json') }),
+    new Manifest({ writeToFileEmit: true, fileName: join(OUT, '..', 'manifest.webpack.json') }),
     !IS_DEV && {
       apply: (compiler) =>
         compiler.hooks.emit.tap('emitIntegrity', (compilation) => {
@@ -176,7 +176,7 @@ const baseConfig = {
             }
           }
 
-          const file = join(__dirname, 'dist', 'integrity.webpack.json')
+          const file = join(OUT, '..', 'integrity.webpack.json')
           writeFileSync(file, JSON.stringify(integrity, null, 2), 'utf8')
         })
     },
@@ -232,7 +232,7 @@ if (IS_DEV) {
       filename: 'html.js',
       chunkFilename: '[name].chk.js',
       libraryTarget: 'commonjs2',
-      path: join(__dirname, 'build'),
+      path: join(OUT, '..', 'build'),
       publicPath: '/dist/'
     },
     plugins: [

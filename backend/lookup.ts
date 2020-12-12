@@ -25,37 +25,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Fastify from 'fastify'
-import fastifyAuth from 'fastify-auth'
-import fastifyMongo from 'fastify-mongodb'
-import fastifyTokenize from 'fastify-tokenize'
+import type { FastifyInstance } from 'fastify'
 
-import apiModule from './api'
-import webModule from './web'
+// /lookup?platform=<platform>&id=<id>
+// /lookup-bulk?platform=<platform>&ids=<ids>
 
-const config = require('../config.json')
+// @ts-expect-error
+export default async function (fastify: FastifyInstance) {
 
-const fastify = Fastify({ logger: true })
-
-fastify.register(fastifyAuth)
-fastify.register(fastifyMongo, { url: 'mongodb://localhost:27017/pronoundb' })
-fastify.register(fastifyTokenize, {
-  secret: config.secret,
-  fastifyAuth: true,
-  cookie: false,
-  // todo: filter useful fields
-  fetchAccount: (id: string) => fastify.mongo.db.collection('accounts').findOne({ _id: id })
-})
-
-fastify.register(apiModule, { prefix: '/api/v1' })
-fastify.register(async function (fastify) {
-  fastify.get('/robots.txt', (_, reply) => void reply.type('text/plain').send('User-agent: nsa\nDisallow: /'))
-  fastify.get('*', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, webModule)
-})
-
-fastify.listen(config.port, (e) => {
-  if (e) {
-    console.error(e)
-    process.exit(1)
-  }
-})
+}

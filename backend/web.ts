@@ -25,37 +25,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Fastify from 'fastify'
-import fastifyAuth from 'fastify-auth'
-import fastifyMongo from 'fastify-mongodb'
-import fastifyTokenize from 'fastify-tokenize'
+import { h } from 'preact'
+import { render } from 'preact-render-to-string'
+import type { ComponentType } from 'preact'
+import type { FastifyReply, FastifyRequest } from 'fastify'
 
-import apiModule from './api'
-import webModule from './web'
+let manifest: Record<string, string>
+let integrity: Record<string, string>
+let Html: ComponentType<{ manifest: Record<string, string>, integrity: Record<string, string>, url: string }>
 
-const config = require('../config.json')
+if (__filename.endsWith('ts')) {
+  manifest = require('../dist/backend/manifest.webpack.json')
+  integrity = require('../dist/backend/integrity.webpack.json')
+  Html = require('../dist/backend/build/html').default
+} else {
+  manifest = require('./manifest.webpack.json')
+  integrity = require('./integrity.webpack.json')
+  Html = require('./build/html').default
+}
 
-const fastify = Fastify({ logger: true })
-
-fastify.register(fastifyAuth)
-fastify.register(fastifyMongo, { url: 'mongodb://localhost:27017/pronoundb' })
-fastify.register(fastifyTokenize, {
-  secret: config.secret,
-  fastifyAuth: true,
-  cookie: false,
-  // todo: filter useful fields
-  fetchAccount: (id: string) => fastify.mongo.db.collection('accounts').findOne({ _id: id })
-})
-
-fastify.register(apiModule, { prefix: '/api/v1' })
-fastify.register(async function (fastify) {
-  fastify.get('/robots.txt', (_, reply) => void reply.type('text/plain').send('User-agent: nsa\nDisallow: /'))
-  fastify.get('*', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, webModule)
-})
-
-fastify.listen(config.port, (e) => {
-  if (e) {
-    console.error(e)
-    process.exit(1)
-  }
-})
+export default function (request: FastifyRequest, reply: FastifyReply) {
+  reply.type('text/html')
+    .header('x-powered-by', 'potatoes')
+    .header('x-frame-options', 'DENY')
+    .header('content-security-policy', "default-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;")
+    .send(render(h(Html, { manifest, integrity, url: request.url })))
+}
