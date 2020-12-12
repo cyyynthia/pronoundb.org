@@ -39,7 +39,7 @@
   justify-content: space-between;
   align-items: center;
 
-  a + a {
+  a + a, a + .link {
     margin-left: 16px;
   }
 }
@@ -55,6 +55,25 @@
       text-decoration: none;
     }
   }
+}
+
+.link {
+  appearance: none;
+  background: none;
+  border: 0;
+  font: inherit;
+  color: var(--blue);
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.error {
+  color: #ff2e2e;
+  font-size: 18px;
+  text-align: center;
 }
 
 .content {

@@ -25,21 +25,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import 'preact/debug'
-import { h, render } from 'preact'
-import { route } from 'preact-router'
-import Root from '@components/Root'
+import fetch from 'node-fetch'
+import create from './abstract'
+import type { Self } from './abstract'
 
-let error: number | null = null
-if (location.search) {
-  const search = new URLSearchParams(location.search)
-  error = search.get('error') ? parseInt(search.get('error')!) : null
-  if (typeof error === 'number' && isNaN(error)) error = null
+const config = require('../../config.json')
+const [ clientId, clientSecret ] = config.oauth.discord
 
-  route(location.pathname)
+async function getSelf (token: string): Promise<Self> {
+  const data = await fetch('https://discord.com/api/v6/users/@me', { headers: { authorization: `Bearer ${token}` } })
+    .then(r => r.json())
+
+  return { id: data.id, name: `${data.username}#${data.discriminator}` }
 }
 
-render(
-  h(Root, { error }),
-  document.getElementById('react-root') as HTMLElement
-)
+export default create({
+  clientId,
+  clientSecret,
+  service: 'discord',
+  authorization: 'https://discord.com/oauth2/authorize',
+  token: 'https://discord.com/api/v8/oauth2/token',
+  scopes: [ 'identify' ],
+  nonceKey: 'state',
+  getSelf
+})

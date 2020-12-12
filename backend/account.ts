@@ -25,13 +25,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 
+// GET /me
 // POST /me
 // DELETE /delete
 // DELETE /connections/<id>
 
-// @ts-expect-error
-export default async function (fastify: FastifyInstance) {
+function getMe (request: FastifyRequest, reply: FastifyReply) {
+  const user = (request as any).user
+  reply.send({
+    pronouns: user.pronouns ?? null,
+    accounts: user.accounts
+  })
+}
 
+export default async function (fastify: FastifyInstance) {
+  fastify.get('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, getMe)
 }

@@ -3,7 +3,7 @@
  * @author Cynthia
  * @version 0.0.0-unknown
  * @description PronounDB plugin for BetterDiscord - Shows other's people pronouns in chat, so your chances of mis-gendering them is low. Service by pronoundb.org
- * @source https://github.com/cyyynthia/pronoundb
+ * @source https://github.com/cyyynthia/pronoundb.org
  * @website https://pronoundb.org
  * @donate https://ko-fi.com/cyyynthia
  */

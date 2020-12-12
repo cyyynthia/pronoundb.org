@@ -28,8 +28,9 @@
 import { h } from 'preact'
 import type { RoutableProps } from 'preact-router'
 
-import style from '@styles/home.scss'
 import { Routes } from '@constants'
+
+import style from '@styles/home.scss'
 
 function Home (_: RoutableProps) {
   return (

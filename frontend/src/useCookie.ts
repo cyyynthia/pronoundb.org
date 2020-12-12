@@ -25,21 +25,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import 'preact/debug'
-import { h, render } from 'preact'
-import { route } from 'preact-router'
-import Root from '@components/Root'
+import { useState } from 'preact/hooks'
 
-let error: number | null = null
-if (location.search) {
-  const search = new URLSearchParams(location.search)
-  error = search.get('error') ? parseInt(search.get('error')!) : null
-  if (typeof error === 'number' && isNaN(error)) error = null
-
-  route(location.pathname)
+export default function useCookie (cookieName: string): [ string | null, (value: string | null, maxAge?: number) => void ] {
+  if (process.env.BUILD_SIDE === 'server') {
+    // We're server-side; noop
+    return [ null, () => void 0 ]
+  } else {
+    // We're client-side
+    const rawCookie = document.cookie.split('; ').find(row => row.startsWith(cookieName))?.split('=')[1] ?? null
+    const [ cookie, setCookie ] = useState<string | null>(rawCookie)
+    return [
+      cookie,
+      (value, maxAge = 3600) => {
+        const expires = new Date(Date.now() + maxAge * 1e3).toUTCString()
+        let cookie = `${cookieName}=${value}; samesite=lax; expires=${expires}`
+        if (process.env.NODE_ENV !== 'development') cookie += '; secure=true'
+        document.cookie = cookie
+        setCookie(value)
+      }
+    ]
+  }
 }
-
-render(
-  h(Root, { error }),
-  document.getElementById('react-root') as HTMLElement
-)

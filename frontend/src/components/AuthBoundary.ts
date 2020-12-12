@@ -25,21 +25,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import 'preact/debug'
-import { h, render } from 'preact'
 import { route } from 'preact-router'
-import Root from '@components/Root'
+import { useContext, useEffect } from 'preact/hooks'
+import type { RoutableProps } from 'preact-router'
+import type { VNode } from 'preact'
 
-let error: number | null = null
-if (location.search) {
-  const search = new URLSearchParams(location.search)
-  error = search.get('error') ? parseInt(search.get('error')!) : null
-  if (typeof error === 'number' && isNaN(error)) error = null
+import { Ctx } from './AppContext'
 
-  route(location.pathname)
+function AuthBoundary (props: RoutableProps & { children: VNode }) {
+  const { user } = useContext(Ctx)
+  console.log(user)
+  useEffect(() => { if (user === false) route('/') }, [ user ])
+  return user ? props.children : null
 }
 
-render(
-  h(Root, { error }),
-  document.getElementById('react-root') as HTMLElement
-)
+AuthBoundary.displayName = 'AuthBoundary'
+export default AuthBoundary

@@ -35,9 +35,9 @@ let integrity: Record<string, string>
 let Html: ComponentType<{ manifest: Record<string, string>, integrity: Record<string, string>, url: string }>
 
 if (__filename.endsWith('ts')) {
-  manifest = require('../dist/backend/manifest.webpack.json')
-  integrity = require('../dist/backend/integrity.webpack.json')
-  Html = require('../dist/backend/build/html').default
+  manifest = require('../dist/manifest.webpack.json')
+  integrity = require('../dist/integrity.webpack.json')
+  Html = require('../dist/build/html').default
 } else {
   manifest = require('./manifest.webpack.json')
   integrity = require('./integrity.webpack.json')

@@ -28,6 +28,7 @@
 import Fastify from 'fastify'
 import fastifyAuth from 'fastify-auth'
 import fastifyMongo from 'fastify-mongodb'
+import fastifyCookie from 'fastify-cookie'
 import fastifyTokenize from 'fastify-tokenize'
 
 import apiModule from './api'
@@ -38,13 +39,19 @@ const config = require('../config.json')
 const fastify = Fastify({ logger: true })
 
 fastify.register(fastifyAuth)
+fastify.register(fastifyCookie)
 fastify.register(fastifyMongo, { url: 'mongodb://localhost:27017/pronoundb' })
 fastify.register(fastifyTokenize, {
   secret: config.secret,
   fastifyAuth: true,
-  cookie: false,
+  header: false,
+  cookie: 'token',
   // todo: filter useful fields
-  fetchAccount: (id: string) => fastify.mongo.db.collection('accounts').findOne({ _id: id })
+  fetchAccount: async (id: string) => {
+    const user = await fastify.mongo.db.collection('accounts').findOne({ _id: fastify.mongo.ObjectId(id) })
+    if (user) user.lastTokenReset = 0
+    return user
+  }
 })
 
 fastify.register(apiModule, { prefix: '/api/v1' })

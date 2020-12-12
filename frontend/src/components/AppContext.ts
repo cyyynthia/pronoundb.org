@@ -25,21 +25,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import 'preact/debug'
-import { h, render } from 'preact'
-import { route } from 'preact-router'
-import Root from '@components/Root'
+import { createContext, h } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
+import type { ComponentChildren } from 'preact'
 
-let error: number | null = null
-if (location.search) {
-  const search = new URLSearchParams(location.search)
-  error = search.get('error') ? parseInt(search.get('error')!) : null
-  if (typeof error === 'number' && isNaN(error)) error = null
+import useCookie from '../useCookie'
 
-  route(location.pathname)
+import { Endpoints } from '@constants'
+
+type User = { pronouns: number | null, accounts: string[] }
+interface AppContextValue {
+  user: User | false | null
+  logout: () => void
+  error?: number | null
 }
 
-render(
-  h(Root, { error }),
-  document.getElementById('react-root') as HTMLElement
-)
+interface AppContextProps {
+  error?: number | null
+  children: ComponentChildren
+}
+
+export const Ctx = createContext<AppContextValue>({ user: null, logout: () => void 0, error: null })
+Ctx.displayName = 'AppContext'
+
+function AppContext (props: AppContextProps) {
+  const [ user, setUser ] = useState<User | false | null>(null)
+  const [ token, setToken ] = useCookie('token')
+
+  useEffect(() => {
+    if (!token) {
+      setUser(false)
+    } else if (!user) {
+      fetch(Endpoints.SELF, { headers: { authorization: token } }).then(r => r.json()).then(u => {
+        if (u.error) {
+          setUser(false)
+          setToken(null, -1)
+        } else {
+          setUser(u)
+        }
+      }).catch(() => {
+        setUser(false)
+        setToken(null, -1)
+      })
+    }
+  }, [ token, user ])
+
+  return h(Ctx.Provider, { value: { user, logout: () => setToken(null, -1), error: props.error }, children: props.children })
+}
+
+AppContext.displayName = 'AppContextWrapper'
+export default AppContext

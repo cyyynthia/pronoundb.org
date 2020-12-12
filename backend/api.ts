@@ -35,5 +35,5 @@ export default async function (fastify: FastifyInstance) {
   fastify.register(oauthModule, { prefix: '/oauth' })
   fastify.register(accountModule, { prefix: '/accounts' })
   fastify.register(lookupModule)
+  fastify.get('*', (_, reply) => void reply.send({ error: 404, message: 'Not Found' }))
 }
-

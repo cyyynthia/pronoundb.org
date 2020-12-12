@@ -28,10 +28,13 @@
 import { h } from 'preact'
 import { useState } from 'preact/hooks'
 import { useMeta, useTitle } from 'hoofd/preact'
-import Router from 'preact-router'
+import Router, { route } from 'preact-router'
 
+import AppContext from './AppContext'
+import AuthBoundary from './AuthBoundary'
 import Layout from './Layout'
 import Home from './Home'
+import OAuth from './OAuth'
 import Docs from './Docs'
 import Notice from './Legal/Notice'
 import Privacy from './Legal/Privacy'
@@ -41,6 +44,7 @@ import '@styles/main.scss'
 
 interface RootProps {
   url?: string
+  error?: number | null
 }
 
 function Root (props: RootProps) {
@@ -55,14 +59,25 @@ function Root (props: RootProps) {
   // useLink({ rel: 'shortcut icon', href: avatar })
 
   return (
-    <Layout>
-      <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
-        <Home path={Routes.HOME}/>
-        <Docs path={Routes.DOCS}/>
-        <Notice path={Routes.LEGAL}/>
-        <Privacy path={Routes.PRIVACY}/>
-      </Router>
-    </Layout>
+    <AppContext error={props.error}>
+      <Layout>
+        <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
+          <Home path={Routes.HOME}/>
+          <OAuth path={Routes.LOGIN} intent='login'/>
+          <OAuth path={Routes.REGISTER} intent='register'/>
+
+          <AuthBoundary path={Routes.ME}>
+            <p>a</p>
+          </AuthBoundary>
+          <AuthBoundary path={Routes.LINK}>
+            <OAuth intent='link'/>
+          </AuthBoundary>
+          <Docs path={Routes.DOCS}/>
+          <Notice path={Routes.LEGAL}/>
+          <Privacy path={Routes.PRIVACY}/>
+        </Router>
+      </Layout>
+    </AppContext>
   )
 }
 

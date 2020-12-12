@@ -40,7 +40,7 @@ const { DefinePlugin, HotModuleReplacementPlugin, optimize: { LimitChunkCountPlu
 const COMMIT_HASH = require('child_process').execSync('git rev-parse HEAD').toString().trim()
 const IS_DEV = process.env.NODE_ENV === 'development'
 const SRC = join(__dirname, 'src')
-const OUT = join(__dirname, '..', 'dist', 'backend', 'dist')
+const OUT = join(__dirname, '..', 'dist', 'dist')
 
 const baseConfig = {
   mode: IS_DEV ? 'development' : 'production',
@@ -202,7 +202,8 @@ const baseConfig = {
     quiet: true,
     publicPath: '/dist/',
     contentBase: __dirname,
-    historyApiFallback: true
+    historyApiFallback: true,
+    proxy: { '/api': `http://localhost:${require('../config.json').port}/` }
   }
 }
 

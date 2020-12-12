@@ -26,16 +26,28 @@
  */
 
 import { h } from 'preact'
+import { route } from 'preact-router'
 import type { ComponentChildren } from 'preact'
 
 import { Routes } from '@constants'
 import style from '@styles/layout.scss'
+import { useContext } from 'preact/hooks'
+import { Ctx } from './AppContext'
 
 interface LayoutProps {
   children: ComponentChildren
 }
 
+const ERRORS = [
+  'Something went wrong',
+  'Could not authenticate you with the external service due to an error',
+  'No account was found, did you mean to create an account?',
+  'This account already exists, did you mean to login?'
+]
+
 function Layout (props: LayoutProps) {
+  const { user, logout, error } = useContext(Ctx)
+
   return (
     <div className={style.container}>
       <header className={style.header}>
@@ -43,11 +55,14 @@ function Layout (props: LayoutProps) {
           <a href={Routes.HOME}>PronounDB</a>
         </div>
         <div className={style.links}>
-          <a href={Routes.LOGIN}>Login</a>
-          <a href={Routes.REGISTER}>Create account</a>
+          {!user && <a href={Routes.LOGIN}>Login</a>}
+          {!user && <a href={Routes.REGISTER}>Create account</a>}
+          {user && <a href={Routes.ME}>My account</a>}
+          {user && <button className={style.link} onClick={logout}>Logout</button>}
         </div>
       </header>
       <main className={style.content}>
+        {typeof error === 'number' && <div className={style.error}>{ERRORS[error]}</div>}
         {props.children}
       </main>
       <footer className={style.footer}>

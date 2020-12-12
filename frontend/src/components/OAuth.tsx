@@ -25,21 +25,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import 'preact/debug'
-import { h, render } from 'preact'
-import { route } from 'preact-router'
-import Root from '@components/Root'
+import { h } from 'preact'
+import { useTitle } from 'hoofd/preact'
+import type { RoutableProps } from 'preact-router'
 
-let error: number | null = null
-if (location.search) {
-  const search = new URLSearchParams(location.search)
-  error = search.get('error') ? parseInt(search.get('error')!) : null
-  if (typeof error === 'number' && isNaN(error)) error = null
+import { Endpoints, Routes } from '@constants'
 
-  route(location.pathname)
+import mainStyles from '@styles/main.scss'
+
+interface OAuthProps extends RoutableProps {
+  intent: 'login' | 'register' | 'link'
 }
 
-render(
-  h(Root, { error }),
-  document.getElementById('react-root') as HTMLElement
-)
+const IntentTitles = {
+  login: 'Login to your account',
+  register: 'Register an account',
+  link: 'Link another account'
+}
+
+function OAuth (props: OAuthProps) {
+  useTitle(IntentTitles[props.intent])
+
+  return (
+    <div>
+      <div className={mainStyles.context}>Authentication</div>
+      <h2>{IntentTitles[props.intent]}</h2>
+      <p>Select an authentication provider. You will be redirected to the platform you selected to perform the authentication.</p>
+      {props.intent === 'register' && <p>Make sure to select an account you already linked on PronounDB.</p>}
+      <ul>
+        {/* @ts-expect-error */}
+        <li><a native href={Endpoints.OAUTH('discord', props.intent)}>Discord</a></li>
+      </ul>
+    </div>
+  )
+}
+
+OAuth.displayName = 'OAuth'
+export default OAuth

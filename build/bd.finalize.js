@@ -3,7 +3,7 @@ const { readFileSync, writeFileSync } = require('fs')
 const { version } = require('../package.json')
 
 const templatePath = join(__dirname, 'bd.template.js')
-const pluginPath = join(__dirname, '..', 'dist', 'bd', 'PronounDB.plugin.js')
+const pluginPath = join(__dirname, '..', 'dist', 'plugins', 'PronounDB.plugin.js')
 
 const template = readFileSync(templatePath, 'utf8')
 const plugin = readFileSync(pluginPath, 'utf8')

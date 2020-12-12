@@ -27,10 +27,8 @@
 
 import type { FastifyInstance } from 'fastify'
 
-// /<service>/authorize
-// /<service>/callback
+import discordModule from './oauth/discord'
 
-// @ts-expect-error
 export default async function (fastify: FastifyInstance) {
-
+  fastify.register(discordModule, { prefix: '/discord' })
 }

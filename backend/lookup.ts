@@ -30,7 +30,6 @@ import type { FastifyInstance } from 'fastify'
 // /lookup?platform=<platform>&id=<id>
 // /lookup-bulk?platform=<platform>&ids=<ids>
 
-// @ts-expect-error
 export default async function (fastify: FastifyInstance) {
 
 }

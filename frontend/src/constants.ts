@@ -30,10 +30,16 @@ export const Routes = Object.freeze({
   LOGIN: '/login',
   REGISTER: '/register',
   ME: '/me',
+  LINK: '/link',
   DOCS: '/docs',
   LEGAL: '/legal',
   PRIVACY: '/privacy',
   GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
   CHROME_EXT: '',
   FIREFOX_ADDON: ''
+})
+
+export const Endpoints = Object.freeze({
+  OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
+  SELF: '/api/v1/accounts/me'
 })
