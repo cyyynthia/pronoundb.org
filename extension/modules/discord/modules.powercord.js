@@ -56,10 +56,6 @@ export function exporter (exp) {
 
     pluginWillUnload () {
       injections.forEach(i => porkordUninject(i))
-      const Message = getModule([ 'MESSAGE_ID_PREFIX' ], false)
-      if (Message?.default.OriginalMessage) {
-        Message.default = Message.default.OriginalMessage 
-      }
     }
   }
 
@@ -72,12 +68,10 @@ export async function getModules () {
   const fnUserPopOut = await getModuleByDisplayName('UserPopout')
   const FluxAppearance = await getModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
   const MessageHeader = await getModule([ 'MessageTimestamp' ])
-  const Message = await getModule([ 'MESSAGE_ID_PREFIX' ])
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
     React,
-    Message: Message,
     Messages: extractMessages(React, fnMessagesWrapper.type),
     MessageHeader,
     UserProfileBody,

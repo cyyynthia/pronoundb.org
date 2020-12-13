@@ -67,12 +67,10 @@ export async function getModules () {
   const fnUserPopOut = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserPopout', [ 'exports', 'default' ])
   const FluxAppearance = await fetchWebpack(m => m?.exports?.default?.displayName === 'FluxContainer(UserSettingsAppearance)', [ 'exports', 'default' ])
   const MessageHeader = await fetchWebpack(m => m?.exports?.MessageTimestamp, [ 'exports' ])
-  const Message = await fetchWebpack(m => m?.exports?.MESSAGE_ID_PREFIX, [ 'exports' ])
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
     React,
-    Message: Message,
     Messages: extractMessages(React, fnMessagesWrapper.type),
     MessageHeader,
     UserProfileBody,

@@ -30,11 +30,11 @@ import { fetchPronouns, fetchPronounsBulk } from '../../fetch'
 
 exporter(
   async function (settings) {
-    const { React, Message, Messages, MessageHeader, AppearanceSettings, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
+    const { React, Messages, MessageHeader, AppearanceSettings, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
 
     const PronounsWrapper = React.memo(
       props => {
-        const [ allPronouns, setPronouns ] = React.useState({})
+        const [ pronouns, setPronouns ] = React.useState({})
         React.useEffect(() => {
           const toFetch = [ ...new Set(props.items.filter(i => i.props.message && !i.props.message.author.bot).map(i => i.props.message.author.id)) ]
           fetchPronounsBulk('discord', toFetch).then(setPronouns)
@@ -44,20 +44,22 @@ exporter(
           const res = []
           for (const i of props.items) {
             const authorId = i.props.message?.author.id
-            res.push(
-              authorId && allPronouns[authorId]
-                ? React.cloneElement(i, { __$pronouns: allPronouns[authorId] })
-                : i
-            )
+            if (authorId && pronouns[authorId]) {
+              const message = window._.clone(i.props.message)
+              message.__$pronouns = pronouns[authorId]
+              res.push(React.cloneElement(i, { message }))
+            } else {
+              res.push(i)
+            }
           }
           return res
-        }, [ props.items, allPronouns ])
+        }, [ props.items, pronouns ])
 
         return React.createElement(React.Fragment, null, ...elements)
       }
     )
 
-    inject(Messages, 'type', function (args, res) {
+    inject(Messages, 'type', function (_, res) {
       const ogFn = res.props.children.props.children[1].props.children
       res.props.children.props.children[1].props.children = function (e) {
         const res = ogFn(e)
@@ -68,29 +70,10 @@ exporter(
       return res
     })
 
-    const og = Message.default
-    Message.default = React.memo(
-      props => {
-        const res = og.type(props)
-        if (props.__$pronouns) {
-          const og = res.props.childrenHeader.type
-          res.props.childrenHeader.type = function (p) {
-            const res = og.type(p)
-            if (res.type !== 'span') {
-              res.props.__$pronouns = props.__$pronouns
-            }
-            return res
-          }
-        }
-        return res
-      }
-    )
-    Message.default.OriginalMessage = og
-
     inject(MessageHeader, 'default', function ([ props ], res) {
-      if (props.__$pronouns) {
+      if (props.message.__$pronouns) {
         res.props.children[1].props.children.push(
-          React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem', marginRight: props.compact ? '.6rem' : '' } }, ' • ', props.__$pronouns)
+          React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem', marginRight: props.compact ? '.6rem' : '' } }, ' • ', props.message.__$pronouns)
         )
       }
       return res

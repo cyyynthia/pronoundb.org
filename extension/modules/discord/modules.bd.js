@@ -68,8 +68,6 @@ export function exporter (exp) {
 
     stop () {
       injections.forEach(i => i())
-      const Message = BdApi.findModuleByProps('MESSAGE_ID_PREFIX')
-      Message.default = Message.default.OriginalMessage
     }
   }
 
@@ -82,12 +80,10 @@ export async function getModules () {
   const fnUserPopOut = BdApi.findModuleByDisplayName('UserPopout')
   const FluxAppearance = BdApi.findModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
   const MessageHeader = BdApi.findModuleByProps('MessageTimestamp')
-  const Message = BdApi.findModuleByProps('MESSAGE_ID_PREFIX')
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
     React: BdApi.React,
-    Message: Message,
     Messages: extractMessages(React, fnMessagesWrapper.type),
     MessageHeader,
     UserProfileBody,
