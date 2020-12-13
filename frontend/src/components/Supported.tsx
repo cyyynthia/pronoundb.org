@@ -25,12 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h, Fragment } from 'preact'
+import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
-
-import { Supported as Platforms, Pronouns } from '@shared'
-import githubPreview from '@assets/github-preview.png'
 
 function Supported (_: RoutableProps) {
   useTitle('Supported Platforms')

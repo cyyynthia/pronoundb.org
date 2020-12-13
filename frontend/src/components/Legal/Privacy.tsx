@@ -56,6 +56,16 @@ function Privacy (_: RoutableProps) {
         stored. You may update it or remove it at any time on the website.
       </p>
       <p>
+        Third parties will be able to lookup the information you submitted on the website based on your linked
+        external accounts. Third parties will not be able to enumerate your linked accounts, and absolutely no
+        information provided by pronoundb.org can be used to personally identify you.
+      </p>
+      <p>
+        pronoundb.org may distribute aggregated information, such as the total user count or some statistics about
+        website usage, or percentages about the user repartition. In all cases, pronoundb.org will never specify who
+        is included in aggregated information.
+      </p>
+      <p>
         You may request the entire removal of your data from pronoundb.org's servers by deleting your account. Your
         data will be dropped immediately, but may still live for an additional thirty days on our servers in the
         form of database backups.
