@@ -68,7 +68,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     return
   }
 
-  const ids = query.ids.split(',')
+  const ids = query.ids.split(',').slice(0, 50)
   const accounts = await this.mongo.db.collection('accounts').find(
     { accounts: { $elemMatch: { platform: query.platform, id: { $in: ids } } } },
     { accounts: 1, pronouns: 1 }

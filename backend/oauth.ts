@@ -28,7 +28,11 @@
 import type { FastifyInstance } from 'fastify'
 
 import discordModule from './oauth/discord'
+import githubModule from './oauth/github'
+import twitchModule from './oauth/twitch'
 
 export default async function (fastify: FastifyInstance) {
   fastify.register(discordModule, { prefix: '/discord' })
+  fastify.register(githubModule, { prefix: '/github' })
+  fastify.register(twitchModule, { prefix: '/twitch' })
 }

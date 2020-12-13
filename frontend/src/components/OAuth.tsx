@@ -52,7 +52,11 @@ function OAuth (props: OAuthProps) {
       {props.intent === 'register' && <p>Make sure to select an account you already linked on PronounDB.</p>}
       <ul>
         {/* @ts-expect-error */}
+        <li><a native href={Endpoints.OAUTH('github', props.intent)}>GitHub</a></li>
+        {/* @ts-expect-error */}
         <li><a native href={Endpoints.OAUTH('discord', props.intent)}>Discord</a></li>
+        {/* @ts-expect-error */}
+        <li><a native href={Endpoints.OAUTH('twitch', props.intent)}>Twitch</a></li>
       </ul>
     </div>
   )

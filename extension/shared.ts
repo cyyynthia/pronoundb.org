@@ -31,6 +31,7 @@ export const Supported = [ 'discord', 'github', 'twitch', 'twitter' ]
 
 // Contributors: please keep the list sorted alphabetically.
 export const Pronouns = Object.freeze({
+  unspecified: null,
   avoid: 'Avoid, use my name',
   hh: 'he/him',
   hs: 'he/she',
@@ -53,5 +54,5 @@ const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080'
 
 export const Endpoints = Object.freeze({
   LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${ids.join(',')}`
+  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`
 })

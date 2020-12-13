@@ -46,6 +46,5 @@ export default create({
   authorization: 'https://discord.com/oauth2/authorize',
   token: 'https://discord.com/api/v8/oauth2/token',
   scopes: [ 'identify' ],
-  nonceKey: 'state',
   getSelf
 })

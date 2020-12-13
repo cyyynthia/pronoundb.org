@@ -25,22 +25,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Routes = Object.freeze({
-  HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  ME: '/me',
-  LINK: '/link',
-  DOCS: '/docs',
-  LEGAL: '/legal',
-  PRIVACY: '/privacy',
-  GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
-  CHROME_EXT: '',
-  FIREFOX_ADDON: ''
-})
+import fetch from 'node-fetch'
+import create from './abstract'
+import type { Self } from './abstract'
 
-export const Endpoints = Object.freeze({
-  SELF: '/api/v1/accounts/me',
-  OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
-  CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`
+const config = require('../../config.json')
+const [ clientId, clientSecret ] = config.oauth.github
+
+async function getSelf (token: string): Promise<Self> {
+  const data = await fetch('https://api.github.com/user', {
+    headers: {
+      accept: 'application/vnd.github.v3+json',
+      authorization: `token ${token}`
+    }
+  }).then(r => r.json())
+
+  return { id: data.id.toString(), name: data.name || data.login }
+}
+
+export default create({
+  clientId,
+  clientSecret,
+  platform: 'github',
+  authorization: 'https://github.com/login/oauth/authorize',
+  token: 'https://github.com/login/oauth/access_token',
+  scopes: [],
+  getSelf
 })

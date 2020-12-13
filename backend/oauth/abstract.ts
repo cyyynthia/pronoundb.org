@@ -47,7 +47,7 @@ export interface OAuthDescriptor {
 
 export default function (oauth: OAuthDescriptor) {
   return async function (fastify: FastifyInstance) {
-    const nonceKey = oauth.nonceKey ?? 'nonce'
+    const nonceKey = oauth.nonceKey ?? 'state'
     const nonces = new Set()
 
     function authorize (request: FastifyRequest, reply: FastifyReply) {
@@ -55,6 +55,10 @@ export default function (oauth: OAuthDescriptor) {
       const intent = query.intent ?? 'login'
       if (Object.prototype.hasOwnProperty.call(request, 'user') && intent !== 'link') {
         reply.redirect('/me')
+        return
+      }
+      if (!Object.prototype.hasOwnProperty.call(request, 'user') && intent === 'link') {
+        reply.redirect('/')
         return
       }
 
@@ -68,7 +72,7 @@ export default function (oauth: OAuthDescriptor) {
         scope: oauth.scopes.join(' '),
         response_type: 'code',
         client_id: oauth.clientId,
-        redirect_uri: `${config.host}${redirect}`,
+        redirect_uri: `${config.host}${redirect}`
       })
 
       reply.setCookie('nonce', nonce, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
@@ -93,8 +97,12 @@ export default function (oauth: OAuthDescriptor) {
       try {
         const token = await fetch(oauth.token, {
           method: 'POST',
-          headers: { 'content-type': 'application/x-www-form-urlencoded' },
+          headers: {
+            accept: 'application/json',
+            'content-type': 'application/x-www-form-urlencoded'
+          },
           body: encode({
+            [nonceKey]: query[nonceKey],
             client_id: oauth.clientId,
             client_secret: oauth.clientSecret,
             redirect_uri: `${config.host}${request.routerPath}`,
@@ -155,7 +163,7 @@ export default function (oauth: OAuthDescriptor) {
       reply.setCookie('token', tok, { maxAge: 365 * 24 * 3600, path: '/' }).redirect(`/me`)
     }
 
-    fastify.get('/authorize', authorize)
-    fastify.get('/callback', callback)
+    fastify.get('/authorize', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, authorize)
+    fastify.get('/callback', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, callback)
   }
 }

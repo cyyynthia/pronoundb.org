@@ -25,22 +25,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Routes = Object.freeze({
-  HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  ME: '/me',
-  LINK: '/link',
-  DOCS: '/docs',
-  LEGAL: '/legal',
-  PRIVACY: '/privacy',
-  GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
-  CHROME_EXT: '',
-  FIREFOX_ADDON: ''
-})
+import fetch from 'node-fetch'
+import create from './abstract'
+import type { Self } from './abstract'
 
-export const Endpoints = Object.freeze({
-  SELF: '/api/v1/accounts/me',
-  OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
-  CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`
+const config = require('../../config.json')
+const [ clientId, clientSecret ] = config.oauth.twitch
+
+async function getSelf (token: string): Promise<Self> {
+  const data = await fetch('https://api.twitch.tv/helix/users', {
+    headers: {
+      authorization: `Bearer ${token}`,
+      'client-id': clientId
+    }
+  }).then(r => r.json())
+
+  return { id: data.data[0].id, name: data.data[0].display_name }
+}
+
+export default create({
+  clientId,
+  clientSecret,
+  platform: 'twitch',
+  authorization: 'https://id.twitch.tv/oauth2/authorize',
+  token: 'https://id.twitch.tv/oauth2/token',
+  scopes: [],
+  getSelf
 })

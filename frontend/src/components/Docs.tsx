@@ -52,27 +52,33 @@ function Docs (_: RoutableProps) {
       <div>
         <b>Pronouns:</b> Short identifier for a set of pronouns. Here are the valid identifiers:
         <ul>
-          <li><code>unspecified</code>: Unspecified</li>
-          {Object.entries(Pronouns).map(([ id, pronouns ]) => <li key={id}><code>{id}</code>: {pronouns}</li>)}
+          {Object.entries(Pronouns).map(([ id, pronouns ]) => <li key={id}><code>{id}</code>: {pronouns ?? 'Unspecified'}</li>)}
         </ul>
       </div>
       <h3>Lookup an account</h3>
       <div>
-        <p>GET /api/v1/lookup?platform=&lt;platform&gt;&amp;id=&lt;id&gt;</p>
+        <p>GET /api/v1/lookup</p>
+        <p>Query parameters</p>
         <ul>
-          <li><b>platform</b>: Either <SupportedFragment/></li>
-          <li><b>id</b>: Account ID (not the username!)</li>
+          <li><b>platform</b>: A supported platform as described above</li>
+          <li><b>id</b>: Account ID on the platform</li>
+        </ul>
+        <p>Response: 404 if not found, 200 otherwise with the following payload</p>
+        <ul>
+          <li><b>pronouns</b>: Short identifier as defined above</li>
         </ul>
       </div>
 
       <h3>Lookup accounts in bulk</h3>
       <div>
-        <p>GET /api/v1/lookup-bulk?platform=&lt;platform&gt;&amp;ids=&lt;ids&gt;</p>
+        <p>GET /api/v1/lookup-bulk</p>
         <p>Note: you can only lookup multiple account for a single platform.</p>
+        <p>Query parameters</p>
         <ul>
-          <li><b>platform</b>: Either <SupportedFragment/></li>
+          <li><b>platform</b>: A supported platform as described above</li>
           <li><b>ids</b>: Comma-separated Account IDs, will be cropped to 50 max</li>
         </ul>
+        <p>Response: A map of IDs with their corresponding set of pronouns. IDs not found will not be included.</p>
       </div>
     </div>
   )
