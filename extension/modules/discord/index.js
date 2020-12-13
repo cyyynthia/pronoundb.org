@@ -47,7 +47,7 @@ exporter(
       const res = MessageHeaderWithPronouns.MessageHeader.call(null, props)
       if (pronouns && showInChat) {
         res.props.children[1].props.children.push(
-          React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem' } }, ' • ', pronouns)
+          React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem', marginRight: props.compact ? '.6rem' : '' } }, ' • ', pronouns)
         )
       }
       return res
