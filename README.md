@@ -2,7 +2,7 @@
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G71TSDF)<br>
 [![License](https://img.shields.io/github/license/cyyynthia/pronoundb.org.svg?style=flat-square)](https://github.com/cyyynthia/pronoundb.org/blob/mistress/LICENSE)
 
-A Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet, so
+A Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet, so
 mistakes are less likely to happen. Link your accounts, set your pronouns and magically fellow PronounDB users will
 know your pronouns. Simple, efficient. Check it out at https://pronoundb.org!
 

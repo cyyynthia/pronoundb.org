@@ -54,8 +54,8 @@ function Root (props: RootProps) {
   // useMeta({ name: 'og:image', content: avatar })
   useMeta({ name: 'og:title', content: 'PronounDB' })
   useMeta({ name: 'og:site_name', content: 'PronounDB' })
-  useMeta({ name: 'og:description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
-  useMeta({ name: 'description', content: 'Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet' })
+  useMeta({ name: 'og:description', content: 'Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet' })
+  useMeta({ name: 'description', content: 'Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet' })
   // useLink({ rel: 'shortcut icon', href: avatar })
 
   return (
