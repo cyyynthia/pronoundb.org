@@ -53,7 +53,9 @@ function Privacy (_: RoutableProps) {
       </p>
       <p>
         pronoundb.org lets you submit some data through the website. All of the data you submit will be collected and
-        stored. You may update it or remove it at any time on the website.
+        stored. You can update it or remove it at any time on the website. You may during your use of pronoundb.org
+        be invited to input information regarding your gender identity. By submitting any information on the website,
+        you consent to your data to be stored and processed by pronoundb.org to provide its service.
       </p>
       <p>
         Third parties will be able to lookup the information you submitted on the website based on your linked

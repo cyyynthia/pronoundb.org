@@ -29,7 +29,7 @@ import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-import { Endpoints } from '@constants'
+import { Endpoints, Routes } from '@constants'
 import { PlatformNames, Supported } from '@shared'
 
 interface OAuthProps extends RoutableProps {
@@ -50,7 +50,8 @@ function OAuth (props: OAuthProps) {
       <div className='page-context'>Authentication</div>
       <h2>{IntentTitles[props.intent]}</h2>
       <p>Select an authentication provider. You will be redirected to the platform you selected to perform the authentication.</p>
-      {props.intent === 'register' && <p>Make sure to select an account you already linked on PronounDB.</p>}
+      {props.intent === 'login' && <p>Make sure to select an account you already linked on PronounDB.</p>}
+      {props.intent === 'register' && <p>Make sure to give the <a href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of those.</p>}
       <ul>
         {Supported.map(s => (
           <li>

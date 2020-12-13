@@ -34,8 +34,9 @@ import useCookie from '../useCookie'
 import { Endpoints } from '@constants'
 import { Platforms } from '@shared'
 
-interface Account { platform: Platforms, id: string, name: string }
-interface User { pronouns: string, accounts: Account[] }
+export interface Account { platform: Platforms, id: string, name: string }
+export interface User { pronouns: string, accounts: Account[] }
+
 interface AppContextValue {
   user: User | false | null
   error?: number | null
@@ -59,6 +60,15 @@ export const Ctx = createContext<AppContextValue>({
 })
 Ctx.displayName = 'AppContext'
 
+function sortAccounts (acc1: Account, acc2: Account) {
+  const res = acc1.platform.localeCompare(acc2.platform)
+  if (res === 0) {
+    const max = Math.max(acc1.id.length, acc2.id.length)
+    return acc1.id.padStart(max, '0').localeCompare(acc2.platform.padStart(max, '0'))
+  }
+  return res
+}
+
 function AppContext (props: AppContextProps) {
   const ogUrl = useMemo(() => props.url, [])
   const [ error, setError ] = useState(props.error)
@@ -74,6 +84,7 @@ function AppContext (props: AppContextProps) {
           setUser(false)
           setToken(null, -1)
         } else {
+          u.accounts.sort(sortAccounts)
           setUser(u)
         }
       }).catch(() => {

@@ -36,6 +36,7 @@ import { Pronouns, PlatformNames } from '@shared'
 function Me () {
   useTitle('My account')
   const { user, logout, setPronouns, unlinkAccount } = useContext(Ctx)
+
   const deleteAccount = useCallback(function () {
     if (confirm('Are you sure? This action is irreversible!')) {
       fetch(Endpoints.SELF, { method: 'DELETE' }).then(() => logout())
