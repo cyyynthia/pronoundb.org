@@ -32,7 +32,7 @@ import { get as porkordFetch } from 'powercord/http'
 
 import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
-fetchPronouns[symbolHttp] = (url) => porkordFetch(url).then(r => r.body)
+fetchPronouns[symbolHttp] = (url) => porkordFetch(url).set('x-pronoundb-source', 'Powercord (v0.0.0-unknown)').then(r => r.body)
 
 const injections = []
 export function inject (mdl, meth, repl) {

@@ -29,60 +29,40 @@ import { h, Fragment } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
-import { Supported, Pronouns } from '@shared'
+import { Supported as Platforms, Pronouns } from '@shared'
+import githubPreview from '@assets/github-preview.png'
 
-const SupportedFragment = () => {
- const items = Supported.map(s => [ <code>{s}</code>, ', ' ])
- items[items.length - 2][1] = ', or '
- items[items.length - 1][1] = ''
- return h(Fragment, null, ...items)
-}
-
-function Docs (_: RoutableProps) {
-  useTitle('API Docs')
+function Supported (_: RoutableProps) {
+  useTitle('Supported Platforms')
 
   return (
     <div>
       <div className='page-context'>About PronounDB</div>
-      <h2>API Documentation</h2>
-      <h3>Types</h3>
-      <div>
-        <b>Platform:</b> <SupportedFragment/>
-      </div>
-      <div>
-        <b>Pronouns:</b> Short identifier for a set of pronouns. Here are the valid identifiers:
-        <ul>
-          {Object.entries(Pronouns).map(([ id, pronouns ]) => <li key={id}><code>{id}</code>: {pronouns ?? 'Unspecified'}</li>)}
-        </ul>
-      </div>
-      <h3>Lookup an account</h3>
-      <div>
-        <p>GET /api/v1/lookup</p>
-        <p>Query parameters</p>
-        <ul>
-          <li><b>platform</b>: A supported platform as described above</li>
-          <li><b>id</b>: Account ID on the platform</li>
-        </ul>
-        <p>Response: 404 if not found, 200 otherwise with the following payload</p>
-        <ul>
-          <li><b>pronouns</b>: Short identifier as defined above</li>
-        </ul>
-      </div>
-
-      <h3>Lookup accounts in bulk</h3>
-      <div>
-        <p>GET /api/v1/lookup-bulk</p>
-        <p>Note: you can only lookup multiple account for a single platform.</p>
-        <p>Query parameters</p>
-        <ul>
-          <li><b>platform</b>: A supported platform as described above</li>
-          <li><b>ids</b>: Comma-separated Account IDs, will be cropped to 50 max</li>
-        </ul>
-        <p>Response: A map of IDs with their corresponding set of pronouns. IDs not found will not be included.</p>
-      </div>
+      <h2>Supported platforms</h2>
+      <p>
+        PronounDB aims to support a wide range of platforms, to help as many people as possible to share their pronouns
+        online. Here's the list of services supported, previews are coming soon!
+      </p>
+      <ul>
+        <li>Discord</li>
+        <li>GitHub</li>
+        <li>Twitch</li>
+      </ul>
+      <p>
+        Support coming soon:
+      </p>
+      <ul>
+        <li>Twitter</li>
+        <li>Mastodon</li>
+        <li>GitLab</li>
+        <li>Reddit</li>
+      </ul>
+      <p>
+        Want to see another service supported? Shoot an issue on our issue tracker!
+      </p>
     </div>
   )
 }
 
-Docs.displayName = 'Docs'
-export default Docs
+Supported.displayName = 'Supported'
+export default Supported

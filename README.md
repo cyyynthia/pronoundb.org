@@ -13,14 +13,14 @@ at and finds a balance between ease to find and doing too much.
  - GitHub
  - Discord (Web)
    - Exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
-   - Exists as a [plugin](https://cdn.cynthia.dev/ci/PronounDB.plugin.js) for [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp)
- - Twitter
+   - Exists as a [plugin](https://cdn.cynthia.dev/pronoundb/PronounDB.plugin.js) for [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp)
  - Twitch
 
 **Support coming soon:tm: for:**
- - Reddit
+ - Twitter
  - Mastodon
  - GitLab
+ - Reddit
 
 Want to see another service supported? Shoot an issue!
 

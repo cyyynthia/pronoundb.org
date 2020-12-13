@@ -29,12 +29,16 @@ import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUser
 import { fetchPronouns, symbolHttp } from '../../fetch'
 fetchPronouns[symbolHttp] = function (url) {
   return new Promise(resolve => {
-    require('https').get(url, res => {
-      let data = ''
-      res.setEncoding('utf8')
-      res.on('data', d => data += d)
-      res.on('end', () => resolve(JSON.parse(data)))
-    })
+    require('https').get(
+      url,
+      { headers: { 'x-pronoundb-source': 'BetterDiscord (v0.0.0-unknown)' } },
+      res => {
+        let data = ''
+        res.setEncoding('utf8')
+        res.on('data', d => data += d)
+        res.on('end', () => resolve(JSON.parse(data)))
+      }
+    )
   })
 }
 

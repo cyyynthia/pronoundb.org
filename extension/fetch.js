@@ -52,4 +52,5 @@ export async function fetchPronounsBulk (platform, ids) {
   return data
 }
 
-fetchPronouns[symbolHttp] = fetchPronounsBulk[symbolHttp] = url => fetch(url).then(r => r.json())
+fetchPronouns[symbolHttp] = fetchPronounsBulk[symbolHttp] =
+  url => fetch(url, { headers: { 'x-pronoundb-source': 'BetterDiscord (v0.0.0-unknown)' } }).then(r => r.json())

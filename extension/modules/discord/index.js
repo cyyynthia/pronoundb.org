@@ -33,6 +33,7 @@ exporter(
     const { React, MessageHeader, AppearanceSettings, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
 
     // Custom component
+    // todo: find a better injection path where it's possible to bulk-fetch IDs, to not spam the server
     const MessageHeaderWithPronouns = (React => props => { // doing this weird thing otherwise it gets thrown out of the promise by rollup
       const [ pronouns, setPronouns ] = React.useState(null)
       const showInChat = settings.get('showInChat', true)

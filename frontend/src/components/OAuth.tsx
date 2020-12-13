@@ -30,6 +30,7 @@ import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 import { Endpoints } from '@constants'
+import { PlatformNames, Supported } from '@shared'
 
 interface OAuthProps extends RoutableProps {
   intent: 'login' | 'register' | 'link'
@@ -51,12 +52,12 @@ function OAuth (props: OAuthProps) {
       <p>Select an authentication provider. You will be redirected to the platform you selected to perform the authentication.</p>
       {props.intent === 'register' && <p>Make sure to select an account you already linked on PronounDB.</p>}
       <ul>
-        {/* @ts-expect-error */}
-        <li><a native href={Endpoints.OAUTH('github', props.intent)}>GitHub</a></li>
-        {/* @ts-expect-error */}
-        <li><a native href={Endpoints.OAUTH('discord', props.intent)}>Discord</a></li>
-        {/* @ts-expect-error */}
-        <li><a native href={Endpoints.OAUTH('twitch', props.intent)}>Twitch</a></li>
+        {Supported.map(s => (
+          <li>
+            {/* @ts-expect-error */}
+            <a native href={Endpoints.OAUTH(s, props.intent)}>{PlatformNames[s]}</a>
+          </li>
+        ))}
       </ul>
     </div>
   )

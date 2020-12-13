@@ -36,7 +36,7 @@ function Privacy (_: RoutableProps) {
     <div className='justified'>
       <div className='page-context'>Legal</div>
       <h2>Privacy Policy</h2>
-      <p>Last edited: December 12, 2020</p>
+      <p>Last edited: December 13, 2020</p>
 
       <p>
         pronoundb.org automatically collect various metadata sent by your web browser: IP address, browser information,
@@ -44,14 +44,16 @@ function Privacy (_: RoutableProps) {
         and is only used for debugging and troubleshooting purposes. None of this data will be ever shared or sold.
       </p>
       <p>
-        pronoundb.org lets you connect to external accounts using the OAuth 2.0 authentication standard. When
-        connecting, pronoundb.org will collect the external account's unique identifier, as well as the account
-        name. You may require the removal of this data directly on the website, by pressing the "Unlink" button
-        next to them, in "My account".
+        pronoundb.org lets you connect to external accounts using the OAuth authentication standard. When connecting
+        an external account, pronoundb.org will collect the external account's unique identifier, as well as the
+        account's display name on the external platform. You may require the removal of this data directly on the
+        website, by pressing the "Unlink" button next to them, in "My account". In some circumstances, as for example
+        when you only have a single account linked, not be presented with the "Unlink" option. In this case, your
+        only solution is to delete your account.
       </p>
       <p>
         pronoundb.org lets you submit some data through the website. All of the data you submit will be collected and
-        stored. You may update it at any time on the website.
+        stored. You may update it or remove it at any time on the website.
       </p>
       <p>
         You may request the entire removal of your data from pronoundb.org's servers by deleting your account. Your

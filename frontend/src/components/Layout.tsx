@@ -52,6 +52,7 @@ function Layout (props: LayoutProps) {
       <header className='header'>
         <div className='site-name'>
           <a href={Routes.HOME}>PronounDB</a>
+          <span className='beta red'>beta</span>
         </div>
         <div className='nav-links'>
           {!user && <a href={Routes.LOGIN}>Login</a>}

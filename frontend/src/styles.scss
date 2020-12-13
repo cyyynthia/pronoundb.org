@@ -136,6 +136,8 @@ code {
 .site-name {
   font-weight: bold;
   font-size: 28px;
+  display: flex;
+  align-items: center;
 
   a {
     color: inherit;
@@ -143,6 +145,13 @@ code {
     &:hover {
       text-decoration: none;
     }
+  }
+
+  .beta {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 3;
+    margin-left: 16px;
   }
 }
 

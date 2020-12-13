@@ -34,6 +34,7 @@ import AppContext from './AppContext'
 import AuthBoundary from './AuthBoundary'
 import Layout from './Layout'
 import Home from './Home'
+import Supported from './Supported'
 import Me from './Me'
 import OAuth from './OAuth'
 import Docs from './Docs'
@@ -62,6 +63,7 @@ function Root (props: RootProps) {
       <Layout>
         <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
           <Home path={Routes.HOME}/>
+          <Supported path={Routes.SUPPORTED}/>
           <OAuth path={Routes.LOGIN} intent='login'/>
           <OAuth path={Routes.REGISTER} intent='register'/>
 
