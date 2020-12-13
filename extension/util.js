@@ -56,3 +56,9 @@ export function css (style) {
 export function sleep (ms) {
   return new Promise(res => setTimeout(res, ms))
 }
+
+export function createDeferred () {
+  let deferred = {}
+  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
+  return deferred
+}

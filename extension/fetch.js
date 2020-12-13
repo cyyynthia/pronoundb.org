@@ -26,6 +26,7 @@
  */
 
 import { Endpoints, Pronouns } from './shared.ts'
+import { createDeferred } from './util'
 
 export const symbolHttp = Symbol('pronoundb.http')
 
@@ -42,15 +43,31 @@ export function fetchPronouns (platform, id) {
 }
 
 export async function fetchPronounsBulk (platform, ids) {
-  // todo: smart cache usage
-  const fetcher = fetchPronouns[symbolHttp]
-  const data = await fetcher(Endpoints.LOOKUP_BULK(platform, ids))
-  for (const id in data) {
-    if (Object.prototype.hasOwnProperty.call(data, id)) {
-      data[id] = Pronouns[data[id]]
+  if (!cache[platform]) cache[platform] = {}
+  const toFetch = []
+  const res = {}
+  const def = {}
+  for (const id of ids) {
+    if (cache[platform][id]) {
+      res[id] = await cache[platform][id]
+    } else {
+      def[id] = createDeferred()
+      cache[platform][id] = def[id].promise
+      toFetch.push(id)
     }
   }
-  return data
+
+  if (toFetch.length > 0) {
+    const fetcher = fetchPronouns[symbolHttp]
+    const data = await fetcher(Endpoints.LOOKUP_BULK(platform, toFetch))
+    for (const id of toFetch) {
+      const pronouns = data[id] ? Pronouns[data[id]] : null
+      def[id].resolve(pronouns)
+      res[id] = pronouns
+    }
+  }
+
+  return res
 }
 
 fetchPronouns[symbolHttp] = url => fetch(url, { headers: { 'x-pronoundb-source': 'Extension' } }).then(r => r.json())
