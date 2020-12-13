@@ -29,6 +29,8 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { Supported } from '../extension/shared'
 
 async function lookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  reply.header('access-control-allow-origin', '*')
+
   const query = request.query as Record<string, string>
   if (!Supported.includes(query.platform)) {
     reply.code(400).send({ error: 400, message: 'Unsupported platform' })
@@ -53,6 +55,8 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
 }
 
 async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  reply.header('access-control-allow-origin', '*')
+
   const query = request.query as Record<string, string>
   if (!Supported.includes(query.platform)) {
     reply.code(400).send({ error: 400, message: 'Unsupported platform' })

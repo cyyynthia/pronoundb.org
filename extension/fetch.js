@@ -25,16 +25,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Endpoints, Pronouns } from './shared.ts'
+
 export const symbolHttp = Symbol('pronoundb.http')
 
-export async function fetchPronouns (platform, id) {
-  console.log('fetch:', id)
-  return 'she/her'
+const cache = {}
+export function fetchPronouns (platform, id) {
+  if (!cache[platform]) cache[platform] = {}
+  if (!cache[platform][id]) {
+    cache[platform][id] = new Promise(resolve => {
+      const fetcher = fetchPronouns[symbolHttp]
+      fetcher(Endpoints.LOOKUP(platform, id)).then(data => resolve(Pronouns[data.pronouns]))
+    })
+  }
+  return cache[platform][id]
 }
 
 export async function fetchPronounsBulk (platform, ids) {
-  console.log('fetch:', ids)
-  const res = {}
-  ids.forEach(id => (res[id] = 'she/her'))
-  return res
+  const fetcher = fetchPronounsBulk[symbolHttp]
+  const data = await fetcher(Endpoints.LOOKUP_BULK(platform, ids))
+  for (const id in data) {
+    if (Object.prototype.hasOwnProperty.apply(data, id)) {
+      data[id] = Pronouns[data[id]]
+    }
+  }
+  return data
 }
+
+fetchPronouns[symbolHttp] = fetchPronounsBulk[symbolHttp] = url => fetch(url).then(r => r.json())

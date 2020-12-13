@@ -27,7 +27,16 @@
 
 import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
-fetchPronouns[symbolHttp] = () => null // todo
+fetchPronouns[symbolHttp] = function (url) {
+  return new Promise(resolve => {
+    require('https').get(url, res => {
+      let data = ''
+      res.setEncoding('utf8')
+      res.on('data', d => data += d)
+      res.on('end', () => resolve(JSON.parse(data)))
+    })
+  })
+}
 
 const injections = []
 export function inject (mdl, meth, repl) {

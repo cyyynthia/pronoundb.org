@@ -9,10 +9,10 @@
   "scripts": {
     "web:dev": "cross-env NODE_ENV=development webpack serve --config frontend/webpack.config.js",
     "web:build": "cross-env NODE_ENV=production webpack --config frontend/webpack.config.js",
-    "ext:dev": "microbundle watch -i extension/index.js --no-compress --external none --sourcemap false -f iife -o dist/extension/script.js",
-    "ext:build": "microbundle build -i extension/index.js --no-compress --external none --sourcemap false -f iife -o dist/extension/script.js",
-    "ext:powercord": "microbundle build -i extension/modules/discord/index.js --no-compress --external powercord/entities,powercord/webpack,powercord/injector,powercord/http --alias ./modules.browser=./modules.powercord --sourcemap false -f cjs --target node -o dist/plugins/powercord/index.js && node ./build/powercord.finalize.js",
-    "ext:bd": "microbundle build -i extension/modules/discord/index.js --no-compress --alias ./modules.browser=./modules.bd --sourcemap false -f cjs --target node -o dist/plugins/PronounDB.plugin.js && node ./build/bd.finalize.js",
+    "ext:dev": "microbundle watch -i extension/index.js --no-compress --define process.env.NODE_ENV='development' --external none --sourcemap false -f iife -o dist/extension/script.js",
+    "ext:build": "microbundle build -i extension/index.js --no-compress --define process.env.NODE_ENV='production' --external none --sourcemap false -f iife -o dist/extension/script.js",
+    "ext:powercord": "microbundle build -i extension/modules/discord/index.js --no-compress --define process.env.NODE_ENV='production' --external powercord/entities,powercord/webpack,powercord/injector,powercord/http --alias ./modules.browser=./modules.powercord --sourcemap false -f cjs --target node -o dist/plugins/powercord/index.js && node ./build/powercord.finalize.js",
+    "ext:bd": "microbundle build -i extension/modules/discord/index.js --no-compress --define process.env.NODE_ENV='production' --alias ./modules.browser=./modules.bd --sourcemap false -f cjs --target node -o dist/plugins/PronounDB.plugin.js && node ./build/bd.finalize.js",
     "api:dev": "ts-node backend/server.ts",
     "api:build": "tsc --build backend/tsconfig.json",
     "api:run": "node dist/backend/server.js"
