@@ -50,7 +50,7 @@ function Docs (_: RoutableProps) {
         <b>Platform:</b> <SupportedFragment/>
       </div>
       <div>
-        <b>Pronouns:</b> Short identifier for a set of pronouns. Here are the valid identifiers:
+        <b>Pronouns:</b> Short identifier for a set of pronouns. Here are the identifiers recognized by PronounDB:
         <ul>
           {Object.entries(Pronouns).map(([ id, pronouns ]) => <li key={id}><code>{id}</code>: {pronouns ?? 'Unspecified'}</li>)}
         </ul>
