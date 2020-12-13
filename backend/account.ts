@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Pronouns, Supported } from '../extension/shared'
+import { Pronouns, Supported } from './shared'
 
 function getMe (request: FastifyRequest, reply: FastifyReply) {
   const user = (request as any).user

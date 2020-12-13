@@ -1,6 +1,6 @@
 {
   "name": "@cyyynthia/pronoundb",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Chrome/Firefox extention that lets people know how to refer to each other on various places of the Internet",
   "main": "index.js",
   "repository": "git@github.com:cyyynthia/pronoundb.org.git",
@@ -15,7 +15,8 @@
     "ext:bd": "microbundle build -i extension/modules/discord/index.js --no-compress --define process.env.NODE_ENV='production' --alias ./modules.browser=./modules.bd --sourcemap false -f cjs --target node -o dist/plugins/PronounDB.plugin.js && node ./build/bd.finalize.js",
     "api:dev": "ts-node backend/server.ts",
     "api:build": "tsc --build backend/tsconfig.json",
-    "api:run": "node dist/backend/server.js"
+    "api:run": "node dist/backend/server.js",
+    "org:build": "pnpm run web:build && pnpm run api:build"
   },
   "dependencies": {
     "fastify": "^3.9.1",

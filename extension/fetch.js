@@ -35,7 +35,7 @@ export function fetchPronouns (platform, id) {
   if (!cache[platform][id]) {
     cache[platform][id] = new Promise(resolve => {
       const fetcher = fetchPronouns[symbolHttp]
-      fetcher(Endpoints.LOOKUP(platform, id)).then(data => resolve(Pronouns[data.pronouns]))
+      fetcher(Endpoints.LOOKUP(platform, id)).then(data => resolve(data.pronouns ? Pronouns[data.pronouns] : null))
     })
   }
   return cache[platform][id]

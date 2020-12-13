@@ -23,5 +23,5 @@
     "esModuleInterop": true,
     "outDir": "../dist"
   },
-  "include": [ "./**/*", "../extension/shared.ts" ]
+  "include": [ "./**/*" ]
 }
