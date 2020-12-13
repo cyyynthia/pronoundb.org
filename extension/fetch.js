@@ -42,15 +42,15 @@ export function fetchPronouns (platform, id) {
 }
 
 export async function fetchPronounsBulk (platform, ids) {
-  const fetcher = fetchPronounsBulk[symbolHttp]
+  // todo: smart cache usage
+  const fetcher = fetchPronouns[symbolHttp]
   const data = await fetcher(Endpoints.LOOKUP_BULK(platform, ids))
   for (const id in data) {
-    if (Object.prototype.hasOwnProperty.apply(data, id)) {
+    if (Object.prototype.hasOwnProperty.call(data, id)) {
       data[id] = Pronouns[data[id]]
     }
   }
   return data
 }
 
-fetchPronouns[symbolHttp] = fetchPronounsBulk[symbolHttp] =
-  url => fetch(url, { headers: { 'x-pronoundb-source': 'BetterDiscord (v0.0.0-unknown)' } }).then(r => r.json())
+fetchPronouns[symbolHttp] = url => fetch(url, { headers: { 'x-pronoundb-source': 'Extension' } }).then(r => r.json())

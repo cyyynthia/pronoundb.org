@@ -26,39 +26,75 @@
  */
 
 import { inject, exporter, getModules } from './modules.browser'
-import { fetchPronouns } from '../../fetch'
+import { fetchPronouns, fetchPronounsBulk } from '../../fetch'
 
 exporter(
   async function (settings) {
-    const { React, MessageHeader, AppearanceSettings, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
+    const { React, Message, Messages, MessageHeader, AppearanceSettings, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
 
-    // Custom component
-    // todo: find a better injection path where it's possible to bulk-fetch IDs, to not spam the server
-    const MessageHeaderWithPronouns = (React => props => { // doing this weird thing otherwise it gets thrown out of the promise by rollup
-      const [ pronouns, setPronouns ] = React.useState(null)
-      const showInChat = settings.get('showInChat', true)
-      React.useEffect(function () {
-        if (showInChat && !props.message.author.bot) {
-          fetchPronouns('discord', props.message.author.id)
-            .then(pronouns => setPronouns(pronouns))
+    const PronounsWrapper = React.memo(
+      props => {
+        const [ allPronouns, setPronouns ] = React.useState({})
+        React.useEffect(() => {
+          const toFetch = [ ...new Set(props.items.filter(i => i.props.message && !i.props.message.author.bot).map(i => i.props.message.author.id)) ]
+          fetchPronounsBulk('discord', toFetch).then(setPronouns)
+        }, [ props.items ])
+
+        const elements = React.useMemo(() => {
+          const res = []
+          for (const i of props.items) {
+            const authorId = i.props.message?.author.id
+            res.push(
+              authorId && allPronouns[authorId]
+                ? React.cloneElement(i, { __$pronouns: allPronouns[authorId] })
+                : i
+            )
+          }
+          return res
+        }, [ props.items, allPronouns ])
+
+        return React.createElement(React.Fragment, null, ...elements)
+      }
+    )
+
+    inject(Messages, 'type', function (args, res) {
+      const ogFn = res.props.children.props.children[1].props.children
+      res.props.children.props.children[1].props.children = function (e) {
+        const res = ogFn(e)
+        const items = res.props.children.props.children[1]
+        res.props.children.props.children[1] = React.createElement(PronounsWrapper, { items })
+        return res
+      }
+      return res
+    })
+
+    const og = Message.default
+    Message.default = React.memo(
+      props => {
+        const res = og.type(props)
+        if (props.__$pronouns) {
+          const og = res.props.childrenHeader.type
+          res.props.childrenHeader.type = function (p) {
+            const res = og.type(p)
+            if (res.type !== 'span') {
+              res.props.__$pronouns = props.__$pronouns
+            }
+            return res
+          }
         }
-      }, [ pronouns, showInChat, props.message.author.id ])
+        return res
+      }
+    )
+    Message.default.OriginalMessage = og
 
-      const res = MessageHeaderWithPronouns.MessageHeader.call(null, props)
-      if (pronouns && showInChat) {
+    inject(MessageHeader, 'default', function ([ props ], res) {
+      if (props.__$pronouns) {
         res.props.children[1].props.children.push(
-          React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem', marginRight: props.compact ? '.6rem' : '' } }, ' • ', pronouns)
+          React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem', marginRight: props.compact ? '.6rem' : '' } }, ' • ', props.__$pronouns)
         )
       }
       return res
-    })(React)
-
-    const ogDefault = MessageHeader.default
-    MessageHeaderWithPronouns.displayName = 'MessageHeaderWithPronouns'
-    MessageHeaderWithPronouns.MessageHeader = ogDefault
-    MessageHeader.default = MessageHeaderWithPronouns
-    MessageHeader.default.toString = ogDefault.toString
-    Object.assign(MessageHeader.default, ogDefault)
+    })
 
     // Settings
     inject(AppearanceSettings.prototype, 'render', function (_, res) {

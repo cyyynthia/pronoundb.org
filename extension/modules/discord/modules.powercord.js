@@ -30,7 +30,7 @@ import { React, getModule, getModuleByDisplayName } from 'powercord/webpack'
 import { inject as porkordInject, uninject as porkordUninject } from 'powercord/injector'
 import { get as porkordFetch } from 'powercord/http'
 
-import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+import { extractFromFlux, extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
 fetchPronouns[symbolHttp] = (url) =>
   porkordFetch(url)
@@ -56,9 +56,9 @@ export function exporter (exp) {
 
     pluginWillUnload () {
       injections.forEach(i => porkordUninject(i))
-      const MessageHeader = getModule([ 'MessageTimestamp' ], false)
-      if (MessageHeader?.default?.MessageHeader) {
-        MessageHeader.default = MessageHeader.default.MessageHeader
+      const Message = getModule([ 'MESSAGE_ID_PREFIX' ], false)
+      if (Message?.default.OriginalMessage) {
+        Message.default = Message.default.OriginalMessage 
       }
     }
   }
@@ -67,14 +67,18 @@ export function exporter (exp) {
 }
 
 export async function getModules () {
+  const fnMessagesWrapper = await getModule(m => m.type?.toString().includes('getOldestUnreadMessageId'))
   const UserProfile = await getModuleByDisplayName('UserProfile')
   const fnUserPopOut = await getModuleByDisplayName('UserPopout')
   const FluxAppearance = await getModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
   const MessageHeader = await getModule([ 'MessageTimestamp' ])
+  const Message = await getModule([ 'MESSAGE_ID_PREFIX' ])
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
     React,
+    Message: Message,
+    Messages: extractMessages(React, fnMessagesWrapper.type),
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),

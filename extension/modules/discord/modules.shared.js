@@ -52,6 +52,12 @@ function wrapInHooks (fn) {
   }
 }
 
+export const extractMessages = wrapInHooks(
+  function (fnMessagesWrapper) {
+    return fnMessagesWrapper({ channel: { getGuildId: () => 'a' } }).props.children.type
+  }
+)
+
 export const extractUserPopOut = wrapInHooks(f => f({ user: { isNonUserBot: () => void 0 } }).type)
 
 export function extractUserProfileBody (UserProfile) {

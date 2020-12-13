@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+import { extractFromFlux, extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
 fetchPronouns[symbolHttp] = function (url) {
   return new Promise(resolve => {
@@ -59,6 +59,7 @@ export function exporter (exp) {
     getDescription () { return 'PronounDB plugin for BetterDiscord - Shows other\'s people pronouns in chat, so your chances of mis-gendering them is low. Service by pronoundb.org' }
 
     start () {
+      // todo: throw in an updater
       exp({
         get: (k, d) => BdApi.loadData(this.getName(), k) ?? d,
         set: (k, v) => BdApi.saveData(this.getName(), k, v)
@@ -67,8 +68,8 @@ export function exporter (exp) {
 
     stop () {
       injections.forEach(i => i())
-      const MessageHeader = BdApi.findModuleByProps('MessageTimestamp')
-      MessageHeader.default = MessageHeader.default.MessageHeader
+      const Message = BdApi.findModuleByProps('MESSAGE_ID_PREFIX')
+      Message.default = Message.default.OriginalMessage
     }
   }
 
@@ -76,14 +77,18 @@ export function exporter (exp) {
 }
 
 export async function getModules () {
+  const fnMessagesWrapper = BdApi.findModule(m => m.type?.toString().includes('getOldestUnreadMessageId'))
   const UserProfile = BdApi.findModuleByDisplayName('UserProfile')
   const fnUserPopOut = BdApi.findModuleByDisplayName('UserPopout')
   const FluxAppearance = BdApi.findModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
   const MessageHeader = BdApi.findModuleByProps('MessageTimestamp')
+  const Message = BdApi.findModuleByProps('MESSAGE_ID_PREFIX')
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
     React: BdApi.React,
+    Message: Message,
+    Messages: extractMessages(React, fnMessagesWrapper.type),
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),

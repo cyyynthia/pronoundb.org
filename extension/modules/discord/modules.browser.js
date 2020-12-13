@@ -26,7 +26,7 @@
  */
 
 import { sleep } from '../../util'
-import { extractFromFlux, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+import { extractFromFlux, extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 
 let _webpack = null
 async function fetchWebpack (filter, dig = []) {
@@ -61,15 +61,19 @@ export function exporter (exp) {
 }
 
 export async function getModules () {
+  const fnMessagesWrapper = await getModule(m => m?.exports?.default?.type?.toString().includes('getOldestUnreadMessageId'), [ 'exports', 'default' ])
   const React = await fetchWebpack(m => m?.exports?.createElement, [ 'exports' ])
   const UserProfile = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserProfile', [ 'exports', 'default' ])
   const fnUserPopOut = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserPopout', [ 'exports', 'default' ])
   const FluxAppearance = await fetchWebpack(m => m?.exports?.default?.displayName === 'FluxContainer(UserSettingsAppearance)', [ 'exports', 'default' ])
   const MessageHeader = await fetchWebpack(m => m?.exports?.MessageTimestamp, [ 'exports' ])
+  const Message = await fetchWebpack(m => m?.exports?.MESSAGE_ID_PREFIX, [ 'exports' ])
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
   return {
     React,
+    Message: Message,
+    Messages: extractMessages(React, fnMessagesWrapper.type),
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),
