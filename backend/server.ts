@@ -56,6 +56,8 @@ fastify.register(fastifyTokenize, {
 
 fastify.register(apiModule, { prefix: '/api/v1' })
 fastify.register(async function (fastify) {
+  await fastify.mongo.db.createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
+
   fastify.get('/robots.txt', (_, reply) => void reply.type('text/plain').send('User-agent: nsa\nDisallow: /'))
   fastify.get('*', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, webModule)
 })

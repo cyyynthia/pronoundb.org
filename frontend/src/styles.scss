@@ -116,7 +116,7 @@ code {
 
 /* Layout */
 .container {
-  width: 80%;
+  width: 95%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -128,6 +128,7 @@ code {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
 
   a + a, a + .link {
     margin-left: 16px;
@@ -212,4 +213,10 @@ select {
   outline: none;
   font: inherit;
   font-size: 14px;
+}
+
+@media screen and (min-width: 760px) {
+  .container {
+    width: 80%;
+  }
 }

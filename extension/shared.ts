@@ -29,11 +29,11 @@ export type Platforms = 'discord' | 'github' | 'twitch' // | 'twitter'
 
 export const Supported = [ 'discord', 'github', 'twitch' ] // , 'twitter' ]
 
-// Contributors: please keep the list sorted alphabetically.
 export const Pronouns = Object.freeze({
   unspecified: null,
   avoid: 'Avoid, use my name',
   any: 'Any pronouns',
+  // -- Contributors: please keep the list sorted alphabetically.
   hh: 'he/him',
   hs: 'he/she',
   ht: 'he/they',
@@ -43,6 +43,8 @@ export const Pronouns = Object.freeze({
   th: 'they/he',
   ts: 'they/she',
   tt: 'they/them',
+  // --
+  other: 'Other'
 })
 
 export const PlatformNames = Object.freeze({

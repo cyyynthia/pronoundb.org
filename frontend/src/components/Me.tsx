@@ -64,7 +64,7 @@ function Me () {
       </p>
       <h3>My pronouns</h3>
       <p>
-        To avoid any form of biases, the list is sorted alphabetically. Your selection will be saved automatically.
+        To avoid any form of biases, pronouns are sorted alphabetically. Your selection will be saved automatically.
       </p>
       <select value={user.pronouns} onChange={e => changePronouns((e.target as any).value)}>
         {Object.entries(Pronouns).map(([ id, pronouns ]) => <option key={id} value={id}>{pronouns ?? 'Unspecified'}</option>)}
