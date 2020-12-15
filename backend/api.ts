@@ -30,8 +30,10 @@ import type { FastifyInstance } from 'fastify'
 import oauthModule from './oauth'
 import accountModule from './account'
 import lookupModule from './lookup'
+import adminModule from './admin'
 
 export default async function (fastify: FastifyInstance) {
+  fastify.register(adminModule, { prefix: '/admin' })
   fastify.register(oauthModule, { prefix: '/oauth' })
   fastify.register(accountModule, { prefix: '/accounts' })
   fastify.register(lookupModule)

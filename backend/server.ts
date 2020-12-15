@@ -35,8 +35,11 @@ import apiModule from './api'
 import webModule from './web'
 
 const config = require('../config.json')
-
 const fastify = Fastify({ logger: true })
+
+
+type Account = { platform: string, id: string }
+const isEqual = (a: Account, b: Account) => a.platform === b.platform && a.id === b.id
 
 fastify.register(fastifyAuth)
 fastify.register(fastifyCookie)
@@ -49,7 +52,10 @@ fastify.register(fastifyTokenize, {
   // todo: filter useful fields
   fetchAccount: async (id: string) => {
     const user = await fastify.mongo.db.collection('accounts').findOne({ _id: fastify.mongo.ObjectId(id) })
-    if (user) user.lastTokenReset = 0
+    if (user) {
+      user.lastTokenReset = 0
+      user.admin = Boolean(user.accounts.find((acc: Account) => config.admins.find((a: Account) => isEqual(acc, a))))
+    }
     return user
   }
 })

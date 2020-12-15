@@ -2,6 +2,9 @@
   "port": 80,
   "secret": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "host": "http://localhost",
+  "admins": [
+    { "platform": "discord", "id": "69696969" }
+  ],
   "oauth": {
     "discord": [ "client id", "client secret" ],
     "github": [ "client id", "client secret" ],

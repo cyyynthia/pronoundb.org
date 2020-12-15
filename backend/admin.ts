@@ -25,38 +25,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { render } from 'preact-render-to-string'
-import { randomBytes } from 'crypto'
-import type { ComponentType } from 'preact'
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 
-let manifest: Record<string, string>
-let integrity: Record<string, string>
-let Html: ComponentType<any>
-
-if (__filename.endsWith('ts')) {
-  manifest = require('../dist/manifest.webpack.json')
-  integrity = require('../dist/integrity.webpack.json')
-  Html = require('../dist/build/html').default
-} else {
-  manifest = require('./manifest.webpack.json')
-  integrity = require('./integrity.webpack.json')
-  Html = require('./build/html').default
-}
-
-let usersCount: number | null = null
-export default async function (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  if (!usersCount) {
-    usersCount = await this.mongo.db.collection('accounts').countDocuments()
-    setTimeout(() => (usersCount = null), 3600e3)
+function isAdmin (request: FastifyRequest, _: FastifyReply, next: (e?: Error) => void) {
+  if (!(request as any).user.admin) {
+    next(new Error('You tried'))
+    return
   }
 
-  const count = usersCount as number
-  const nonce = randomBytes(32).toString('hex')
-  reply.type('text/html')
-    .header('x-powered-by', 'potatoes')
-    .header('x-frame-options', 'DENY')
-    .header('content-security-policy', `default-src 'self'; script-src 'nonce-${nonce}' style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;`)
-    .send(render(h(Html, { nonce, count, manifest, integrity, url: request.url })))
+  next()
+}
+
+async function getStatus (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return {}
+}
+
+async function adminLookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return {}
+}
+
+async function createBan (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return {}
+}
+
+async function updateBan (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return {}
+}
+
+async function deleteBan (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return {}
+}
+
+export default async function (fastify: FastifyInstance) {
+  fastify.get('/status', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, isAdmin ], { relation: 'and' }) }, getStatus)
+  fastify.get('/lookup', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, isAdmin ], { relation: 'and' }) }, adminLookup)
+  fastify.post('/bans', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, isAdmin ], { relation: 'and' }) }, createBan)
+  fastify.patch('/bans/:id', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, isAdmin ], { relation: 'and' }) }, updateBan)
+  fastify.delete('/bans/:id', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, isAdmin ], { relation: 'and' }) }, deleteBan)
 }

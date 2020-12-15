@@ -37,7 +37,13 @@ import { Platforms } from '@shared'
 export interface Account { platform: Platforms, id: string, name: string }
 export interface User { pronouns: string, accounts: Account[] }
 
+interface AppState {
+  admin: boolean
+  count: number
+}
+
 interface AppContextValue {
+  appState: AppState
   user: User | false | null
   error?: number | null
   setPronouns: (pronouns: string) => void
@@ -51,14 +57,11 @@ interface AppContextProps {
   children: ComponentChildren
 }
 
-export const Ctx = createContext<AppContextValue>({
-  user: null,
-  error: null,
-  setPronouns: () => void 0,
-  unlinkAccount: () => void 0,
-  logout: () => void 0
-})
-Ctx.displayName = 'AppContext'
+declare global {
+  interface Window {
+    __STATE__?: AppState
+  }
+}
 
 function sortAccounts (acc1: Account, acc2: Account) {
   const res = acc1.platform.localeCompare(acc2.platform)
@@ -68,6 +71,20 @@ function sortAccounts (acc1: Account, acc2: Account) {
   }
   return res
 }
+
+const fakeAppState = { count: 6969, admin: true }
+let appState = window.__STATE__ ?? fakeAppState
+delete window.__STATE__
+
+export const Ctx = createContext<AppContextValue>({
+  appState: fakeAppState,
+  user: null,
+  error: null,
+  setPronouns: () => void 0,
+  unlinkAccount: () => void 0,
+  logout: () => void 0
+})
+
 
 function AppContext (props: AppContextProps) {
   const ogUrl = useMemo(() => props.url, [])
@@ -107,6 +124,7 @@ function AppContext (props: AppContextProps) {
 
   return h(Ctx.Provider, {
     value: {
+      appState,
       user,
       error, 
       setPronouns: p => user && setUser({ ...user, pronouns: p }),

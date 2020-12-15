@@ -8,6 +8,9 @@
   </head>
   <body>
     <div id='react-root'></div>
+    <script nonce={props.nonce}>
+      window.__STATE__ = { count: 6969, admin: true }
+    </script>
     <script src='/dist/main.js'></script>
     <script src='/dist/styles.js'></script>
   </body>
