@@ -33,6 +33,14 @@ import { Ctx } from './AppContext'
 import { Endpoints, Routes } from '@constants'
 import { Pronouns, PlatformNames } from '@shared'
 
+function getHost () {
+  if (process.env.BUILD_SIDE === 'server') {
+    const config = __non_webpack_require__('../../config.json')
+    return `${config.host}`
+  }
+  return `${location.origin}`
+}
+
 function Me () {
   useTitle('My account')
   const { user, logout, setPronouns, unlinkAccount } = useContext(Ctx)
@@ -80,6 +88,10 @@ function Me () {
           </li>
         ))}
         <li><a href={Routes.LINK}>Link a new account</a></li>
+      </ul>
+      <h3>External integrations</h3>
+      <ul>
+        <li>shields.io endpoint: <code>{getHost()}/shields/{user.id}</code></li>
       </ul>
       <h3>Delete your account</h3>
       <p>

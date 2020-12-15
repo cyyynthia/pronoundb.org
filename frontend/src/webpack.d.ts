@@ -25,6 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+declare const __non_webpack_require__: typeof require
+
 declare const COMMIT_HASH: string
 
 declare module '@assets/*' {

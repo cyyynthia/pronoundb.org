@@ -25,17 +25,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance } from 'fastify'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { Pronouns } from './shared'
 
-import adminModule from './admin'
-import oauthModule from './oauth'
-import accountModule from './account'
-import lookupModule from './lookup'
+function isAdmin (request: FastifyRequest, _: FastifyReply, next: (e?: Error) => void) {
+  if (!(request as any).user.admin) {
+    next(new Error('You tried'))
+    return
+  }
+
+  next()
+}
+
+async function generateShield (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  const params = request.params as Record<string, string>
+  if (!this.mongo.ObjectId.isValid(params.id)) {
+    reply.code(400)
+    return { error: 400, message: 'Invalid ID' }
+  }
+
+  const id = this.mongo.ObjectId(params.id)
+  const user: { pronouns: keyof typeof Pronouns } = await this.mongo.db.collection('accounts').findOne({ _id: id })
+  if (!user) {
+    reply.code(404)
+    return { error: 404, message: 'Not Found' }
+  }
+
+  return {
+    schemaVersion: 1,
+    label: 'pronouns',
+    message: Pronouns[user.pronouns ?? 'unspecified'] ?? 'Unspecified'
+  }
+}
 
 export default async function (fastify: FastifyInstance) {
-  fastify.register(adminModule, { prefix: '/admin' })
-  fastify.register(oauthModule, { prefix: '/oauth' })
-  fastify.register(accountModule, { prefix: '/accounts' })
-  fastify.register(lookupModule)
-  fastify.get('*', (_, reply) => void reply.send({ error: 404, message: 'Not Found' }))
+  fastify.get('/:id', generateShield)
 }

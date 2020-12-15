@@ -31,6 +31,7 @@ import { Pronouns, Supported } from './shared'
 function getMe (request: FastifyRequest, reply: FastifyReply) {
   const user = (request as any).user
   reply.send({
+    id: user._id.toString(),
     pronouns: user.pronouns ?? 'unspecified',
     accounts: user.accounts
   })

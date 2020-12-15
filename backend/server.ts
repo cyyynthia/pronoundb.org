@@ -33,6 +33,7 @@ import fastifyTokenize from 'fastify-tokenize'
 
 import apiModule from './api'
 import webModule from './web'
+import shieldsModule from './shields'
 
 const config = require('../config.json')
 const fastify = Fastify({ logger: true })
@@ -61,6 +62,7 @@ fastify.register(fastifyTokenize, {
 })
 
 fastify.register(apiModule, { prefix: '/api/v1' })
+fastify.register(shieldsModule, { prefix: '/shields' })
 fastify.register(async function (fastify) {
   await fastify.mongo.db.collection('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 
