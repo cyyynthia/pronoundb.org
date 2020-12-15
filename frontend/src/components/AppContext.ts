@@ -73,8 +73,11 @@ function sortAccounts (acc1: Account, acc2: Account) {
 }
 
 const fakeAppState = { count: 6969, admin: true }
-let appState = window.__STATE__ ?? fakeAppState
-delete window.__STATE__
+let appState = fakeAppState
+if (typeof window !== 'undefined' && window.__STATE__) {
+  appState = window.__STATE__
+  delete window.__STATE__
+}
 
 export const Ctx = createContext<AppContextValue>({
   appState: fakeAppState,

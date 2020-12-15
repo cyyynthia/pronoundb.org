@@ -28,15 +28,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { Pronouns } from './shared'
 
-function isAdmin (request: FastifyRequest, _: FastifyReply, next: (e?: Error) => void) {
-  if (!(request as any).user.admin) {
-    next(new Error('You tried'))
-    return
-  }
-
-  next()
-}
-
 async function generateShield (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   const params = request.params as Record<string, string>
   if (!this.mongo.ObjectId.isValid(params.id)) {

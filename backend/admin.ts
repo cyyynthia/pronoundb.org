@@ -36,22 +36,27 @@ function isAdmin (request: FastifyRequest, _: FastifyReply, next: (e?: Error) =>
   next()
 }
 
+// @ts-ignore
 async function getStatus (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   return {}
 }
 
+// @ts-ignore
 async function adminLookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   return {}
 }
 
+// @ts-ignore
 async function createBan (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   return {}
 }
 
+// @ts-ignore
 async function updateBan (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   return {}
 }
 
+// @ts-ignore
 async function deleteBan (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   return {}
 }
