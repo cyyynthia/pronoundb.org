@@ -31,7 +31,7 @@ export const Supported = [ 'discord', 'github', 'twitch' ] // , 'twitter' ]
 
 export const Pronouns = Object.freeze({
   unspecified: null,
-  avoid: 'Avoid, use my name',
+  avoid: 'Avoid pronouns, use my name',
   any: 'Any pronouns',
   // -- Contributors: please keep the list sorted alphabetically.
   hh: 'he/him',
@@ -44,7 +44,8 @@ export const Pronouns = Object.freeze({
   ts: 'they/she',
   tt: 'they/them',
   // --
-  other: 'Other'
+  other: 'Other pronouns',
+  other_ask: 'Other pronouns (Ask me)'
 })
 
 export const PlatformNames = Object.freeze({
