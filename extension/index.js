@@ -25,7 +25,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import './modules/github'
-import './modules/discord'
-import './modules/twitch'
-import './modules/twitter'
+import modules from './modules'
+
+for (const platform in modules) {
+  if (Object.prototype.hasOwnProperty.call(modules, platform)) {
+    const module = modules[platform]
+    if (module.match.test(location.href)) {
+      chrome.storage.sync.get([ `${platform}.enabled` ], res => {
+        if (res[`${platform}.enabled`] ?? true) {
+          console.log(`[PronounDB] Enabling ${module.displayName} module`)
+          module.run()
+        } else {
+          console.debug(`[PronounDB] Skipping ${module.displayName} module`)
+        }
+      })
+    }
+  }
+}

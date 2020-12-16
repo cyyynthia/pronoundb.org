@@ -26,8 +26,8 @@
  */
 
 import { commentDiscussion } from '../icons/octicons'
-import { fetchPronouns, fetchPronounsBulk } from '../fetch'
-import { css, h } from '../util'
+import { fetchPronouns, fetchPronounsBulk } from '../util/fetch'
+import { css, h } from '../util/dom'
 
 function injectHoverCards () {
   const popover = document.querySelector('.js-hovercard-content > .Popover-message')
@@ -127,7 +127,7 @@ async function injectProfileLists () {
   }
 }
 
-function inject () {
+export function run () {
   injectHoverCards()
   if (document.querySelector('.user-profile-nav')) {
     injectUserProfile()
@@ -143,6 +143,4 @@ function inject () {
   )
 }
 
-if (/(^|\.)github\.com$/.test(location.hostname)) {
-  inject()
-}
+export const match = /^https:\/\/(.+\.)?github\.com/

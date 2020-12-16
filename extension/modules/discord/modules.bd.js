@@ -26,7 +26,8 @@
  */
 
 import { extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
-import { fetchPronouns, symbolHttp } from '../../fetch'
+import { fetchPronouns, symbolHttp } from '../../util/fetch'
+// fixme: update to new fetcher
 fetchPronouns[symbolHttp] = function (url) {
   return new Promise(resolve => {
     require('https').get(
@@ -60,10 +61,7 @@ export function exporter (exp) {
 
     start () {
       // todo: throw in an updater
-      exp({
-        get: (k, d) => BdApi.loadData(this.getName(), k) ?? d,
-        set: (k, v) => BdApi.saveData(this.getName(), k, v)
-      })
+      exp()
     }
 
     stop () {

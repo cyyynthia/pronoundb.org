@@ -25,51 +25,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { fetchPronouns } from '../util/fetch'
-import { h, css } from '../util/dom'
+import { Supported, PlatformNames } from './shared.ts'
 
-function makeChatBadge (pronouns) {
-  const style = css({
-    display: 'inline-block',
-    borderRadius: 'var(--border-radius-medium)',
-    backgroundColor: 'var(--color-background-button-secondary-default)',
-    color: 'var(--color-text-button-secondary)',
-    lineHeight: '1.8rem',
-    position: 'relative',
-    bottom: '-1px',
-    marginRight: '4px',
-    padding: '0 2px'
-  })
+const updateSetting = e => chrome.storage.sync.set({ [e.target.id]: e.target.checked })
 
-  return h('span', { style }, pronouns)
+/* Generate UI */
+function createPlatformItem (platform) {
+  const div = document.createElement('div')
+  const input = document.createElement('input')
+  const label = document.createElement('label')
+
+  div.className = 'form-checkbox'
+  input.type = 'checkbox'
+  input.checked = true
+  input.id = `${platform}.enabled`
+  input.addEventListener('change', updateSetting)
+  label.setAttribute('for', `${platform}.enabled`)
+  label.innerText = PlatformNames[platform]
+
+  div.appendChild(label)
+  div.appendChild(input)
+  return div
 }
 
-async function injectChatLine (line) {
-  // fixme: rewrite to use a MO
-  const reactKey = Object.keys(line).find(k => k.startsWith('__reactInternalInstance'))
-  const pronouns = await fetchPronouns('twitch', line[reactKey].return.memoizedProps.message.user.userID)
-  if (pronouns) {
-    const username = line.querySelector('.chat-line__username-container')
-    username.parentNode.insertBefore(makeChatBadge(pronouns), username)
-  }
-}
+const container = document.getElementById('platforms-container')
+Supported.forEach(p => container.appendChild(createPlatformItem(p)))
 
-function handleMutation (nodes) {
-  for (const { target, addedNodes } of nodes) {
-    if (target.classList?.contains('chat-scrollable-area__message-container')) {
-      for (const added of addedNodes) {
-        if (added.classList?.contains('chat-line__message')) {
-          injectChatLine(added)
-        }
+chrome.storage.sync.get(
+  Supported.map(p => `${p}.enabled`),
+  settings => {
+    for (const key in settings) {
+      if (Object.prototype.hasOwnProperty.call(settings, key) && settings[key] === false) {
+        document.getElementById(key).checked = false
       }
     }
   }
-}
-
-export function run () {
-  // todo: consider injecting in the React component for chat lines rather than relying on a MO
-  const observer = new MutationObserver(handleMutation)
-  observer.observe(document, { childList: true, subtree: true })
-}
-
-export const match = /^https:\/\/(.+\.)?twitch\.tv/
+)

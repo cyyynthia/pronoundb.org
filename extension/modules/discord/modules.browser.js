@@ -25,13 +25,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { sleep } from '../../util'
 import { extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+
+function sleep (ms) {
+  return new Promise(res => setTimeout(res, ms))
+}
 
 let _webpack = null
 async function fetchWebpack (filter, dig = []) {
   if (!_webpack) {
-    _webpack = webpackJsonp.push([ [], { __pronoundb: (_, e, r) => (e.c = r.c) }, [ [ '__pronoundb' ] ] ])
+    _webpack = window.webpackJsonp.push([ [], { __pronoundb: (_, e, r) => (e.c = r.c) }, [ [ '__pronoundb' ] ] ])
     delete _webpack.c.__pronoundb
   }
 
@@ -49,19 +52,11 @@ export function inject (mdl, meth, repl) {
 }
 
 export function exporter (exp) {
-  if (/^https:\/\/([a-z]+\.)?discord\.com\/(channels|activity|login|app|library|store)/.test(location.href)) {
-    const iframe = document.createElement('iframe')
-    document.body.appendChild(iframe)
-
-    exp({
-      get: (k, d) => iframe.contentWindow.localStorage[`__pronoundb_${k}`] ?? d,
-      set: (k, v) => iframe.contentWindow.localStorage[`__pronoundb_${k}`] = v
-    })
-  }
+  exp()
 }
 
 export async function getModules () {
-  const fnMessagesWrapper = await getModule(m => m?.exports?.default?.type?.toString().includes('getOldestUnreadMessageId'), [ 'exports', 'default' ])
+  const fnMessagesWrapper = await fetchWebpack(m => m?.exports?.default?.type?.toString().includes('getOldestUnreadMessageId'), [ 'exports', 'default' ])
   const React = await fetchWebpack(m => m?.exports?.createElement, [ 'exports' ])
   const UserProfile = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserProfile', [ 'exports', 'default' ])
   const fnUserPopOut = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserPopout', [ 'exports', 'default' ])

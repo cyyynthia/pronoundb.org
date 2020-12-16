@@ -25,40 +25,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export function h (tag, props, ...child) {
-  const e = document.createElement(tag)
-  if (props) {
-    for (const key in props) {
-      if (Object.prototype.hasOwnProperty.call(props, key)) {
-        e.setAttribute(key, String(props[key]))
-      }
-    }
-  }
+import * as discord from './discord'
+import * as github from './github'
+import * as twitch from './twitch'
+import * as twitter from './twitter'
 
-  for (const c of child) {
-    if (!c) continue
-    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
-  }
-
-  return e
-}
-
-export function css (style) {
-  let res = ''
-  for (const prop in style) {
-    if (Object.prototype.hasOwnProperty.call(style, prop)) {
-      res += `${prop.replace(/[A-Z]/g, s => `-${s.toLowerCase()}`)}:${style[prop]};`
-    }
-  }
-  return res
-}
-
-export function sleep (ms) {
-  return new Promise(res => setTimeout(res, ms))
-}
-
-export function createDeferred () {
-  let deferred = {}
-  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
-  return deferred
+export default {
+  discord,
+  github,
+  twitch,
+  twitter
 }

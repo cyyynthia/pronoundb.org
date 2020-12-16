@@ -33,14 +33,18 @@ import { SwitchItem } from 'powercord/components/settings'
 import { FormNotice } from 'powercord/components'
 
 import { extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
-import { fetchPronouns, symbolHttp } from '../../fetch'
-import { WEBSITE } from '../../shared.ts'
+import { fetchPronouns, fetchPronounsBulk } from '../../util/fetch'
+import { WEBSITE, Endpoints } from '../../shared.ts'
 
-fetchPronouns[symbolHttp] = (url) =>
-  porkordFetch(url)
+function doReq (url) {
+  return porkordFetch(url)
     .set('x-pronoundb-source', 'Powercord (v0.0.0-unknown)')
     .then(r => r.body)
     .catch(() => ({}))
+}
+
+fetchPronouns.__customFetch = (platform, id) => doReq(Endpoints.LOOKUP(platform, id))
+fetchPronounsBulk.__customFetch = (platform, ids) => doReq(Endpoints.LOOKUP_BULK(platform, ids))
 
 const injections = []
 export function inject (mdl, meth, repl) {
@@ -58,6 +62,7 @@ const Settings = React.memo(
         FormNotice,
         {
           type: 'cardPrimary',
+          className: 'marginBottom20-32qID7',
           body: React.createElement(
             React.Fragment,
             null,

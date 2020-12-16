@@ -25,51 +25,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { fetchPronouns } from '../util/fetch'
-import { h, css } from '../util/dom'
-
-function makeChatBadge (pronouns) {
-  const style = css({
-    display: 'inline-block',
-    borderRadius: 'var(--border-radius-medium)',
-    backgroundColor: 'var(--color-background-button-secondary-default)',
-    color: 'var(--color-text-button-secondary)',
-    lineHeight: '1.8rem',
-    position: 'relative',
-    bottom: '-1px',
-    marginRight: '4px',
-    padding: '0 2px'
-  })
-
-  return h('span', { style }, pronouns)
-}
-
-async function injectChatLine (line) {
-  // fixme: rewrite to use a MO
-  const reactKey = Object.keys(line).find(k => k.startsWith('__reactInternalInstance'))
-  const pronouns = await fetchPronouns('twitch', line[reactKey].return.memoizedProps.message.user.userID)
-  if (pronouns) {
-    const username = line.querySelector('.chat-line__username-container')
-    username.parentNode.insertBefore(makeChatBadge(pronouns), username)
-  }
-}
-
-function handleMutation (nodes) {
-  for (const { target, addedNodes } of nodes) {
-    if (target.classList?.contains('chat-scrollable-area__message-container')) {
-      for (const added of addedNodes) {
-        if (added.classList?.contains('chat-line__message')) {
-          injectChatLine(added)
-        }
+export function h (tag, props, ...child) {
+  const e = document.createElement(tag)
+  if (props) {
+    for (const key in props) {
+      if (Object.prototype.hasOwnProperty.call(props, key)) {
+        e.setAttribute(key, String(props[key]))
       }
     }
   }
+
+  for (const c of child) {
+    if (!c) continue
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
+  }
+
+  return e
 }
 
-export function run () {
-  // todo: consider injecting in the React component for chat lines rather than relying on a MO
-  const observer = new MutationObserver(handleMutation)
-  observer.observe(document, { childList: true, subtree: true })
+export function css (style) {
+  let res = ''
+  for (const prop in style) {
+    if (Object.prototype.hasOwnProperty.call(style, prop)) {
+      res += `${prop.replace(/[A-Z]/g, s => `-${s.toLowerCase()}`)}:${style[prop]};`
+    }
+  }
+  return res
 }
-
-export const match = /^https:\/\/(.+\.)?twitch\.tv/

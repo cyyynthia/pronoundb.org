@@ -25,9 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { fetchPronouns } from '../fetch'
+import { h, css } from '../util/dom'
+import { fetchPronouns } from '../util/fetch'
 import { topics } from '../icons/twitter'
-import { h, css } from '../util'
 
 async function injectProfileHeader (header) {
   const pronouns = await fetchPronouns('twitter', null)
@@ -102,11 +102,9 @@ function handleMutation (nodes) {
   }
 }
 
-function inject () {
+export function run () {
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 }
 
-if (/(^|\.)twitter\.com$/.test(location.hostname)) {
-  inject()
-}
+export const match = /^https:\/\/(.+\.)?twitter\.com/

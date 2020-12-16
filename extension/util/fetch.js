@@ -25,20 +25,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Endpoints, Pronouns } from './shared.ts'
-import { createDeferred } from './util'
+import { Pronouns } from '../shared.ts'
 
 export const symbolHttp = Symbol('pronoundb.http')
+
+function createDeferred () {
+  let deferred = {}
+  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
+  return deferred
+}
+
+function doFetchSingle (platform, id) {
+  if (fetchPronouns.__customFetch) { // Powercord, BD, ...
+    return fetchPronouns.__customFetch(platform, id)
+  }
+
+  // Use background script
+  return new Promise(resolve =>
+    chrome.runtime.sendMessage({ kind: 'http', target: 'lookup', platform, id }, resolve)
+  )
+}
+
+function doFetchBulk (platform, ids) {
+  if (fetchPronounsBulk.__customFetch) { // Powercord, BD, ...
+    return fetchPronounsBulk.__customFetch(platform, ids)
+  }
+
+  // Use background script
+  return new Promise(resolve =>
+    chrome.runtime.sendMessage({ kind: 'http', target: 'lookup-bulk', platform, ids }, resolve)
+  )
+}
 
 const cache = {}
 export function fetchPronouns (platform, id) {
   if (!cache[platform]) cache[platform] = {}
   if (!cache[platform][id]) {
-    setTimeout(() => (delete cache[platform][id]), 1800e3)
-    cache[platform][id] = new Promise(resolve => {
-      const fetcher = fetchPronouns[symbolHttp]
-      fetcher(Endpoints.LOOKUP(platform, id)).then(data => resolve(data.pronouns ? Pronouns[data.pronouns] : null))
-    })
+    cache[platform][id] = doFetchSingle(platform, id)
+      .then(data => data.pronouns ? Pronouns[data.pronouns] : null)
   }
   return cache[platform][id]
 }
@@ -54,14 +78,12 @@ export async function fetchPronounsBulk (platform, ids) {
     } else {
       def[id] = createDeferred()
       cache[platform][id] = def[id].promise
-      setTimeout(() => (delete cache[platform][id]), 1800e3)
       toFetch.push(id)
     }
   }
 
   if (toFetch.length > 0) {
-    const fetcher = fetchPronouns[symbolHttp]
-    const data = await fetcher(Endpoints.LOOKUP_BULK(platform, toFetch))
+    const data = await doFetchBulk(platform, toFetch)
     for (const id of toFetch) {
       const pronouns = data[id] ? Pronouns[data[id]] : null
       def[id].resolve(pronouns)
