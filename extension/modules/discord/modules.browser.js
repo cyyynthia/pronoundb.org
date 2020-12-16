@@ -26,7 +26,7 @@
  */
 
 import { sleep } from '../../util'
-import { extractFromFlux, extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+import { extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 
 let _webpack = null
 async function fetchWebpack (filter, dig = []) {
@@ -65,7 +65,6 @@ export async function getModules () {
   const React = await fetchWebpack(m => m?.exports?.createElement, [ 'exports' ])
   const UserProfile = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserProfile', [ 'exports', 'default' ])
   const fnUserPopOut = await fetchWebpack(m => m?.exports?.default?.displayName === 'UserPopout', [ 'exports', 'default' ])
-  const FluxAppearance = await fetchWebpack(m => m?.exports?.default?.displayName === 'FluxContainer(UserSettingsAppearance)', [ 'exports', 'default' ])
   const MessageHeader = await fetchWebpack(m => m?.exports?.MessageTimestamp, [ 'exports' ])
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
@@ -75,7 +74,6 @@ export async function getModules () {
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),
-    UserPopOut: extractUserPopOut(React, fnUserPopOut),
-    AppearanceSettings: extractFromFlux(FluxAppearance)
+    UserPopOut: extractUserPopOut(React, fnUserPopOut)
   }
 }

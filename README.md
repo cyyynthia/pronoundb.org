@@ -13,7 +13,7 @@ at and finds a balance between ease to find and doing too much.
  - GitHub
  - Discord (Web)
    - Exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
-   - Exists as a [plugin](https://cdn.cynthia.dev/pronoundb/PronounDB.plugin.js) for [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp)
+   - Exists as a [plugin](https://cdn.cynthia.dev/pronoundb/PronounDB.plugin.js) for [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp) (**Experimental, and most likely broken to some extent. Lacks self-updating and some functionalities**).
  - Twitch
 
 **Support coming soon:tm: for:**
@@ -35,6 +35,8 @@ Want to see another service supported? Shoot an issue!
 ### Neopronouns support
 TL;DR: Too much things to consider, and there are too many neopronouns to have proper support.
 
+[Original issue](https://github.com/cyyynthia/pronoundb.org/issues/3)
+
 Support for neopronouns was suggested, but after discussing the conclusion was that supporting them would bring more
 downsides than it'd solve problems. One of the major issue is the amount of neopronouns out there, which makes building
 a complete list near impossible, and the pronoun selector would be gigantic and need UX tweaks.
@@ -52,5 +54,3 @@ would get exponentially more and more time consuming.
 As a final decision, it was considered acceptable to let people use "Other" when going by neopronouns, and have an
 additional option which explicitly tells people they can feel free to ask the person about their pronouns. This
 decision may, in the future, be revised if there's popular demand or if I randomly decide to.
-
-[Original issue](https://github.com/cyyynthia/pronoundb.org/issues/3)

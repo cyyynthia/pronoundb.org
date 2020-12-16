@@ -30,7 +30,7 @@ import { fetchPronouns, fetchPronounsBulk } from '../../fetch'
 
 exporter(
   async function (settings) {
-    const { React, Messages, MessageHeader, AppearanceSettings, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
+    const { React, Messages, MessageHeader, UserPopOut, UserProfileBody, UserProfileInfo } = await getModules()
 
     const PronounsWrapper = React.memo(
       props => {
@@ -76,24 +76,6 @@ exporter(
           React.createElement('span', { style: { color: 'var(--text-muted)', fontSize: '.9rem', marginRight: props.compact ? '.6rem' : '' } }, ' • ', props.message.__$pronouns)
         )
       }
-      return res
-    })
-
-    // Settings
-    inject(AppearanceSettings.prototype, 'render', function (_, res) {
-      const section = React.createElement(
-        React.Fragment,
-        null,
-        React.cloneElement(res.props.children[3].props.children[0], { children: 'PronounDB settings' }),
-        React.cloneElement(res.props.children[3].props.children[1], {
-          children: 'Show pronouns in chat',
-          disabled: false,
-          value: settings.get('showInChat', true),
-          onChange: v => settings.set('showInChat', v) | this.forceUpdate()
-        })
-      )
-  
-      res.props.children.splice(3, 0, section)
       return res
     })
 

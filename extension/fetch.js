@@ -34,6 +34,7 @@ const cache = {}
 export function fetchPronouns (platform, id) {
   if (!cache[platform]) cache[platform] = {}
   if (!cache[platform][id]) {
+    setTimeout(() => (delete cache[platform][id]), 1800e3)
     cache[platform][id] = new Promise(resolve => {
       const fetcher = fetchPronouns[symbolHttp]
       fetcher(Endpoints.LOOKUP(platform, id)).then(data => resolve(data.pronouns ? Pronouns[data.pronouns] : null))
@@ -53,6 +54,7 @@ export async function fetchPronounsBulk (platform, ids) {
     } else {
       def[id] = createDeferred()
       cache[platform][id] = def[id].promise
+      setTimeout(() => (delete cache[platform][id]), 1800e3)
       toFetch.push(id)
     }
   }

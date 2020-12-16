@@ -26,12 +26,16 @@
  */
 
 import { Plugin } from 'powercord/entities'
-import { React, getModule, getModuleByDisplayName } from 'powercord/webpack'
-import { inject as porkordInject, uninject as porkordUninject } from 'powercord/injector'
 import { get as porkordFetch } from 'powercord/http'
+import { inject as porkordInject, uninject as porkordUninject } from 'powercord/injector'
+import { React, getModule, getModuleByDisplayName } from 'powercord/webpack'
+import { SwitchItem } from 'powercord/components/settings'
+import { FormNotice } from 'powercord/components'
 
-import { extractFromFlux, extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+import { extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
+import { WEBSITE } from '../../shared.ts'
+
 fetchPronouns[symbolHttp] = (url) =>
   porkordFetch(url)
     .set('x-pronoundb-source', 'Powercord (v0.0.0-unknown)')
@@ -45,9 +49,42 @@ export function inject (mdl, meth, repl) {
   injections.push(iid)
 }
 
+const Settings = React.memo(
+  function ({ getSetting, toggleSetting }) {
+    return React.createElement(
+      React.Fragment,
+      null,
+      React.createElement(
+        FormNotice,
+        {
+          type: 'cardPrimary',
+          body: React.createElement(
+            React.Fragment,
+            null,
+            'To set your pronouns, go to ',
+            React.createElement('a', { href: WEBSITE, target: '_blank' }, WEBSITE),
+            ' and link your Discord account.'
+          )
+        },
+      ),
+      React.createElement(
+        SwitchItem,
+        { value: getSetting('showInChat', true), onChange: () => toggleSetting('showInChat', true),  },
+        'Show pronouns in chat'
+      )
+    )
+  }
+)
+
 export function exporter (exp) {
   class PronounDB extends Plugin {
     startPlugin () {
+      powercord.api.settings.registerSettings(this.entityID, {
+        category: this.entityID,
+        label: 'PronounDB',
+        render: Settings
+      })
+
       exp({
         get: (k, d) => this.settings.get(k, d),
         set: (k, v) => this.settings.set(k, v)
@@ -55,6 +92,7 @@ export function exporter (exp) {
     }
 
     pluginWillUnload () {
+      powercord.api.settings.unregisterSettings(this.entityID);
       injections.forEach(i => porkordUninject(i))
     }
   }
@@ -66,7 +104,6 @@ export async function getModules () {
   const fnMessagesWrapper = await getModule(m => m.type?.toString().includes('getOldestUnreadMessageId'))
   const UserProfile = await getModuleByDisplayName('UserProfile')
   const fnUserPopOut = await getModuleByDisplayName('UserPopout')
-  const FluxAppearance = await getModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
   const MessageHeader = await getModule([ 'MessageTimestamp' ])
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
@@ -76,7 +113,6 @@ export async function getModules () {
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),
-    UserPopOut: extractUserPopOut(React, fnUserPopOut),
-    AppearanceSettings: extractFromFlux(FluxAppearance)
+    UserPopOut: extractUserPopOut(React, fnUserPopOut)
   }
 }

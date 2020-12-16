@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { extractFromFlux, extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
+import { extractMessages, extractUserPopOut, extractUserProfileBody, extractUserProfileInfo } from './modules.shared'
 import { fetchPronouns, symbolHttp } from '../../fetch'
 fetchPronouns[symbolHttp] = function (url) {
   return new Promise(resolve => {
@@ -78,7 +78,6 @@ export async function getModules () {
   const fnMessagesWrapper = BdApi.findModule(m => m.type?.toString().includes('getOldestUnreadMessageId'))
   const UserProfile = BdApi.findModuleByDisplayName('UserProfile')
   const fnUserPopOut = BdApi.findModuleByDisplayName('UserPopout')
-  const FluxAppearance = BdApi.findModuleByDisplayName('FluxContainer(UserSettingsAppearance)')
   const MessageHeader = BdApi.findModuleByProps('MessageTimestamp')
   const UserProfileBody = extractUserProfileBody(UserProfile)
 
@@ -88,7 +87,6 @@ export async function getModules () {
     MessageHeader,
     UserProfileBody,
     UserProfileInfo: extractUserProfileInfo(UserProfileBody),
-    UserPopOut: extractUserPopOut(BdApi.React, fnUserPopOut),
-    AppearanceSettings: extractFromFlux(FluxAppearance)
+    UserPopOut: extractUserPopOut(BdApi.React, fnUserPopOut)
   }
 }
