@@ -26,11 +26,19 @@
  */
 
 body {
-  font-family: 'Quicksand';
+  font-family: 'Quicksand', sans-serif;
   font-size: 14px;
   width: 180px;
-  margin: 16px;
-  margin-bottom: 16px;
+  margin: 12px;
+}
+
+a {
+  color: #007ac0;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 h2 {
@@ -54,5 +62,5 @@ footer {
   padding-top: 8px;
   border-top: 1px solid #ddd;
   font-size: 12px;
-  opacity: 0.6;
+  color: #444;
 }

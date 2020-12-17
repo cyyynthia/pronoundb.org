@@ -25,21 +25,59 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import modules from './modules'
-import { PlatformNames } from './shared.ts'
+import { createDeferred } from './deferred'
 
-for (const platform in modules) {
-  if (Object.prototype.hasOwnProperty.call(modules, platform)) {
-    const module = modules[platform]
-    if (module.match.test(location.href)) {
-      chrome.storage.sync.get([ `${platform}.enabled` ], res => {
-        if (res[`${platform}.enabled`] ?? true) {
-          console.log(`[PronounDB] Enabling ${PlatformNames[platform]} module`)
-          module.run()
-        } else {
-          console.debug(`[PronounDB] Skipping ${PlatformNames[platform]} module`)
+const pendingInvokes = new Map()
+
+function runAs (js) {
+  const script = document.createElement('script')
+  script.textContent = js
+  document.head.appendChild(script)
+  script.remove()
+}
+
+let connected = false
+export function connect () {
+  if (connected) throw new Error('Bridge already connected!')
+
+  connected = true
+  window.addEventListener('message', function (e) {
+    if (e.source === window && e.data.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'invoke.result') {
+        if (!pendingInvokes.has(data.id)) {
+          console.warn('[PronounDB] Received unexpected invoke result')
+          return
+        }
+
+        pendingInvokes.get(data.id).call(null, data.res)
+      }
+    }
+  })
+}
+
+export function invoke (fn, ...args) {
+  if (!connected) throw new Error('Bridge is not connected!')
+
+  const deferred = createDeferred()
+  const id = Math.random().toString(36).slice(2)
+  const timeout = setTimeout(() => deferred.resolve(null) | console.error('[PronounDB] Invocation timed out after 10 seconds.'), 10e3)
+  pendingInvokes.set(id, v => pendingInvokes.delete(id) | deferred.resolve(v) | clearTimeout(timeout))
+
+  const js = fn.toString().replace(/^function[^\(]+/, 'function')
+  const script = `
+    (async function () {
+      window.postMessage({
+        source: 'pronoundb',
+        payload: {
+          action: 'invoke.result',
+          res: await (${js})(${args.map(a => JSON.stringify(a)).join(',')}),
+          id: '${id}'
         }
       })
-    }
-  }
+    }())
+  `
+
+  runAs(script)
+  return deferred.promise
 }

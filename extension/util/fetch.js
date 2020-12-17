@@ -26,34 +26,29 @@
  */
 
 import { Pronouns } from '../shared.ts'
-
-export const symbolHttp = Symbol('pronoundb.http')
-
-function createDeferred () {
-  let deferred = {}
-  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
-  return deferred
-}
+import { createDeferred } from './deferred'
 
 function doFetchSingle (platform, id) {
-  if (fetchPronouns.__customFetch) { // Powercord, BD, ...
-    return fetchPronouns.__customFetch(platform, id)
-  }
-
-  // Use background script
   return new Promise(resolve =>
-    chrome.runtime.sendMessage({ kind: 'http', target: 'lookup', platform, id }, resolve)
+    chrome.runtime.sendMessage(
+      { kind: 'http', target: 'lookup', platform, id },
+      function (res) {
+        if (res.success) return resolve(res.data)
+        console.error('[PronounDB] Failed to fetch:', res.error)
+      }
+    )
   )
 }
 
 function doFetchBulk (platform, ids) {
-  if (fetchPronounsBulk.__customFetch) { // Powercord, BD, ...
-    return fetchPronounsBulk.__customFetch(platform, ids)
-  }
-
-  // Use background script
   return new Promise(resolve =>
-    chrome.runtime.sendMessage({ kind: 'http', target: 'lookup-bulk', platform, ids }, resolve)
+    chrome.runtime.sendMessage(
+      { kind: 'http', target: 'lookup-bulk', platform, ids },
+      function (res) {
+        if (res.success) return resolve(res.data)
+        console.error('[PronounDB] Failed to fetch:', res.error)
+      }
+    )
   )
 }
 
@@ -93,5 +88,3 @@ export async function fetchPronounsBulk (platform, ids) {
 
   return res
 }
-
-fetchPronouns[symbolHttp] = url => fetch(url, { headers: { 'x-pronoundb-source': 'Extension' } }).then(r => r.json())

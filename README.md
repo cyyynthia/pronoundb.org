@@ -13,7 +13,6 @@ at and finds a balance between ease to find and doing too much.
  - GitHub
  - Discord (Web)
    - Exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
-   - Exists as a [plugin](https://cdn.cynthia.dev/pronoundb/PronounDB.plugin.js) for [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp) (**Experimental, and most likely broken to some extent. Lacks self-updating and some functionalities**).
  - Twitch
 
 **Support coming soon:tm: for:**

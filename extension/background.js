@@ -34,7 +34,11 @@ chrome.runtime.onMessage.addListener(
         ? Endpoints.LOOKUP(request.platform, request.id)
         : Endpoints.LOOKUP_BULK(request.platform, request.ids)
 
-      fetch(url, { headers: { 'x-pronoundb-source': 'Extension' } }).then(r => r.json()).then(d => sendResponse(d))
+      fetch(url, { headers: { 'x-pronoundb-source': 'Extension' } })
+        .then(r => r.json())
+        .then(d => sendResponse({ success: true, data: d }))
+        .catch(e => sendResponse({ success: false, error: e }))
+
       return true
     }
   }

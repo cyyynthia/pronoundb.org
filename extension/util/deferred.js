@@ -25,44 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { useContext } from 'preact/hooks'
-import type { RoutableProps } from 'preact-router'
-
-import { Ctx } from './AppContext'
-import { Routes } from '@constants'
-
-function Home (_: RoutableProps) {
-  const { appState: { count } } = useContext(Ctx)
-
-  return (
-    <div className='homepage'>
-      <div className='title'>Know how to refer to your peers over the Internet</div>
-      <div className='subtitle'>
-        Stop struggling to remember how you should refer to that person. PronounDB makes it easy for people to share
-        and lookup each other's pronouns, to avoid the critical mistake of mis-gendering people online.
-      </div>
-      <div className='catch'>
-        PronounDB supports a <a href={Routes.SUPPORTED}>wide variety of platforms</a>, and integrates smoothly with
-        their designs, as if it was always here.
-      </div>
-      <div className='catch'>
-        Join the {count} people sharing their pronouns online! Get the extension:
-      </div>
-      <div className='links'>
-        <p>Extension coming soon on Chrome and Firefox!</p>
-        {/*
-        <a href={Routes.CHROME_EXT} className='link' target='_blank' rel='noreferrer'>
-          Get the extension
-        </a>
-        <a href={Routes.FIREFOX_ADDON} className='link' target='_blank' rel='noreferrer'>
-          Get the addon
-        </a>
-        */}
-      </div>
-    </div>
-  )
+export function createDeferred () {
+  let deferred = {}
+  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
+  return deferred
 }
-
-Home.displayName = 'Home'
-export default Home
