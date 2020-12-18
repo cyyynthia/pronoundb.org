@@ -53,6 +53,7 @@ interface AppContextValue {
 
 interface AppContextProps {
   url: string
+  usersCount?: number
   error?: number | null
   children: ComponentChildren
 }
@@ -124,6 +125,10 @@ function AppContext (props: AppContextProps) {
       return () => clearTimeout(timer)
     }
   }, [ props.url, error ])
+
+  if (props.usersCount) {
+    appState.count = props.usersCount
+  }
 
   return h(Ctx.Provider, {
     value: {

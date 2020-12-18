@@ -53,10 +53,11 @@ export default async function (this: FastifyInstance, request: FastifyRequest, r
   }
 
   const count = usersCount as number
+  const admin = Boolean((request as any).user.admin)
   const nonce = randomBytes(32).toString('hex')
   reply.type('text/html')
     .header('x-powered-by', 'potatoes')
     .header('x-frame-options', 'DENY')
     .header('content-security-policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;`)
-    .send(render(h(Html, { nonce, count, manifest, integrity, url: request.url })))
+    .send(render(h(Html, { nonce, count, admin, manifest, integrity, url: request.url })))
 }

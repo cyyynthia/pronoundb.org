@@ -40,7 +40,7 @@ export interface HtmlProps {
 }
 
 function Html (props: HtmlProps) {
-  const html = render(<Root url={props.url}/>)
+  const html = render(<Root url={props.url} usersCount={props.count}/>)
   const { metas, links, title, lang } = toStatic()
 
   return (
