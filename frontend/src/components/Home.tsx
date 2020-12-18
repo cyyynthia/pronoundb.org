@@ -50,13 +50,16 @@ function Home (_: RoutableProps) {
         Join the {count} people sharing their pronouns online! Get the extension:
       </div>
       <div className='links'>
-        <p>Extension coming soon on Chrome and Firefox!</p>
+        <p>Extension pending review in Chrome Web Store, Firefox Addons and Edge Addons. Stay tuned!</p>
         {/*
-        <a href={Routes.CHROME_EXT} className='link' target='_blank' rel='noreferrer'>
-          Get the extension
+        <a href={Routes.LINK_CHROME} className='link' target='_blank' rel='noreferrer'>
+          Get for Chrome
         </a>
-        <a href={Routes.FIREFOX_ADDON} className='link' target='_blank' rel='noreferrer'>
-          Get the addon
+        <a href={Routes.LINK_FIREFOX} className='link' target='_blank' rel='noreferrer'>
+          Get for Firefox
+        </a>
+        <a href={Routes.LINK_EDGE} className='link' target='_blank' rel='noreferrer'>
+          Get for Edge
         </a>
         */}
       </div>

@@ -1,6 +1,6 @@
 {
   "name": "@cyyynthia/pronoundb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet",
   "main": "index.js",
   "repository": "git@github.com:cyyynthia/pronoundb.org.git",
@@ -11,8 +11,6 @@
     "web:build": "cross-env NODE_ENV=production webpack --config frontend/webpack.config.js",
     "ext:dev": "microbundle build -i extension/index.js -i extension/popup.js -i extension/background.js --no-compress --define process.env.NODE_ENV='development' --external none --sourcemap false -f iife -o dist/extension && node ./build/extension.finalize.js",
     "ext:build": "microbundle build -i extension/index.js -i extension/popup.js -i extension/background.js --define process.env.NODE_ENV='production' --external none -f iife -o dist/extension && node ./build/extension.finalize.js --pack",
-    "ext:powercord": "microbundle build -i extension/modules/discord/index.js --no-compress --define process.env.NODE_ENV='discord' --external powercord/* --alias ./modules.browser=./modules.powercord --sourcemap false -f cjs --target node -o dist/plugins/powercord/index.js && node ./build/powercord.finalize.js",
-    "ext:bd": "microbundle build -i extension/modules/discord/index.js --no-compress --define process.env.NODE_ENV='discord' --alias ./modules.browser=./modules.bd --sourcemap false -f cjs --target node -o dist/plugins/PronounDB.plugin.js && node ./build/bd.finalize.js",
     "api:dev": "ts-node backend/server.ts",
     "api:build": "tsc --build backend/tsconfig.json",
     "api:run": "node dist/backend/server.js",
