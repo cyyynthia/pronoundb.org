@@ -53,16 +53,21 @@ function doFetchBulk (platform, ids) {
 }
 
 const cache = {}
-export function fetchPronouns (platform, id) {
+export function fetchPronouns (platform, id, raw) {
   if (!cache[platform]) cache[platform] = {}
   if (!cache[platform][id]) {
-    cache[platform][id] = doFetchSingle(platform, id)
-      .then(data => data.pronouns ? Pronouns[data.pronouns] : null)
+    cache[platform][id] = doFetchSingle(platform, id) .then(
+      data => data.pronouns
+        ? raw
+          ? data.pronouns
+          : Pronouns[data.pronouns]
+        : null
+    )
   }
   return cache[platform][id]
 }
 
-export async function fetchPronounsBulk (platform, ids) {
+export async function fetchPronounsBulk (platform, ids, raw) {
   if (!cache[platform]) cache[platform] = {}
   const toFetch = []
   const res = {}
@@ -80,7 +85,11 @@ export async function fetchPronounsBulk (platform, ids) {
   if (toFetch.length > 0) {
     const data = await doFetchBulk(platform, toFetch)
     for (const id of toFetch) {
-      const pronouns = data[id] ? Pronouns[data[id]] : null
+      const pronouns = data[id]
+        ? raw
+          ? data.pronouns
+          : Pronouns[data[id]]
+        : null
       def[id].resolve(pronouns)
       res[id] = pronouns
     }

@@ -27,7 +27,7 @@
         "https://*.twitch.tv/*",
         "https://*.twitter.com/*"
       ],
-      "js": [ "script.js" ]
+      "js": [ "pronoundb.js" ]
     }
   ]
 }

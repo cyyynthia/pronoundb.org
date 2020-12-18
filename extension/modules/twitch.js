@@ -25,10 +25,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { fetchPronouns } from '../util/fetch'
 import { h, css } from '../util/dom'
+import { connect, invoke } from '../util/bridge'
+import { fetchPronouns } from '../util/fetch'
+import { PronounsShort } from '../shared.ts'
+
+function fetchIdForUsername (username) {
+  const node = document.querySelector(`.chat-line__message [data-a-user="${username}"]`)
+  if (!node) return null
+
+  const line = node.parentElement.parentElement
+  const reactKey = Object.keys(line).find(k => k.startsWith('__reactInternalInstance'))
+  return line[reactKey].pendingProps.children.props.userData.userID
+}
+
+function isPaused () {
+  return Boolean(document.querySelector('.chat-room .chat-paused-footer'))
+}
+
+function doScrollToBottom () {
+  const node = document.querySelector('.chat-room .chat-list--default > div')
+  const reactKey = Object.keys(node).find(k => k.startsWith('__reactInternalInstance'))
+  node[reactKey].memoizedProps.children[1]._owner.stateNode.scrollRef.scrollToBottom()
+}
+
+const cache = {}
+async function getIdForUsername (username) {
+  if (!cache[username]) cache[username] = await invoke(fetchIdForUsername, username)
+  return cache[username]
+}
 
 function makeChatBadge (pronouns) {
+  // todo: tooltip
   const style = css({
     display: 'inline-block',
     borderRadius: 'var(--border-radius-medium)',
@@ -41,33 +69,35 @@ function makeChatBadge (pronouns) {
     padding: '0 2px'
   })
 
-  return h('span', { style }, pronouns)
+  return h('span', { class: 'pronoundb-pronouns', style }, PronounsShort[pronouns])
 }
 
-async function injectChatLine (line) {
-  // fixme: rewrite to use a MO
-  const reactKey = Object.keys(line).find(k => k.startsWith('__reactInternalInstance'))
-  const pronouns = await fetchPronouns('twitch', line[reactKey].return.memoizedProps.message.user.userID)
-  if (pronouns) {
+async function handleChatLine (line) {
+  const username = line.querySelector('.chat-author__display-name').innerText.toLowerCase()
+  const id = await getIdForUsername(username)
+  const pronouns = await fetchPronouns('twitch', id, true)
+
+  const wasPaused = isPaused()
+  if (pronouns && !line.querySelector('.pronoundb-pronouns')) {
     const username = line.querySelector('.chat-line__username-container')
     username.parentNode.insertBefore(makeChatBadge(pronouns), username)
   }
+
+  if (!wasPaused) setTimeout(() => invoke(doScrollToBottom), 10)
 }
 
 function handleMutation (nodes) {
-  for (const { target, addedNodes } of nodes) {
-    if (target.classList?.contains('chat-scrollable-area__message-container')) {
-      for (const added of addedNodes) {
-        if (added.classList?.contains('chat-line__message')) {
-          injectChatLine(added)
-        }
+  for (const { addedNodes } of nodes) {
+    for (const added of addedNodes) {
+      if (added.classList?.contains('chat-line__message') && added.querySelector('.chat-author__display-name')) {
+        handleChatLine(added)
       }
     }
   }
 }
 
 export function run () {
-  // todo: consider injecting in the React component for chat lines rather than relying on a MO
+  connect()
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 }

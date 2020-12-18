@@ -48,6 +48,14 @@ export const Pronouns = Object.freeze({
   other_ask: 'Other pronouns (Ask me)'
 })
 
+export const PronounsShort = Object.freeze({
+  ...Pronouns,
+  avoid: 'Avoid',
+  any: 'Any',
+  other: 'Other',
+  other_ask: 'Other'
+})
+
 export const PlatformNames = Object.freeze({
   discord: 'Discord',
   github: 'GitHub',

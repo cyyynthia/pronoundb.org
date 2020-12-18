@@ -1,5 +1,7 @@
-const { join } = require('path')
-const { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, unlinkSync } = require('fs')
+const { join, basename } = require('path')
+const { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync, unlinkSync, createReadStream, createWriteStream } = require('fs')
+const archiver = require('archiver')
+
 const manifest = require('./manifest.browser.json')
 const { version } = require('../package.json')
 
@@ -18,41 +20,45 @@ function mkdirOverwrite (path) {
   }
 }
 
-// Load files in memory
-const backgroundScriptFile = join(__dirname, '..', 'dist', 'extension', 'background.js')
-const contentScriptFile = join(__dirname, '..', 'dist', 'extension', 'pronoundb.js')
-const popupScriptFile = join(__dirname, '..', 'dist', 'extension', 'popup.js')
-const popupStyleFile = join(__dirname, '..', 'extension', 'popup.css')
-const popupHtmlFile = join(__dirname, '..', 'extension', 'popup.html')
-
-const backgroundScript = readFileSync(join(backgroundScriptFile), 'utf8')
-const contentScript = readFileSync(join(contentScriptFile), 'utf8')
-const popupScript = readFileSync(join(popupScriptFile), 'utf8')
-const popupStyle = readFileSync(join(popupStyleFile), 'utf8')
-const popupHtml = readFileSync(join(popupHtmlFile), 'utf8')
-
 manifest.version = version
-if (process.argv.includes('--pack')) {
-  // Load source maps
-  const backgroundScriptMapFile = join(__dirname, '..', 'dist', 'extension', 'background.js.map')
-  const contentScriptMapFile = join(__dirname, '..', 'dist', 'extension', 'pronoundb.js.map')
-  const popupScriptMapFile = join(__dirname, '..', 'dist', 'extension', 'popup.js.map')
+const production = process.argv.includes('--pack')
+const extensionDistPath = join(__dirname, '..', 'dist', 'extension')
+const extensionCodePath = join(__dirname, '..', 'extension')
+const files = [
+  join(extensionDistPath, 'background.js'),
+  join(extensionDistPath, 'pronoundb.js'),
+  join(extensionDistPath, 'popup.js'),
+  join(extensionCodePath, 'popup.css'),
+  join(extensionCodePath, 'popup.html'),
 
-  const backgroundScriptMap = readFileSync(join(backgroundScriptMapFile), 'utf8')
-  const contentScriptMap = readFileSync(join(contentScriptMapFile), 'utf8')
-  const popupScriptMap = readFileSync(join(popupScriptMapFile), 'utf8')
+  production && join(extensionDistPath, 'background.js'),
+  production && join(extensionDistPath, 'pronoundb.js'),
+  production && join(extensionDistPath, 'popup.js')
+].filter(Boolean)
 
+if (production) {
   // Create zip
-  console.log('not implemented')
+  const dest = join(__dirname, '..', 'dist', 'extension', 'pronoundb.zip')
+  const zip = archiver('zip', { zlib: { level: 9 } })
+  zip.pipe(createWriteStream(dest))
+
+  for (const file of files) {
+    zip.append(createReadStream(file), { name: basename(file) })
+  }
+
+  zip.append(JSON.stringify(manifest, null, 2), { name: 'manifest.json' })
+  zip.finalize()
 } else {
   manifest.permissions.push('http://localhost:8080/api/v1/*')
   const dest = join(__dirname, '..', 'dist', 'extension', 'unpacked')
   mkdirOverwrite(dest)
 
-  writeFileSync(join(dest, 'background.js'), backgroundScript)
-  writeFileSync(join(dest, 'script.js'), contentScript)
-  writeFileSync(join(dest, 'popup.js'), popupScript)
-  writeFileSync(join(dest, 'popup.css'), popupStyle)
-  writeFileSync(join(dest, 'popup.html'), popupHtml)
+  for (const file of files) {
+    writeFileSync(
+      join(dest, basename(file)),
+      readFileSync(file, 'utf8')
+    )
+  }
+
   writeFileSync(join(dest, 'manifest.json'), JSON.stringify(manifest, null, 2))
 }

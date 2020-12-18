@@ -41,6 +41,7 @@
     "@prefresh/webpack": "^2.4.0",
     "@types/node": "^14.14.14",
     "@types/node-fetch": "^2.5.7",
+    "archiver": "^5.1.0",
     "autoprefixer": "^10.1.0",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.3",
