@@ -32,12 +32,10 @@ import Root from '@components/Root'
 
 import './styles.scss'
 
-let error: number | null = null
+let error: string | null = null
 if (location.search) {
   const search = new URLSearchParams(location.search)
-  error = search.get('error') ? parseInt(search.get('error')!) : null
-  if (typeof error === 'number' && isNaN(error)) error = null
-
+  error = search.get('error') ? search.get('error') : null
   route(location.pathname)
 }
 

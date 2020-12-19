@@ -35,8 +35,8 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
     return { error: 400, message: 'Invalid ID' }
   }
 
-  const id = this.mongo.ObjectId(params.id)
-  const user: { pronouns: keyof typeof Pronouns } = await this.mongo.db.collection('accounts').findOne({ _id: id })
+  const id = new this.mongo.ObjectId(params.id)
+  const user: { pronouns: keyof typeof Pronouns } | null = await this.mongo.db!.collection('accounts').findOne({ _id: id })
   if (!user) {
     reply.code(404)
     return { error: 404, message: 'Not Found' }

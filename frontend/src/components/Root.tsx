@@ -45,7 +45,7 @@ import { Routes } from '@constants'
 interface RootProps {
   url?: string
   usersCount?: number
-  error?: number | null
+  error?: string | null
 }
 
 function Root (props: RootProps) {

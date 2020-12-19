@@ -30,19 +30,11 @@ import { useContext } from 'preact/hooks'
 import type { ComponentChildren } from 'preact'
 
 import { Ctx } from './AppContext'
-import { Routes } from '@constants'
+import { Routes, Errors } from '@constants'
 
 interface LayoutProps {
   children: ComponentChildren
 }
-
-const ERRORS = [
-  'Something went wrong!',
-  'Could not authenticate you with the external platform due to an error.',
-  'No account was found, did you mean to create an account?',
-  'This account already exists, did you mean to login?',
-  'This account has already been linked to another account.'
-]
 
 function Layout (props: LayoutProps) {
   const { user, logout, error } = useContext(Ctx)
@@ -62,7 +54,7 @@ function Layout (props: LayoutProps) {
         </div>
       </header>
       <main className='page-content'>
-        {typeof error === 'number' && <div className='error red'>{ERRORS[error]}</div>}
+        {error && Errors[error] && <div className='error red'>{Errors[error]}</div>}
         {props.children}
       </main>
       <footer className='footer'>

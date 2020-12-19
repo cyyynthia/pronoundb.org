@@ -36,7 +36,7 @@ export const Routes = Object.freeze({
   LEGAL: '/legal',
   PRIVACY: '/privacy',
   GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
-  LINK_CHROME: '',
+  LINK_CHROME: 'https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf',
   LINK_FIREFOX: 'https://addons.mozilla.org/firefox/addon/pronoundb',
   LINK_EDGE: ''
 })
@@ -45,4 +45,14 @@ export const Endpoints = Object.freeze({
   SELF: '/api/v1/accounts/me',
   OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
   CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`
+})
+
+export const Errors: Record<string, string> = Object.freeze({
+  ERR_GENERIC: 'Something went wrong!',
+  ERR_OAUTH_GENERIC: 'Could not authenticate you with the external platform due to an error.',
+  ERR_ALREADY_EXISTS: 'This account already exists, did you mean to login?',
+  ERR_NOT_FOUND: 'No account was found, did you mean to create an account?',
+  ERR_LOGGED_IN: 'You are already logged in.',
+  ERR_NOT_LOGGED_IN: 'You must be logged in to do this.',
+  ERR_ALREADY_LINKED: 'This account has already been linked to another account.'
 })

@@ -25,34 +25,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance } from 'fastify'
-import fetch from 'node-fetch'
 
-import register from './abstract/oauth2'
-import type { ExternalUser } from './abstract/shared'
+/*
+extracted from twitter api docs, need to check if what I got is spec compliant:tm:
 
-const config = require('../../config.json')
-const [ clientId, clientSecret ] = config.oauth.github
+POST oauth/request_token
+> oauth_callback
+> oauth_consumer_key
+< token
+< secret // useless?
+< oauth_callback_confirmed // must be true else ERR_OAUTH_GENERIC
 
-async function getSelf (token: string): Promise<ExternalUser> {
-  const data = await fetch('https://api.github.com/user', {
-    headers: {
-      accept: 'application/vnd.github.v3+json',
-      authorization: `token ${token}`
-    }
-  }).then(r => r.json())
+--> GET oauth/authorize
+> token // consider as state
+< token // consider as state
+< verifier
 
-  return { id: data.id.toString(), name: data.name || data.login, platform: 'github' }
-}
-
-export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId,
-    clientSecret,
-    platform: 'github',
-    authorization: 'https://github.com/login/oauth/authorize',
-    token: 'https://github.com/login/oauth/access_token',
-    scopes: [],
-    getSelf
-  })
-}
+POST oauth/access_token
+> oauth_consumer_key
+> token
+> verifier
+*/

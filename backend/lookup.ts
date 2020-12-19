@@ -42,10 +42,11 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
-  const account = await this.mongo.db.collection('accounts').findOne(
+  const account = await this.mongo.db!.collection('accounts').findOne(
     { accounts: { $elemMatch: { platform: query.platform, id: query.id } } },
-    { accounts: 1, pronouns: 1 }
+    { projection: { _id: 0, pronouns: 1 } }
   )
+
   if (!account) {
     reply.code(404).send({ error: 404, message: 'Not Found' })
     return
@@ -69,9 +70,9 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   }
 
   const ids = query.ids.split(',').slice(0, 50)
-  const accounts = await this.mongo.db.collection('accounts').find(
+  const accounts = await this.mongo.db!.collection('accounts').find(
     { accounts: { $elemMatch: { platform: query.platform, id: { $in: ids } } } },
-    { accounts: 1, pronouns: 1 }
+    { projection: { _id: 0, accounts: 1, pronouns: 1 } }
   ).toArray()
 
   const res: Record<string, string> = {}

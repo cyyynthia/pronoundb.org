@@ -49,12 +49,15 @@ async function updateMe (this: FastifyInstance, request: FastifyRequest, reply: 
     return
   }
 
-  await this.mongo.db.collection('accounts').updateOne({ _id: this.mongo.ObjectId((request as any).user._id) }, { $set: { pronouns } })
+  await this.mongo.db!.collection('accounts').updateOne(
+    { _id: new this.mongo.ObjectId((request as any).user._id) },
+    { $set: { pronouns } }
+  )
   reply.code(204).send()
 }
 
 async function deleteMe (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  await this.mongo.db.collection('accounts').deleteOne({ _id: this.mongo.ObjectId((request as any).user._id) })
+  await this.mongo.db!.collection('accounts').deleteOne({ _id: new this.mongo.ObjectId((request as any).user._id) })
   reply.code(204).send()
 }
 
@@ -70,8 +73,8 @@ async function deleteConnection (this: FastifyInstance, request: FastifyRequest,
     return
   }
 
-  await this.mongo.db.collection('accounts').updateOne(
-    { _id: this.mongo.ObjectId((request as any).user._id) },
+  await this.mongo.db!.collection('accounts').updateOne(
+    { _id: new this.mongo.ObjectId((request as any).user._id) },
     { $pull: { accounts: { platform: query.platform, id: query.id } } }
   )
   reply.code(204).send()

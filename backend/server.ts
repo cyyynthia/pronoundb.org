@@ -52,7 +52,7 @@ fastify.register(fastifyTokenize, {
   cookie: 'token',
   // todo: filter useful fields
   fetchAccount: async (id: string) => {
-    const user = await fastify.mongo.db.collection('accounts').findOne({ _id: fastify.mongo.ObjectId(id) })
+    const user = await fastify.mongo.db!.collection('accounts').findOne({ _id: new fastify.mongo.ObjectId(id) })
     if (user) {
       user.lastTokenReset = 0
       user.admin = Boolean(user.accounts.find((acc: Account) => config.admins.find((a: Account) => isEqual(acc, a))))
@@ -64,7 +64,7 @@ fastify.register(fastifyTokenize, {
 fastify.register(apiModule, { prefix: '/api/v1' })
 fastify.register(shieldsModule, { prefix: '/shields' })
 fastify.register(async function (fastify) {
-  await fastify.mongo.db.collection('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
+  await fastify.mongo.db!.collection('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 
   fastify.get('/robots.txt', (_, reply) => void reply.type('text/plain').send('User-agent: nsa\nDisallow: /'))
   fastify.get('*', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, webModule)

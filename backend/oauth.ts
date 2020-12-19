@@ -32,6 +32,7 @@ import githubModule from './oauth/github'
 import twitchModule from './oauth/twitch'
 
 export default async function (fastify: FastifyInstance) {
+  fastify.addHook('preHandler', fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]))
   fastify.register(discordModule, { prefix: '/discord' })
   fastify.register(githubModule, { prefix: '/github' })
   fastify.register(twitchModule, { prefix: '/twitch' })

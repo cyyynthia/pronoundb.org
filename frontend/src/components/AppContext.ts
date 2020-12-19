@@ -45,7 +45,7 @@ interface AppState {
 interface AppContextValue {
   appState: AppState
   user: User | false | null
-  error?: number | null
+  error?: string | null
   setPronouns: (pronouns: string) => void
   unlinkAccount: (platform: string, id: string) => void
   logout: () => void
@@ -54,7 +54,7 @@ interface AppContextValue {
 interface AppContextProps {
   url: string
   usersCount?: number
-  error?: number | null
+  error?: string | null
   children: ComponentChildren
 }
 

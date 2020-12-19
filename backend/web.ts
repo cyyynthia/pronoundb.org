@@ -48,13 +48,13 @@ if (__filename.endsWith('ts')) {
 let usersCount: number | null = null
 export default async function (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   if (!usersCount) {
-    usersCount = await this.mongo.db.collection('accounts').countDocuments()
+    usersCount = await this.mongo.db!.collection('accounts').countDocuments()
     setTimeout(() => (usersCount = null), 3600e3)
   }
 
   const count = usersCount as number
   const admin = Boolean((request as any).user.admin)
-  const nonce = randomBytes(32).toString('hex')
+  const nonce = randomBytes(16).toString('hex')
   reply.type('text/html')
     .header('x-powered-by', 'potatoes')
     .header('x-frame-options', 'DENY')

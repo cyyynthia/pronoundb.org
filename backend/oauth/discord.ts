@@ -25,26 +25,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { FastifyInstance } from 'fastify'
 import fetch from 'node-fetch'
-import create from './abstract'
-import type { Self } from './abstract'
+
+import register from './abstract/oauth2'
+import type { ExternalUser } from './abstract/shared'
 
 const config = require('../../config.json')
 const [ clientId, clientSecret ] = config.oauth.discord
 
-async function getSelf (token: string): Promise<Self> {
+async function getSelf (token: string): Promise<ExternalUser> {
   const data = await fetch('https://discord.com/api/v8/users/@me', { headers: { authorization: `Bearer ${token}` } })
     .then(r => r.json())
 
-  return { id: data.id, name: `${data.username}#${data.discriminator}` }
+  return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
 }
 
-export default create({
-  clientId,
-  clientSecret,
-  platform: 'discord',
-  authorization: 'https://discord.com/oauth2/authorize',
-  token: 'https://discord.com/api/v8/oauth2/token',
-  scopes: [ 'identify' ],
-  getSelf
-})
+export default async function (fastify: FastifyInstance) {
+  register(fastify, {
+    clientId,
+    clientSecret,
+    platform: 'discord',
+    authorization: 'https://discord.com/oauth2/authorize',
+    token: 'https://discord.com/api/v8/oauth2/token',
+    scopes: [ 'identify' ],
+    getSelf
+  })
+}

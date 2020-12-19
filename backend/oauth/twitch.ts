@@ -25,14 +25,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { FastifyInstance } from 'fastify'
 import fetch from 'node-fetch'
-import create from './abstract'
-import type { Self } from './abstract'
+
+import register from './abstract/oauth2'
+import type { ExternalUser } from './abstract/shared'
 
 const config = require('../../config.json')
 const [ clientId, clientSecret ] = config.oauth.twitch
 
-async function getSelf (token: string): Promise<Self> {
+async function getSelf (token: string): Promise<ExternalUser> {
   const data = await fetch('https://api.twitch.tv/helix/users', {
     headers: {
       authorization: `Bearer ${token}`,
@@ -40,15 +42,17 @@ async function getSelf (token: string): Promise<Self> {
     }
   }).then(r => r.json())
 
-  return { id: data.data[0].id, name: data.data[0].display_name }
+  return { id: data.data[0].id, name: data.data[0].display_name, platform: 'twitch' }
 }
 
-export default create({
-  clientId,
-  clientSecret,
-  platform: 'twitch',
-  authorization: 'https://id.twitch.tv/oauth2/authorize',
-  token: 'https://id.twitch.tv/oauth2/token',
-  scopes: [],
-  getSelf
-})
+export default async function (fastify: FastifyInstance) {
+  register(fastify, {
+    clientId,
+    clientSecret,
+    platform: 'twitch',
+    authorization: 'https://id.twitch.tv/oauth2/authorize',
+    token: 'https://id.twitch.tv/oauth2/token',
+    scopes: [],
+    getSelf
+  })
+}
