@@ -71,7 +71,7 @@ export async function finishUp (this: FastifyInstance, request: FastifyRequest, 
         if (account._id.toString() !== (request as any).user._id.toString()) return reply.redirect('/me?error=ERR_ALREADY_LINKED')
         await updateExternalAccount.call(this, account, user)
       } else {
-        
+        await collection.updateOne({ _id: (request as any).user._id }, { $push: { accounts: user }})
       }
       return reply.redirect('/me')
   }
