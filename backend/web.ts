@@ -53,7 +53,7 @@ export default async function (this: FastifyInstance, request: FastifyRequest, r
   }
 
   const count = usersCount as number
-  const admin = Boolean((request as any).user.admin)
+  const admin = Boolean((request as any).user?.admin)
   const nonce = randomBytes(16).toString('hex')
   reply.type('text/html')
     .header('x-powered-by', 'potatoes')

@@ -42,7 +42,7 @@ async function getSelf (token: string): Promise<ExternalUser> {
     }
   }).then(r => r.json())
 
-  return { id: data.id.toString(), name: data.name || data.login, platform: 'github' }
+  return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
 }
 
 export default async function (fastify: FastifyInstance) {

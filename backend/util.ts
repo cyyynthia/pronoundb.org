@@ -25,47 +25,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export type Platforms = 'discord' | 'github' | 'twitch' | 'twitter'
+import type { FastifyReply } from 'fastify'
+import type { ParsedUrlQueryInput } from 'querystring'
+import { encode as qsEncode } from 'querystring'
 
-export const Supported = [ 'discord', 'github', 'twitch', 'twitter' ]
+export type ConfiguredReply<TReply extends FastifyReply, TConfig> =
+  TReply extends FastifyReply<infer TServer, infer TRequest, infer TReply, infer TGeneric> 
+    ? FastifyReply<TServer, TRequest, TReply, TGeneric, TConfig>
+    : never
 
-export const Pronouns = Object.freeze({
-  unspecified: null,
-  avoid: 'Avoid pronouns, use my name',
-  any: 'Any pronouns',
-  // -- Contributors: please keep the list sorted alphabetically.
-  hh: 'he/him',
-  hs: 'he/she',
-  ht: 'he/they',
-  shh: 'she/he',
-  sh: 'she/her',
-  st: 'she/they',
-  th: 'they/he',
-  ts: 'they/she',
-  tt: 'they/them',
-  // --
-  other: 'Other pronouns',
-  other_ask: 'Other pronouns (Ask me)'
-})
-
-export const PronounsShort = Object.freeze({
-  ...Pronouns,
-  avoid: 'Avoid',
-  any: 'Any',
-  other: 'Other',
-  other_ask: 'Other'
-})
-
-export const PlatformNames = Object.freeze({
-  discord: 'Discord',
-  github: 'GitHub',
-  twitch: 'Twitch',
-  twitter: 'Twitter'
-})
-
-export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
-
-export const Endpoints = Object.freeze({
-  LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`
-})
+export function rfcUriEncode (data: string | ParsedUrlQueryInput) {
+  return (typeof data === 'string' ? encodeURIComponent(data) : qsEncode(data))
+    .replace(/\!/g, '%21')
+    .replace(/\'/g, '%27')
+    .replace(/\(/g, '%28')
+    .replace(/\)/g, '%29')
+    .replace(/\*/g, '%2A')
+}

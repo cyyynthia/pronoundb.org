@@ -30,10 +30,12 @@ import type { FastifyInstance } from 'fastify'
 import discordModule from './oauth/discord'
 import githubModule from './oauth/github'
 import twitchModule from './oauth/twitch'
+import twitterModule from './oauth/twitter'
 
 export default async function (fastify: FastifyInstance) {
   fastify.addHook('preHandler', fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]))
   fastify.register(discordModule, { prefix: '/discord' })
   fastify.register(githubModule, { prefix: '/github' })
   fastify.register(twitchModule, { prefix: '/twitch' })
+  fastify.register(twitterModule, { prefix: '/twitter' })
 }

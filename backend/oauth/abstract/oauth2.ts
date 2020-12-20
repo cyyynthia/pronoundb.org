@@ -31,6 +31,7 @@ import { randomBytes } from 'crypto'
 import fetch from 'node-fetch'
 import { finishUp } from './shared'
 import type { ExternalUser, OAuthIntent } from './shared'
+import type { ConfiguredReply } from '../../util'
 
 const config = require('../../../config.json')
 
@@ -85,12 +86,7 @@ const callbackSchema: FastifySchema = {
 
 const nonces = new Set<string>()
 
-type ConfiguredReply<TReply extends FastifyReply, TConfig> =
-  TReply extends FastifyReply<infer TServer, infer TRequest, infer TReply, infer TGeneric> 
-    ? FastifyReply<TServer, TRequest, TReply, TGeneric, TConfig>
-    : never
-
-async function authorize (this: FastifyInstance, request: AuthorizeRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
+export async function authorize (this: FastifyInstance, request: AuthorizeRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
   const intent = request.query.intent ?? 'login'
 
   if (Object.prototype.hasOwnProperty.call(request, 'user') && intent !== 'link') {
@@ -118,11 +114,11 @@ async function authorize (this: FastifyInstance, request: AuthorizeRequest, repl
   })
 
   reply.setCookie('nonce', nonce, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
-  reply.setCookie('intent', intent, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
-  reply.redirect(`${reply.context.config.authorization}?${q}`)
+    .setCookie('intent', intent, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
+    .redirect(`${reply.context.config.authorization}?${q}`)
 }
 
-async function callback (this: FastifyInstance, request: CallbackRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
+export async function callback (this: FastifyInstance, request: CallbackRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
   if (Object.prototype.hasOwnProperty.call(request.query, 'error') || !request.query.code) {
     reply.redirect('/')
     return
