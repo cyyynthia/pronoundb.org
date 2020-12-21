@@ -1,6 +1,6 @@
 {
   "name": "@cyyynthia/pronoundb",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet",
   "main": "index.js",
   "repository": "git@github.com:cyyynthia/pronoundb.org.git",

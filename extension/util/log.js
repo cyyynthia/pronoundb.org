@@ -25,39 +25,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { render } from 'preact-render-to-string'
-import { randomBytes } from 'crypto'
-import type { ComponentType } from 'preact'
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+const format = str => `[${chrome.runtime.getManifest().name} v${chrome.runtime.getManifest().version}] ${str}`
 
-let manifest: Record<string, string>
-let integrity: Record<string, string>
-let Html: ComponentType<any>
-
-if (__filename.endsWith('ts')) {
-  manifest = require('../dist/manifest.webpack.json')
-  integrity = require('../dist/integrity.webpack.json')
-  Html = require('../dist/build/html').default
-} else {
-  manifest = require('./manifest.webpack.json')
-  integrity = require('./integrity.webpack.json')
-  Html = require('./build/html').default
+export function debug (str) {
+  console.debug(format(str))
 }
 
-let usersCount: number | null = null
-export default async function (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  if (!usersCount) {
-    usersCount = await this.mongo.db!.collection('accounts').countDocuments()
-    setTimeout(() => (usersCount = null), 3600e3)
-  }
+export function log (str) {
+  console.log(format(str))
+}
 
-  const count = usersCount as number
-  const admin = Boolean((request as any).user?.admin)
-  const nonce = randomBytes(16).toString('hex')
-  reply.type('text/html')
-    .header('x-powered-by', 'potatoes')
-    .header('x-frame-options', 'DENY')
-    .header('content-security-policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;`)
-    .send(`<!doctype html>${render(h(Html, { nonce, count, admin, manifest, integrity, url: request.url }))}`)
+export function warn (str) {
+  console.warn(format(str))
+}
+
+export function error (str) {
+  console.error(format(str))
 }

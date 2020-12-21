@@ -44,7 +44,7 @@ function Html (props: HtmlProps) {
   const { metas, links, title, lang } = toStatic()
 
   return (
-    <html lang={lang}>
+    <html lang={lang ?? 'en'}>
       <head>
         <title>{title}</title>
         <meta charSet='utf8'/>

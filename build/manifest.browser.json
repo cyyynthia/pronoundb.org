@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PronounDB",
-  "description": "A Chrome/Firefox extension that lets people know each other's pronouns on various places of the Internet",
+  "description": "An extension that lets people know each other's pronouns on various places of the Internet",
   "permissions": [
     "storage",
     "https://pronoundb.org/api/v1/*"
@@ -15,18 +15,7 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "https://*.discord.com/channels/*",
-        "https://*.discord.com/activity",
-        "https://*.discord.com/login*",
-        "https://*.discord.com/app",
-        "https://*.discord.com/library",
-        "https://*.discord.com/store",
-
-        "https://*.github.com/*",
-        "https://*.twitch.tv/*",
-        "https://*.twitter.com/*"
-      ],
+      "matches": [ "<all_urls>" ],
       "js": [ "pronoundb.js" ]
     }
   ]

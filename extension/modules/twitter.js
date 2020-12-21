@@ -27,10 +27,32 @@
 
 import { h, css } from '../util/dom'
 import { fetchPronouns } from '../util/fetch'
+import { connect, invoke } from '../util/bridge'
 import { topics } from '../icons/twitter'
 
+function fetchCurrentProfileId () {
+  const nodeDescription = document.querySelector('[data-testid="UserDescription"]')
+  if (!nodeDescription) return
+
+  const node = nodeDescription.parentElement.parentElement.parentElement.parentElement
+  const reactKey = Object.keys(node).find(k => k.startsWith('__reactInternalInstance'))
+  return node[reactKey].return.return.pendingProps.scribeData.profile_id
+}
+
+function fetchPoppedOutUser (popoutId) {
+  const popout = document.querySelector(`[data-pronoundb-target="${popoutId}"]`)
+  if (!popout) return
+
+  popout.removeAttribute('data-pronoundb-target')
+  const reactKey = Object.keys(popout).find(k => k.startsWith('__reactInternalInstance'))
+  return popout[reactKey].memoizedProps.children[3].props.children.props.userId
+}
+
 async function injectProfileHeader (header) {
-  const pronouns = await fetchPronouns('twitter', null)
+  const id = await invoke(fetchCurrentProfileId)
+  if (!id) return
+
+  const pronouns = await fetchPronouns('twitter', id)
   if (pronouns) {
     const template = header.children[header.children.length - 1]
     header.appendChild(
@@ -44,9 +66,13 @@ async function injectProfileHeader (header) {
   }
 }
 
-async function injectProfilePopout (popout) {
-  const reactKey = Object.keys(popout).find(k => k.startsWith('__reactInternalInstance'))
-  const pronouns = await fetchPronouns('twitter', popout[reactKey].memoizedProps.children[3].props.children.props.userId)
+let popoutIdCache = 0
+async function injectProfilePopOut (popout) {
+  popout.dataset.pronoundbTarget = ++popoutIdCache
+  const id = await invoke(fetchPoppedOutUser, popoutIdCache)
+  if (!id) return
+
+  const pronouns = await fetchPronouns('twitter', id)
   if (pronouns) {
     if (popout.querySelector('[data-pronoundb]')) return
     const template = popout.querySelector('div + div [dir=ltr]')
@@ -90,7 +116,7 @@ function handleMutation (nodes) {
       if (layers.contains(added)) {
         const link = added.querySelector('a[href*="/following"]')
         if (link) {
-          injectProfilePopout(link.parentElement.parentElement.parentElement.parentElement)
+          injectProfilePopOut(link.parentElement.parentElement.parentElement.parentElement)
         }
       } else {
         const header = added.querySelector?.('[data-testid="UserProfileHeader_Items"]')
@@ -103,6 +129,7 @@ function handleMutation (nodes) {
 }
 
 export function run () {
+  connect()
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 }

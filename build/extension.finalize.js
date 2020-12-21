@@ -59,6 +59,7 @@ if (production) {
   zip.finalize()
   zipFf.finalize()
 } else {
+  manifest.name += ' (dev)'
   manifest.permissions.push('http://localhost:8080/api/v1/*')
   if (process.argv.includes('--firefox')) {
     manifest.browser_specific_settings = { gecko: { id: "firefox-addon+dev@pronoundb.org" } }

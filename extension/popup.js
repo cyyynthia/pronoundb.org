@@ -51,6 +51,8 @@ function createPlatformItem (platform) {
 const container = document.getElementById('platforms-container')
 Supported.forEach(p => container.appendChild(createPlatformItem(p)))
 
+document.getElementById('version-container').innerText = chrome.runtime.getManifest().version
+
 chrome.storage.sync.get(
   Supported.map(p => `${p}.enabled`),
   settings => {

@@ -26,10 +26,8 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import fetch from 'node-fetch'
-
-import register, { securedFetch } from './abstract/oauth10a'
 import type { ExternalUser } from './abstract/shared'
+import register, { securedFetch } from './abstract/oauth10a'
 
 const config = require('../../config.json')
 const [ clientId, clientSecret ] = config.oauth.twitter

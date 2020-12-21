@@ -26,6 +26,7 @@
  */
 
 import { createDeferred } from './deferred'
+import { warn, error } from './log'
 
 const pendingInvokes = new Map()
 
@@ -46,7 +47,7 @@ export function connect () {
       const data = e.data.payload
       if (data.action === 'invoke.result') {
         if (!pendingInvokes.has(data.id)) {
-          console.warn('[PronounDB] Received unexpected invoke result')
+          warn('Received unexpected invoke result')
           return
         }
 
@@ -61,7 +62,7 @@ export function invoke (fn, ...args) {
 
   const deferred = createDeferred()
   const id = Math.random().toString(36).slice(2)
-  const timeout = setTimeout(() => deferred.resolve(null) | console.error('[PronounDB] Invocation timed out after 10 seconds.'), 10e3)
+  const timeout = setTimeout(() => deferred.resolve(null) | error('Invocation timed out after 10 seconds.'), 10e3)
   pendingInvokes.set(id, v => pendingInvokes.delete(id) | deferred.resolve(v) | clearTimeout(timeout))
 
   const js = fn.toString().replace(/^function[^\(]+/, 'function')

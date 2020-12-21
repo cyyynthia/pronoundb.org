@@ -26,6 +26,7 @@
  */
 
 import modules from './modules'
+import { debug, log } from './util/log'
 import { PlatformNames } from './shared.ts'
 
 for (const platform in modules) {
@@ -34,10 +35,10 @@ for (const platform in modules) {
     if (module.match.test(location.href)) {
       chrome.storage.sync.get([ `${platform}.enabled` ], res => {
         if (res[`${platform}.enabled`] ?? true) {
-          console.log(`[PronounDB] Enabling ${PlatformNames[platform]} module`)
+          log(`Enabling ${PlatformNames[platform]} module`)
           module.run()
         } else {
-          console.debug(`[PronounDB] Skipping ${PlatformNames[platform]} module`)
+          debug(`Skipping ${PlatformNames[platform]} module`)
         }
       })
     }
