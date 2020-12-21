@@ -33,6 +33,7 @@ function injectHoverCards () {
   const popover = document.querySelector('.js-hovercard-content > .Popover-message')
   const observer = new MutationObserver(
     async function () {
+      const startHeight = popover.getBoundingClientRect().height
       const tracking = popover.querySelector('[data-hovercard-tracking]')?.dataset?.hovercardTracking
       const hv = popover.querySelector('[data-hydro-view]')?.dataset?.hydroView
       if (!tracking || !hv) return
@@ -66,6 +67,13 @@ function injectHoverCards () {
           )
         )
       )
+
+      if (popover.className.includes('Popover-message--bottom')) {
+        const delta = popover.getBoundingClientRect().height - startHeight
+        if (delta > 0) {
+          popover.parentElement.style.top = `${parseInt(popover.parentElement.style.top) - delta}px`
+        }
+      }
     }
   )
 
