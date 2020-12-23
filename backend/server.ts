@@ -38,7 +38,6 @@ import shieldsModule from './shields'
 const config = require('../config.json')
 const fastify = Fastify({ logger: true })
 
-
 type Account = { platform: string, id: string }
 const isEqual = (a: Account, b: Account) => a.platform === b.platform && a.id === b.id
 

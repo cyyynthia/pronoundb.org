@@ -9,6 +9,12 @@ Simple, efficient. Check it out at https://pronoundb.org!
 The extension aims to inject that piece of information in a discrete way, that matches with the website you're looking
 at and finds a balance between ease to find and doing too much.
 
+## Get the extension
+ - [Chrome Web Store](https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf)
+ - [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/pronoundb)
+ (Android support coming soon, see [this issue](https://github.com/cyyynthia/pronoundb.org/issues/10))
+ - [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn)
+
 ## Supported services
  - GitHub
  - Discord (Web)

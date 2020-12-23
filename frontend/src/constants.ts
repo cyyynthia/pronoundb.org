@@ -38,7 +38,7 @@ export const Routes = Object.freeze({
   GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
   LINK_CHROME: 'https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf',
   LINK_FIREFOX: 'https://addons.mozilla.org/firefox/addon/pronoundb',
-  LINK_EDGE: ''
+  LINK_EDGE: 'https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn'
 })
 
 export const Endpoints = Object.freeze({
