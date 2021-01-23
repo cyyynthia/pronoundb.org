@@ -33,39 +33,46 @@ export const Pronouns = Object.freeze({
   unspecified: null,
   // -- Contributors: please keep the list sorted alphabetically.
   hh: [ 'he/him', 'He/Him' ],
+  hi: [ 'he/it', 'He/It' ],
   hs: [ 'he/she', 'He/She' ],
   ht: [ 'he/they', 'He/They' ],
+  ih: [ 'it/him', 'It/Him' ],
+  ii: [ 'it/it', 'It/It' ],
+  is: [ 'it/she', 'It/She' ],
+  it: [ 'it/they', 'It/They' ],
   shh: [ 'she/he', 'She/He' ],
   sh: [ 'she/her', 'She/Her' ],
+  si: [ 'she/it', 'She/It' ],
   st: [ 'she/they', 'She/They' ],
   th: [ 'they/he', 'They/He' ],
+  ti: [ 'they/it', 'They/It' ],
   ts: [ 'they/she', 'They/She' ],
   tt: [ 'they/them', 'They/Them' ],
   // --
   any: 'Any pronouns',
   other: 'Other pronouns',
   ask: 'Ask me my pronouns',
-  avoid: 'Avoid pronouns, use my name'
+  avoid: 'Avoid pronouns, use my name',
 })
 
 export const PronounsShort = Object.freeze({
   ...Pronouns,
-  avoid: 'Avoid',
   any: 'Any',
   other: 'Other',
-  ask: 'Ask me'
+  ask: 'Ask me',
+  avoid: 'Avoid',
 })
 
 export const PlatformNames = Object.freeze({
   discord: 'Discord',
   github: 'GitHub',
   twitch: 'Twitch',
-  twitter: 'Twitter'
+  twitter: 'Twitter',
 })
 
 export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
 
 export const Endpoints = Object.freeze({
   LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`
+  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
 })
