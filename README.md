@@ -2,9 +2,9 @@
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G71TSDF)<br>
 [![License](https://img.shields.io/github/license/cyyynthia/pronoundb.org.svg?style=flat-square)](https://github.com/cyyynthia/pronoundb.org/blob/mistress/LICENSE)
 
-An extension that lets people know each other's pronouns on various places of the Internet, so mistakes are less
-likely to happen. Link your accounts, set your pronouns and magically fellow PronounDB users will know your pronouns.
-Simple, efficient. Check it out at https://pronoundb.org!
+A browser extension that lets people know how to refer to each other on various places of the Internet, so mistakes are
+less likely to happen. Link your accounts, set your pronouns and magically fellow PronounDB users will know your
+pronouns. Simple, efficient. Check it out at https://pronoundb.org!
 
 The extension aims to inject that piece of information in a discrete way, that matches with the website you're looking
 at and finds a balance between ease to find and doing too much.
