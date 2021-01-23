@@ -45,7 +45,7 @@ export const Pronouns = Object.freeze({
   tt: 'they/them',
   // --
   other: 'Other pronouns',
-  other_ask: 'Other pronouns (Ask me)'
+  ask: 'Ask me my pronouns'
 })
 
 export const PronounsShort = Object.freeze({
@@ -53,7 +53,7 @@ export const PronounsShort = Object.freeze({
   avoid: 'Avoid',
   any: 'Any',
   other: 'Other',
-  other_ask: 'Other'
+  ask: 'Ask me'
 })
 
 export const PlatformNames = Object.freeze({
@@ -63,7 +63,7 @@ export const PlatformNames = Object.freeze({
   twitter: 'Twitter'
 })
 
-export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
+export const WEBSITE = 'https://pronoundb.org' // process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
 
 export const Endpoints = Object.freeze({
   LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,

@@ -119,9 +119,10 @@ function handleMutation (nodes) {
           injectProfilePopOut(link.parentElement.parentElement.parentElement.parentElement)
         }
       } else {
-        const header = added.querySelector?.('[data-testid="UserProfileHeader_Items"]')
-        if (header) {
-          injectProfileHeader(header)
+        if (added.getAttribute?.('property') === 'al:android:url' && added.content.startsWith('twitter://user?')) {
+          const prevPronouns = document.querySelector('[data-pronoundb]')
+          if (prevPronouns) prevPronouns.remove()
+          injectProfileHeader(document.querySelector('[data-testid="UserProfileHeader_Items"]'))
         }
       }
     }

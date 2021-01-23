@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "PronounDB",
-  "description": "An extension that lets people know each other's pronouns on various places of the Internet",
+  "description": "A browser extension that lets people know how to refer to each other on various places of the Internet.",
   "permissions": [
     "storage",
     "https://pronoundb.org/api/v1/*"
