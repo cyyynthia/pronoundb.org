@@ -1,5 +1,6 @@
 # PronounDB
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G71TSDF)<br>
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G71TSDF)[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcyyynthia%2Fpronoundb.org.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcyyynthia%2Fpronoundb.org?ref=badge_shield)
+<br>
 [![License](https://img.shields.io/github/license/cyyynthia/pronoundb.org.svg?style=flat-square)](https://github.com/cyyynthia/pronoundb.org/blob/mistress/LICENSE)
 
 An extension that lets people know each other's pronouns on various places of the Internet, so mistakes are less
@@ -67,3 +68,7 @@ reasons listed above.
 As a final decision, it was considered acceptable to let people use "Other" when going by neo-pronouns, and have an
 additional option which explicitly tells people they can feel free to ask the person about their pronouns. This
 decision may, in the future, be revised if there's popular demand or if I randomly decide to.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcyyynthia%2Fpronoundb.org.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcyyynthia%2Fpronoundb.org?ref=badge_large)
