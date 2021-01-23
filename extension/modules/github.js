@@ -25,9 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { commentDiscussion } from '../icons/octicons'
-import { fetchPronouns, fetchPronounsBulk } from '../util/fetch'
-import { css, h } from '../util/dom'
+import { commentDiscussion } from '../icons/octicons.js'
+import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
+import { css, h } from '../util/dom.js'
 
 function injectHoverCards () {
   const popover = document.querySelector('.js-hovercard-content > .Popover-message')
@@ -88,19 +88,36 @@ async function injectUserProfile () {
   const pronouns = await fetchPronouns('github', userId)
   if (!pronouns) return
 
-  list.appendChild(
-    h(
-      'li',
-      {
-        class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
-        itemprop: 'pronouns',
-        show_title: false,
-        'aria-label': `Pronouns: ${pronouns}`
-      },
-      commentDiscussion({ class: 'octicon' }),
-      h('span', { class: 'p-label' }, pronouns)
-    )
+  const el = h(
+    'li',
+    {
+      class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
+      itemprop: 'pronouns',
+      show_title: false,
+      'aria-label': `Pronouns: ${pronouns}`
+    },
+    commentDiscussion({ class: 'octicon' }),
+    h('span', { class: 'p-label' }, pronouns)
   )
+
+  list.appendChild(el)
+
+  // Tabs do not trigger a page reload but does re-render everything, so we need to re-inject
+  document.querySelectorAll('.UnderlineNav-item').forEach((tab) => {
+    let hasTriggered = false
+    tab.addEventListener('click', () => {
+      if (hasTriggered) return
+
+      hasTriggered = true
+      const interval = setInterval(() => {
+        if (!document.querySelector('.vcard-details [itemprop="pronouns"]')) {
+          clearInterval(interval)
+          const list = document.querySelector('.vcard-details')
+          list.appendChild(el)
+        }
+      }, 100)
+    })
+  })
 }
 
 async function injectProfileLists () {

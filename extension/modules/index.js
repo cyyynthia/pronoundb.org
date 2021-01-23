@@ -25,10 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import * as discord from './discord'
-import * as github from './github'
-import * as twitch from './twitch'
-import * as twitter from './twitter'
+import * as discord from './discord.js'
+import * as github from './github.js'
+import * as twitch from './twitch.js'
+import * as twitter from './twitter.js'
 
 export default {
   discord,

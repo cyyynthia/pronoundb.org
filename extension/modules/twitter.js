@@ -25,10 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h, css } from '../util/dom'
-import { fetchPronouns } from '../util/fetch'
-import { connect, invoke } from '../util/bridge'
-import { topics } from '../icons/twitter'
+import { h, css } from '../util/dom.js'
+import { fetchPronouns } from '../util/fetch.js'
+import { connect, invoke } from '../util/bridge.js'
+import { topics } from '../icons/twitter.js'
 
 function fetchCurrentProfileId () {
   const nodeDescription = document.querySelector('[data-testid="UserDescription"]')

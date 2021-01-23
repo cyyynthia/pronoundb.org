@@ -25,9 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h, css } from '../util/dom'
-import { connect, invoke } from '../util/bridge'
-import { fetchPronouns } from '../util/fetch'
+import { h, css } from '../util/dom.js'
+import { connect, invoke } from '../util/bridge.js'
+import { fetchPronouns } from '../util/fetch.js'
 import { PronounsShort } from '../shared.ts'
 
 function fetchIdForUsername (username) {

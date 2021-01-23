@@ -25,9 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h, css } from '../util/dom'
-import { connect, invoke } from '../util/bridge'
-import { fetchPronouns, fetchPronounsBulk } from '../util/fetch'
+import { h, css } from '../util/dom.js'
+import { connect, invoke } from '../util/bridge.js'
+import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
 
 // Author ID fetchers
 function fetchMessageAuthors (ids) {
@@ -146,6 +146,11 @@ function handleMutation (mutations) {
 
 export function run () {
   connect()
+
+  // Process messages already loaded
+  handleMessages(document.querySelectorAll('[id^=chat-messages-]'))
+
+  // Mutation observer
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 
