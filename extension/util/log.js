@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const format = str => `[${chrome.runtime.getManifest().name} v${chrome.runtime.getManifest().version}] ${str}`
+const format = (str) => `[${chrome.runtime.getManifest().name} v${chrome.runtime.getManifest().version}] ${str}`
 
 export function debug (str) {
   console.debug(format(str))

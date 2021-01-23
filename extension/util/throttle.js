@@ -25,67 +25,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createDeferred } from './deferred'
-import { error } from './log'
+export default function (fn) {
+  let timer = null
+  let buffer = []
 
-function doFetchSingle (platform, id) {
-  return new Promise(resolve =>
-    chrome.runtime.sendMessage(
-      { kind: 'http', target: 'lookup', platform, id },
-      function (res) {
-        if (res.success) return resolve(res.data)
-        error('Failed to fetch:', res.error)
-      }
-    )
-  )
-}
+  return function (arg) {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
+      fn(buffer)
+      timer = null
+      buffer = []
+    }, 200)
 
-function doFetchBulk (platform, ids) {
-  return new Promise(resolve =>
-    chrome.runtime.sendMessage(
-      { kind: 'http', target: 'lookup-bulk', platform, ids },
-      function (res) {
-        if (res.success) return resolve(res.data)
-        error('Failed to fetch:', res.error)
-      }
-    )
-  )
-}
-
-const cache = {}
-export function fetchPronouns (platform, id) {
-  if (!cache[platform]) cache[platform] = {}
-  if (!cache[platform][id]) {
-    cache[platform][id] = doFetchSingle(platform, id) .then(
-      data => data.pronouns ?? null
-    )
+    buffer.push(arg)
   }
-  return cache[platform][id]
-}
-
-export async function fetchPronounsBulk (platform, ids) {
-  if (!cache[platform]) cache[platform] = {}
-  const toFetch = []
-  const res = {}
-  const def = {}
-  for (const id of ids) {
-    if (cache[platform][id]) {
-      res[id] = await cache[platform][id]
-    } else {
-      def[id] = createDeferred()
-      cache[platform][id] = def[id].promise
-      toFetch.push(id)
-    }
-  }
-
-  if (toFetch.length > 0) {
-    const data = await doFetchBulk(platform, toFetch)
-    for (const id of toFetch) {
-      const pronouns = data[id] ?? null
-      def[id].resolve(pronouns)
-      res[id] = pronouns
-    }
-  }
-
-  return res
 }

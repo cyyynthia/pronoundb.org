@@ -29,6 +29,7 @@ import { h, css } from '../util/dom.js'
 import { connect, invoke } from '../util/bridge.js'
 import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
 import { formatPronouns } from '../util/format.js'
+import throttle from '../util/throttle.js'
 
 // Author ID fetchers
 function fetchMessageAuthors (ids) {
@@ -57,6 +58,22 @@ function fetchFocusedUser () {
   return document.querySelector('div[class^="modal-"]')
     .__reactInternalInstance$.memoizedProps
     .children.props.children.props.user.id
+}
+
+function fetchAutocompleteRowIds (pointers) {
+  const res = {}
+
+  // Use old for to avoid transpilation
+  for (let i = 0; i < pointers.length; i++) {
+    const pointer = pointers[i]
+    const row = document.querySelector(`[data-pronoundb-target="${pointer}"]`)
+    if (!row) continue
+
+    const reactKey = Object.keys(row).find(k => k.startsWith('__reactInternalInstance'))
+    res[pointer] = row[reactKey].return.return.return.key
+  }
+
+  return res
 }
 
 // Handlers
@@ -110,19 +127,33 @@ async function handleUserModal (node) {
   }
 }
 
-// Throttle messages to bulk process them
-let messageTimer = null
-let messagesBuffer = []
-function handleMessage (node) {
-  if (messageTimer) clearTimeout(messageTimer)
-  messageTimer = setTimeout(() => {
-    handleMessages(messagesBuffer)
-    messageTimer = null
-    messagesBuffer = []
-  }, 200)
+let popoutIdCache = 0
+async function handleAutocompleteRows (nodes) {
+  const pointers = nodes.map((node) => node.dataset.pronoundbTarget = ++popoutIdCache)
+  const idsMap = await invoke(fetchAutocompleteRowIds, pointers)
+  const ids = Array.from(new Set(Object.values(idsMap)))
+  const pronounsMap = await fetchPronounsBulk('discord', ids)
 
-  messagesBuffer.push(node)
+  for (const pointer of pointers) {
+    const row = document.querySelector(`[data-pronoundb-target="${pointer}"]`)
+    if (!row) continue
+
+    row.removeAttribute('data-pronoundb-target')
+    const pronouns = pronounsMap[idsMap[pointer]]
+    if (pronouns) {
+      const tag = row.querySelector('.description-11DmNu')
+      const element = document.createElement('div')
+      element.className = tag.children[0].className
+      element.style.marginLeft = '4px'
+      element.innerText = ` • ${formatPronouns(pronouns)}`
+      tag.appendChild(element)
+    }
+  }
 }
+
+// Bulk process stuff
+const handleMessage = throttle(handleMessages)
+const handleAutocompleteRow = throttle(handleAutocompleteRows)
 
 function handleMutation (mutations) {
   for (const { addedNodes } of mutations) {
@@ -141,6 +172,18 @@ function handleMutation (mutations) {
         handleUserModal(node)
         continue
       }
+
+      if (node.className?.startsWith?.('autocomplete-')) {
+        handleAutocompleteRows(
+          Array.from(
+            node.querySelectorAll('[class^="autocompleteRow"]')).filter((node) => node.querySelector('[role="img"]')
+          )
+        )
+      }
+
+      if (node.className?.startsWith?.('autocompleteRow') && node.querySelector('[role="img"]')) {
+        handleAutocompleteRow(node)
+      }
     }
   }
 }
@@ -149,7 +192,7 @@ export function run () {
   connect()
 
   // Process messages already loaded
-  handleMessages(document.querySelectorAll('[id^=chat-messages-]'))
+  handleMessages(Array.from(document.querySelectorAll('[id^=chat-messages-]')))
 
   // Mutation observer
   const observer = new MutationObserver(handleMutation)
