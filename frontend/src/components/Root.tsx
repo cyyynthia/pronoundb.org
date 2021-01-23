@@ -40,6 +40,7 @@ import OAuth from './OAuth'
 import Docs from './Docs'
 import Notice from './Legal/Notice'
 import Privacy from './Legal/Privacy'
+import Onboarding from './Onboarding'
 import { Routes } from '@constants'
 
 interface RootProps {
@@ -55,8 +56,8 @@ function Root (props: RootProps) {
   // useMeta({ name: 'og:image', content: avatar })
   useMeta({ name: 'og:title', content: 'PronounDB' })
   useMeta({ name: 'og:site_name', content: 'PronounDB' })
-  useMeta({ name: 'og:description', content: 'Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet' })
-  useMeta({ name: 'description', content: 'Chrome/Firefox extension that lets people know how to refer to each other on various places of the Internet' })
+  useMeta({ name: 'og:description', content: 'A browser extension that lets people know how to refer to each other on various places of the Internet.' })
+  useMeta({ name: 'description', content: 'A browser extension that lets people know how to refer to each other on various places of the Internet.' })
   // useLink({ rel: 'shortcut icon', href: avatar })
 
   return (
@@ -78,6 +79,7 @@ function Root (props: RootProps) {
           <Docs path={Routes.DOCS}/>
           <Notice path={Routes.LEGAL}/>
           <Privacy path={Routes.PRIVACY}/>
+          <Onboarding path={Routes.ONBOARDING}/>
         </Router>
       </Layout>
     </AppContext>

@@ -44,12 +44,12 @@ function Supported (_: RoutableProps) {
         <li>Discord</li>
         <li>GitHub</li>
         <li>Twitch</li>
+        <li>Twitter</li>
       </ul>
       <p>
         Support coming soon:
       </p>
       <ul>
-        <li>Twitter</li>
         <li>Mastodon</li>
         <li>GitLab</li>
         <li>Reddit</li>

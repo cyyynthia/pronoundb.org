@@ -63,7 +63,7 @@ export const PlatformNames = Object.freeze({
   twitter: 'Twitter'
 })
 
-export const WEBSITE = 'https://pronoundb.org' // process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
+export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
 
 export const Endpoints = Object.freeze({
   LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,

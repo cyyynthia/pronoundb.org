@@ -25,7 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Endpoints } from './shared.ts'
+import { Endpoints, WEBSITE } from './shared.ts'
+
+if (process.env.NODE_ENV === 'production') {
+  chrome.runtime.onInstalled.addListener(() => {
+    chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
+  })
+}
 
 chrome.runtime.onMessage.addListener(
   function (request, _, sendResponse) {

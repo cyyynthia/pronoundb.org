@@ -25,36 +25,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Routes = Object.freeze({
-  HOME: '/',
-  SUPPORTED: '/supported',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  ME: '/me',
-  LINK: '/link',
-  DOCS: '/docs',
-  LEGAL: '/legal',
-  PRIVACY: '/privacy',
-  ONBOARDING: '/onboarding',
-  DONATE: 'https://ko-fi.com/cyyynthia',
-  GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
-  LINK_CHROME: 'https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf',
-  LINK_FIREFOX: 'https://addons.mozilla.org/firefox/addon/pronoundb',
-  LINK_EDGE: 'https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn'
-})
+import { h, Fragment } from 'preact'
+import { useTitle } from 'hoofd/preact'
+import { useContext } from 'preact/hooks'
+import type { RoutableProps } from 'preact-router'
 
-export const Endpoints = Object.freeze({
-  SELF: '/api/v1/accounts/me',
-  OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
-  CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`
-})
+import { Ctx } from './AppContext'
+import { Endpoints, Routes } from '@constants'
+import { PlatformNames, Supported } from '@shared'
 
-export const Errors: Record<string, string> = Object.freeze({
-  ERR_GENERIC: 'Something went wrong!',
-  ERR_OAUTH_GENERIC: 'Could not authenticate you with the external platform due to an error.',
-  ERR_ALREADY_EXISTS: 'This account already exists, did you mean to login?',
-  ERR_NOT_FOUND: 'No account was found, did you mean to create an account?',
-  ERR_LOGGED_IN: 'You are already logged in.',
-  ERR_NOT_LOGGED_IN: 'You must be logged in to do this.',
-  ERR_ALREADY_LINKED: 'This account has already been linked to another account.'
-})
+function Onboarding (_: RoutableProps) {
+  const { user } = useContext(Ctx)
+  useTitle('Welcome!')
+
+  const how = user
+    ? <a href={Routes.ME}>going to your account</a>
+    : (
+      <Fragment>
+        <a href={Routes.LOGIN}>logging in</a> or <a href={Routes.REGISTER}>creating an account</a>
+      </Fragment>
+    )
+
+  return (
+    <div>
+      <h2>Welcome!</h2>
+      <p>
+        Thanks for installing the extension. You'll finally no longer have to go through the trouble of reminding
+        pronouns for every single person you see on the Internet!
+      </p>
+      <h3>Share your own pronouns</h3>
+      <p>
+        You can let other people know your pronouns by {how}, configuring your pronouns and linking your accounts. They
+        will instantly see your pronouns show up on the accounts you linked. You can link multiple accounts per
+        platform, if you're into that kind of things!
+      </p>
+      <h3>Feeling generous?</h3>
+      <p>
+        If you wish, you can <a href={Routes.DONATE} target='_blank' rel='noreferrer'>donate</a>, so I can keep buying
+        enough cookies and coffee to stay alive! 🥰
+      </p>        
+    </div>
+  )
+}
+
+Onboarding.displayName = 'Onboarding'
+export default Onboarding
