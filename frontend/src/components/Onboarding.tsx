@@ -31,8 +31,7 @@ import { useContext } from 'preact/hooks'
 import type { RoutableProps } from 'preact-router'
 
 import { Ctx } from './AppContext'
-import { Endpoints, Routes } from '@constants'
-import { PlatformNames, Supported } from '@shared'
+import { Routes } from '@constants'
 
 function Onboarding (_: RoutableProps) {
   const { user } = useContext(Ctx)

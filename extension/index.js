@@ -25,8 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import modules from './modules'
-import { debug, log } from './util/log'
+import modules from './modules/index.js'
+import { debug, log } from './util/log.js'
 import { PlatformNames } from './shared.ts'
 
 for (const platform in modules) {

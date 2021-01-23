@@ -28,6 +28,7 @@
 import { h, css } from '../util/dom.js'
 import { connect, invoke } from '../util/bridge.js'
 import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
+import { formatPronouns } from '../util/format.js'
 
 // Author ID fetchers
 function fetchMessageAuthors (ids) {
@@ -70,7 +71,7 @@ async function handleMessages (nodes) {
     const header = document.querySelector(`#chat-messages-${id} h2`)
     if (pronouns && header) {
       header.appendChild(
-        h('span', { class: 'pronoundb-pronouns', style: css({ color: 'var(--text-muted)', fontSize: '.9rem' }) }, ` • ${pronouns}`)
+        h('span', { class: 'pronoundb-pronouns', style: css({ color: 'var(--text-muted)', fontSize: '.9rem' }) }, ` • ${formatPronouns(pronouns)}`)
       )
     }
   }
@@ -83,14 +84,14 @@ async function handleUserPopOut (node) {
   if (pronouns) {
     const frag = document.createDocumentFragment()
     frag.appendChild(h('div', { class: 'bodyTitle-Y0qMQz marginBottom8-AtZOdT size12-3R0845' }, 'Pronouns'))
-    frag.appendChild(h('div', { class: 'marginBottom8-AtZOdT size14-e6ZScH' }, pronouns))
+    frag.appendChild(h('div', { class: 'marginBottom8-AtZOdT size14-e6ZScH' }, formatPronouns(pronouns)))
     node.querySelector('.bodyInnerWrapper-Z8WDxe').appendChild(frag)
 
     setTimeout(() => {
       const { y, height } = node.getBoundingClientRect()
       const bottom = window.innerHeight - y - height - 16
       if (bottom < 0) node.style.top = `${parseInt(node.style.top) + bottom}px`
-    }, 0)
+    }, 5)
   }
 }
 
@@ -104,7 +105,7 @@ async function handleUserModal (node) {
 
     const frag = document.createDocumentFragment()
     frag.appendChild(h('div', { class: 'userInfoSectionHeader-CBvMDh' }, 'Pronouns'))
-    frag.appendChild(h('div', { class: 'marginBottom8-AtZOdT size14-e6ZScH colorStandard-2KCXvj' }, pronouns))
+    frag.appendChild(h('div', { class: 'marginBottom8-AtZOdT size14-e6ZScH colorStandard-2KCXvj' }, formatPronouns(pronouns)))
     container.appendChild(frag)
   }
 }

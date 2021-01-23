@@ -25,7 +25,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Pronouns } from '../shared.ts'
 import { createDeferred } from './deferred'
 import { error } from './log'
 
@@ -54,21 +53,17 @@ function doFetchBulk (platform, ids) {
 }
 
 const cache = {}
-export function fetchPronouns (platform, id, raw) {
+export function fetchPronouns (platform, id) {
   if (!cache[platform]) cache[platform] = {}
   if (!cache[platform][id]) {
     cache[platform][id] = doFetchSingle(platform, id) .then(
-      data => data.pronouns
-        ? raw
-          ? data.pronouns
-          : Pronouns[data.pronouns]
-        : null
+      data => data.pronouns ?? null
     )
   }
   return cache[platform][id]
 }
 
-export async function fetchPronounsBulk (platform, ids, raw) {
+export async function fetchPronounsBulk (platform, ids) {
   if (!cache[platform]) cache[platform] = {}
   const toFetch = []
   const res = {}
@@ -86,11 +81,7 @@ export async function fetchPronounsBulk (platform, ids, raw) {
   if (toFetch.length > 0) {
     const data = await doFetchBulk(platform, toFetch)
     for (const id of toFetch) {
-      const pronouns = data[id]
-        ? raw
-          ? data.pronouns
-          : Pronouns[data[id]]
-        : null
+      const pronouns = data[id]?.pronouns ?? null
       def[id].resolve(pronouns)
       res[id] = pronouns
     }

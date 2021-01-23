@@ -28,6 +28,7 @@
 import { h, css } from '../util/dom.js'
 import { fetchPronouns } from '../util/fetch.js'
 import { connect, invoke } from '../util/bridge.js'
+import { formatPronouns } from '../util/format.js'
 import { topics } from '../icons/twitter.js'
 
 function fetchCurrentProfileId () {
@@ -60,7 +61,7 @@ async function injectProfileHeader (header) {
         'span',
         { class: template.className, 'data-pronoundb': 'true' },
         topics({ class: template.children[0].getAttribute('class') }),
-        pronouns
+        formatPronouns(pronouns)
       )
     )
   }
@@ -100,7 +101,7 @@ async function injectProfilePopOut (popout) {
             marginRight: '4px'
           })
         }),
-        pronouns
+        formatPronouns(pronouns)
       )
     )
     popout.insertBefore(element, popout.children[2])

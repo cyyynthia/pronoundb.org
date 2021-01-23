@@ -63,7 +63,7 @@ function injectHoverCards () {
             },
             commentDiscussion({ class: 'octicon' }),
             '\n  ',
-            pronouns
+            formatPronouns(pronouns)
           )
         )
       )
@@ -94,10 +94,10 @@ async function injectUserProfile () {
       class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
       itemprop: 'pronouns',
       show_title: false,
-      'aria-label': `Pronouns: ${pronouns}`
+      'aria-label': `Pronouns: ${formatPronouns(pronouns)}`
     },
     commentDiscussion({ class: 'octicon' }),
-    h('span', { class: 'p-label' }, pronouns)
+    h('span', { class: 'p-label' }, formatPronouns(pronouns))
   )
 
   list.appendChild(el)
@@ -145,7 +145,7 @@ async function injectProfileLists () {
           { class: margin ? 'ml-3' : '' },
           commentDiscussion({ class: 'octicon' }),
           '\n  ',
-          pronouns[item.dataset.userId]
+          formatPronouns(pronouns[item.dataset.userId])
         )
       )
     }

@@ -28,7 +28,7 @@
 import { h, css } from '../util/dom.js'
 import { connect, invoke } from '../util/bridge.js'
 import { fetchPronouns } from '../util/fetch.js'
-import { PronounsShort } from '../shared.ts'
+import { formatPronouns } from '../util/format.js'
 
 function fetchIdForUsername (username) {
   const node = document.querySelector(`.chat-line__message [data-a-user="${username}"]`)
@@ -69,7 +69,7 @@ function makeChatBadge (pronouns) {
     padding: '0 2px'
   })
 
-  return h('span', { class: 'pronoundb-pronouns', style }, PronounsShort[pronouns])
+  return h('span', { class: 'pronoundb-pronouns', style }, formatPronouns(pronouns, true))
 }
 
 async function handleChatLine (line) {

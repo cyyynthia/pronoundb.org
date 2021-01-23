@@ -58,6 +58,10 @@ h2:not(:first-of-type) {
   justify-content: space-between;
 }
 
+select {
+  width: 100%;
+}
+
 footer {
   margin-top: 8px;
   padding-top: 8px;

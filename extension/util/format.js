@@ -25,46 +25,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Supported, PlatformNames } from './shared.ts'
+import { Pronouns, PronounsShort } from '../shared.ts'
 
-const updateSetting = (e) => chrome.storage.sync.set({ [e.target.id]: e.target.checked })
+let pronounsFormat = null
+chrome.storage.sync.get([ 'styling' ], ({ styling }) => (pronounsFormat = styling ?? 'lower'))
 
-/* Generate UI */
-function createPlatformItem (platform) {
-  const div = document.createElement('div')
-  const input = document.createElement('input')
-  const label = document.createElement('label')
+export function formatPronouns (pronounsId, short) {
+  const pronouns = short ? PronounsShort[pronounsId] : Pronouns[pronounsId]
 
-  div.className = 'form-checkbox'
-  input.type = 'checkbox'
-  input.checked = true
-  input.id = `${platform}.enabled`
-  input.addEventListener('change', updateSetting)
-  label.setAttribute('for', `${platform}.enabled`)
-  label.innerText = PlatformNames[platform]
-
-  div.appendChild(label)
-  div.appendChild(input)
-  return div
+  return Array.isArray(pronouns)
+    ? pronounsFormat === 'pascal' ? pronouns[1] : pronouns[0]
+    : pronouns
 }
-
-const container = document.getElementById('platforms-container')
-Supported.forEach(p => container.appendChild(createPlatformItem(p)))
-
-const stylingSelector = document.querySelector('#pronouns-styling')
-stylingSelector.addEventListener('change', (e) => chrome.storage.sync.set({ styling: e.target.value }))
-
-document.getElementById('version-container').innerText = chrome.runtime.getManifest().version
-
-chrome.storage.sync.get(
-  [ 'styling', ...Supported.map(p => `${p}.enabled`) ],
-  ({ styling, ...settings }) => {
-    stylingSelector.value = styling ?? 'lower'
-
-    for (const key in settings) {
-      if (Object.prototype.hasOwnProperty.call(settings, key) && settings[key] === false) {
-        document.getElementById(key).checked = false
-      }
-    }
-  }
-)

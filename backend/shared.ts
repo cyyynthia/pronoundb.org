@@ -31,21 +31,21 @@ export const Supported = [ 'discord', 'github', 'twitch', 'twitter' ]
 
 export const Pronouns = Object.freeze({
   unspecified: null,
-  avoid: 'Avoid pronouns, use my name',
-  any: 'Any pronouns',
   // -- Contributors: please keep the list sorted alphabetically.
-  hh: 'he/him',
-  hs: 'he/she',
-  ht: 'he/they',
-  shh: 'she/he',
-  sh: 'she/her',
-  st: 'she/they',
-  th: 'they/he',
-  ts: 'they/she',
-  tt: 'they/them',
+  hh: [ 'he/him', 'He/Him' ],
+  hs: [ 'he/she', 'He/She' ],
+  ht: [ 'he/they', 'He/They' ],
+  shh: [ 'she/he', 'She/He' ],
+  sh: [ 'she/her', 'She/Her' ],
+  st: [ 'she/they', 'She/They' ],
+  th: [ 'they/he', 'They/He' ],
+  ts: [ 'they/she', 'They/She' ],
+  tt: [ 'they/them', 'They/Them' ],
   // --
+  any: 'Any pronouns',
   other: 'Other pronouns',
-  ask: 'Ask me my pronouns'
+  ask: 'Ask me my pronouns',
+  avoid: 'Avoid pronouns, use my name'
 })
 
 export const PronounsShort = Object.freeze({
