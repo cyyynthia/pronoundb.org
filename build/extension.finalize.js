@@ -60,6 +60,7 @@ function mkdirOverwrite (path) {
       unlinkSync(file)
     }
 
+    folders.reverse()
     for (const folder of folders) {
       rmdirSync(folder)
     }
