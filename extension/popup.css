@@ -28,9 +28,12 @@
 body {
   font-family: 'Quicksand', sans-serif;
   font-size: 14px;
-  width: 180px;
   margin: 12px;
   margin-bottom: 10px;
+  min-width: 180px;
+  width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
 }
 
 a {
@@ -68,4 +71,20 @@ footer {
   border-top: 1px solid #ddd;
   font-size: 12px;
   color: #444;
+}
+
+@media (prefers-color-scheme: 'dark') {
+  body {
+    background-color: #303030;
+    color: #ccc;
+  }
+
+  footer {
+    border-top-color: #666;
+    color: #888;
+  }
+
+  a {
+    color: #2bb2ff;
+  }
 }
