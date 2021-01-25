@@ -31,55 +31,97 @@ import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
 import { formatPronouns } from '../util/format.js'
 import throttle from '../util/throttle.js'
 
-// Author ID fetchers
-function fetchMessageAuthors (ids) {
+const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
+
+function fetchMessageAuthorsBridge (ids) {
   const idMap = {}
 
   // Use old for to avoid transpilation
   for (let i = 0; i < ids.length; i++) {
     const id = ids[i]
-    const node = document.getElementById(`chat-messages-${id}`)
+    let node = document.getElementById(`chat-messages-${id}`)
     if (!node) continue // happens when message just gets sent
 
-    // seems like discord somehow makes reactInternalInstance static w/o the random part
+    node = 'wrappedJSObject' in node ? node.wrappedJSObject : node
     idMap[id] = node.__reactInternalInstance$.memoizedProps.children[2].props.message.author.id
   }
 
   return idMap
 }
 
-function fetchPoppedUser (id) {
-  return document.getElementById(id)
-    .__reactInternalInstance$.memoizedProps
+function fetchPoppedUserBridge (id) {
+  let el = document.getElementById(id)
+  el = 'wrappedJSObject' in el ? el.wrappedJSObject : el
+
+  return node.__reactInternalInstance$.memoizedProps
     .children.props.children.props.children.props.userId
 }
 
-function fetchFocusedUser () {  
-  return document.querySelector('div[class^="modal-"]')
-    .__reactInternalInstance$.memoizedProps
+function fetchFocusedUserBridge () {  
+  let el = document.querySelector('div[class^="modal-"]')
+  el = 'wrappedJSObject' in el ? node.wrappedJSObject : el
+
+  return el.__reactInternalInstance$.memoizedProps
     .children.props.children.props.user.id
 }
 
-function fetchAutocompleteRowIds (pointers) {
-  const res = {}
+function fetchAutocompleteRowIdsBridge (pointers) {
+  const res = []
 
   // Use old for to avoid transpilation
   for (let i = 0; i < pointers.length; i++) {
     const pointer = pointers[i]
     const row = document.querySelector(`[data-pronoundb-target="${pointer}"]`)
-    if (!row) continue
+    if (!row) {
+      res.push(null)
+      continue
+    }
 
-    const reactKey = Object.keys(row).find(k => k.startsWith('__reactInternalInstance'))
-    res[pointer] = row[reactKey].return.return.return.key
+    row.removeAttribute('data-pronoundb-target')
+    res.push(row.__reactInternalInstance$.return.return.return.key)
   }
 
   return res
 }
 
+async function fetchMessageAuthors (ids) {
+  if (isFirefox) {
+    return fetchMessageAuthorsBridge(ids)
+  }
+
+  return invoke(fetchMessageAuthorsBridge, ids)
+}
+
+async function fetchPoppedUser (id) {
+  if (isFirefox) {
+    return fetchPoppedUserBridge(id)
+  }
+
+  return invoke(fetchPoppedUserBridge, id)
+}
+
+async function fetchFocusedUser () {  
+  if (isFirefox) {
+    return fetchFocusedUserBridge()
+  }
+
+  return invoke(fetchFocusedUserBridge)
+}
+
+let autocompleteRowsIdCache = 0
+async function fetchAutocompleteRowIds (nodes) {
+  if (isFirefox) {
+    return nodes.map((node) => node.wrappedJSObject.__reactInternalInstance$.return.return.return.key)
+  }
+
+  const pointers = nodes.map((node) => node.dataset.pronoundbTarget = `acrow-${++autocompleteRowsIdCache}`)
+  return invoke(fetchAutocompleteRowIdsBridge, pointers)
+}
+
 // Handlers
 async function handleMessages (nodes) {
   const ids = nodes.map(node => node.id.slice(14))
-  const idMap = await invoke(fetchMessageAuthors, ids)
+  const idMap = await fetchMessageAuthors(ids)
   const authors = Array.from(new Set(Object.values(idMap)))
   const pronounsMap = await fetchPronounsBulk('discord', authors)
 
@@ -95,7 +137,7 @@ async function handleMessages (nodes) {
 }
 
 async function handleUserPopOut (node) {
-  const id = await invoke(fetchPoppedUser, node.id)
+  const id = await fetchPoppedUser(node.id)
   const pronouns = await fetchPronouns('discord', id)
 
   if (pronouns) {
@@ -113,7 +155,7 @@ async function handleUserPopOut (node) {
 }
 
 async function handleUserModal (node) {
-  const id = await invoke(fetchFocusedUser)
+  const id = await fetchFocusedUser()
   const pronouns = await fetchPronouns('discord', id)
 
   if (pronouns) {
@@ -127,27 +169,24 @@ async function handleUserModal (node) {
   }
 }
 
-let popoutIdCache = 0
-async function handleAutocompleteRows (nodes) {
-  const pointers = nodes.map((node) => node.dataset.pronoundbTarget = ++popoutIdCache)
-  const idsMap = await invoke(fetchAutocompleteRowIds, pointers)
-  const ids = Array.from(new Set(Object.values(idsMap)))
-  const pronounsMap = await fetchPronounsBulk('discord', ids)
+async function handleAutocompleteRows (rows) {
+  const ids = await fetchAutocompleteRowIds(rows)
+  const pronounsMap = await fetchPronounsBulk('discord', Array.from(new Set(ids)))
 
-  for (const pointer of pointers) {
-    const row = document.querySelector(`[data-pronoundb-target="${pointer}"]`)
-    if (!row) continue
+  for (let i = 0; i < rows.length; i++) {
+    const id = ids[i]
+    if (!id) return
 
-    row.removeAttribute('data-pronoundb-target')
-    const pronouns = pronounsMap[idsMap[pointer]]
-    if (pronouns) {
-      const tag = row.querySelector('.description-11DmNu')
-      const element = document.createElement('div')
-      element.className = tag.children[0].className
-      element.style.marginLeft = '4px'
-      element.innerText = ` • ${formatPronouns(pronouns)}`
-      tag.appendChild(element)
-    }
+    const pronouns = pronounsMap[id]
+    if (!pronouns) return
+
+    const row = rows[i]
+    const tag = row.querySelector('.description-11DmNu')
+    const element = document.createElement('div')
+    element.className = tag.children[0].className
+    element.style.marginLeft = '4px'
+    element.innerText = ` • ${formatPronouns(pronouns)}`
+    tag.appendChild(element)
   }
 }
 
@@ -162,13 +201,17 @@ function handleMutation (mutations) {
         handleMessage(node)
         continue
       }
-      
+
+      if (isFirefox && node.className?.startsWith?.('chatContent-')) {
+        handleMessages(Array.from(node.querySelectorAll('div[class^="message-"]')))
+      }
+
       if (node.id?.startsWith?.('popout_') && node.querySelector('div[role="dialog"][class^="userPopout-"]')) {
         handleUserPopOut(node)
         continue
       }
 
-      if (node.className?.startsWith?.('modal-') && node.querySelector('div[class^="userInfoSection-"')) {
+      if (node.className?.startsWith?.('modal-') && node.querySelector('div[class^="userInfoSection-"]')) {
         handleUserModal(node)
         continue
       }
@@ -189,7 +232,9 @@ function handleMutation (mutations) {
 }
 
 export function run () {
-  connect()
+  if (!isFirefox) {
+    connect()
+  }
 
   // Process messages already loaded
   handleMessages(Array.from(document.querySelectorAll('[id^=chat-messages-]')))

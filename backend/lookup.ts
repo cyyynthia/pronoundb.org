@@ -57,6 +57,8 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
 
 async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   reply.header('access-control-allow-origin', '*')
+  reply.header('access-control-allow-methods', 'GET')
+  reply.header('access-control-allow-headers', 'x-pronoundb-source')
 
   const query = request.query as Record<string, string>
   if (!Supported.includes(query.platform)) {
@@ -87,7 +89,16 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   reply.send(res)
 }
 
+function cors (_: FastifyRequest, reply: FastifyReply) {
+  reply.header('access-control-allow-origin', '*')
+  reply.header('access-control-allow-methods', 'GET')
+  reply.header('access-control-allow-headers', 'x-pronoundb-source')
+  reply.send()
+}
+
 export default async function (fastify: FastifyInstance) {
   fastify.get('/lookup', lookup)
   fastify.get('/lookup-bulk', lookupBulk)
+  fastify.options('/lookup', cors)
+  fastify.options('/lookup-bulk', cors)
 }

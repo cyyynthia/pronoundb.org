@@ -27,6 +27,7 @@
 
 import { commentDiscussion } from '../icons/octicons.js'
 import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
+import { formatPronouns } from '../util/format.js'
 import { css, h } from '../util/dom.js'
 
 function injectHoverCards () {

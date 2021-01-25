@@ -37,7 +37,7 @@ export const Pronouns = Object.freeze({
   hs: [ 'he/she', 'He/She' ],
   ht: [ 'he/they', 'He/They' ],
   ih: [ 'it/him', 'It/Him' ],
-  ii: [ 'it/it', 'It/It' ],
+  ii: [ 'it/its', 'It/Its' ],
   is: [ 'it/she', 'It/She' ],
   it: [ 'it/they', 'It/They' ],
   shh: [ 'she/he', 'She/He' ],

@@ -132,8 +132,9 @@ if (production) {
   zipExtFirefox.finalize()
   zipExtSource.finalize()
 } else {
-  manifest.name += ' (dev)'
-  manifest.permissions.push('http://localhost:8080/api/v1/*')
+  const usedManifest = process.argv.includes('--firefox') ? manifestFirefox : manifest
+  usedManifest.name += ' (dev)'
+  usedManifest.permissions.push('http://localhost:8080/api/v1/*')
 
   const dest = join(__dirname, '..', 'dist', 'extension', 'unpacked')
   mkdirOverwrite(dest)
@@ -145,8 +146,5 @@ if (production) {
     )
   }
 
-  writeFileSync(
-    join(dest, 'manifest.json'),
-    JSON.stringify(process.argv.includes('--firefox') ? manifestFirefox : manifest, null, 2)
-  )
+  writeFileSync(join(dest, 'manifest.json'), JSON.stringify(usedManifest, null, 2))
 }
