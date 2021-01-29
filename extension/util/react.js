@@ -25,23 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createDeferred } from './deferred'
-import { warn, error } from './log'
+import { createDeferred } from './deferred.js'
+import { warn, error } from './log.js'
+
+const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 
 const pendingInvokes = new Map()
-
-function runAs (js) {
-  const script = document.createElement('script')
-  script.textContent = js
-  document.head.appendChild(script)
-  script.remove()
-}
-
-let connected = false
-export function connect () {
-  if (connected) throw new Error('Bridge already connected!')
-
-  connected = true
+if (!isFirefox) {
   window.addEventListener('message', function (e) {
     if (e.source === window && e.data.source === 'pronoundb') {
       const data = e.data.payload
@@ -57,28 +47,91 @@ export function connect () {
   })
 }
 
-export function invoke (fn, ...args) {
-  if (!connected) throw new Error('Bridge is not connected!')
-
+function invoke (fn, ...args) {
   const deferred = createDeferred()
   const id = Math.random().toString(36).slice(2)
   const timeout = setTimeout(() => deferred.resolve(null) | error('Invocation timed out after 10 seconds.'), 10e3)
   pendingInvokes.set(id, v => pendingInvokes.delete(id) | deferred.resolve(v) | clearTimeout(timeout))
 
-  const js = fn.toString().replace(/^function[^\(]+/, 'function')
   const script = `
-    (async function () {
+    (function () {
       window.postMessage({
         source: 'pronoundb',
         payload: {
           action: 'invoke.result',
-          res: await (${js})(${args.map(a => JSON.stringify(a)).join(',')}),
+          res: (${fn})(${args.map(a => JSON.stringify(a)).join(',')}),
           id: '${id}'
         }
       })
     }())
   `
 
-  runAs(script)
+  const scriptEl = document.createElement('script')
+  scriptEl.textContent = script
+  document.head.appendChild(scriptEl)
+  scriptEl.remove()
+
   return deferred.promise
+}
+
+function doFetchReactProp (targets, propPath) {
+  if (typeof targets[0] === 'number') {
+    targets = targets.map((target) => {
+      const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
+      node.removeAttribute('data-pronoundb-target-id')
+      return node
+    })
+  }
+
+  if (targets.length === 0) return []
+
+  const reactKey = Object.keys(targets[0]).find(k => k.startsWith('__reactInternalInstance'))
+  if (!reactKey) return
+
+  let props = []
+  for (let i = 0; i < targets.length; i++) {
+    let res = targets[i][reactKey]
+    for (let j = 0; j < propPath.length; j++) {
+      res = res?.[propPath[j]]
+    }
+    props.push(res)
+  }
+
+  return props
+}
+
+function doExecuteReactProp (targets, propPath, args) {
+  const fn = doFetchReactProp(targets, propPath)
+  return fn(...args)
+}
+
+const fetchReactPropFn = doFetchReactProp.toString().replace('doFetchReactProp', '')
+const executeReactPropFn = fetchReactPropFn.replace('propPath', 'propPath, args').replace('return res', 'return res(...args)')
+
+let targetId = 0
+
+export async function fetchReactPropBulk (nodes, propPath) {
+  if (isFirefox) {
+    return doFetchReactProp(nodes.map((node) => node.wrappedJSObject), propPath)
+  }
+
+  const targets = nodes.map((node) => node.dataset.pronoundbTargetId = ++targetId)
+  return invoke(fetchReactPropFn, targets, propPath)
+}
+
+export async function executeReactPropBulk (nodes, propPath, args = []) {
+  if (isFirefox) {
+    return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, args)
+  }
+
+  const targets = nodes.map((node) => node.dataset.pronoundbTargetId = ++targetId)
+  return invoke(executeReactPropFn, targets, propPath, args)
+}
+
+export async function fetchReactProp (node, propPath) {
+  return fetchReactPropBulk([ node ], propPath).then((res) => res[0])
+}
+
+export async function executeReactProp (node, propPath, args = []) {
+  return executeReactPropBulk([ node ], propPath, args).then((res) => res[0])
 }

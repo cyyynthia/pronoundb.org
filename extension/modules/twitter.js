@@ -27,56 +27,16 @@
 
 import { h, css } from '../util/dom.js'
 import { fetchPronouns } from '../util/fetch.js'
-import { connect, invoke } from '../util/bridge.js'
+import { fetchReactProp } from '../util/react.js'
 import { formatPronouns } from '../util/format.js'
 import { topics } from '../icons/twitter.js'
 
-const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
-
-function fetchCurrentProfileIdBridge () {
+async function injectProfileHeader (header) {
   const nodeDescription = document.querySelector('[data-testid="UserDescription"]')
   if (!nodeDescription) return
 
-  let node = nodeDescription.parentElement.parentElement.parentElement.parentElement
-  node = 'wrappedJSObject' in node ? node.wrappedJSObject : node
-
-  const reactKey = Object.keys(node).find(k => k.startsWith('__reactInternalInstance'))
-  return node[reactKey].return.return.pendingProps.scribeData.profile_id
-}
-
-function fetchPoppedOutUserBridge (popout) {
-  if (typeof popout === 'number') {
-    popout = document.querySelector(`[data-pronoundb-target="usrpop-${popout}"]`)
-  }
-
-  if (!popout) return
-  popout.removeAttribute('data-pronoundb-target')
-
-  popout = 'wrappedJSObject' in popout ? popout.wrappedJSObject : popout
-  const reactKey = Object.keys(popout).find(k => k.startsWith('__reactInternalInstance'))
-  return popout[reactKey].memoizedProps.children[3].props.children.props.userId
-}
-
-async function fetchCurrentProfileId () {
-  if (isFirefox) {
-    return fetchCurrentProfileIdBridge()
-  }
-
-  return invoke(fetchCurrentProfileIdBridge)
-}
-
-let popoutIdCache = 0
-async function fetchPoppedOutUser (popout) {
-  if (isFirefox) {
-    return fetchPoppedOutUserBridge(popout)
-  }
-
-  popout.dataset.pronoundbTarget = `usrpop-${++popoutIdCache}`
-  return invoke(fetchPoppedOutUserBridge, popoutIdCache)
-}
-
-async function injectProfileHeader (header) {
-  const id = await fetchCurrentProfileId()
+  const node = nodeDescription.parentElement.parentElement.parentElement.parentElement
+  const id = await fetchReactProp(node, [ 'return', 'return', 'pendingProps', 'scribeData', 'profile_id' ])
   if (!id) return
 
   const pronouns = await fetchPronouns('twitter', id)
@@ -94,7 +54,7 @@ async function injectProfileHeader (header) {
 }
 
 async function injectProfilePopOut (popout) {
-  const id = await fetchPoppedOutUser(popout)
+  const id = await fetchReactProp(popout, [ 'memoizedProps', 'children', 3, 'props', 'children', 'props', 'userId' ])
   if (!id) return
 
   const pronouns = await fetchPronouns('twitter', id)
@@ -155,10 +115,6 @@ function handleMutation (nodes) {
 }
 
 export function run () {
-  if (!isFirefox) {
-    connect()
-  }
-
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 }

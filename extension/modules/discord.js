@@ -26,108 +26,24 @@
  */
 
 import { h, css } from '../util/dom.js'
-import { connect, invoke } from '../util/bridge.js'
+import { fetchReactProp, fetchReactPropBulk } from '../util/react.js'
 import { fetchPronouns, fetchPronounsBulk } from '../util/fetch.js'
 import { formatPronouns } from '../util/format.js'
 import throttle from '../util/throttle.js'
 
 const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 
-function fetchMessageAuthorsBridge (ids) {
-  const idMap = {}
-
-  // Use old for to avoid transpilation
-  for (let i = 0; i < ids.length; i++) {
-    const id = ids[i]
-    let node = document.getElementById(`chat-messages-${id}`)
-    if (!node) continue // happens when message just gets sent
-
-    node = 'wrappedJSObject' in node ? node.wrappedJSObject : node
-    idMap[id] = node.__reactInternalInstance$.memoizedProps.children[2].props.message.author.id
-  }
-
-  return idMap
-}
-
-function fetchPoppedUserBridge (id) {
-  let el = document.getElementById(id)
-  el = 'wrappedJSObject' in el ? el.wrappedJSObject : el
-
-  return node.__reactInternalInstance$.memoizedProps
-    .children.props.children.props.children.props.userId
-}
-
-function fetchFocusedUserBridge () {  
-  let el = document.querySelector('div[class^="modal-"]')
-  el = 'wrappedJSObject' in el ? el.wrappedJSObject : el
-
-  return el.__reactInternalInstance$.memoizedProps
-    .children.props.children.props.user.id
-}
-
-function fetchAutocompleteRowIdsBridge (pointers) {
-  const res = []
-
-  // Use old for to avoid transpilation
-  for (let i = 0; i < pointers.length; i++) {
-    const pointer = pointers[i]
-    const row = document.querySelector(`[data-pronoundb-target="${pointer}"]`)
-    if (!row) {
-      res.push(null)
-      continue
-    }
-
-    row.removeAttribute('data-pronoundb-target')
-    res.push(row.__reactInternalInstance$.return.return.return.key)
-  }
-
-  return res
-}
-
-async function fetchMessageAuthors (ids) {
-  if (isFirefox) {
-    return fetchMessageAuthorsBridge(ids)
-  }
-
-  return invoke(fetchMessageAuthorsBridge, ids)
-}
-
-async function fetchPoppedUser (id) {
-  if (isFirefox) {
-    return fetchPoppedUserBridge(id)
-  }
-
-  return invoke(fetchPoppedUserBridge, id)
-}
-
-async function fetchFocusedUser () {  
-  if (isFirefox) {
-    return fetchFocusedUserBridge()
-  }
-
-  return invoke(fetchFocusedUserBridge)
-}
-
-let autocompleteRowsIdCache = 0
-async function fetchAutocompleteRowIds (nodes) {
-  if (isFirefox) {
-    return nodes.map((node) => node.wrappedJSObject.__reactInternalInstance$.return.return.return.key)
-  }
-
-  const pointers = nodes.map((node) => node.dataset.pronoundbTarget = `acrow-${++autocompleteRowsIdCache}`)
-  return invoke(fetchAutocompleteRowIdsBridge, pointers)
-}
-
-// Handlers
 async function handleMessages (nodes) {
-  const ids = nodes.map(node => node.id.slice(14))
-  const idMap = await fetchMessageAuthors(ids)
-  const authors = Array.from(new Set(Object.values(idMap)))
+  nodes = nodes.filter((node) => node.isConnected)
+  const ids = await fetchReactPropBulk(nodes, [ 'memoizedProps', 'children', 2, 'props', 'message', 'author', 'id' ])
+  const authors = Array.from(new Set(ids))
   const pronounsMap = await fetchPronounsBulk('discord', authors)
 
-  for (const id of ids) {
-    const pronouns = pronounsMap[idMap[id]]
-    const header = document.querySelector(`#chat-messages-${id} h2`)
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    const id = ids[i]
+    const pronouns = pronounsMap[id]
+    const header = node.querySelector('h2')
     if (pronouns && header) {
       header.appendChild(
         h('span', { class: 'pronoundb-pronouns', style: css({ color: 'var(--text-muted)', fontSize: '.9rem' }) }, ` • ${formatPronouns(pronouns)}`)
@@ -137,7 +53,7 @@ async function handleMessages (nodes) {
 }
 
 async function handleUserPopOut (node) {
-  const id = await fetchPoppedUser(node.id)
+  const id = await fetchReactProp(node, [ 'memoizedProps', 'children', 'props', 'children', 'props', 'children', 'props', 'userId' ])
   const pronouns = await fetchPronouns('discord', id)
 
   if (pronouns) {
@@ -155,7 +71,7 @@ async function handleUserPopOut (node) {
 }
 
 async function handleUserModal (node) {
-  const id = await fetchFocusedUser()
+  const id = await fetchReactProp(node, [ 'memoizedProps', 'children', 'props', 'children', 'props', 'user', 'id' ])
   const pronouns = await fetchPronouns('discord', id)
 
   if (pronouns) {
@@ -170,21 +86,23 @@ async function handleUserModal (node) {
 }
 
 async function handleAutocompleteRows (rows) {
-  const ids = await fetchAutocompleteRowIds(rows)
+  rows = rows.filter((row) => row.isConnected)
+  const ids = await fetchReactPropBulk(rows, [ 'return', 'return', 'return', 'key' ])
   const pronounsMap = await fetchPronounsBulk('discord', Array.from(new Set(ids)))
 
   for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
+    if (row.querySelector('.pronoundb-autocomplete-pronouns')) continue
+
     const id = ids[i]
-    if (!id) return
+    if (!id) continue
 
     const pronouns = pronounsMap[id]
-    if (!pronouns) return
+    if (!pronouns) continue
 
-    const row = rows[i]
-    const tag = row.querySelector('.description-11DmNu')
-    const element = document.createElement('div')
-    element.className = tag.children[0].className
-    element.style.marginLeft = '4px'
+    const tag = row.querySelector('.autocompleteRowContentSecondary-1tgI-F')
+    const element = document.createElement('span')
+    element.className = 'pronoundb-autocomplete-pronouns'
     element.innerText = ` • ${formatPronouns(pronouns)}`
     tag.appendChild(element)
   }
@@ -204,6 +122,7 @@ function handleMutation (mutations) {
 
       if (isFirefox && node.className?.startsWith?.('chatContent-')) {
         handleMessages(Array.from(node.querySelectorAll('div[class^="message-"]')))
+        continue
       }
 
       if (node.id?.startsWith?.('popout_') && node.querySelector('div[role="dialog"][class^="userPopout-"]')) {
@@ -219,7 +138,7 @@ function handleMutation (mutations) {
       if (node.className?.startsWith?.('autocomplete-')) {
         handleAutocompleteRows(
           Array.from(
-            node.querySelectorAll('[class^="autocompleteRow"]')).filter((node) => node.querySelector('[role="img"]')
+            node.querySelectorAll('[class*="autocompleteRow-"]')).filter((node) => node.querySelector('[role="img"]')
           )
         )
       }
@@ -232,10 +151,6 @@ function handleMutation (mutations) {
 }
 
 export function run () {
-  if (!isFirefox) {
-    connect()
-  }
-
   // Process messages already loaded
   handleMessages(Array.from(document.querySelectorAll('[id^=chat-messages-]')))
 
