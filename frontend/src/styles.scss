@@ -193,15 +193,26 @@ code {
     font-size: 18px;
   }
 
-  .links {
+  .extension-links {
     margin-top: 32px;
     display: flex;
     flex-wrap: wrap;
   }
 
-  .link {
-    font-size: 20px;
-    margin: 8px 32px;
+  .extension-link {
+    display: flex;
+    flex-direction: column;
+
+    .link {
+      font-size: 20px;
+      margin: 8px 32px 0;
+    }
+
+    span {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
   }
 }
 

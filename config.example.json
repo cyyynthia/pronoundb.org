@@ -7,8 +7,13 @@
   ],
   "oauth": {
     "discord": [ "client id", "client secret" ],
-    "github": [ "client id", "client secret" ],
+    "github": [ "client id", "client secret", "token" ],
     "twitch": [ "client id", "client secret" ],
     "twitter": [ "client id", "client secret" ]
+  },
+  "extension": {
+    "chrome": "",
+    "mozilla": "",
+    "edge": ""
   }
 }

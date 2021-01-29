@@ -40,6 +40,7 @@ export interface User { id: string, pronouns: string, accounts: Account[] }
 interface AppState {
   admin: boolean
   count: number
+  extVersions: Record<string, string>
 }
 
 interface AppContextValue {
@@ -53,6 +54,7 @@ interface AppContextValue {
 
 interface AppContextProps {
   url: string
+  extVersions?: Record<string, string>
   usersCount?: number
   error?: string | null
   children: ComponentChildren
@@ -73,8 +75,17 @@ function sortAccounts (acc1: Account, acc2: Account) {
   return res
 }
 
-const fakeAppState = { count: 6969, admin: true }
-let appState = fakeAppState
+const fakeAppState: AppState = {
+  count: 6969,
+  admin: true,
+  extVersions: {
+    chrome: '0.0.0',
+    mozilla: '0.0.0',
+    edge: '0.0.0',
+  },
+}
+
+let appState: AppState = fakeAppState
 if (typeof window !== 'undefined' && window.__STATE__) {
   appState = window.__STATE__
   delete window.__STATE__
@@ -128,6 +139,10 @@ function AppContext (props: AppContextProps) {
 
   if (props.usersCount) {
     appState.count = props.usersCount
+  }
+
+  if (props.extVersions) {
+    appState.extVersions = props.extVersions
   }
 
   return h(Ctx.Provider, {

@@ -25,36 +25,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Routes = Object.freeze({
-  HOME: '/',
-  SUPPORTED: '/supported',
-  LOGIN: '/login',
-  REGISTER: '/register',
-  ME: '/me',
-  LINK: '/link',
-  DOCS: '/docs',
-  LEGAL: '/legal',
-  PRIVACY: '/privacy',
-  ONBOARDING: '/onboarding',
-  DONATE: 'https://ko-fi.com/cyyynthia',
-  GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
-  LINK_CHROME: 'https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf',
-  LINK_FIREFOX: 'https://addons.mozilla.org/firefox/addon/pronoundb',
-  LINK_EDGE: 'https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn',
-})
+import fetch from 'node-fetch'
 
-export const Endpoints = Object.freeze({
-  SELF: '/api/v1/accounts/me',
-  OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
-  CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`,
-})
+const { extension } = require('../config.json')
 
-export const Errors: Record<string, string> = Object.freeze({
-  ERR_GENERIC: 'Something went wrong!',
-  ERR_OAUTH_GENERIC: 'Could not authenticate you with the external platform due to an error.',
-  ERR_ALREADY_EXISTS: 'This account already exists, did you mean to login?',
-  ERR_NOT_FOUND: 'No account was found, did you mean to create an account?',
-  ERR_LOGGED_IN: 'You are already logged in.',
-  ERR_NOT_LOGGED_IN: 'You must be logged in to do this.',
-  ERR_ALREADY_LINKED: 'This account has already been linked to another account.',
-})
+async function fetchChrome (): Promise<string> {
+  return fetch('https://chrome.google.com/webstore/detail/nblkbiljcjfemkfjnhoobnojjgjdmknf')
+    .then((r) => r.text())
+    .then((html) => html.match(/itemprop="version" content="([0-9.]+)/)?.[1] ?? 'unknown')
+}
+
+async function fetchMozilla (): Promise<string> {
+  return fetch(`https://addons.mozilla.org/api/v5/addons/addon/${extension.mozilla}`)
+    .then((r) => r.json())
+    .then((d) => d.current_version.version)
+}
+
+async function fetchEdge (): Promise<string> {
+  return fetch(`https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/${extension.edge}`)
+    .then((r) => r.json())
+    .then((d) => d.version)
+}
+
+type ExtensionVersions = { chrome: string, mozilla: string, edge: string }
+
+let cache: ExtensionVersions | null = null
+export default async function (): Promise<ExtensionVersions> {
+  if (!cache) {
+    const [ chrome, mozilla, edge ] = await Promise.all([ fetchChrome(), fetchMozilla(), fetchEdge(), ])
+    cache = { chrome: chrome, mozilla: mozilla, edge: edge }
+    setTimeout(() => (cache = null), 3600e3)
+  }
+
+  return cache!
+}

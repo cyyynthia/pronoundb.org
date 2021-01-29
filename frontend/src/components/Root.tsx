@@ -46,6 +46,7 @@ import { Routes } from '@constants'
 interface RootProps {
   url?: string
   usersCount?: number
+  extVersions?: Record<string, string>
   error?: string | null
 }
 
@@ -61,7 +62,7 @@ function Root (props: RootProps) {
   // useLink({ rel: 'shortcut icon', href: avatar })
 
   return (
-    <AppContext url={url} usersCount={props.usersCount} error={props.error}>
+    <AppContext url={url} extVersions={props.extVersions} usersCount={props.usersCount} error={props.error}>
       <Layout>
         <Router url={props.url} onChange={(e) => setUrl(new URL(e.url, 'https://pronoundb.org').pathname)}>
           <Home path={Routes.HOME}/>

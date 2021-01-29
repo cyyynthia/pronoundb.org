@@ -25,11 +25,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+import type { ComponentType } from 'preact'
+import { randomBytes } from 'crypto'
 import { h } from 'preact'
 import { render } from 'preact-render-to-string'
-import { randomBytes } from 'crypto'
-import type { ComponentType } from 'preact'
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+import fetchExtVersions from './extension'
 
 let manifest: Record<string, string>
 let integrity: Record<string, string>
@@ -55,9 +56,10 @@ export default async function (this: FastifyInstance, request: FastifyRequest, r
   const count = usersCount as number
   const admin = Boolean((request as any).user?.admin)
   const nonce = randomBytes(16).toString('hex')
+  const extVersions = await fetchExtVersions()
   reply.type('text/html')
     .header('x-powered-by', 'potatoes')
     .header('x-frame-options', 'DENY')
     .header('content-security-policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;`)
-    .send(`<!doctype html>${render(h(Html, { nonce, count, admin, manifest, integrity, url: request.url }))}`)
+    .send(`<!doctype html>${render(h(Html, { nonce, count, admin, manifest, integrity, extVersions, url: request.url }))}`)
 }

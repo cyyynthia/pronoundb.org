@@ -36,11 +36,12 @@ export interface HtmlProps {
   admin: boolean
   manifest: Record<string, string>
   integrity: Record<string, string>
+  extVersions: Record<string, string>
   url: string
 }
 
 function Html (props: HtmlProps) {
-  const html = render(<Root url={props.url} usersCount={props.count}/>)
+  const html = render(<Root url={props.url} usersCount={props.count} extVersions={props.extVersions}/>)
   const { metas, links, title, lang } = toStatic()
 
   return (
@@ -60,7 +61,7 @@ function Html (props: HtmlProps) {
       <body>
         <div id='react-root' dangerouslySetInnerHTML={{ __html: html }}/>
         <script nonce={props.nonce}>
-          {`window.__STATE__ = { count: ${props.count}, admin: ${props.admin} }`}
+          {`window.__STATE__ = { count: ${props.count}, admin: ${props.admin}, extVersions: ${JSON.stringify(props.extVersions)} }`}
         </script>
         <script src={props.manifest['main.js']} integrity={props.integrity['main.js']} crossOrigin='anonymous'></script>
         <script src={props.manifest['styles.js']} integrity={props.integrity['styles.js']} crossOrigin='anonymous'></script>

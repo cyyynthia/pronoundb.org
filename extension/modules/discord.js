@@ -59,7 +59,7 @@ function fetchPoppedUserBridge (id) {
 
 function fetchFocusedUserBridge () {  
   let el = document.querySelector('div[class^="modal-"]')
-  el = 'wrappedJSObject' in el ? node.wrappedJSObject : el
+  el = 'wrappedJSObject' in el ? el.wrappedJSObject : el
 
   return el.__reactInternalInstance$.memoizedProps
     .children.props.children.props.user.id

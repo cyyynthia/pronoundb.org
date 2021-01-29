@@ -33,7 +33,7 @@ import { Ctx } from './AppContext'
 import { Routes } from '@constants'
 
 function Home (_: RoutableProps) {
-  const { appState: { count } } = useContext(Ctx)
+  const { appState: { count, extVersions } } = useContext(Ctx)
 
   return (
     <div className='homepage'>
@@ -49,16 +49,25 @@ function Home (_: RoutableProps) {
       <div className='catch'>
         Join the {count} people sharing their pronouns online! Get the extension:
       </div>
-      <div className='links'>
-        <a href={Routes.LINK_CHROME} className='link' target='_blank' rel='noreferrer'>
-          Get for Chrome
-        </a>
-        <a href={Routes.LINK_FIREFOX} className='link' target='_blank' rel='noreferrer'>
-          Get for Firefox
-        </a>
-        <a href={Routes.LINK_EDGE} className='link' target='_blank' rel='noreferrer'>
-          Get for Edge
-        </a>
+      <div className='extension-links'>
+        <div className='extension-link'>
+          <a href={Routes.LINK_CHROME} className='link' target='_blank' rel='noreferrer'>
+            Get for Chrome
+          </a>
+          <span>Version {extVersions.chrome}</span>
+        </div>
+        <div className='extension-link'>
+          <a href={Routes.LINK_FIREFOX} className='link' target='_blank' rel='noreferrer'>
+            Get for Firefox
+          </a>
+          <span>Version {extVersions.mozilla}</span>
+        </div>
+        <div className='extension-link'>
+          <a href={Routes.LINK_EDGE} className='link' target='_blank' rel='noreferrer'>
+            Get for Edge
+          </a>
+          <span>Version {extVersions.edge}</span>
+        </div>
       </div>
     </div>
   )
