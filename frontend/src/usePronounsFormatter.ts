@@ -29,21 +29,31 @@ import { useState, useCallback, useEffect } from 'preact/hooks'
 import { Pronouns } from '@shared'
 
 const listeners = new Set<() => void>()
-window.addEventListener('message', (e) => {
-  if (e.source === window && e.data.source === 'pronoundb') {
-    const data = e.data.payload
-    if (data.action === 'settings.styling') {
-      localStorage.format = data.styling
-      for (const listener of listeners) {
-        listener()
+if (typeof window !== 'undefined') {
+  window.addEventListener('message', (e) => {
+    if (e.source === window && e.data.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'settings.styling') {
+        localStorage.format = data.styling
+        for (const listener of listeners) {
+          listener()
+        }
       }
     }
+  })
+}
+
+function getFormat () {
+  if (typeof localStorage !== 'undefined') {
+    return localStorage.format
   }
-})
+
+  return 'lower'
+}
 
 export default function () {
+  const format = getFormat()
   const [ i, forceUpdate ] = useState(0)
-  
   const listener = useCallback(() => { forceUpdate(i + 1) }, [ i ])
 
   useEffect(() => {
@@ -55,9 +65,9 @@ export default function () {
     const pronouns = Pronouns[pronounsId]
 
     return Array.isArray(pronouns)
-      ? localStorage.format === 'pascal' ? pronouns[1] : pronouns[0]
+      ? format === 'pascal' ? pronouns[1] : pronouns[0]
       : pronouns
   }
 
-  return useCallback(formatter, [ localStorage.format ])
+  return useCallback(formatter, [ format ])
 }
