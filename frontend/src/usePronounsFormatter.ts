@@ -25,46 +25,39 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import modules from './modules/index.js'
-import { debug, log } from './util/log.js'
-import { PlatformNames, WEBSITE } from './shared.ts'
+import { useState, useCallback, useEffect } from 'preact/hooks'
+import { Pronouns } from '@shared'
 
-for (const platform in modules) {
-  if (Object.prototype.hasOwnProperty.call(modules, platform)) {
-    const module = modules[platform]
-    if (module.match.test(location.href)) {
-      chrome.storage.sync.get([ `${platform}.enabled` ], (res) => {
-        if (res[`${platform}.enabled`] ?? true) {
-          log(`Enabling ${PlatformNames[platform]} module`)
-          module.run()
-        } else {
-          debug(`Skipping ${PlatformNames[platform]} module`)
-        }
-      })
+const listeners = new Set<() => void>()
+window.addEventListener('message', (e) => {
+  if (e.source === window && e.data.source === 'pronoundb') {
+    const data = e.data.payload
+    if (data.action === 'settings.styling') {
+      localStorage.format = data.styling
+      for (const listener of listeners) {
+        listener()
+      }
     }
   }
-}
+})
 
-if (location.origin === WEBSITE) {
-  chrome.storage.sync.get([ 'styling' ], ({ styling }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.styling',
-        styling: styling
-      }
-    }, '*')
-  })
+export default function () {
+  const [ i, forceUpdate ] = useState(0)
+  
+  const listener = useCallback(() => { forceUpdate(i + 1) }, [ i ])
 
-  chrome.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
-      }, '*')
-    }
-  })
+  useEffect(() => {
+    listeners.add(listener)
+    return () => listeners.delete(listener)
+  }, [ listener ])
+
+  function formatter (pronounsId: keyof typeof Pronouns): string | null {
+    const pronouns = Pronouns[pronounsId]
+
+    return Array.isArray(pronouns)
+      ? localStorage.format === 'pascal' ? pronouns[1] : pronouns[0]
+      : pronouns
+  }
+
+  return useCallback(formatter, [ localStorage.format ])
 }

@@ -29,6 +29,7 @@ import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import { useCallback, useContext } from 'preact/hooks'
 
+import usePronounsFormatter from '../usePronounsFormatter'
 import { Ctx } from './AppContext'
 import { Endpoints, Routes } from '@constants'
 import { Pronouns, PlatformNames } from '@shared'
@@ -44,6 +45,7 @@ function getHost () {
 function Me () {
   useTitle('My account')
   const { user, logout, setPronouns, unlinkAccount } = useContext(Ctx)
+  const formatter = usePronounsFormatter()
 
   const deleteAccount = useCallback(function () {
     if (confirm('Are you sure? This action is irreversible!')) {
@@ -75,9 +77,9 @@ function Me () {
         To avoid any form of biases, pronouns are sorted alphabetically. Your selection will be saved automatically.
       </p>
       <select value={user.pronouns} onChange={e => changePronouns((e.target as any).value)}>
-        {Object.entries(Pronouns).map(([ id, pronouns ]) => (
-          <option key={id} value={id}>
-            {Array.isArray(pronouns) ? pronouns[0] : pronouns ?? 'Unspecified'}
+        {Object.keys(Pronouns).map((pronounsId) => (
+          <option key={pronounsId} value={pronounsId}>
+            {formatter(pronounsId as keyof typeof Pronouns) ?? 'Unspecified'}
           </option>
         ))}
       </select>

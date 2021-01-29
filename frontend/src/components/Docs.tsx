@@ -29,6 +29,7 @@ import { h, Fragment } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
+import usePronounsFormatter from '../usePronounsFormatter'
 import { Supported, Pronouns } from '@shared'
 
 const SupportedFragment = () => {
@@ -41,6 +42,8 @@ const SupportedFragment = () => {
 function Docs (_: RoutableProps) {
   useTitle('API Docs')
 
+  const formatter = usePronounsFormatter()
+
   return (
     <div>
       <div className='page-context'>About PronounDB</div>
@@ -52,8 +55,8 @@ function Docs (_: RoutableProps) {
       <div>
         <b>Pronouns:</b> Short identifier for a set of pronouns. Here are the identifiers recognized by PronounDB:
         <ul>
-          {Object.entries(Pronouns).map(([ id, pronouns ]) => (
-            <li key={id}><code>{id}</code>: {Array.isArray(pronouns) ? pronouns[0] : pronouns ?? 'Unspecified'}</li>)
+          {Object.keys(Pronouns).map((pronounsId) => (
+            <li key={pronounsId}><code>{pronounsId}</code>: {formatter(pronounsId as keyof typeof Pronouns) ?? 'Unspecified'}</li>)
           )}
         </ul>
       </div>
