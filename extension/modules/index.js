@@ -26,12 +26,14 @@
  */
 
 import * as discord from './discord.js'
+import * as facebook from './facebook.js'
 import * as github from './github.js'
 import * as twitch from './twitch.js'
 import * as twitter from './twitter.js'
 
 export default {
   discord,
+  facebook,
   github,
   twitch,
   twitter

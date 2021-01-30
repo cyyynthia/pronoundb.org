@@ -56,7 +56,11 @@ export interface OAuth2Options {
   authorization: string
   token: string
   scopes: string[]
-  getSelf: (token: string) => Promise<ExternalUser>
+  authProps?: Record<string, string>
+  getSelf: (token: string, state: string) => Promise<ExternalUser | null>
+
+  // The extension sometimes use the nonce to carry additional data
+  transformState?: (state: string) => string
 }
 
 const authorizeSchema: FastifySchema = {
@@ -84,7 +88,7 @@ const callbackSchema: FastifySchema = {
   }
 }
 
-const nonces = new Set<string>()
+const states = new Set<string>()
 
 export async function authorize (this: FastifyInstance, request: AuthorizeRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
   const intent = request.query.intent ?? 'login'
@@ -99,21 +103,22 @@ export async function authorize (this: FastifyInstance, request: AuthorizeReques
     return
   }
 
-  const nonce = randomBytes(16).toString('hex')
-  const fullNonce = `${reply.context.config.platform}-${nonce}`
-  setTimeout(() => nonces.delete(fullNonce), 300e3)
-  nonces.add(fullNonce)
+  const state = randomBytes(16).toString('hex')
+  const fullState = `${reply.context.config.platform}-${state}`
+  setTimeout(() => states.delete(fullState), 300e3)
+  states.add(fullState)
 
   const redirect = request.routerPath.replace('authorize', 'callback')
   const q = encode({
-    state: nonce,
+    state: state,
     response_type: 'code',
     scope: reply.context.config.scopes.join(' '),
     client_id: reply.context.config.clientId,
-    redirect_uri: `${config.host}${redirect}`
+    redirect_uri: `${config.host}${redirect}`,
+    ...(reply.context.config.authProps ?? {})
   })
 
-  reply.setCookie('nonce', nonce, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
+  reply.setCookie('state', state, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
     .setCookie('intent', intent, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
     .redirect(`${reply.context.config.authorization}?${q}`)
 }
@@ -124,21 +129,30 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
     return
   }
 
-  const nonceCookie = reply.unsignCookie(request.cookies.nonce)
+  if (!request.cookies.state || !request.cookies.intent) {
+    reply.redirect('/')
+    return
+  }
+
+  const stateCookie = reply.unsignCookie(request.cookies.state)
   const intentCookie = reply.unsignCookie(request.cookies.intent)
-  if (!nonceCookie.valid || !intentCookie.valid) {
+  if (!stateCookie.valid || !intentCookie.valid) {
     reply.redirect('/')
     return
   }
 
-  const fullNonce = `${reply.context.config.platform}-${request.query.state}`
-  const expectedNonce = `${reply.context.config.platform}-${nonceCookie.value}`
-  if (fullNonce !== expectedNonce || !nonces.has(fullNonce)) {
+  const realState = reply.context.config.transformState
+    ? reply.context.config.transformState(request.query.state)
+    : request.query.state
+
+  const fullState = `${reply.context.config.platform}-${realState}`
+  const expectedState = `${reply.context.config.platform}-${stateCookie.value}`
+  if (fullState !== expectedState || !states.has(fullState)) {
     reply.redirect('/')
     return
   }
 
-  nonces.delete(fullNonce)
+  states.delete(fullState)
   let accessToken = null
   try {
     const token = await fetch(reply.context.config.token, {
@@ -168,7 +182,7 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
     return
   }
 
-  const user = await reply.context.config.getSelf(accessToken)
+  const user = await reply.context.config.getSelf(accessToken, request.query.state)
   if (!user) {
     reply.redirect('/?error=ERR_OAUTH_GENERIC')
     return

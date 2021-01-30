@@ -25,40 +25,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance } from 'fastify'
-import fetch from 'node-fetch'
+import { log, warn } from '../util/log.js'
+import { WEBSITE } from '../shared.ts'
 
-import register from './abstract/oauth2'
-import type { ExternalUser } from './abstract/shared'
+export function run () {
+  if (location.pathname === '/v9.0/dialog/oauth') {
+    const search = new URLSearchParams(location.search)
+    if (!search.get('state') || search.get('state').includes(';;;')) return
 
-const config = require('../../../config.json')
-const [ clientId, clientSecret ] = config.oauth.facebook
+    const redirectOrigin = new URL(search.get('redirect_uri')).origin
+    if (redirectOrigin === WEBSITE) {
+      log('Detected OAuth flow for PronounDB')
+      const el = document.querySelector('[id^="profile_pic_header_"')
+      if (!el) {
+        warn('Failed to find the Real User ID. Authentication flow will fail.')
+        return
+      }
 
-async function getSelf (token: string, state: string): Promise<ExternalUser | null> {
-  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: { authorization: `Bearer ${token}` } })
-    .then(r => r.json())
+      const id = el.id.slice(19)
+      search.set('state', `${search.get('state')};;;${btoa(id).replace(/=/g, '')}`)
+      location.search = `?${search.toString()}`
+    }
 
-  const encodedId = state.split(';;;')[1]
-  if (!encodedId) return null
-
-  const realId = Buffer.from(encodedId, 'base64').toString()
-  console.log(data, realId) // todo: check if the harvested ID and the provided ID match
-
-  // Ensure authorization screen will be prompted again
-  await fetch('https://graph.facebook.com/v9.0/me/permissions', { method: 'DELETE', headers: { authorization: `Bearer ${token}` } })
-  return null as any
+    return
+  }
 }
 
-export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId,
-    clientSecret,
-    platform: 'facebook',
-    authorization: 'https://www.facebook.com/v9.0/dialog/oauth',
-    token: 'https://graph.facebook.com/v9.0/oauth/access_token',
-    scopes: [],
-    getSelf,
-    transformState: (state) => state.split(';;;')[0],
-    authProps: { auth_type: 'reauthorize' },
-  })
-}
+export const match = /^https:\/\/(.+\.)?facebook\.com/

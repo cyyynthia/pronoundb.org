@@ -67,4 +67,9 @@ if (location.origin === WEBSITE) {
       }, '*')
     }
   })
+
+  const s = document.createElement('script')
+  s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${chrome.runtime.getManifest().version}'}`
+  document.head.appendChild(s)
+  s.remove()
 }
