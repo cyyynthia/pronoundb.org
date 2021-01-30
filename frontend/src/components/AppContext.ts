@@ -32,9 +32,8 @@ import type { ComponentChildren } from 'preact'
 import useCookie from '../useCookie'
 
 import { Endpoints } from '@constants'
-import { Platform } from '@shared'
 
-export interface Account { platform: Platform, id: string, name: string }
+export interface Account { platform: string, id: string, name: string }
 export interface User { id: string, pronouns: string, accounts: Account[] }
 
 interface AppState {

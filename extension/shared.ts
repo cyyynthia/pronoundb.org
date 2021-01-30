@@ -25,7 +25,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Platforms = Object.freeze({
+export type Platform = {
+  name: string
+  color: string
+  companion?: string
+  soon?: boolean
+}
+
+export const Platforms: Record<string, Platform> = Object.freeze({
   discord: {
     name: 'Discord',
     color: '#7289DA',
@@ -34,6 +41,7 @@ export const Platforms = Object.freeze({
     name: 'Facebook',
     color: '#4267B2',
     companion: '0.5.0',
+    soon: true
   },
   github: {
     name: 'GitHub',
@@ -48,8 +56,6 @@ export const Platforms = Object.freeze({
     color: '#1DA1F2',
   },
 })
-
-export type Platform = keyof typeof Platforms
 
 export const Pronouns = Object.freeze({
   unspecified: null,

@@ -27,11 +27,11 @@
 
 import type { RoutableProps } from 'preact-router'
 import { h } from 'preact'
-import { useRef, useMemo, useState, useCallback } from 'preact/hooks'
+import { useRef, useMemo, useCallback } from 'preact/hooks'
 import { useTitle } from 'hoofd/preact'
 
 import { Endpoints, Routes } from '@constants'
-import { Platforms, Platform } from '@shared'
+import { Platforms, } from '@shared'
 import { compareSemver } from '../util'
 
 const iconsRequire = require.context('../icons', false, /\.svg$/)
@@ -48,11 +48,11 @@ const IntentTitles = {
   link: 'Link another account'
 }
 
-function LinkButton (props: typeof Platforms[Platform] & { id: Platform, intent: OAuthIntent }) {
+function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAuthIntent }) {
   const divRef = useRef<HTMLDivElement>()
   const tooltipRef = useRef<HTMLDivElement>()
   const disabled = useMemo(() => {
-    if ('companion' in props) {
+    if (props.companion) {
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) return true
       if (compareSemver(props.companion, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
     }
@@ -82,6 +82,10 @@ function LinkButton (props: typeof Platforms[Platform] & { id: Platform, intent:
     tooltip.style.opacity = '0'
     setTimeout(() => tooltip.remove(), 150)
   }, [ tooltipRef ])
+
+  if (props.soon && process.env.NODE_ENV !== 'development') {
+    return null
+  }
 
   if (disabled) {
     return (
@@ -118,7 +122,7 @@ function OAuth (props: OAuthProps) {
       {props.intent === 'register' && <p>Make sure to give the <a href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of those.</p>}
       <div className='oauth-buttons'>
         {Object.entries(Platforms).map(([ platformId, platform ]) => (
-          <LinkButton id={platformId as Platform} intent={props.intent} {...platform}/>
+          <LinkButton id={platformId} intent={props.intent} {...platform}/>
         ))}
       </div>
     </div>
