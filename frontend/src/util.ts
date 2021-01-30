@@ -25,17 +25,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-declare const __non_webpack_require__: typeof require
+export function compareSemver (ver1: string, ver2: string): -1 | 0 | 1 {
+  const v1 = ver1.split('.').map(Number)
+  const v2 = ver2.split('.').map(Number)
 
-interface NodeRequire {
-  context (directory: string, useSubdirectories?: boolean, regExp?: RegExp): typeof require & { keys: () => string[] }
-}
+  for (let i = 0; i < v1.length; i++) {
+      if (v1[i] === v2[i]) continue
+      else if (v1[i] > v2[i]) return 1
+      else return -1
+  }
 
-interface Window {
-  __PRONOUNDB_EXTENSION_VERSION__: string
-}
-
-declare module '@assets/*' {
-  let asset: string
-  export default asset
+  return 0
 }

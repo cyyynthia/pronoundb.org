@@ -114,6 +114,29 @@ code {
   color: var(--red);
 }
 
+/* Tooltip */
+.tooltip {
+  text-align: center;
+  padding: 8px;
+  background-color: #000;
+  color: #fff;
+  position: absolute;
+  max-width: 300px;
+  transform: translateX(-50%) translateY(calc(-100% - 6px));
+  transition: opacity .15s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    transform: rotate(45deg);
+    left: 50%;
+    bottom: -4px;
+    background-color: inherit;
+  }
+}
+
 /* Layout */
 .container {
   width: 95%;
@@ -262,6 +285,11 @@ select {
   &:hover {
     text-decoration: none;
     filter: brightness(.9)
+  }
+
+  &.disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
   }
 }
 

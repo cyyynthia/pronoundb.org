@@ -25,23 +25,85 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
+import { h } from 'preact'
+import { useRef, useMemo, useState, useCallback } from 'preact/hooks'
+import { useTitle } from 'hoofd/preact'
 
 import { Endpoints, Routes } from '@constants'
-import { Platforms } from '@shared'
+import { Platforms, Platform } from '@shared'
+import { compareSemver } from '../util'
 
 const iconsRequire = require.context('../icons', false, /\.svg$/)
 
+type OAuthIntent = 'login' | 'register' | 'link'
+
 interface OAuthProps extends RoutableProps {
-  intent: 'login' | 'register' | 'link'
+  intent: OAuthIntent
 }
 
 const IntentTitles = {
   login: 'Login to your account',
   register: 'Register an account',
   link: 'Link another account'
+}
+
+function LinkButton (props: typeof Platforms[Platform] & { id: Platform, intent: OAuthIntent }) {
+  const divRef = useRef<HTMLDivElement>()
+  const tooltipRef = useRef<HTMLDivElement>()
+  const disabled = useMemo(() => {
+    if ('companion' in props) {
+      if (!window.__PRONOUNDB_EXTENSION_VERSION__) return true
+      if (compareSemver(props.companion, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
+    }
+    return false
+  }, [ props ])
+
+  const onMouseIn = useCallback(() => {
+    const { x, y, width } = divRef.current.getBoundingClientRect()
+    const tt = document.createElement('div')
+    tt.className = 'tooltip'
+    tt.style.left = `${x + width / 2}px`
+    tt.style.top = `${y}px`
+    tt.style.opacity = '0'
+    tt.innerText = window.__PRONOUNDB_EXTENSION_VERSION__
+      ? `You need to update the PronounDB extension to link a ${props.name} account.`
+      : `You need to install the PronounDB extension to link a ${props.name} account.`
+    document.body.appendChild(tt)
+
+    setTimeout(() => tt.style.opacity = '1', 0)
+    tooltipRef.current = tt
+  }, [ disabled ])
+
+  const onMouseOut = useCallback(() => {
+    const tooltip = tooltipRef.current
+    if (!tooltip) return
+
+    tooltip.style.opacity = '0'
+    setTimeout(() => tooltip.remove(), 150)
+  }, [ tooltipRef ])
+
+  if (disabled) {
+    return (
+      <div
+        className='oauth-button disabled'
+        style={`--color: ${props.color}`}
+        onMouseEnter={onMouseIn}
+        onMouseLeave={onMouseOut}
+        ref={divRef}
+      >
+        <img src={iconsRequire(`./${props.id}.svg`).default} alt={`${props.name}`}/>
+        <span>Connect with {props.name}</span>
+      </div>
+    )
+  }
+  return (
+    // @ts-expect-error
+    <a native className='oauth-button' style={`--color: ${props.color}`} href={Endpoints.OAUTH(props.id, props.intent)}>
+      <img src={iconsRequire(`./${props.id}.svg`).default} alt={`${props.name}`}/>
+      <span>Connect with {props.name}</span>
+    </a>
+  )
 }
 
 function OAuth (props: OAuthProps) {
@@ -56,11 +118,7 @@ function OAuth (props: OAuthProps) {
       {props.intent === 'register' && <p>Make sure to give the <a href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of those.</p>}
       <div className='oauth-buttons'>
         {Object.entries(Platforms).map(([ platformId, platform ]) => (
-          // @ts-expect-error
-          <a native href={Endpoints.OAUTH(platformId, props.intent)} className='oauth-button' style={`--color: ${platform.color}`}>
-            <img src={iconsRequire(`./${platformId}.svg`).default} alt={`${platform.name}`}/>
-            <span>Connect with {platform.name}</span>
-          </a>
+          <LinkButton id={platformId as Platform} intent={props.intent} {...platform}/>
         ))}
       </div>
     </div>
