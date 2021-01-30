@@ -27,9 +27,7 @@
 
 import type { FastifyInstance } from 'fastify'
 import selfModule from './account/self'
-import facebookModule from './account/facebook'
 
 export default async function (fastify: FastifyInstance) {
   fastify.register(selfModule, { prefix: '/me' })
-  fastify.register(facebookModule, { prefix: '/facebook' })
 }
