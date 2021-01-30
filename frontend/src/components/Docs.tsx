@@ -30,10 +30,10 @@ import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 import usePronounsFormatter from '../usePronounsFormatter'
-import { Supported, Pronouns } from '@shared'
+import { Platforms, Pronouns } from '@shared'
 
 const SupportedFragment = () => {
- const items = Supported.map(s => [ <code>{s}</code>, ', ' ])
+ const items = Object.keys(Platforms).map((platformId) => [ <code>{platformId}</code>, ', ' ])
  items[items.length - 2][1] = ', or '
  items[items.length - 1][1] = ''
  return h(Fragment, null, ...items)

@@ -30,7 +30,9 @@ import { useTitle } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 import { Endpoints, Routes } from '@constants'
-import { PlatformNames, Supported } from '@shared'
+import { Platforms } from '@shared'
+
+const iconsRequire = require.context('../icons', false, /\.svg$/)
 
 interface OAuthProps extends RoutableProps {
   intent: 'login' | 'register' | 'link'
@@ -52,14 +54,15 @@ function OAuth (props: OAuthProps) {
       <p>Select an authentication provider. You will be redirected to the platform you selected to perform the authentication.</p>
       {props.intent === 'login' && <p>Make sure to select an account you already linked on PronounDB.</p>}
       {props.intent === 'register' && <p>Make sure to give the <a href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of those.</p>}
-      <ul>
-        {Supported.map(s => (
-          <li>
-            {/* @ts-expect-error */}
-            <a native href={Endpoints.OAUTH(s, props.intent)}>{PlatformNames[s]}</a>
-          </li>
+      <div className='oauth-buttons'>
+        {Object.entries(Platforms).map(([ platformId, platform ]) => (
+          // @ts-expect-error
+          <a native href={Endpoints.OAUTH(platformId, props.intent)} className='oauth-button' style={`--color: ${platform.color}`}>
+            <img src={iconsRequire(`./${platformId}.svg`).default} alt={`${platform.name}`}/>
+            <span>Connect with {platform.name}</span>
+          </a>
         ))}
-      </ul>
+      </div>
     </div>
   )
 }

@@ -32,7 +32,7 @@ import { useCallback, useContext } from 'preact/hooks'
 import usePronounsFormatter from '../usePronounsFormatter'
 import { Ctx } from './AppContext'
 import { Endpoints, Routes } from '@constants'
-import { Pronouns, PlatformNames } from '@shared'
+import { Pronouns, Platforms } from '@shared'
 
 function getHost () {
   if (process.env.BUILD_SIDE === 'server') {
@@ -87,7 +87,7 @@ function Me () {
       <ul>
         {user.accounts.map(account => (
           <li key={account.id}>
-            {PlatformNames[account.platform]}: <b>{account.name}</b>{' - '}
+            {Platforms[account.platform]?.name}: <b>{account.name}</b>{' - '}
             {user.accounts.length > 1
               ? <button className='link' onClick={() => unlinkExternal(account.platform, account.id)}>Unlink</button>
               : <i>Cannot unlink your only linked account.</i>}

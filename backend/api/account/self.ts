@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Pronouns, Supported } from '../../shared'
+import { Pronouns, Platforms } from '../../shared'
 
 function getMe (request: FastifyRequest, reply: FastifyReply) {
   const user = (request as any).user
@@ -63,7 +63,7 @@ async function deleteMe (this: FastifyInstance, request: FastifyRequest, reply: 
 
 async function deleteConnection (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   const query = request.query as Record<string, string>
-  if (!Supported.includes(query.platform)) {
+  if (!Object.keys(Platforms).includes(query.platform)) {
     reply.code(400).send({ error: 400, message: 'Unsupported platform' })
     return
   }

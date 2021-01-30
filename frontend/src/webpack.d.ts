@@ -29,6 +29,10 @@ declare const __non_webpack_require__: typeof require
 
 declare const COMMIT_HASH: string
 
+interface NodeRequire {
+  context (directory: string, useSubdirectories?: boolean, regExp?: RegExp): typeof require & { keys: () => string[] }
+}
+
 declare module '@assets/*' {
   let asset: string
   export default asset

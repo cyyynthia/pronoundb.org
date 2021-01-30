@@ -25,9 +25,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Supported = [ 'discord', /* 'facebook', */ 'github', 'twitch', 'twitter' ] // as const
+export const Platforms = Object.freeze({
+  discord: {
+    name: 'Discord',
+    color: '#7289DA',
+  },
+  facebook: {
+    name: 'Facebook',
+    color: '#4267B2',
+    companion: '0.5.0',
+  },
+  github: {
+    name: 'GitHub',
+    color: '#211F1F',
+  },
+  twitch: {
+    name: 'Twitch',
+    color: '#9146FF',
+  },
+  twitter: {
+    name: 'Twitter',
+    color: '#1DA1F2',
+  },
+})
 
-export type Platforms = 'discord' | 'facebook' | 'github' | 'twitch' | 'twitter' // typeof Supported[number]
+export type Platform = keyof typeof Platforms
 
 export const Pronouns = Object.freeze({
   unspecified: null,
@@ -61,14 +83,6 @@ export const PronounsShort = Object.freeze({
   other: 'Other',
   ask: 'Ask me',
   avoid: 'Avoid',
-})
-
-export const PlatformNames = Object.freeze({
-  discord: 'Discord',
-  facebook: 'Facebook',
-  github: 'GitHub',
-  twitch: 'Twitch',
-  twitter: 'Twitter',
 })
 
 export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'

@@ -224,3 +224,45 @@ select {
     width: 80%;
   }
 }
+
+/* OAuth screen */
+@media screen and (min-width: 330px) {
+  .oauth-buttons {
+    display: grid;
+    grid-gap: 8px;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  }
+}
+
+@media screen and (max-width: 330px) {
+  .oauth-buttons .oauth-button:not(:last-child) {
+    margin-bottom: 8px;
+  }
+}
+
+.oauth-button {
+  display: flex;
+  align-items: center;
+  background-color: var(--color);
+  padding: 16px;
+
+  img {
+    filter: brightness(100);
+    width: 32px;
+    height: 32px;
+    margin-right: 16px;
+    user-select: none;
+  }
+
+  span {
+    font-weight: 500;
+    color: #fff;
+  }
+
+  &:hover {
+    text-decoration: none;
+    filter: brightness(.9)
+  }
+}
+
+/* Account screen */
