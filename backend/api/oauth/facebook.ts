@@ -26,18 +26,30 @@
  */
 
 import type { FastifyInstance } from 'fastify'
+import fetch from 'node-fetch'
 
-import discordModule from './oauth/discord'
-import facebookModule from './oauth/facebook'
-import githubModule from './oauth/github'
-import twitchModule from './oauth/twitch'
-import twitterModule from './oauth/twitter'
+import register from './abstract/oauth2'
+import type { ExternalUser } from './abstract/shared'
+
+const config = require('../../../config.json')
+const [ clientId, clientSecret ] = config.oauth.facebook
+
+async function getSelf (token: string): Promise<ExternalUser> {
+  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: { authorization: `Bearer ${token}` } })
+    .then(r => r.json())
+
+  console.log(data) // Todo: test if a Real ID can be matched to the App-Scoped ID `data.id` holds
+  return null as any
+}
 
 export default async function (fastify: FastifyInstance) {
-  fastify.addHook('preHandler', fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]))
-  fastify.register(discordModule, { prefix: '/discord' })
-  fastify.register(facebookModule, { prefix: '/facebook' })
-  fastify.register(githubModule, { prefix: '/github' })
-  fastify.register(twitchModule, { prefix: '/twitch' })
-  fastify.register(twitterModule, { prefix: '/twitter' })
+  register(fastify, {
+    clientId,
+    clientSecret,
+    platform: 'facebook',
+    authorization: 'https://www.facebook.com/v9.0/dialog/oauth',
+    token: 'https://graph.facebook.com/v9.0/oauth/access_token',
+    scopes: [],
+    getSelf
+  })
 }

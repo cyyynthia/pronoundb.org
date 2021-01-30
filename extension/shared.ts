@@ -25,9 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export type Platforms = 'discord' | 'github' | 'twitch' | 'twitter'
+export const Supported = [ 'discord', 'facebook', 'github', 'twitch', 'twitter' ] // as const
 
-export const Supported = [ 'discord', 'github', 'twitch', 'twitter' ]
+export type Platforms = 'discord' | 'facebook' | 'github' | 'twitch' | 'twitter' // typeof Supported[number]
 
 export const Pronouns = Object.freeze({
   unspecified: null,
@@ -65,6 +65,7 @@ export const PronounsShort = Object.freeze({
 
 export const PlatformNames = Object.freeze({
   discord: 'Discord',
+  facebook: 'Facebook',
   github: 'GitHub',
   twitch: 'Twitch',
   twitter: 'Twitter',
