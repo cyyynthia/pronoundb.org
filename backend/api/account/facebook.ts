@@ -25,34 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance } from 'fastify'
-import fetch from 'node-fetch'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 
-import register from './abstract/oauth2'
-import type { ExternalUser } from './abstract/shared'
-
-const config = require('../../config.json')
-const [ clientId, clientSecret ] = config.oauth.github
-
-async function getSelf (token: string): Promise<ExternalUser> {
-  const data = await fetch('https://api.github.com/user', {
-    headers: {
-      accept: 'application/vnd.github.v3+json',
-      authorization: `token ${token}`
-    }
-  }).then(r => r.json())
-
-  return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
+// @ts-ignore
+async function deleteCallback (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  return {}
 }
 
 export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId,
-    clientSecret,
-    platform: 'github',
-    authorization: 'https://github.com/login/oauth/authorize',
-    token: 'https://github.com/login/oauth/access_token',
-    scopes: [],
-    getSelf
-  })
+  fastify.get('/delete-callback', deleteCallback)
 }

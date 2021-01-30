@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Supported } from './shared'
+import { Supported } from '../shared'
 
 async function lookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   reply.header('access-control-allow-origin', '*')

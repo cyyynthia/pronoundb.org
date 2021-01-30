@@ -31,9 +31,9 @@ import { randomBytes } from 'crypto'
 import fetch from 'node-fetch'
 import { finishUp } from './shared'
 import type { ExternalUser, OAuthIntent } from './shared'
-import type { ConfiguredReply } from '../../util'
+import type { ConfiguredReply } from '../../../util'
 
-const config = require('../../../config.json')
+const config = require('../../../../config.json')
 
 interface AuthorizeRequestProps {
   Querystring: { intent?: OAuthIntent }

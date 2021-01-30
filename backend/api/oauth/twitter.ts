@@ -29,7 +29,7 @@ import type { FastifyInstance } from 'fastify'
 import type { ExternalUser } from './abstract/shared'
 import register, { securedFetch } from './abstract/oauth10a'
 
-const config = require('../../config.json')
+const config = require('../../../config.json')
 const [ clientId, clientSecret ] = config.oauth.twitter
 
 async function getSelf (token: string, secret: string): Promise<ExternalUser> {

@@ -33,7 +33,7 @@ import fastifyTokenize from 'fastify-tokenize'
 
 import apiModule from './api'
 import webModule from './web'
-import shieldsModule from './shields'
+import shieldsModule from './api/shields'
 
 const config = require('../config.json')
 const fastify = Fastify({ logger: true })

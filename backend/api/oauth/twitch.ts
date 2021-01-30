@@ -31,7 +31,7 @@ import fetch from 'node-fetch'
 import register from './abstract/oauth2'
 import type { ExternalUser } from './abstract/shared'
 
-const config = require('../../config.json')
+const config = require('../../../config.json')
 const [ clientId, clientSecret ] = config.oauth.twitch
 
 async function getSelf (token: string): Promise<ExternalUser> {

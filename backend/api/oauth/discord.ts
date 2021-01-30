@@ -25,30 +25,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Pronouns } from './shared'
+import type { FastifyInstance } from 'fastify'
+import fetch from 'node-fetch'
 
-async function generateShield (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  const params = request.params as Record<string, string>
-  if (!this.mongo.ObjectId.isValid(params.id)) {
-    reply.code(400)
-    return { error: 400, message: 'Invalid ID' }
-  }
+import register from './abstract/oauth2'
+import type { ExternalUser } from './abstract/shared'
 
-  const id = new this.mongo.ObjectId(params.id)
-  const user: { pronouns: keyof typeof Pronouns } | null = await this.mongo.db!.collection('accounts').findOne({ _id: id })
-  if (!user) {
-    reply.code(404)
-    return { error: 404, message: 'Not Found' }
-  }
+const config = require('../../../config.json')
+const [ clientId, clientSecret ] = config.oauth.discord
 
-  return {
-    schemaVersion: 1,
-    label: 'pronouns',
-    message: Pronouns[user.pronouns ?? 'unspecified'] ?? 'Unspecified'
-  }
+async function getSelf (token: string): Promise<ExternalUser> {
+  const data = await fetch('https://discord.com/api/v8/users/@me', { headers: { authorization: `Bearer ${token}` } })
+    .then(r => r.json())
+
+  return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
 }
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get('/:id', generateShield)
+  register(fastify, {
+    clientId,
+    clientSecret,
+    platform: 'discord',
+    authorization: 'https://discord.com/oauth2/authorize',
+    token: 'https://discord.com/api/v8/oauth2/token',
+    scopes: [ 'identify' ],
+    getSelf
+  })
 }

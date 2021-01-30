@@ -31,24 +31,28 @@ import fetch from 'node-fetch'
 import register from './abstract/oauth2'
 import type { ExternalUser } from './abstract/shared'
 
-const config = require('../../config.json')
-const [ clientId, clientSecret ] = config.oauth.discord
+const config = require('../../../config.json')
+const [ clientId, clientSecret ] = config.oauth.github
 
 async function getSelf (token: string): Promise<ExternalUser> {
-  const data = await fetch('https://discord.com/api/v8/users/@me', { headers: { authorization: `Bearer ${token}` } })
-    .then(r => r.json())
+  const data = await fetch('https://api.github.com/user', {
+    headers: {
+      accept: 'application/vnd.github.v3+json',
+      authorization: `token ${token}`
+    }
+  }).then(r => r.json())
 
-  return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
+  return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
 }
 
 export default async function (fastify: FastifyInstance) {
   register(fastify, {
     clientId,
     clientSecret,
-    platform: 'discord',
-    authorization: 'https://discord.com/oauth2/authorize',
-    token: 'https://discord.com/api/v8/oauth2/token',
-    scopes: [ 'identify' ],
+    platform: 'github',
+    authorization: 'https://github.com/login/oauth/authorize',
+    token: 'https://github.com/login/oauth/access_token',
+    scopes: [],
     getSelf
   })
 }

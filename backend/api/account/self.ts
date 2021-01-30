@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Pronouns, Supported } from './shared'
+import { Pronouns, Supported } from '../../shared'
 
 function getMe (request: FastifyRequest, reply: FastifyReply) {
   const user = (request as any).user
@@ -81,8 +81,8 @@ async function deleteConnection (this: FastifyInstance, request: FastifyRequest,
 }
 
 export default async function (fastify: FastifyInstance) {
-  fastify.get('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, getMe)
-  fastify.post('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, updateMe)
-  fastify.delete('/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteMe)
-  fastify.delete('/me/connection', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteConnection)
+  fastify.get('/', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, getMe)
+  fastify.post('/', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, updateMe)
+  fastify.delete('/', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteMe)
+  fastify.delete('/connection', { preHandler: fastify.auth([ fastify.verifyTokenizeToken ]) }, deleteConnection)
 }

@@ -31,10 +31,10 @@ import { encode, decode } from 'querystring'
 import { randomBytes, createHmac } from 'crypto'
 import { finishUp } from './shared'
 import type { ExternalUser, OAuthIntent } from './shared'
-import { rfcUriEncode } from '../../util'
-import type { ConfiguredReply } from '../../util'
+import { rfcUriEncode } from '../../../util'
+import type { ConfiguredReply } from '../../../util'
 
-const config = require('../../../config.json')
+const config = require('../../../../config.json')
 
 interface AuthorizeRequestProps {
   Querystring: { intent?: OAuthIntent }
