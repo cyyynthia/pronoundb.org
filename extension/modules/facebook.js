@@ -36,7 +36,7 @@ export function run () {
     const redirectOrigin = new URL(search.get('redirect_uri')).origin
     if (redirectOrigin === WEBSITE) {
       log('Detected OAuth flow for PronounDB')
-      const el = document.querySelector('[id^="profile_pic_header_"')
+      const el = document.querySelector('[id^="profile_pic_header_"]')
       if (!el) {
         warn('Failed to find the Real User ID. Authentication flow will fail.')
         return

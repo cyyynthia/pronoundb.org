@@ -34,19 +34,35 @@ import type { ExternalUser } from './abstract/shared'
 const config = require('../../../config.json')
 const [ clientId, clientSecret ] = config.oauth.facebook
 
+function yeetToken (token: string): void {
+  // Don't even bother awaiting the Promise
+  fetch('https://graph.facebook.com/v9.0/me/permissions', { method: 'DELETE', headers: { authorization: `Bearer ${token}` } })
+}
+
 async function getSelf (token: string, state: string): Promise<ExternalUser | null> {
-  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: { authorization: `Bearer ${token}` } })
-    .then(r => r.json())
+  const headers = { authorization: `Bearer ${token}` }
+  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: headers }).then(r => r.json())
 
   const encodedId = state.split(';;;')[1]
-  if (!encodedId) return null
+  if (!encodedId) {
+    yeetToken(token)
+    return null
+  }
 
   const realId = Buffer.from(encodedId, 'base64').toString()
-  console.log(data, realId) // todo: check if the harvested ID and the provided ID match
+  if (!realId.match(/^\d+$/)) {
+    yeetToken(token)
+    return null
+  }
 
-  // Ensure authorization screen will be prompted again
-  await fetch('https://graph.facebook.com/v9.0/me/permissions', { method: 'DELETE', headers: { authorization: `Bearer ${token}` } })
-  return null as any
+  const check = await fetch(`https://graph.facebook.com/v9.0/?ids=${data.id},${realId}`, { headers: headers }).then(r => r.json())
+  if (Object.keys(check).length !== 1) {
+    yeetToken(token)
+    return null
+  }
+
+  yeetToken(token)
+  return { id: realId, name: data.name, platform: 'facebook' }
 }
 
 export default async function (fastify: FastifyInstance) {
@@ -59,6 +75,5 @@ export default async function (fastify: FastifyInstance) {
     scopes: [],
     getSelf,
     transformState: (state) => state.split(';;;')[0],
-    authProps: { auth_type: 'reauthorize' },
   })
 }

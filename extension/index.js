@@ -68,8 +68,12 @@ if (location.origin === WEBSITE) {
     }
   })
 
-  const s = document.createElement('script')
-  s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${chrome.runtime.getManifest().version}'}`
-  document.head.appendChild(s)
-  s.remove()
+  if (typeof chrome !== 'undefined' && typeof browser !== 'undefined') {
+    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = chrome.runtime.getManifest().version
+  } else {
+    const s = document.createElement('script')
+    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${chrome.runtime.getManifest().version}'`
+    document.head.appendChild(s)
+    s.remove()
+  }
 }

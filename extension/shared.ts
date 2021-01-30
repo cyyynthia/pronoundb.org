@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Supported = [ 'discord', 'facebook', 'github', 'twitch', 'twitter' ] // as const
+export const Supported = [ 'discord', /* 'facebook', */ 'github', 'twitch', 'twitter' ] // as const
 
 export type Platforms = 'discord' | 'facebook' | 'github' | 'twitch' | 'twitter' // typeof Supported[number]
 

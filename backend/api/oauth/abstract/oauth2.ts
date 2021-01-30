@@ -56,7 +56,6 @@ export interface OAuth2Options {
   authorization: string
   token: string
   scopes: string[]
-  authProps?: Record<string, string>
   getSelf: (token: string, state: string) => Promise<ExternalUser | null>
 
   // The extension sometimes use the nonce to carry additional data
@@ -115,7 +114,6 @@ export async function authorize (this: FastifyInstance, request: AuthorizeReques
     scope: reply.context.config.scopes.join(' '),
     client_id: reply.context.config.clientId,
     redirect_uri: `${config.host}${redirect}`,
-    ...(reply.context.config.authProps ?? {})
   })
 
   reply.setCookie('state', state, { path: redirect, signed: true, maxAge: 300, httpOnly: true })

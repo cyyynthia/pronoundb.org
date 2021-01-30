@@ -36,7 +36,7 @@ let error: string | null = null
 if (location.search) {
   const search = new URLSearchParams(location.search)
   error = search.get('error') ? search.get('error') : null
-  route(location.pathname)
+  setTimeout(() => route(location.pathname), 250)
 }
 
 render(
