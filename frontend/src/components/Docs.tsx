@@ -26,7 +26,7 @@
  */
 
 import { h, Fragment } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import { useTitle, useMeta } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 import usePronounsFormatter from '../usePronounsFormatter'
@@ -41,6 +41,7 @@ const SupportedFragment = () => {
 
 function Docs (_: RoutableProps) {
   useTitle('API Docs')
+  useMeta({ name: 'og:title', content: 'API Docs' })
 
   const formatter = usePronounsFormatter()
 

@@ -62,7 +62,7 @@ function Onboarding (_: RoutableProps) {
       <p>
         If you wish, you can <a href={Routes.DONATE} target='_blank' rel='noreferrer'>donate</a>, so I can keep buying
         enough cookies and coffee to stay alive! 🥰
-      </p>        
+      </p>
     </div>
   )
 }

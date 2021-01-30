@@ -26,11 +26,12 @@
  */
 
 import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import { useTitle, useMeta } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 function Privacy (_: RoutableProps) {
   useTitle('Privacy Policy')
+  useMeta({ name: 'og:title', content: 'Privacy Policy' })
 
   return (
     <div className='justified'>

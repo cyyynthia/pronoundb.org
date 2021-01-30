@@ -26,11 +26,12 @@
  */
 
 import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import { useTitle, useMeta } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 function Supported (_: RoutableProps) {
   useTitle('Supported Platforms')
+  useMeta({ name: 'og:title', content: 'Supported Platforms' })
 
   return (
     <div>

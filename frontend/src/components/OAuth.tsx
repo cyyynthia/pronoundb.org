@@ -27,8 +27,8 @@
 
 import type { RoutableProps } from 'preact-router'
 import { h } from 'preact'
+import { useTitle, useMeta } from 'hoofd/preact'
 import { useRef, useMemo, useCallback } from 'preact/hooks'
-import { useTitle } from 'hoofd/preact'
 
 import { Endpoints, Routes } from '@constants'
 import { Platforms, } from '@shared'
@@ -112,6 +112,7 @@ function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAu
 
 function OAuth (props: OAuthProps) {
   useTitle(IntentTitles[props.intent])
+  useMeta({ name: 'og:title', content: IntentTitles[props.intent] })
 
   return (
     <div>

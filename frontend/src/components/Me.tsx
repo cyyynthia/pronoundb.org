@@ -26,7 +26,7 @@
  */
 
 import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import { useTitle, useMeta } from 'hoofd/preact'
 import { useCallback, useContext } from 'preact/hooks'
 
 import usePronounsFormatter from '../usePronounsFormatter'
@@ -44,6 +44,8 @@ function getHost () {
 
 function Me () {
   useTitle('My account')
+  useMeta({ name: 'og:title', content: 'My account' })
+
   const { user, logout, setPronouns, unlinkAccount } = useContext(Ctx)
   const formatter = usePronounsFormatter()
 

@@ -26,11 +26,12 @@
  */
 
 import { h } from 'preact'
-import { useTitle } from 'hoofd/preact'
+import { useTitle, useMeta } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
 
 function Notice (_: RoutableProps) {
   useTitle('Legal Notice')
+  useMeta({ name: 'og:title', content: 'Legal Notice' })
 
   return (
     <div>
