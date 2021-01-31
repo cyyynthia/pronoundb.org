@@ -266,11 +266,11 @@ select {
 .oauth-button {
   display: flex;
   align-items: center;
-  background-color: var(--color);
+  background: var(--color);
   padding: 16px;
 
   img {
-    filter: brightness(100);
+    filter: grayscale(1) brightness(255);
     width: 32px;
     height: 32px;
     margin-right: 16px;

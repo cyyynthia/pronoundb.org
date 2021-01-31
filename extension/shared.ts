@@ -31,8 +31,13 @@ export type Platform = {
   companion?: string,
   soon?: boolean
 }
-
+// background:;
 export const Platforms: Record<string, Platform> = Object.freeze({
+  codeberg: {
+    name: 'Codeberg',
+    color: '#2185D0',
+    soon: true,
+  },
   discord: {
     name: 'Discord',
     color: '#7289DA',
@@ -46,6 +51,31 @@ export const Platforms: Record<string, Platform> = Object.freeze({
   github: {
     name: 'GitHub',
     color: '#211F1F',
+  },
+  gitlab: {
+    name: 'GitLab',
+    color: '#FCA121',
+    soon: true,
+  },
+  instagram: {
+    name: 'Instagram',
+    color: '#E4405F',
+    soon: true,
+  },
+  mastodon: {
+    name: 'Mastodon',
+    color: '#3088D4',
+    soon: true,
+  },
+  osu: {
+    name: 'osu!',
+    color: '#FF66AA',
+    soon: true,
+  },
+  reddit: {
+    name: 'Reddit',
+    color: '#FF4500',
+    soon: true,
   },
   twitch: {
     name: 'Twitch',
