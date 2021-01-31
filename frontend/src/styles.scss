@@ -284,11 +284,11 @@ select {
 
   &:hover {
     text-decoration: none;
-    filter: brightness(.9)
+    filter: brightness(.9);
   }
 
   &.disabled {
-    opacity: 0.8;
+    opacity: 0.6;
     cursor: not-allowed;
   }
 }

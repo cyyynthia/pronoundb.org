@@ -27,18 +27,20 @@
 
 import modules from './modules/index.js'
 import { debug, log } from './util/log.js'
-import { PlatformNames, WEBSITE } from './shared.ts'
+import { Platforms, WEBSITE } from './shared.ts'
 
 for (const platform in modules) {
   if (Object.prototype.hasOwnProperty.call(modules, platform)) {
     const module = modules[platform]
     if (module.match.test(location.href)) {
+      if (module.alwaysRun) module.alwaysRun()
+
       chrome.storage.sync.get([ `${platform}.enabled` ], (res) => {
         if (res[`${platform}.enabled`] ?? true) {
-          log(`Enabling ${PlatformNames[platform]} module`)
+          log(`Enabling ${Platforms[platform].name} module`)
           module.run()
         } else {
-          debug(`Skipping ${PlatformNames[platform]} module`)
+          debug(`Skipping ${Platforms[platform].name} module`)
         }
       })
     }

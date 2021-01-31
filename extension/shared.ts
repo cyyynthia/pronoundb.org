@@ -26,9 +26,9 @@
  */
 
 export type Platform = {
-  name: string
-  color: string
-  companion?: string
+  name: string,
+  color: string,
+  companion?: string,
   soon?: boolean
 }
 

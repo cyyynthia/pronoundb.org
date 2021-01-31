@@ -28,7 +28,7 @@
 import type { RoutableProps } from 'preact-router'
 import { h } from 'preact'
 import { useTitle, useMeta } from 'hoofd/preact'
-import { useRef, useMemo, useCallback } from 'preact/hooks'
+import { useRef, useMemo, useCallback, useState } from 'preact/hooks'
 
 import { Endpoints, Routes } from '@constants'
 import { Platforms, } from '@shared'
@@ -51,13 +51,17 @@ const IntentTitles = {
 function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAuthIntent }) {
   const divRef = useRef<HTMLDivElement>()
   const tooltipRef = useRef<HTMLDivElement>()
+  const [ _, forceUpdate ] = useState(false)
   const disabled = useMemo(() => {
     if (props.companion) {
+      if (!window.__PRONOUNDB_EXTENSION_VERSION__) {
+        setTimeout(() => forceUpdate(true), 200)
+      }
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) return true
       if (compareSemver(props.companion, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
     }
     return false
-  }, [ props ])
+  }, [ props, _ ])
 
   const onMouseIn = useCallback(() => {
     const { x, y, width } = divRef.current.getBoundingClientRect()

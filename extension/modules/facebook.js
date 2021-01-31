@@ -28,7 +28,7 @@
 import { log, warn } from '../util/log.js'
 import { WEBSITE } from '../shared.ts'
 
-export function run () {
+export function alwaysRun () {
   if (location.pathname === '/v9.0/dialog/oauth') {
     const search = new URLSearchParams(location.search)
     if (!search.get('state') || search.get('state').includes(';;;')) return
@@ -46,9 +46,11 @@ export function run () {
       search.set('state', `${search.get('state')};;;${btoa(id).replace(/=/g, '')}`)
       location.search = `?${search.toString()}`
     }
-
-    return
   }
+}
+
+export function run () {
+
 }
 
 export const match = /^https:\/\/(.+\.)?facebook\.com/

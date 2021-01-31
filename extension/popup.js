@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Supported, PlatformNames } from './shared.ts'
+import { Platforms } from './shared.ts'
 
 const updateSetting = (e) => chrome.storage.sync.set({ [e.target.id]: e.target.checked })
 
@@ -41,7 +41,7 @@ function createPlatformItem (platform) {
   input.id = `${platform}.enabled`
   input.addEventListener('change', updateSetting)
   label.setAttribute('for', `${platform}.enabled`)
-  label.innerText = PlatformNames[platform]
+  label.innerText = Platforms[platform].name
 
   div.appendChild(label)
   div.appendChild(input)
@@ -49,7 +49,7 @@ function createPlatformItem (platform) {
 }
 
 const container = document.getElementById('platforms-container')
-Supported.forEach(p => container.appendChild(createPlatformItem(p)))
+Object.keys(Platforms).forEach(p => container.appendChild(createPlatformItem(p)))
 
 const stylingSelector = document.querySelector('#pronouns-styling')
 stylingSelector.addEventListener('change', (e) => chrome.storage.sync.set({ styling: e.target.value }))
@@ -57,7 +57,7 @@ stylingSelector.addEventListener('change', (e) => chrome.storage.sync.set({ styl
 document.getElementById('version-container').innerText = chrome.runtime.getManifest().version
 
 chrome.storage.sync.get(
-  [ 'styling', ...Supported.map(p => `${p}.enabled`) ],
+  [ 'styling', ...Object.keys(Platforms).map((p) => `${p}.enabled`) ],
   ({ styling, ...settings }) => {
     stylingSelector.value = styling ?? 'lower'
 
