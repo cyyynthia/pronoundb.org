@@ -78,18 +78,24 @@ function doFetchReactProp (targets, propPath) {
   if (typeof targets[0] === 'number') {
     targets = targets.map((target) => {
       const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
-      node.removeAttribute('data-pronoundb-target-id')
+      if (node) node.removeAttribute('data-pronoundb-target-id')
       return node
     })
   }
 
-  if (targets.length === 0) return []
+  const first = targets.find(Boolean)
+  if (!first) return []
 
-  const reactKey = Object.keys(targets[0]).find(k => k.startsWith('__reactInternalInstance'))
-  if (!reactKey) return
+  const reactKey = Object.keys(first).find(k => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
+  if (!reactKey) return []
 
   let props = []
   for (let i = 0; i < targets.length; i++) {
+    if (!targets[i]) {
+      props.push(null)
+      continue
+    }
+
     let res = targets[i][reactKey]
     for (let j = 0; j < propPath.length; j++) {
       res = res?.[propPath[j]]

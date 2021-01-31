@@ -25,46 +25,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { RoutableProps } from 'preact-router'
-import { h } from 'preact'
-import { useMemo } from 'preact/hooks'
-import { useTitle, useMeta } from 'hoofd/preact'
-import { Platforms } from '@shared'
+import { css } from '../util/dom.js'
 
-function Supported (_: RoutableProps) {
-  useTitle('Supported Platforms')
-  useMeta({ name: 'og:title', content: 'Supported Platforms' })
+export function info () {
+  const style = css({
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yO/r/jJ2Rynyk2v1.png)',
+    backgroundSize: 'auto',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '0 -457px',
+    display: 'inline-block',
+    height: '20px',
+    width: '20px',
+  })
 
-  const [ supported, soon ] = useMemo(() => {
-    const supported: string[] = []
-    const soon: string[] = []
-    Object.values(Platforms).forEach((v) => v.soon ? soon.push(v.name) : supported.push(v.name))
-    return [ supported, soon ]
-  }, [])
-  
-  return (
-    <div>
-      <div className='page-context'>About PronounDB</div>
-      <h2>Supported platforms</h2>
-      <p>
-        PronounDB aims to support a wide range of platforms, to help as many people as possible to share their pronouns
-        online. Here's the list of services supported, previews are coming soon!
-      </p>
-      <ul>
-        {supported.map((s) => <li key={s}>{s}</li>)}
-      </ul>
-      <p>
-        Support coming soon:
-      </p>
-      <ul>
-        {soon.map((s) => <li key={s}>{s}</li>)}
-      </ul>
-      <p>
-        Want to see another service supported? Shoot an issue on the issue tracker!
-      </p>
-    </div>
-  )
+  const div = document.createElement('div')
+  div.setAttribute('style', style)
+  return div
 }
-
-Supported.displayName = 'Supported'
-export default Supported

@@ -26,7 +26,7 @@
  */
 
 import { createDeferred } from './deferred'
-import { error } from './log'
+import { log, error } from './log'
 
 function doFetchSingle (platform, id) {
   return new Promise(resolve =>
@@ -88,4 +88,15 @@ export async function fetchPronounsBulk (platform, ids) {
   }
 
   return res
+}
+
+// Dev utils
+export async function __fetchPronouns (platform, id) {
+  log(`fetchPronouns ${platform} ${id}`)
+  return 'sh'
+}
+
+export async function __fetchPronounsBulk (platform, ids) {
+  log(`fetchPronounsBulk ${platform} ${ids}`)
+  return Object.fromEntries(ids.map((id) => [ id, 'sh' ]))
 }
