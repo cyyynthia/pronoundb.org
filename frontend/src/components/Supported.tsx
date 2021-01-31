@@ -25,14 +25,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
-import { useTitle, useMeta } from 'hoofd/preact'
 import type { RoutableProps } from 'preact-router'
+import { h } from 'preact'
+import { useMemo } from 'preact/hooks'
+import { useTitle, useMeta } from 'hoofd/preact'
+import { Platforms } from '@shared'
 
 function Supported (_: RoutableProps) {
   useTitle('Supported Platforms')
   useMeta({ name: 'og:title', content: 'Supported Platforms' })
 
+  const [ supported, soon ] = useMemo(() => {
+    const supported: string[] = []
+    const soon: string[] = []
+    Object.values(Platforms).forEach((v) => v.soon ? soon.push(v.name) : supported.push(v.name))
+    return [ supported, soon ]
+  }, [])
+  
   return (
     <div>
       <div className='page-context'>About PronounDB</div>
@@ -42,18 +51,13 @@ function Supported (_: RoutableProps) {
         online. Here's the list of services supported, previews are coming soon!
       </p>
       <ul>
-        <li>Discord</li>
-        <li>GitHub</li>
-        <li>Twitch</li>
-        <li>Twitter</li>
+        {supported.map((s) => <li key={s}>{s}</li>)}
       </ul>
       <p>
         Support coming soon:
       </p>
       <ul>
-        <li>Mastodon</li>
-        <li>GitLab</li>
-        <li>Reddit</li>
+        {soon.map((s) => <li key={s}>{s}</li>)}
       </ul>
       <p>
         Want to see another service supported? Shoot an issue on our issue tracker!
