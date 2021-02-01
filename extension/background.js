@@ -25,13 +25,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Endpoints, WEBSITE } from './shared.ts'
+import { compareSemver } from './util/format.js'
+import { Endpoints, Platforms, WEBSITE } from './shared.ts'
 
-if (process.env.NODE_ENV === 'production') {
-  chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener(({ previousVersion, reason }) => {
+  if (reason === 'install') {
     chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
-  })
-}
+  } else if (reason === 'update') {
+    const { version } = chrome.runtime.getManifest()
+    const keys = Object.keys(Platforms)
+    const newPlatforms = keys.filter(
+      (key) =>
+        compareSemver(previousVersion, Platforms[key].since) === -1 &&
+        compareSemver(version, Platforms[key].since) !== -1
+    )
+
+    chrome.storage.local.set(Object.fromEntries(newPlatforms.map((p) => [ p, true ])))
+  }
+})
 
 chrome.runtime.onMessage.addListener(
   function (request, _, sendResponse) {

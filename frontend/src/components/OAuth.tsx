@@ -53,12 +53,12 @@ function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAu
   const tooltipRef = useRef<HTMLDivElement>()
   const [ _, forceUpdate ] = useState(false)
   const disabled = useMemo(() => {
-    if (props.companion) {
+    if (props.since) {
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) {
         setTimeout(() => forceUpdate(true), 200)
       }
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) return true
-      if (compareSemver(props.companion, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
+      if (compareSemver(props.since, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
     }
     return false
   }, [ props, _ ])

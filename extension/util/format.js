@@ -37,3 +37,15 @@ export function formatPronouns (pronounsId, short) {
     ? pronounsFormat === 'pascal' ? pronouns[1] : pronouns[0]
     : pronouns
 }
+
+export function compareSemver (ver1, ver2) {
+  const v1 = ver1.split('.').map(Number)
+  const v2 = ver2.split('.').map(Number)
+
+  for (let i = 0; i < v1.length; i++) {
+    if (v1[i] === v2[i]) continue
+    return v1[i] > v2[i] ? 1 : -1
+  }
+
+  return 0
+}

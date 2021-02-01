@@ -28,7 +28,7 @@
 export type Platform = {
   name: string,
   color: string,
-  companion?: string,
+  since: string,
   soon?: boolean
 }
 // background:;
@@ -36,54 +36,64 @@ export const Platforms: Record<string, Platform> = Object.freeze({
   codeberg: {
     name: 'Codeberg',
     color: '#2185D0',
+    since: '0.0.0',
     soon: true,
   },
   discord: {
     name: 'Discord',
     color: '#7289DA',
+    since: '0.2.0',
   },
   facebook: {
     name: 'Facebook',
     color: '#4267B2',
-    companion: '0.5.0',
+    since: '0.5.0',
     soon: true
   },
   github: {
     name: 'GitHub',
     color: '#211F1F',
+    since: '0.2.0',
   },
   gitlab: {
     name: 'GitLab',
     color: '#FCA121',
+    since: '0.0.0',
     soon: true,
   },
   instagram: {
     name: 'Instagram',
     color: '#E4405F',
+    since: '0.0.0',
     soon: true,
   },
   mastodon: {
     name: 'Mastodon',
     color: '#3088D4',
+    since: '0.0.0',
     soon: true,
   },
   osu: {
     name: 'osu!',
     color: '#FF66AA',
+    since: '0.0.0',
     soon: true,
   },
   reddit: {
     name: 'Reddit',
     color: '#FF4500',
+    since: '0.0.0',
     soon: true,
   },
   twitch: {
     name: 'Twitch',
     color: '#9146FF',
+    since: '0.0.0',
   },
   twitter: {
     name: 'Twitter',
     color: '#1DA1F2',
+    since: '0.3.0',
   },
 })
 

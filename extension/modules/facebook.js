@@ -97,21 +97,19 @@ const handleArticle = throttle(handleArticles)
 async function handleMutation (nodes) {
   for (const { addedNodes } of nodes) {
     for (const added of addedNodes) {
-      if (typeof added.className === 'string') {
-        const profileTilesFeed = added.querySelector?.('[data-pagelet="ProfileTilesFeed_0"]')
-        if (profileTilesFeed) {
-          handleProfileTilesFeed(profileTilesFeed)
-          return
-        }
-
-        if (added.tagName === 'DIV' && added.attributes.length === 1 && added.className && added.querySelector('image')) {
-          const hoverCardProp = await fetchReactProp(added, [ 'child', 'memoizedProps', 'children', 'props', 'entryPoint', 'root' ])
-          if (hoverCardProp) handlePopOut(added)
-        }
-
-        const articles = added.querySelectorAll('[role="article"]')
-        if (articles.length !== 0) articles.forEach((article) => handleArticle(article))
+      const profileTilesFeed = added.querySelector?.('[data-pagelet="ProfileTilesFeed_0"]')
+      if (profileTilesFeed) {
+        handleProfileTilesFeed(profileTilesFeed)
+        return
       }
+
+      if (added.tagName === 'DIV' && added.attributes.length === 1 && added.className && added.querySelector('image')) {
+        const hoverCardProp = await fetchReactProp(added, [ 'child', 'memoizedProps', 'children', 'props', 'entryPoint', 'root' ])
+        if (hoverCardProp) handlePopOut(added)
+      }
+
+      const articles = added.querySelectorAll?.('[role="article"]')
+      if (articles && articles.length !== 0) articles.forEach((article) => handleArticle(article))
     }
   }
 }
