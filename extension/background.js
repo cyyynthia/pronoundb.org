@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener(({ previousVersion, reason }) => {
         compareSemver(version, Platforms[key].since) !== -1
     )
 
-    chrome.storage.local.set(Object.fromEntries(newPlatforms.map((p) => [ p, true ])))
+    chrome.storage.local.set(Object.fromEntries(newPlatforms.map((p) => [ `new.${p}`, true ])))
   }
 })
 

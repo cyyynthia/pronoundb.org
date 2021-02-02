@@ -49,7 +49,8 @@ function createPlatformItem (platform) {
 }
 
 const container = document.getElementById('platforms-container')
-Object.keys(Platforms).forEach(p => container.appendChild(createPlatformItem(p)))
+Object.keys(Platforms).filter((p) => !Platforms[p].soon || process.env.NODE_ENV === 'development')
+  .forEach((p) => container.appendChild(createPlatformItem(p)))
 
 const stylingSelector = document.querySelector('#pronouns-styling')
 stylingSelector.addEventListener('change', (e) => chrome.storage.sync.set({ styling: e.target.value }))
