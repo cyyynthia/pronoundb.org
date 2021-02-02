@@ -107,12 +107,16 @@ function doFetchReactProp (targets, propPath) {
 }
 
 function doExecuteReactProp (targets, propPath, args) {
-  const fn = doFetchReactProp(targets, propPath)
-  return fn(...args)
+  const fn = propPath.pop()
+  const obj = doFetchReactProp(targets, propPath)
+  return obj.map((o) => o[fn].apply(o, args))
 }
 
 const fetchReactPropFn = doFetchReactProp.toString().replace('doFetchReactProp', '')
-const executeReactPropFn = fetchReactPropFn.replace('propPath', 'propPath, args').replace('return res', 'return res(...args)')
+const executeReactPropFn = fetchReactPropFn
+  .replace('propPath', 'propPath, args')
+  .replace('if', 'const fn = propPath.pop(); if')
+  .replace('return props', 'return props.map((p) => p[fn](...args))')
 
 let targetId = 0
 
@@ -125,7 +129,7 @@ export async function fetchReactPropBulk (nodes, propPath) {
   return invoke(fetchReactPropFn, targets, propPath)
 }
 
-export async function executeReactPropBulk (nodes, propPath, args = []) {
+export async function executeReactPropBulk (nodes, propPath, ...args) {
   if (isFirefox) {
     return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, args)
   }
@@ -138,6 +142,6 @@ export async function fetchReactProp (node, propPath) {
   return fetchReactPropBulk([ node ], propPath).then((res) => res[0])
 }
 
-export async function executeReactProp (node, propPath, args = []) {
-  return executeReactPropBulk([ node ], propPath, args).then((res) => res[0])
+export async function executeReactProp (node, propPath, ...args) {
+  return executeReactPropBulk([ node ], propPath, ...args).then((res) => res[0])
 }

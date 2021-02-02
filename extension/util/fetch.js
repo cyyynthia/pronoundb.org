@@ -34,7 +34,8 @@ function doFetchSingle (platform, id) {
       { kind: 'http', target: 'lookup', platform, id },
       function (res) {
         if (res.success) return resolve(res.data)
-        error('Failed to fetch:', res.error)
+        console.log(res.error)
+        error(`Failed to fetch: ${res.error.toString()}`)
       }
     )
   )
@@ -46,7 +47,8 @@ function doFetchBulk (platform, ids) {
       { kind: 'http', target: 'lookup-bulk', platform, ids },
       function (res) {
         if (res.success) return resolve(res.data)
-        error('Failed to fetch:', res.error)
+        console.log(res.error)
+        error(`Failed to fetch: ${res.error.toString()}`)
       }
     )
   )

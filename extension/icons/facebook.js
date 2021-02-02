@@ -27,15 +27,45 @@
 
 import { css } from '../util/dom.js'
 
-export function info () {
+export function personCard (width = 20, height = 20) {
   const style = css({
-    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yO/r/jJ2Rynyk2v1.png)',
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yb/r/Nxb0jln7NuU.png)',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    display: 'inline-block',
+    height: `${height}px`,
+    width: `${width}px`,
+  })
+
+  const div = document.createElement('div')
+  div.setAttribute('style', style)
+  return div
+}
+
+export function editThin () {
+  const style = css({
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yJ/r/9Ye_838oQBb.png)',
     backgroundSize: 'auto',
     backgroundRepeat: 'no-repeat',
-    backgroundPosition: '0 -457px',
+    backgroundPosition: '0 -487px',
     display: 'inline-block',
-    height: '20px',
-    width: '20px',
+    height: `20px`,
+    width: `20px`,
+  })
+
+  const div = document.createElement('div')
+  div.setAttribute('style', style)
+  return div
+}
+
+export function privacyPublic (width = 16, height = 16) {
+  const style = css({
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yi/r/7wYk0RRj5-g.png)',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    display: 'inline-block',
+    height: `${height}px`,
+    width: `${width}px`,
   })
 
   const div = document.createElement('div')
