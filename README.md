@@ -16,16 +16,13 @@ at and finds a balance between ease to find and doing too much.
  - [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn)
 
 ## Supported services
+ - Discord
+ - Facebook
  - GitHub
- - Discord (Web)
-   - Exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
  - Twitch
  - Twitter
 
-**Support coming soon:tm: for:**
- - GitLab
- - Reddit
- - Mastodon
+PronounDB also exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
 
 Want to see another service supported? Shoot an issue!
 
