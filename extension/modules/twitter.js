@@ -32,10 +32,7 @@ import { formatPronouns } from '../util/format.js'
 import { topics } from '../icons/twitter.js'
 
 async function injectProfileHeader (header) {
-  const nodeDescription = document.querySelector('[data-testid="UserDescription"]')
-  if (!nodeDescription) return
-
-  const node = nodeDescription.parentElement.parentElement.parentElement.parentElement
+  const node = header.parentElement.parentElement.parentElement
   const id = await fetchReactProp(node, [ 'return', 'return', 'pendingProps', 'scribeData', 'profile_id' ])
   if (!id) return
 
