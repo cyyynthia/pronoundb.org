@@ -28,7 +28,7 @@
 import type { RoutableProps } from 'preact-router'
 import { h } from 'preact'
 import { useTitle, useMeta } from 'hoofd/preact'
-import { useRef, useMemo, useCallback, useState } from 'preact/hooks'
+import { useRef, useMemo, useCallback, useState, useEffect } from 'preact/hooks'
 
 import { Endpoints, Routes } from '@constants'
 import { Platforms, } from '@shared'
@@ -53,7 +53,7 @@ function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAu
   const tooltipRef = useRef<HTMLDivElement>()
   const [ _, forceUpdate ] = useState(false)
   const disabled = useMemo(() => {
-    if (props.since) {
+    if (props.requiresExt) {
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) {
         setTimeout(() => forceUpdate(true), 200)
       }
@@ -86,6 +86,12 @@ function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAu
     tooltip.style.opacity = '0'
     setTimeout(() => tooltip.remove(), 150)
   }, [ tooltipRef ])
+
+  useEffect(() => {
+    if (!disabled && tooltipRef.current) {
+      tooltipRef.current.remove()
+    }
+  }, [ disabled, tooltipRef.current ])
 
   if (props.soon && process.env.NODE_ENV !== 'development') {
     return null

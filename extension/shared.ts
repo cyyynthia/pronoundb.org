@@ -29,7 +29,8 @@ export type Platform = {
   name: string,
   color: string,
   since: string,
-  soon?: boolean
+  soon?: boolean,
+  requiresExt?: boolean
 }
 // background:;
 export const Platforms: Record<string, Platform> = Object.freeze({
@@ -48,7 +49,8 @@ export const Platforms: Record<string, Platform> = Object.freeze({
     name: 'Facebook',
     color: '#4267B2',
     since: '0.5.0',
-    soon: true
+    soon: true,
+    requiresExt: true,
   },
   github: {
     name: 'GitHub',
