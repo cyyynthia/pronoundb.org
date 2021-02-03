@@ -25,35 +25,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export function h (tag, props, ...child) {
-  const e = document.createElement(tag)
-  if (props) {
-    for (const key in props) {
-      if (Object.prototype.hasOwnProperty.call(props, key)) {
-        if (key.startsWith('on')) {
-          const event = key.slice(2).toLowerCase()
-          e.addEventListener(event, props[key])
-        } else {
-          e.setAttribute(key, String(props[key]))
-        }
-      }
-    }
-  }
-
-  for (const c of child) {
-    if (!c) continue
-    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
-  }
-
-  return e
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: 'Quicksand', sans-serif;
+  background-color: #fff;
+  color: #111;
+  width: 360px;
+  font-size: 1rem;
 }
 
-export function css (style) {
-  let res = ''
-  for (const prop in style) {
-    if (Object.prototype.hasOwnProperty.call(style, prop)) {
-      res += `${prop.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`)}:${style[prop]};`
-    }
-  }
-  return res
+h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+a {
+  color: #007ac0;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.content {
+  margin-bottom: 16px;
+}
+
+.buttons a + a {
+  margin-left: 16px;
+}
+
+.buttons + .buttons {
+  margin-top: 8px;
 }

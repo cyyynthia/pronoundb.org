@@ -9,8 +9,8 @@
   "scripts": {
     "web:dev": "cross-env NODE_ENV=development webpack serve --config frontend/webpack.config.js",
     "web:build": "cross-env NODE_ENV=production webpack --config frontend/webpack.config.js",
-    "ext:dev": "microbundle build -i extension/index.js -i extension/popup.js -i extension/background.js --no-compress --define process.env.NODE_ENV='development' --external none --sourcemap false -f iife -o dist/extension && node ./build/extension.finalize.js",
-    "ext:build": "microbundle build -i extension/index.js -i extension/popup.js -i extension/background.js --define process.env.NODE_ENV='production' --external none -f iife -o dist/extension && node ./build/extension.finalize.js --pack",
+    "ext:dev": "microbundle build -i extension/index.js -i extension/popup.js -i extension/supported.js -i extension/background.js --no-compress --define process.env.NODE_ENV='development' --external none --sourcemap false -f iife -o dist/extension && node ./build/extension.finalize.js",
+    "ext:build": "microbundle build -i extension/index.js -i extension/popup.js -i extension/supported.js -i extension/background.js --define process.env.NODE_ENV='production' --external none -f iife -o dist/extension && node ./build/extension.finalize.js --pack",
     "api:dev": "ts-node backend/server.ts",
     "api:build": "tsc --build backend/tsconfig.json",
     "api:run": "node dist/backend/server.js",

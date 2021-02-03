@@ -27,27 +27,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>PronounDB</title>
     <meta charset='utf8'/>
-    <link rel='stylesheet' href='popup.css'/>
+    <link rel='stylesheet' href='supported.css'/>
     <link href='https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap' rel='stylesheet'>
   </head>
   <body>
-    <h2>Enabled platforms</h2>
-    <div id='platforms-container'></div>
-
-    <h2>Pronouns styling</h2>
-    <select id='pronouns-styling'>
-      <option value='lower'>aaa/aaa</option>
-      <option value='pascal'>Aaa/Aaa</option>
-    </select>
-    <footer>
-      <div>PronounDB v<span id='version-container'>0.0.0</span></div>
-      <div>
-        <a href='https://pronoundb.org' target='_blank'>Website</a> -
-        <a href='https://github.com/cyyynthia/pronoundb.org' target='_blank'>GitHub</a>
-      </div>
-    </footer>
-    <script src='popup.js'></script>
+    <h1>🎉 PronounDB now supports <span data-platform></span>!</h1>
+    <div class='content'>
+      You can now see the pronouns of people who linked their <span data-platform></span> account on PronounDB. You can
+      also let other people know yours by linking your account!
+    </div>
+    <div class='buttons'>
+      <a data-close href='https://pronoundb.org/me' target='_blank' rel='noreferrer'>Link my <span data-platform></span> account</a>
+      <a data-close href='#'>Got it</a>
+    </div>
+    <div class='buttons'>
+      <a data-close-forever href='#'>Don't show this again</a>
+    </div>
+    <script src='supported.js'></script>
   </body>
 </html>

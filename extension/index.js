@@ -26,6 +26,7 @@
  */
 
 import modules from './modules/index.js'
+import { h, css } from './util/dom.js'
 import { debug, log } from './util/log.js'
 import { Platforms, WEBSITE } from './shared.ts'
 
@@ -42,6 +43,53 @@ for (const platform in modules) {
         } else {
           debug(`Skipping ${Platforms[platform].name} module`)
         }
+      })
+
+      chrome.storage.sync.get([ 'noPopup' ], ({ noPopup }) => {
+        chrome.storage.local.get([ `new.${platform}` ], (res) => {
+          if (res[`new.${platform}`]) {
+            chrome.storage.local.set({ [`new.${platform}`]: false })
+            if (noPopup) return
+
+            const doc = chrome.runtime.getURL('supported.html')
+            const iframe = h(
+              'iframe',
+              {
+                src: `${doc}?platform=${encodeURIComponent(Platforms[platform].name)}`,
+                style: css({
+                  width: '360px',
+                  position: 'fixed',
+                  top: '24px',
+                  right: '24px',
+                  border: '0',
+                  borderRadius: '8px',
+                  transition: 'all .3s',
+                  boxShadow: 'rgba(0, 0, 0, .4) 0 0 10px 3px',
+                  transform: 'translateY(-24px)',
+                  opacity: '0',
+                  zIndex: '9999',
+                })
+              }
+            )
+
+            document.body.appendChild(iframe)
+
+            function onMessage (e) {
+              if (e.source === iframe.contentWindow && e.data.msg === 'pronoundb::supported::close') {
+                window.removeEventListener('message', onMessage)
+                iframe.remove()
+              }
+
+              if (e.source === iframe.contentWindow && e.data.msg === 'pronoundb::supported::height') {
+                iframe.style.height = `${e.data.height}px`
+                iframe.style.transform = ''
+                iframe.style.opacity = '1'
+              }
+            }
+
+            window.addEventListener('message', onMessage)
+          }
+        })
       })
     }
   }

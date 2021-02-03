@@ -59,7 +59,7 @@ async function handleProfileTilesFeed (node) {
   if (!profile) return
 
   const pronouns = await fetchPronouns('facebook', id)
-  if (!pronouns) return
+  if (!pronouns || pronouns === 'other') return
 
   list.appendChild(
     h(
@@ -98,7 +98,7 @@ async function handleProfileAbout (node) {
   if (!profile) return
 
   const pronouns = await fetchPronouns('facebook', id)
-  if (!pronouns) return
+  if (!pronouns || pronouns === 'other') return
 
   const isSelf = Boolean(node.firstChild.firstChild.querySelector('i'))
   node.firstChild.appendChild(
@@ -134,7 +134,7 @@ async function handlePopOut (popout) {
   if (!profile) return
 
   const pronouns = await fetchPronouns('facebook', id)
-  if (!pronouns) return
+  if (!pronouns || pronouns === 'other') return
 
   const filter = 'invert(41%) sepia(8%) saturate(507%) hue-rotate(179deg) brightness(93%) contrast(91%)'
   list.appendChild(

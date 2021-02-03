@@ -89,10 +89,14 @@ const files = [
   join(extensionDistPath, 'popup.js'),
   join(extensionCodePath, 'popup.css'),
   join(extensionCodePath, 'popup.html'),
+  join(extensionCodePath, 'supported.js'),
+  join(extensionCodePath, 'supported.css'),
+  join(extensionCodePath, 'supported.html'),
 
   production && join(extensionDistPath, 'background.js.map'),
   production && join(extensionDistPath, 'pronoundb.js.map'),
-  production && join(extensionDistPath, 'popup.js.map')
+  production && join(extensionDistPath, 'popup.js.map'),
+  production && join(extensionDistPath, 'supported.js.map'),
 ].filter(Boolean)
 
 if (production) {
