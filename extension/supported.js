@@ -15,7 +15,9 @@ document.querySelectorAll('[data-close-forever]').forEach((el) => {
 })
 
 function emitHeight () {
-  parent.postMessage({ msg: 'pronoundb::supported::height', height: document.body.scrollHeight }, '*')
+  setTimeout(() => {
+    parent.postMessage({ msg: 'pronoundb::supported::height', height: document.body.scrollHeight }, '*')
+  }, 100)
 }
 
 if (document.readyState === 'loading') {

@@ -131,7 +131,7 @@ export async function fetchReactPropBulk (nodes, propPath) {
 
 export async function executeReactPropBulk (nodes, propPath, ...args) {
   if (isFirefox) {
-    return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, args)
+    return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, cloneInto(args, window))
   }
 
   const targets = nodes.map((node) => node.dataset.pronoundbTargetId = ++targetId)

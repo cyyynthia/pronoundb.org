@@ -173,6 +173,11 @@ const handleArticle = throttle(handleArticles)
 async function handleMutation (nodes) {
   for (const { addedNodes } of nodes) {
     for (const added of addedNodes) {
+      if (added.dataset?.pagelet === 'ProfileTilesFeed_0') {
+        handleProfileTilesFeed(profileTilesFeed)
+        continue
+      }
+
       const profileTilesFeed = added.querySelector?.('[data-pagelet="ProfileTilesFeed_0"]')
       if (profileTilesFeed) {
         handleProfileTilesFeed(profileTilesFeed)
@@ -197,12 +202,6 @@ async function handleMutation (nodes) {
         const section = document.querySelector('[data-pagelet="ProfileAppSection_0"]')
         if (added.contains(section)) {
           preprocessProfileAbout(section)
-          continue
-        }
-
-        const overview = section.querySelector('a[href*="about_overview"]')
-        if (added.contains(overview)) {
-          console.log('AHA')
           continue
         }
       }
