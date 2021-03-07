@@ -32,7 +32,7 @@ export type Platform = {
   soon?: boolean,
   requiresExt?: boolean
 }
-// background:;
+
 export const Platforms: Record<string, Platform> = Object.freeze({
   codeberg: {
     name: 'Codeberg',
@@ -49,7 +49,6 @@ export const Platforms: Record<string, Platform> = Object.freeze({
     name: 'Facebook',
     color: '#4267B2',
     since: '0.5.0',
-    soon: true,
     requiresExt: true,
   },
   github: {

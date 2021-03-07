@@ -53,7 +53,7 @@ function LinkButton (props: typeof Platforms[string] & { id: string, intent: OAu
   const tooltipRef = useRef<HTMLDivElement>()
   const [ _, forceUpdate ] = useState(false)
   const disabled = useMemo(() => {
-    if (props.requiresExt) {
+    if (typeof window !== 'undefined' && props.requiresExt) {
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) {
         setTimeout(() => forceUpdate(true), 200)
       }

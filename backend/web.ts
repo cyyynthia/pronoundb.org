@@ -60,6 +60,6 @@ export default async function (this: FastifyInstance, request: FastifyRequest, r
   reply.type('text/html')
     .header('x-powered-by', 'potatoes')
     .header('x-frame-options', 'DENY')
-    .header('content-security-policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;`)
+    .header('content-security-policy', `default-src 'self'; script-src 'self' 'nonce-${nonce}'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net;`)
     .send(`<!doctype html>${render(h(Html, { nonce, count, admin, manifest, integrity, extVersions, url: request.url }))}`)
 }
