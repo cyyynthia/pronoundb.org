@@ -31,11 +31,13 @@ import oauthModule from './api/oauth'
 import accountModule from './api/account'
 import lookupModule from './api/lookup'
 import adminModule from './api/admin'
+import pronounsModule from './api/pronouns'
 
 export default async function (fastify: FastifyInstance) {
   fastify.register(adminModule, { prefix: '/admin' })
   fastify.register(oauthModule, { prefix: '/oauth' })
   fastify.register(accountModule, { prefix: '/accounts' })
   fastify.register(lookupModule)
+  fastify.register(pronounsModule)
   fastify.get('*', (_, reply) => void reply.send({ error: 404, message: 'Not Found' }))
 }
