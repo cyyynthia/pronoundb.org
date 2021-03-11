@@ -86,6 +86,12 @@ function Docs (_: RoutableProps) {
         </ul>
         <p>Response: A map of IDs with their corresponding set of pronouns. IDs not found will not be included.</p>
       </div>
+
+      <h3>List all supported pronouns</h3>
+      <div>
+        <p>GET /api/v1/pronouns</p>
+        <p>Response: A map of pronoun abbreviations with their corresponding set of pronouns.</p>
+      </div>
     </div>
   )
 }
