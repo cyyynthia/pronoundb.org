@@ -22,45 +22,33 @@ at and finds a balance between ease to find and doing too much.
  - Twitch
  - Twitter
 
-PronounDB also exists as a [plugin](https://github.com/cyyynthia/pronoundb-powercord) for [Powercord](https://powercord.dev)
-
 Want to see another service supported? Shoot an issue!
+
+## Other resources
+ - [Powercord](https://powercord.dev) plugin: https://github.com/cyyynthia/pronoundb-powercord
+ - [BetterDiscord](http://betterdiscord.app) plugin by [@Strencher](https://github.com/Strencher): https://betterdiscord.app/plugin/PronounDB
+ - [Aliucord](https://github.com/Aliucord/Aliucord) plugin by [@Juby210](https://github.com/Juby210): https://github.com/Juby210/Aliucord-plugins#pronoundb
+ - Discord bot by [@NurMarvin](https://github.com/NurMarvin): https://github.com/NurMarvin/pronoundb-bot ([Invite](https://nurmarv.in/invite-pronoundb-bot))
 
 ## Structure
  - The backend is built using [fastify](https://fastify.io)
- - The frontend is built using [preact](https://preactjs.com) and bundled with [webpack](https://webpack.js.org)
+ - The frontend is built using [preact](https://preactjs.com), [tailwindcss](https://tailwindcss.com) and [vite](https://vitejs.dev)
  - The extension is bundled using [microbundle](https://github.com/developit/microbundle)
  - Data is stored using [mongodb](https://mongodb.com)
  - May contains stains of coffee and a few cookie crumbs :whistle:
 
 ## FAQ
-### Is is possible to add support for customized pronouns?
-It's possible, but I won't add it. The reason for this is that this creates an attack vector for people with malicious
-intents, to go and start mocking on communities (reality is that communities who'd want and benefit from a "custom"
-field are communities which are mocked too often, and I don't want to start being a vector involved in this).
+### Neo-pronouns and/or custom pronouns support?
+Based on the current architecture, and the features I want to implement, neo-pronouns support is not something I'll
+be adding. The list of sets would grow exponentially and would become unmaintainable, or I'd need to add custom
+pronouns and moderate the platform usage (for offensive stuff) and this is a strict no from me.
 
-I'd need to start moderating the platform, which would require a team of moderators looking into people's linked
-accounts and pronouns which sounds invasive to me. So to avoid any form of abuse, the only options will remain "Other"
-and "Other (Ask me)" in the pronouns picker.
+I want to add internationalization support in the future, and neo-pronouns are very much english-only and make for
+not very amazing i18n. Just with the current sets it's a problem for some languages! Sure I can skip them, but it's
+not a path I want to take.
 
-### How about neo-pronouns support?
-TL;DR: Too much things to consider, and there are too many neo-pronouns to have proper support.
+PronounDB is a side project I don't want to put tons of time in it, and that's sadly incompatible with adding support
+of neo-pronouns. Some people will say there are sets that are less used than some neo-pronouns. Maybe, maybe not. I
+just made all combinations possible.
 
-[Original issue](https://github.com/cyyynthia/pronoundb.org/issues/3)
-
-Support for neo-pronouns was suggested, but after discussing the conclusion was that supporting them would bring more
-downsides than it'd solve problems. One of the major issue is the amount of neo-pronouns out there, which makes building
-a complete list near impossible, and the pronoun selector would be gigantic and need UX tweaks.
-
-A proposal was to only support the most common/popular ones, but the issue with that is that defining how common/popular
-a neo-pronoun is is complicated, and could be seen as unfair (because there are no way of accurately measuring it).
-I also considered unfair to only support a few neo-pronouns, and tell people going by unlisted ones "sorry, your
-pronouns aren't popular enough". This sounds super harsh and definitely not something people may want to be confronted
-with.
-
-Another proposal was to let people input a custom set of pronouns themselves, but I rejected this proposal for the
-reasons listed above.
-
-As a final decision, it was considered acceptable to let people use "Other" when going by neo-pronouns, and have an
-additional option which explicitly tells people they can feel free to ask the person about their pronouns. This
-decision may, in the future, be revised if there's popular demand or if I randomly decide to.
+Some suggested supporting "popular" neo-pronouns, which is something I don't feel confident with either.

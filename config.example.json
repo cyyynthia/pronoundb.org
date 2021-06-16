@@ -1,19 +1,14 @@
 {
   "port": 80,
-  "secret": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "bind": "127.0.0.1",
   "host": "http://localhost",
-  "admins": [
-    { "platform": "discord", "id": "69696969" }
-  ],
+  "mongo": "mongodb://localhost:27017/pronoundb",
+  "secret": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "oauth": {
     "discord": [ "client id", "client secret" ],
     "github": [ "client id", "client secret", "token" ],
     "twitch": [ "client id", "client secret" ],
-    "twitter": [ "client id", "client secret" ]
-  },
-  "extension": {
-    "chrome": "",
-    "mozilla": "",
-    "edge": ""
+    "twitter": [ "client id", "client secret" ],
+    "facebook": [ "client id", "client secret" ]
   }
 }

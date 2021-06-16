@@ -6,3 +6,4 @@ dist
 *.nogit/
 *.nogit.*
 config.json
+conf/nginx.custom.conf

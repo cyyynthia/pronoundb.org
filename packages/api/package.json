@@ -1,0 +1,37 @@
+{
+  "name": "@pronoundb/api",
+  "description": "PronounDB REST API",
+  "repository": "git@github.com:cyyynthia/pronoundb.org.git",
+  "author": "Cynthia <cynthia@cynthia.dev>",
+  "license": "BSD-3-Clause",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsc-watch --onSuccess \"node dist/index.js\"",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint --ext ts --ext tsx src"
+  },
+  "dependencies": {
+    "fastify": "^3.17.0",
+    "fastify-auth": "^1.1.0",
+    "fastify-cookie": "^5.3.1",
+    "fastify-mongodb": "^2.0.1",
+    "fastify-tokenize": "^1.3.1",
+    "mongodb": "^3.6.9",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@pronoundb/shared": "workspace:*",
+    "@types/mongodb": "^3.6.17",
+    "@types/node": "^15.12.2",
+    "@types/node-fetch": "^2.5.10",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "eslint": "^7.26.0",
+    "eslint-plugin-deprecation": "^1.2.1",
+    "tsc-watch": "^4.4.0",
+    "typescript": "^4.3.2",
+    "vite": "^2.3.7"
+  }
+}

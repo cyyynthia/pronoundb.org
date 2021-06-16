@@ -1,0 +1,16 @@
+{
+  "name": "@pronoundb/shared",
+  "description": "Shared resources for PronounDB",
+  "repository": "git@github.com:cyyynthia/pronoundb.org.git",
+  "author": "Cynthia <cynthia@cynthia.dev>",
+  "license": "BSD-3-Clause",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^15.12.1",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@typescript-eslint/parser": "^4.22.1",
+    "eslint": "^7.26.0",
+    "eslint-plugin-deprecation": "^1.2.1"
+  }
+}

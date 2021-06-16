@@ -25,15 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export type Platform = {
-  name: string,
-  color: string,
-  since: string,
-  soon?: boolean,
-  requiresExt?: boolean
-}
-
-export const Platforms: Record<string, Platform> = Object.freeze({
+export const Platforms = {
   codeberg: {
     name: 'Codeberg',
     color: '#2185D0',
@@ -42,7 +34,7 @@ export const Platforms: Record<string, Platform> = Object.freeze({
   },
   discord: {
     name: 'Discord',
-    color: '#7289DA',
+    color: '#5865F2', // Degraded blurple, real blurple is 7289da.
     since: '0.2.0',
   },
   facebook: {
@@ -96,9 +88,11 @@ export const Platforms: Record<string, Platform> = Object.freeze({
     color: '#1DA1F2',
     since: '0.3.0',
   },
-})
+}
 
-export const Pronouns = Object.freeze({
+export const PlatformIds = Object.keys(Platforms).sort()
+
+export const Pronouns = {
   unspecified: null,
   // -- Contributors: please keep the list sorted alphabetically.
   hh: [ 'he/him', 'He/Him' ],
@@ -122,19 +116,14 @@ export const Pronouns = Object.freeze({
   other: 'Other pronouns',
   ask: 'Ask me my pronouns',
   avoid: 'Avoid pronouns, use my name',
-})
+}
 
-export const PronounsShort = Object.freeze({
+export const PronounsShort = {
   ...Pronouns,
   any: [ 'any', 'Any' ],
   other: [ 'other', 'Other' ],
   ask: [ 'ask me', 'Ask me' ],
   avoid: [ 'avoid', 'Avoid' ],
-})
+}
 
 export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
-
-export const Endpoints = Object.freeze({
-  LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
-})

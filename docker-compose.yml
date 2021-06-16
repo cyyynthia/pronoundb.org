@@ -1,0 +1,52 @@
+services:
+  # Services
+  webserver:
+    image: nginx:alpine
+    ports:
+      - 8080:80
+    volumes:
+      - ./conf/nginx.dev.conf:/etc/nginx/conf.d/default.conf
+  mongo:
+    image: mongo:4-bionic
+    ports:
+      - 27017:27017
+    volumes:
+      - db-data:/data/db
+  api:
+    environment:
+      NODE_ENV: development
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        PACKAGE_NAME: api
+    image: pronoundb-api
+    working_dir: /opt/pronoundb.org/packages/api
+    command: pnpm run dev
+    volumes:
+      - ./packages/shared:/opt/pronoundb.org/packages/shared
+      - ./packages/api/src:/opt/pronoundb.org/packages/api/src
+      - ./packages/api/dist:/opt/pronoundb.org/packages/api/dist
+      - ./packages/api/package.json:/opt/pronoundb.org/packages/api/package.json
+      - ./packages/api/tsconfig.json:/opt/pronoundb.org/packages/api/tsconfig.json
+      - ./config.json:/opt/pronoundb.org/config.json
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        PACKAGE_NAME: website
+    image: pronoundb-web
+    command: pnpm run dev -- --host
+    working_dir: /opt/pronoundb.org/packages/website
+    volumes:
+      - ./packages/shared:/opt/pronoundb.org/packages/shared
+      - ./packages/website/src:/opt/pronoundb.org/packages/website/src
+      - ./packages/website/dist:/opt/pronoundb.org/packages/website/dist
+      - ./packages/website/package.json:/opt/pronoundb.org/packages/website/package.json
+      - ./packages/website/tsconfig.json:/opt/pronoundb.org/packages/website/tsconfig.json
+      - ./packages/website/tailwind.config.js:/opt/pronoundb.org/packages/website/tailwind.config.js
+
+volumes:
+  db-data:
+    driver: local

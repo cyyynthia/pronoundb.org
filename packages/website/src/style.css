@@ -1,0 +1,104 @@
+/*
+ * Copyright (c) 2020-2021 Cynthia K. Rey, All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* todo: font-faces */
+}
+
+@layer components {
+  hr {
+    @apply border-gray-200 dark:border-gray-700;
+  }
+
+  .container-head {
+    @apply flex-none container flex flex-wrap items-center justify-between border-gray-200 mx-auto p-4 dark:border-gray-700;
+  }
+
+  .container-main {
+    @apply container mx-auto p-4 flex-1;
+  }
+
+  .title-context {
+    @apply uppercase text-sm font-bold text-pink-dark dark:text-pink;
+    letter-spacing: 0.25em;
+  }
+
+  .link {
+    @apply text-blue-800 hover:underline dark:text-cyan-200;
+  }
+
+  .btn {
+    @apply flex items-center justify-center bg-gray-200 px-6 pt-3 pb-4 rounded dark:bg-gray-700;
+  }
+
+  .btn-chrome, .btn-firefox, .btn-edge {
+    @apply btn relative overflow-hidden;
+  }
+
+  .btn-chrome::before, .btn-firefox::before, .btn-edge::before {
+    @apply block absolute h-2 inset-x-0 bottom-0;
+    content: '';
+  }
+
+  .btn-chrome::before {
+    background: linear-gradient(90deg, #4285f4, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853);
+  }
+
+  .btn-firefox::before {
+    background: linear-gradient(90deg, #ff3c61, #fe7c38);
+  }
+
+  .btn-edge::before {
+    background: linear-gradient(90deg, #4bc8f6, #35d6c7 55%, #49be77);
+  }
+
+  .auth-grid {
+    @apply gap-4 flex flex-col xs:grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  }
+
+  .accounts-grid {
+    @apply gap-3 flex flex-col xs:grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  .tooltip {
+    @apply bg-black absolute z-50 text-white p-2 transition-opacity text-center;
+    max-width: 300px;
+    transform: translateX(-50%) translateY(calc(-100% - 6px));
+  }
+
+  .tooltip::before {
+    @apply absolute w-2 h-2 left-1/2 bg-black transform rotate-45;
+    content: '';
+    bottom: -4px;
+  }
+}
