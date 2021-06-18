@@ -36,13 +36,18 @@ export default function Privacy (_: Attributes) {
     <main className='container-main'>
       <div className='title-context'>Legal</div>
       <h2 className='text-2xl font-bold mb-2'>Privacy Policy</h2>
-      <p className='mb-4'>Last edited: June 16, 2021</p>
+      <p className='mb-4'>Last edited: June 18, 2021</p>
       <div className='text-justify'>
         <p className='mb-3'>
           pronoundb.org automatically receives and collects various metadata sent by your web browser: IP address,
           browser information, operating system information, timestamp of your visits, pages visited. This data is only
           kept for seven days and is only used for debugging, troubleshooting and counter-abuse purposes. None of this
           data, or any other data we may collect, will be ever sold to anyone.
+        </p>
+        <p className='mb-3'>
+          In the event one or more users are found to abuse the pronoundb.org website, we reserve the right to
+          indefinitely store IP addresses and various other metadata for counter-abuse. We also reserve the right
+          to store aggregated and non-personal information about how the service is used, in the intent to improve it.
         </p>
         <p className='mb-3'>
           pronoundb.org lets you connect to external accounts using the OAuth authentication standard. When connecting

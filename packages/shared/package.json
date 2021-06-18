@@ -7,10 +7,10 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@types/node": "^15.12.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.1",
-    "@typescript-eslint/parser": "^4.22.1",
-    "eslint": "^7.26.0",
+    "@types/node": "^15.12.2",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
+    "eslint": "^7.28.0",
     "eslint-plugin-deprecation": "^1.2.1"
   }
 }

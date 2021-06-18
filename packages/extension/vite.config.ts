@@ -27,11 +27,10 @@
 
 import type { Plugin, ESBuildOptions } from 'vite'
 
-import { defineConfig } from 'vite'
-import { rename } from 'fs/promises'
 import { join } from 'path'
+import { readFile, rmdir, rename } from 'fs/promises'
+import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
-import magicalSvg from 'vite-plugin-magical-svg'
 
 function noJsxInject (): Plugin {
   return {
@@ -40,28 +39,47 @@ function noJsxInject (): Plugin {
   }
 }
 
-function moveIndex (): Plugin {
+function finalizeBuild (): Plugin {
   return {
-    name: 'move-index',
+    name: 'finalize-build',
+    generateBundle: async function (_, bundle) {
+      // "http://pronoundb.localhost:8080/api/v1/*"
+      const out = Object.entries(bundle)
+      let manifest = await readFile(join(__dirname, 'manifest.template.json'), 'utf8')
+      for (const file of out) manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
+
+      this.emitFile({ type: 'asset', fileName: 'manifest.json', source: manifest })
+    },
     closeBundle: async () => {
-      if (process.argv.includes('--ssr')) {
-        await rename(join(__dirname, 'dist', 'index.html'), join(__dirname, 'server', 'index.html'))
-      }
+      // Move index.html
+      const src = join(__dirname, 'dist', 'src')
+      const popup = join(src, 'popup')
+      const index = join(popup, 'index.html')
+      const out = join(__dirname, 'dist', 'popup.html')
+
+      await rename(index, out)
+      await rmdir(popup)
+      await rmdir(src)
     },
   }
 }
 
 export default defineConfig({
-  publicDir: process.argv.includes('--ssr') ? '_' : 'public',
   build: {
     assetsInlineLimit: 0,
-    outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
+    outDir: 'dist',
+    rollupOptions: {
+      input: {
+        extension: join(__dirname, 'src', 'index.ts'),
+        background: join(__dirname, 'src', 'background.ts'),
+        popup: join(__dirname, 'src', 'popup', 'index.html'),
+      },
+    },
   },
-  server: { hmr: { port: 8080 } },
   plugins: [
     preact(),
     noJsxInject(),
-    magicalSvg({ target: 'preact' }),
-    moveIndex(),
+    finalizeBuild(),
+    // magicalSvg({ target: 'preact' }),
   ],
 })

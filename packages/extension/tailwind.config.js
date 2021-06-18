@@ -25,43 +25,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Plugin, ESBuildOptions } from 'vite'
+const colors = require('tailwindcss/colors')
 
-import { defineConfig } from 'vite'
-import { rename } from 'fs/promises'
-import { join } from 'path'
-import preact from '@preact/preset-vite'
-import magicalSvg from 'vite-plugin-magical-svg'
-
-function noJsxInject (): Plugin {
-  return {
-    name: 'no-jsx-inject',
-    config: (c) => void ((c.esbuild as ESBuildOptions).jsxInject = ''),
-  }
-}
-
-function moveIndex (): Plugin {
-  return {
-    name: 'move-index',
-    closeBundle: async () => {
-      if (process.argv.includes('--ssr')) {
-        await rename(join(__dirname, 'dist', 'index.html'), join(__dirname, 'server', 'index.html'))
-      }
+module.exports = {
+  mode: 'jit',
+  darkMode: 'media',
+  purge: [ './index.html', './src/**/*.tsx' ],
+  theme: {
+    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+    container: {
+      screens: {
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1360px',
+      },
     },
-  }
-}
-
-export default defineConfig({
-  publicDir: process.argv.includes('--ssr') ? '_' : 'public',
-  build: {
-    assetsInlineLimit: 0,
-    outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
+    extend: {
+      screens: { xs: '420px' },
+      colors: {
+        pink: {
+          DEFAULT: '#f49898',
+          dark: '#bb6570',
+        },
+        cyan: colors.cyan,
+        gray: colors.trueGray,
+        emerald: colors.emerald,
+        'red-orange': '#ff9483',
+      },
+    },
   },
-  server: { hmr: { port: 8080 } },
-  plugins: [
-    preact(),
-    noJsxInject(),
-    magicalSvg({ target: 'preact' }),
-    moveIndex(),
-  ],
-})
+  plugins: [],
+}

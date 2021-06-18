@@ -25,43 +25,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Plugin, ESBuildOptions } from 'vite'
+import { readdir, stat } from 'fs/promises'
+import { relative } from 'path'
 
-import { defineConfig } from 'vite'
-import { rename } from 'fs/promises'
-import { join } from 'path'
-import preact from '@preact/preset-vite'
-import magicalSvg from 'vite-plugin-magical-svg'
-
-function noJsxInject (): Plugin {
-  return {
-    name: 'no-jsx-inject',
-    config: (c) => void ((c.esbuild as ESBuildOptions).jsxInject = ''),
+export async function* readdirRecursive (path, base = path.pathname) {
+  const files = await readdir(path)
+  for (const file of files) {
+    const filepath = new URL(file, path)
+    const info = await stat(filepath)
+    if (info.isDirectory()) {
+      if (file === 'node_modules' || file === 'dist' || file === 'packed') continue
+      yield* readdirRecursive(new URL(`${file}/`, path), base)
+    } else {
+      yield { name: relative(base, filepath.pathname), path: filepath.pathname }
+    }
   }
 }
-
-function moveIndex (): Plugin {
-  return {
-    name: 'move-index',
-    closeBundle: async () => {
-      if (process.argv.includes('--ssr')) {
-        await rename(join(__dirname, 'dist', 'index.html'), join(__dirname, 'server', 'index.html'))
-      }
-    },
-  }
-}
-
-export default defineConfig({
-  publicDir: process.argv.includes('--ssr') ? '_' : 'public',
-  build: {
-    assetsInlineLimit: 0,
-    outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
-  },
-  server: { hmr: { port: 8080 } },
-  plugins: [
-    preact(),
-    noJsxInject(),
-    magicalSvg({ target: 'preact' }),
-    moveIndex(),
-  ],
-})

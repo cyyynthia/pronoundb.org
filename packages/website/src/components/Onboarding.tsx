@@ -41,7 +41,6 @@ export default function Onboarding (_: Attributes) {
     ? <a className='link' href={Routes.ME}>going to your account</a>
     : <><a className='link' href={Routes.LOGIN}>logging in</a> or <a href={Routes.REGISTER}>creating an account</a></>
 
-
   return (
     <main className='container-main'>
       <h2 className='text-2xl font-bold mb-2'>Welcome!</h2>

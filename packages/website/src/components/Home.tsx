@@ -71,10 +71,6 @@ export default function Home (_: Attributes) {
           <span>Get for Edge</span>
         </a>
       </div>
-      <hr/>
-      <div className='flex gap-6 mt-4'>
-        <a href='/' className='link'>Get the userscript</a>
-      </div>
     </main>
   )
 }
