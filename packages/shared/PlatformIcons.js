@@ -25,9 +25,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { JSX } from 'preact'
-import type { PlatformId } from '@pronoundb/shared'
-
 import Codeberg from 'simple-icons/icons/codeberg.svg'
 import Discord from 'simple-icons/icons/discord.svg'
 import Facebook from 'simple-icons/icons/facebook.svg'
@@ -40,9 +37,7 @@ import Reddit from 'simple-icons/icons/reddit.svg'
 import Twitch from 'simple-icons/icons/twitch.svg'
 import Twitter from 'simple-icons/icons/twitter.svg'
 
-type Icon = (props: JSX.SVGAttributes) => JSX.Element
-
-const PlatformIcons: Record<PlatformId, Icon> = {
+const PlatformIcons = {
   codeberg: Codeberg,
   discord: Discord,
   facebook: Facebook,

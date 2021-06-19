@@ -7,11 +7,22 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@types/node": "^15.12.2",
+    "@types/node": "^15.12.4",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
-    "eslint": "^7.28.0",
+    "eslint": "^7.29.0",
     "eslint-plugin-deprecation": "^1.2.1",
+    "preact": "^10.5.13",
     "tailwindcss": "^2.2.2"
+  },
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts"
+    },
+    "./PlatformIcons": {
+      "import": "./PlatformIcons.js",
+      "types": "./PlatformIcons.d.ts"
+    }
   }
 }

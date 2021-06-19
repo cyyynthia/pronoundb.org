@@ -30,8 +30,8 @@ import { h } from 'preact'
 import { useContext, useCallback, useState } from 'preact/hooks'
 import { useTitle } from 'hoofd/preact'
 import { Platforms, Pronouns } from '@pronoundb/shared'
+import PlatformIcons from '@pronoundb/shared/PlatformIcons'
 
-import PlatformIcons from './PlatformIcons'
 import UserContext from './UserContext'
 import { Routes, Endpoints } from '../constants'
 

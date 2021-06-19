@@ -32,9 +32,9 @@ import { useRef, useMemo, useCallback, useState, useEffect, useContext } from 'p
 import { useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared'
+import PlatformIcons from '@pronoundb/shared/PlatformIcons'
 import { compareSemver } from '../util'
 
-import PlatformIcons from './PlatformIcons'
 import { Routes, Endpoints } from '../constants'
 import UserContext from './UserContext'
 
