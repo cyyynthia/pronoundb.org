@@ -25,13 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+@import '@pronoundb/shared/styles.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer base {
-  /* todo: font-faces */
-}
 
 @layer components {
   hr {

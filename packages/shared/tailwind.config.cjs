@@ -25,24 +25,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { browser } from 'webextension-polyfill-ts'
-import { Endpoints, WEBSITE } from '@pronoundb/shared'
+const colors = require('tailwindcss/colors')
 
-browser.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    browser.tabs.create({ url: `${WEBSITE}/onboarding` })
-  }
-})
-
-browser.runtime.onMessage.addListener((request) => {
-  if (request.kind === 'http') {
-    const url = request.target === 'lookup'
-      ? Endpoints.LOOKUP(request.platform, request.id)
-      : Endpoints.LOOKUP_BULK(request.platform, request.ids)
-
-    return fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${browser.runtime.getManifest().version}` } })
-      .then((r) => r.json())
-      .then((d) => ({ success: true, data: d }))
-      .catch((e) => ({ success: false, error: e }))
-  }
-})
+module.exports = {
+  mode: 'jit',
+  darkMode: 'media',
+  purge: [ './**/*.html', './src/**/*.tsx' ],
+  theme: {
+    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+    container: {
+      screens: {
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1360px',
+      },
+    },
+    extend: {
+      screens: { xs: '420px' },
+      colors: {
+        pink: {
+          DEFAULT: '#f49898',
+          dark: '#bb6570',
+        },
+        cyan: colors.cyan,
+        gray: colors.trueGray,
+        emerald: colors.emerald,
+        'red-orange': '#ff9483',
+      },
+    },
+  },
+  plugins: [],
+}

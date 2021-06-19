@@ -25,24 +25,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { browser } from 'webextension-polyfill-ts'
-import { Endpoints, WEBSITE } from '@pronoundb/shared'
-
-browser.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    browser.tabs.create({ url: `${WEBSITE}/onboarding` })
-  }
-})
-
-browser.runtime.onMessage.addListener((request) => {
-  if (request.kind === 'http') {
-    const url = request.target === 'lookup'
-      ? Endpoints.LOOKUP(request.platform, request.id)
-      : Endpoints.LOOKUP_BULK(request.platform, request.ids)
-
-    return fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${browser.runtime.getManifest().version}` } })
-      .then((r) => r.json())
-      .then((d) => ({ success: true, data: d }))
-      .catch((e) => ({ success: false, error: e }))
-  }
-})
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}

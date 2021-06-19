@@ -25,6 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { Endpoints as SharedEndpoints } from '@pronoundb/shared'
+
 export const Routes = {
   HOME: '/',
   ONBOARDING: '/onboarding',
@@ -47,7 +49,7 @@ export const Routes = {
 }
 
 export const Endpoints = {
-  SELF: '/api/v1/accounts/me',
+  ...SharedEndpoints,
   OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
   CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`,
 }

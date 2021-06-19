@@ -76,4 +76,12 @@ declare module '@pronoundb/shared' {
   }
 
   export const PronounsShort: typeof Pronouns
+
+  export const WEBSITE: string
+
+  export const Endpoints: {
+    SELF: string
+    LOOKUP: (platform: string, id: string) => string
+    LOOKUP_BULK: (platform: string, ids: string[]) => string
+  }
 }

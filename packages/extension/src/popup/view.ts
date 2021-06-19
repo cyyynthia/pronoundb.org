@@ -25,3 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { h, render } from 'preact'
+import Popup from './components/Popup'
+
+render(h(Popup, null), document.querySelector('#app')!)

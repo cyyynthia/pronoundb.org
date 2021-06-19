@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "types": [ "vite/client" ],
+    "types": [ "vite/client", "webextension-polyfill-ts" ],
     "outDir": "./dist",
     "jsx": "preserve",
     "jsxFactory": "h",

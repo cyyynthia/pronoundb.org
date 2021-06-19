@@ -25,36 +25,4 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const colors = require('tailwindcss/colors')
-
-module.exports = {
-  mode: 'jit',
-  darkMode: 'media',
-  purge: [ './index.html', './src/**/*.tsx' ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    container: {
-      screens: {
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1360px',
-      },
-    },
-    extend: {
-      screens: { xs: '420px' },
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.trueGray,
-        emerald: colors.emerald,
-        'red-orange': '#ff9483',
-      },
-    },
-  },
-  plugins: [],
-}
+module.exports = require('@pronoundb/shared/tailwind.config.cjs')

@@ -126,4 +126,10 @@ export const PronounsShort = {
   avoid: [ 'avoid', 'Avoid' ],
 }
 
-export const WEBSITE = process.env.NODE_ENV === 'development' ? 'http://localhost:8080' : 'https://pronoundb.org'
+export const WEBSITE = import.meta.env?.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
+
+export const Endpoints = {
+  SELF: `${WEBSITE}/api/v1/accounts/me`,
+  LOOKUP: (platform, id) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
+  LOOKUP_BULK: (platform, ids) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
+}

@@ -25,24 +25,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { browser } from 'webextension-polyfill-ts'
-import { Endpoints, WEBSITE } from '@pronoundb/shared'
+import { h } from 'preact'
 
-browser.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    browser.tabs.create({ url: `${WEBSITE}/onboarding` })
-  }
-})
+export enum Views {}
 
-browser.runtime.onMessage.addListener((request) => {
-  if (request.kind === 'http') {
-    const url = request.target === 'lookup'
-      ? Endpoints.LOOKUP(request.platform, request.id)
-      : Endpoints.LOOKUP_BULK(request.platform, request.ids)
-
-    return fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${browser.runtime.getManifest().version}` } })
-      .then((r) => r.json())
-      .then((d) => ({ success: true, data: d }))
-      .catch((e) => ({ success: false, error: e }))
-  }
-})
+export function Unsupported () {
+  return (
+    <main className='flex-grow p-4 flex flex-col items-center'>
+      <p className='font-semibold text-xl text-center m-4 p-4 mt-0 pt-0 border-b border-gray-200'>This website is not supported by PronounDB</p>
+      <button className='link'>Configure PronounDB</button>
+    </main>
+  )
+}
