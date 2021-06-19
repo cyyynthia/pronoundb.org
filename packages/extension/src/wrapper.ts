@@ -25,8 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export default function main () {
-  console.log('yay k')
-}
+// @ts-ignore
+const ext = window.browser || window.chrome
 
-main()
+const script = ext.runtime.getManifest().web_accessible_resources[0]
+import(ext.runtime.getURL(script))
+
+export {}

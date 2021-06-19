@@ -4,16 +4,13 @@
   "description": "A browser extension that lets people know how to refer to each other on various places of the Internet",
   "version": "0.6.0",
   "permissions": [ "tabs", "storage", "https://pronoundb.org/api/v1/*" ],
-  "browser_action": {
-    "default_popup": "popup.html"
-  },
-  "background": {
-    "scripts": [ "@chunk:background" ]
-  },
+  "browser_action": { "default_popup": "popup.html" },
+  "background": { "page": "background.html" },
+  "web_accessible_resources": [ "@chunk:extension" ],
   "content_scripts": [
     {
       "matches": [ "<all_urls>" ],
-      "js": [ "@chunk:extension" ]
+      "js": [ "@chunk:wrapper" ]
     }
   ]
 }

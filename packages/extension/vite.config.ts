@@ -31,6 +31,7 @@ import { join } from 'path'
 import { readFile, rmdir, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
+import magicalSvg from 'vite-plugin-magical-svg'
 
 function noJsxInject (): Plugin {
   return {
@@ -40,25 +41,34 @@ function noJsxInject (): Plugin {
 }
 
 function finalizeBuild (): Plugin {
+  let isDev = false
   return {
     name: 'finalize-build',
+    configResolved: (cfg) => void (isDev = Boolean(cfg.build.watch)),
     generateBundle: async function (_, bundle) {
-      // "http://pronoundb.localhost:8080/api/v1/*"
       const out = Object.entries(bundle)
       let manifest = await readFile(join(__dirname, 'manifest.template.json'), 'utf8')
       for (const file of out) manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
+      if (isDev) {
+        manifest = manifest
+          .replace('PronounDB', 'PronounDB (dev)')
+          .replace('https://pronoundb.org', 'http://pronoundb.localhost:8080')
+      }
 
       this.emitFile({ type: 'asset', fileName: 'manifest.json', source: manifest })
     },
     closeBundle: async () => {
-      // Move index.html
+      // Move html files
       const src = join(__dirname, 'dist', 'src')
-      const popup = join(src, 'popup')
-      const index = join(popup, 'index.html')
-      const out = join(__dirname, 'dist', 'popup.html')
 
-      await rename(index, out)
-      await rmdir(popup)
+      const popup = join(src, 'popup', 'index.html')
+      const popupOut = join(__dirname, 'dist', 'popup.html')
+      const background = join(src, 'background.html')
+      const backgroundOut = join(__dirname, 'dist', 'background.html')
+
+      await rename(popup, popupOut)
+      await rename(background, backgroundOut)
+      await rmdir(join(src, 'popup'))
       await rmdir(src)
     },
   }
@@ -68,10 +78,12 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     outDir: 'dist',
+    target: 'es6',
     rollupOptions: {
       input: {
+        wrapper: join(__dirname, 'src', 'wrapper.ts'),
         extension: join(__dirname, 'src', 'index.ts'),
-        background: join(__dirname, 'src', 'background.ts'),
+        background: join(__dirname, 'src', 'background.html'),
         popup: join(__dirname, 'src', 'popup', 'index.html'),
       },
     },
@@ -80,6 +92,6 @@ export default defineConfig({
     preact(),
     noJsxInject(),
     finalizeBuild(),
-    // magicalSvg({ target: 'preact' }),
+    magicalSvg({ target: 'preact' }),
   ],
 })

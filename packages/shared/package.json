@@ -14,15 +14,5 @@
     "eslint-plugin-deprecation": "^1.2.1",
     "preact": "^10.5.13",
     "tailwindcss": "^2.2.2"
-  },
-  "exports": {
-    ".": {
-      "import": "./index.js",
-      "types": "./index.d.ts"
-    },
-    "./PlatformIcons": {
-      "import": "./PlatformIcons.js",
-      "types": "./PlatformIcons.d.ts"
-    }
   }
 }
