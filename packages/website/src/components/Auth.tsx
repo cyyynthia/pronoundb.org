@@ -28,13 +28,15 @@
 import type { Attributes } from 'preact'
 import type { Platform, PlatformId } from '@pronoundb/shared'
 import { h } from 'preact'
+import { useRef, useMemo, useCallback, useState, useEffect, useContext } from 'preact/hooks'
 import { useTitle } from 'hoofd/preact'
-import { useRef, useMemo, useCallback, useState, useEffect } from 'preact/hooks'
+import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared'
 import { compareSemver } from '../util'
 
 import PlatformIcons from './PlatformIcons'
 import { Routes, Endpoints } from '../constants'
+import UserContext from './UserContext'
 
 type OAuthIntent = 'login' | 'register' | 'link'
 
@@ -126,6 +128,13 @@ function LinkButton (props: Platform & { id: PlatformId, intent: OAuthIntent }) 
 
 export default function Auth (props: OAuthProps) {
   useTitle(IntentTitles[props.intent])
+  const user = useContext(UserContext)
+  const expectLoggedIn = props.intent === 'link'
+
+  if (user !== void 0 && Boolean(user) !== expectLoggedIn) {
+    route(expectLoggedIn ? '/login' : '/me')
+    return null
+  }
 
   return (
     <main className='container-main'>
