@@ -25,20 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Plugin, ESBuildOptions } from 'vite'
+import type { Plugin } from 'vite'
 
 import { defineConfig } from 'vite'
 import { rename } from 'fs/promises'
 import { join } from 'path'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
-
-function noJsxInject (): Plugin {
-  return {
-    name: 'no-jsx-inject',
-    config: (c) => void ((c.esbuild as ESBuildOptions).jsxInject = ''),
-  }
-}
 
 function moveIndex (): Plugin {
   return {
@@ -60,7 +53,6 @@ export default defineConfig({
   server: { hmr: { port: 8080 } },
   plugins: [
     preact(),
-    noJsxInject(),
     magicalSvg({ target: 'preact' }),
     moveIndex(),
   ],

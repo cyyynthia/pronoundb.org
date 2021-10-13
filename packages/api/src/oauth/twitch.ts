@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from './abstract/shared.js'
+import type { ExternalUser } from '../database.js'
 
 import fetch from 'node-fetch'
 import register from './abstract/oauth2.js'
@@ -40,7 +40,7 @@ async function getSelf (token: string): Promise<ExternalUser> {
       authorization: `Bearer ${token}`,
       'client-id': clientId,
     },
-  }).then((r) => r.json())
+  }).then((r) => r.json() as any)
 
   return { id: data.data[0].id, name: data.data[0].display_name, platform: 'twitch' }
 }

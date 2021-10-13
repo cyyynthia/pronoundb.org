@@ -26,8 +26,9 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } from 'fastify'
-import type { ExternalUser, OAuthIntent } from './shared.js'
+import type { OAuthIntent } from './shared.js'
 import type { ConfiguredReply } from '../../util.js'
+import type { ExternalUser } from '../../database.js'
 import { randomBytes } from 'crypto'
 import { encode } from 'querystring'
 import fetch from 'node-fetch'
@@ -167,7 +168,7 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
         grant_type: 'authorization_code',
         code: request.query.code,
       }),
-    }).then((r) => r.json())
+    }).then((r) => r.json() as any)
     accessToken = token.access_token
   } catch {
     reply.redirect('/?error=ERR_OAUTH_GENERIC')

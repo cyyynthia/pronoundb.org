@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from './abstract/shared.js'
+import type { ExternalUser } from '../database.js'
 
 import fetch from 'node-fetch'
 import register from './abstract/oauth2.js'
@@ -40,7 +40,7 @@ async function getSelf (token: string): Promise<ExternalUser> {
       accept: 'application/vnd.github.v3+json',
       authorization: `token ${token}`,
     },
-  }).then((r) => r.json())
+  }).then((r) => r.json() as any)
 
   return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
 }

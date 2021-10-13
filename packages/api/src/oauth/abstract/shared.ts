@@ -26,21 +26,14 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { ObjectId } from 'mongodb'
+import type { MongoAccount, ExternalUser } from '../../database.js'
 
-export interface ExternalUser { id: string, name: string, platform: string }
 export type OAuthIntent = 'register' | 'login' | 'link'
-
-interface MongoAccount {
-  _id: ObjectId
-  pronouns?: string
-  accounts: ExternalUser[]
-}
 
 async function updateExternalAccount (this: FastifyInstance, account: MongoAccount, user: ExternalUser) {
   const savedAccount = account.accounts.find((a) => a.id === user.id && a.platform === user.platform)
   if (savedAccount && savedAccount.name !== user.name) {
-    await this.mongo.db!.collection('accounts').updateOne(
+    await this.mongo.db!.collection<MongoAccount>('accounts').updateOne(
       { _id: account._id },
       { $set: { 'accounts.$[account].name': user.name } },
       { arrayFilters: [ { 'account.platform': savedAccount.platform, 'account.id': savedAccount.id } ] }
@@ -49,7 +42,7 @@ async function updateExternalAccount (this: FastifyInstance, account: MongoAccou
 }
 
 export async function finishUp (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply, intent: OAuthIntent, user: ExternalUser) {
-  const collection = this.mongo.db!.collection('accounts')
+  const collection = this.mongo.db!.collection<MongoAccount>('accounts')
   const account = await collection.findOne({ 'accounts.id': user.id, 'accounts.platform': user.platform })
 
   let id = null
@@ -57,7 +50,7 @@ export async function finishUp (this: FastifyInstance, request: FastifyRequest, 
     case 'register': {
       if (account) return reply.redirect('/?error=ERR_ALREADY_EXISTS')
       const res = await collection.insertOne({ accounts: [ user ] })
-      id = res.ops[0]._id.toString()
+      id = res.insertedId.toString()
       break
     }
     case 'login':

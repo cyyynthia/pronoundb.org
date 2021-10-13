@@ -27,8 +27,5 @@
 
 // @ts-ignore
 const ext = window.browser || window.chrome
-
 const script = ext.runtime.getManifest().web_accessible_resources[0]
 import(ext.runtime.getURL(script))
-
-export {}

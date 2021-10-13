@@ -26,15 +26,13 @@
  */
 
 import type { FastifyRequest, FastifyReply } from 'fastify'
+import type { MongoAccount } from './database.js'
+
 import fastifyFactory from 'fastify'
 import fastifyAuth from 'fastify-auth'
 import fastifyMongo from 'fastify-mongodb'
 import fastifyCookie from 'fastify-cookie'
 import fastifyTokenize from 'fastify-tokenize'
-
-// import apiModule from './api'
-// import webModule from './web'
-// import shieldsModule from './api/shields'
 
 import lookup from './lookup.js'
 import oauth from './oauth/index.js'
@@ -53,8 +51,8 @@ fastify.register(fastifyTokenize, {
   header: false,
   cookie: 'token',
   fetchAccount: async (id: string) => {
-    const user = await fastify.mongo.db!.collection('accounts').findOne({ _id: new fastify.mongo.ObjectId(id) })
-    if (user) user.lastTokenReset = 0
+    const user = await fastify.mongo.db!.collection<MongoAccount>('accounts').findOne({ _id: new fastify.mongo.ObjectId(id) })
+    if (user) (user as any).lastTokenReset = 0
     return user
   },
 })

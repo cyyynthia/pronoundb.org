@@ -14,4 +14,4 @@ COPY pnpm-workspace.yaml .
 COPY packages/ packages/
 
 # Install
-RUN pnpm install -r --reporter=append-only --filter @pronoundb/${PACKAGE_NAME}
+RUN pnpm install -r --reporter=append-only --filter @pronoundb/${PACKAGE_NAME} --filter @pronoundb/shared

@@ -26,8 +26,9 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } from 'fastify'
+import type { OAuthIntent } from './shared.js'
+import type { ExternalUser } from '../../database.js'
 import type { ConfiguredReply } from '../../util.js'
-import type { ExternalUser, OAuthIntent } from './shared.js'
 import { randomBytes, createHmac } from 'crypto'
 import { encode, decode } from 'querystring'
 import fetch from 'node-fetch'

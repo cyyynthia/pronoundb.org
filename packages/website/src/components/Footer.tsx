@@ -30,6 +30,8 @@ import { useMemo } from 'preact/hooks'
 
 import { Routes } from '../constants'
 
+import Paw from '/assets/paw.svg'
+
 const HEARTS = [ '❤️', '🧡', '💛', '💚', '💙', '💜', '💗', '💖', '💝' ]
 
 export default function Footer () {
@@ -37,8 +39,9 @@ export default function Footer () {
 
   return (
     <footer className='container-head border-t py-3'>
-      <div className='flex-none flex items-center mr-6'>
-        <span className='text-gray-600 dark:text-gray-400'>Copyright &copy; {new Date().getUTCFullYear()} Cynthia K. Rey </span>
+      <div className='flex-none flex items-center mr-6 text-gray-600 dark:text-gray-400'>
+        <Paw className='w-5 h-5 mr-2'/>
+        <span>Copyright &copy; {new Date().getUTCFullYear()} Cynthia K. Rey </span>
       </div>
       <div className='flex-none flex items-center gap-4'>
         <a href={Routes.DOCS} className='link'>API Docs</a>

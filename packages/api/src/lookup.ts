@@ -26,6 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import type { MongoAccount } from './database.js'
 import { createHash } from 'crypto'
 import { Platforms } from '@pronoundb/shared'
 
@@ -54,7 +55,7 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
-  const account = await this.mongo.db!.collection('accounts').findOne(
+  const account = await this.mongo.db!.collection<MongoAccount>('accounts').findOne(
     { accounts: { $elemMatch: { platform: query.platform, id: query.id } } },
     { projection: { _id: 0, pronouns: 1 } }
   )
@@ -87,7 +88,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   }
 
   const ids = query.ids.split(',').slice(0, 50).sort()
-  const accounts = await this.mongo.db!.collection('accounts').aggregate([
+  const accounts = await this.mongo.db!.collection<MongoAccount>('accounts').aggregate([
     { $match: { accounts: { $elemMatch: { platform: query.platform, id: { $in: ids } } } } },
     { $addFields: { ids: '$accounts.id' } },
     { $project: { _id: 0, ids: 1, pronouns: 1 } },
@@ -96,7 +97,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   const hash = createHash('sha1').update(config.secret).update(query.platform)
   const res: Record<string, string> = {}
   for (const id of ids) {
-    const acc = accounts.find((a: any) => a.ids.includes(id))
+    const acc = accounts.find((a) => a.ids.includes(id))
     const pronouns = acc?.pronouns ?? 'unspecified'
     hash.update(id).update(pronouns)
     res[id] = pronouns
@@ -113,7 +114,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
 }
 
 export default async function (fastify: FastifyInstance) {
-  await fastify.mongo.db!.collection('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
+  await fastify.mongo.db!.collection<MongoAccount>('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 
   fastify.options('/lookup', cors)
   fastify.get('/lookup', lookup)

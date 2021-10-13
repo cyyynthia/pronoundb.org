@@ -1,9 +1,9 @@
 
-.PHONY: boat
+.PHONY: dev
 dev:
 	docker-compose up -d
 
-.PHONY: web-build
+.PHONY: dev-rebuild
 dev-rebuild:
 	docker-compose up --build -d
 

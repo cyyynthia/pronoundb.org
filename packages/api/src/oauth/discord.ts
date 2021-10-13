@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from './abstract/shared.js'
+import type { ExternalUser } from '../database.js'
 
 import fetch from 'node-fetch'
 import register from './abstract/oauth2.js'
@@ -36,7 +36,7 @@ const [ clientId, clientSecret ] = config.oauth.discord
 
 async function getSelf (token: string): Promise<ExternalUser> {
   const data = await fetch('https://discord.com/api/v9/users/@me', { headers: { authorization: `Bearer ${token}` } })
-    .then((r) => r.json())
+    .then((r) => r.json() as any)
 
   return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
 }

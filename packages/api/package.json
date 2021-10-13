@@ -13,25 +13,22 @@
     "lint": "eslint --ext ts --ext tsx src"
   },
   "dependencies": {
-    "fastify": "^3.18.0",
+    "fastify": "^3.22.0",
     "fastify-auth": "^1.1.0",
     "fastify-cookie": "^5.3.1",
-    "fastify-mongodb": "^2.0.1",
+    "fastify-mongodb": "^4.1.1",
     "fastify-tokenize": "^1.3.1",
-    "mongodb": "^3.6.9",
-    "node-fetch": "^2.6.1"
+    "mongodb": "^4.1.3",
+    "node-fetch": "^3.0.0"
   },
   "devDependencies": {
     "@pronoundb/shared": "workspace:*",
-    "@types/mongodb": "^3.6.18",
-    "@types/node": "^15.12.4",
-    "@types/node-fetch": "^2.5.10",
-    "@typescript-eslint/eslint-plugin": "^4.27.0",
-    "@typescript-eslint/parser": "^4.27.0",
-    "eslint": "^7.29.0",
-    "eslint-plugin-deprecation": "^1.2.1",
-    "tsc-watch": "^4.4.0",
-    "typescript": "^4.3.4",
-    "vite": "^2.3.7"
+    "@types/node": "^16.10.8",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^8.0.0",
+    "tsc-watch": "^4.5.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.6.7"
   }
 }

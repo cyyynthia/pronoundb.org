@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from './abstract/shared.js'
+import type { ExternalUser } from '../database.js'
 import register, { securedFetch } from './abstract/oauth10a.js'
 import config from '../config.js'
 
@@ -38,7 +38,7 @@ async function getSelf (token: string, secret: string): Promise<ExternalUser> {
     clientSecret: clientSecret,
     tokenSecret: secret,
     token: token,
-  }).then((r) => r.response.json())
+  }).then((r) => r.response.json() as any)
 
   return { id: data.id_str, name: `${data.name} (@${data.screen_name})`, platform: 'twitter' }
 }

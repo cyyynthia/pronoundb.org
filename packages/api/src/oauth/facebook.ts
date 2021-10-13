@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from './abstract/shared.js'
+import type { ExternalUser } from '../database.js'
 
 import fetch from 'node-fetch'
 import register from './abstract/oauth2.js'
@@ -41,8 +41,6 @@ function yeetToken (token: string): void {
 
 async function getSelf (token: string, state: string): Promise<ExternalUser | null> {
   const headers = { authorization: `Bearer ${token}` }
-  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: headers }).then((r) => r.json())
-
   const encodedId = state.split(';;;')[1]
   if (!encodedId) {
     yeetToken(token)
@@ -55,7 +53,8 @@ async function getSelf (token: string, state: string): Promise<ExternalUser | nu
     return null
   }
 
-  const check = await fetch(`https://graph.facebook.com/v9.0/?ids=${data.id},${realId}`, { headers: headers }).then((r) => r.json())
+  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: headers }).then((r) => r.json() as any)
+  const check = await fetch(`https://graph.facebook.com/v9.0/?ids=${data.id},${realId}`, { headers: headers }).then((r) => r.json() as any)
   if (Object.keys(check).length !== 1) {
     yeetToken(token)
     return null
