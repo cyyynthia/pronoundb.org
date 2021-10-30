@@ -48,12 +48,6 @@ export const Platforms = {
     color: '#211F1F',
     since: '0.2.0',
   },
-  gitlab: {
-    name: 'GitLab',
-    color: '#FCA121',
-    since: '0.0.0',
-    soon: true,
-  },
   instagram: {
     name: 'Instagram',
     color: '#E4405F',

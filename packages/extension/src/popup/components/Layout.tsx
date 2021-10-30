@@ -28,7 +28,21 @@
 import type { RestUser } from '@pronoundb/shared'
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
+
+import { ViewState } from './Views'
+import { usePronouns, formatPronouns } from '../pronouns'
+
+import Settings from 'feather-icons/dist/icons/settings.svg'
+import ArrowLeft from 'feather-icons/dist/icons/arrow-left.svg'
+
+type HeaderProps = {
+  view: ViewState
+  onOpenSettings: () => void
+  onCloseSettings: () => void
+}
+
+type FooterProps = { user: RestUser | null, onOpenPronounsSelector: () => void }
 
 const CUTE_COMMENTS = [
   'So cute!',
@@ -37,15 +51,33 @@ const CUTE_COMMENTS = [
   'That\'s adorable!',
 ]
 
-export function Header () {
+const specialNotes = {
+  unspecified: 'You didn\'t specify your pronouns yet.',
+  other: 'You\'re going by other pronouns than the ones available on PronounDB.',
+  ask: 'You want people to ask for your pronouns.',
+  avoid: 'You want people to avoid using pronouns on you.',
+}
+
+export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) {
   return (
-    <header className='px-4 py-2 border-b border-gray-200'>
-      <h1 className='text-2xl font-bold'>PronounDB</h1>
+    <header className='px-4 py-2 border-b border-gray-200 flex'>
+      {view === ViewState.SETTINGS && (
+        <button className='mr-4' onClick={onCloseSettings}>
+          <ArrowLeft className='w-5'/>
+        </button>
+      )}
+      <h1 className='text-2xl font-bold'>{view === ViewState.SETTINGS ? 'Settings' : 'PronounDB'}</h1>
+      {view !== ViewState.SETTINGS && (
+        <button className='ml-auto' onClick={onOpenSettings}>
+          <Settings className='w-5'/>
+        </button>
+      )}
     </header>
   )
 }
 
-export function Footer ({ user }: { user: RestUser | null }) {
+export function Footer ({ user, onOpenPronounsSelector }: FooterProps) {
+  usePronouns()
   const cute = useMemo(() => Math.floor(Math.random() * CUTE_COMMENTS.length), [])
 
   return (
@@ -53,8 +85,10 @@ export function Footer ({ user }: { user: RestUser | null }) {
       {user
         ? (
           <div className='py-2 px-4 border-t border-gray-200'>
-            <p>You're going by {user.pronouns}. {CUTE_COMMENTS[cute]}</p>
-            <button className='link'>Change pronouns</button>
+            {user.pronouns in specialNotes
+              ? <p>{specialNotes[user.pronouns as keyof typeof specialNotes]}</p>
+              : <p>You're going by {formatPronouns(user.pronouns)}. {CUTE_COMMENTS[cute]}</p>}
+            <button className='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
           </div>
         )
         : (

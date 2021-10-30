@@ -49,6 +49,7 @@ importers:
       archiver: ^5.3.0
       autoprefixer: ^10.3.7
       eslint: ^8.0.0
+      feather-icons: ^4.28.0
       postcss: ^8.3.9
       preact: ^10.5.15
       tailwindcss: ^2.2.17
@@ -67,6 +68,7 @@ importers:
       archiver: 5.3.0
       autoprefixer: 10.3.7_postcss@8.3.9
       eslint: 8.0.0
+      feather-icons: 4.28.0
       postcss: 8.3.9
       preact: 10.5.15
       tailwindcss: 2.2.17_96f83969316717847b3edf58a3f353f3
@@ -1105,8 +1107,8 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /core-js/3.14.0:
-    resolution: {integrity: sha512-3s+ed8er9ahK+zJpp9ZtuVcDoFzHNiZsPbNAAE4KXgrRHbjSqqNN6xGSXq6bq7TZIbKj4NLrLb6bJ5i+vSVjHA==}
+  /core-js/3.18.3:
+    resolution: {integrity: sha512-tReEhtMReZaPFVw7dajMx0vlsz3oOb8ajgPoHVYGxr8ErnZ6PcYEvvmjGmXlfpnxpkYSdOQttjB+MvVbCGfvLw==}
     requiresBuild: true
     dev: true
 
@@ -1755,7 +1757,7 @@ packages:
     resolution: {integrity: sha512-gRdqKESXRBUZn6Nl0VBq2wPHKRJgZz7yblrrc2lYsS6odkNFDnA4bqvrlEVRUPjE1tFax+0TdbJKZ31ziJuzjg==}
     dependencies:
       classnames: 2.3.1
-      core-js: 3.14.0
+      core-js: 3.18.3
     dev: true
 
   /fetch-blob/3.1.2:

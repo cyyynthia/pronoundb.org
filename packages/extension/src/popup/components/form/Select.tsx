@@ -25,48 +25,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
-import { WEBSITE } from '@pronoundb/shared'
-import modules, { getModule } from './modules'
+import { h } from 'preact'
+import { useCallback } from 'preact/hooks'
 
-for (const mdl of modules) mdl.main?.()
+type SelectProps = {
+  options: [ string, string ][]
+  value?: string
+  onChange?: (v: string) => void
+}
 
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    currentMdl.inject()
-    console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-  }
-})
+export default function Select ({ options, value, onChange }: SelectProps) {
+  const onChangeHandler = useCallback((e: Event) => onChange?.((e.target as any).value), [ onChange ])
 
-if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'styling' ]).then(({ styling }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.styling',
-        styling: styling ?? 'lower'
-      }
-    }, '*')
-  })
-
-  browser.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
-      }, '*')
-    }
-  })
-
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+  return (
+    <div className='flex flex-col text-base pb-3 border-b border-gray-200 mb-3'>
+      <select onChange={onChangeHandler}>
+        {options.map(([ k, v ]) => <option value={k} selected={value === k}>{v}</option>)}
+      </select>
+    </div>
+  )
 }

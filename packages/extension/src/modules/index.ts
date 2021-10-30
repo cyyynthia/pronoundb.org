@@ -25,48 +25,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { PlatformId } from '@pronoundb/shared'
 import browser from 'webextension-polyfill'
-import { WEBSITE } from '@pronoundb/shared'
-import modules, { getModule } from './modules'
 
-for (const mdl of modules) mdl.main?.()
-
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    currentMdl.inject()
-    console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-  }
-})
-
-if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'styling' ]).then(({ styling }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.styling',
-        styling: styling ?? 'lower'
-      }
-    }, '*')
-  })
-
-  browser.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
-      }, '*')
-    }
-  })
-
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+export type ExtensionModule = {
+  id: PlatformId
+  match: RegExp
+  settings?: any
+  inject: () => void
+  main?: () => void
 }
+
+const modules: ExtensionModule[] = []
+const rawModules = import.meta.globEager('./*.ts')
+for (const mdl in rawModules) modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
+
+export async function getModule (): Promise<(ExtensionModule & { id: PlatformId }) | null> {
+  let loc = location.href
+  if (browser.tabs) {
+    const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
+    loc = tab.url!
+  }
+
+  return modules.find((mdl) => mdl.match.test(loc)) || null;
+}
+
+export default modules

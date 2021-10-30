@@ -39,7 +39,7 @@ export default function Onboarding (_: Attributes) {
 
   const how = loggedIn
     ? <a className='link' href={Routes.ME}>going to your account</a>
-    : <><a className='link' href={Routes.LOGIN}>logging in</a> or <a href={Routes.REGISTER}>creating an account</a></>
+    : <><a className='link' href={Routes.LOGIN}>logging in</a> or <a className='link' href={Routes.REGISTER}>creating an account</a></>
 
   return (
     <main className='container-main'>
@@ -67,9 +67,9 @@ export default function Onboarding (_: Attributes) {
 
       <h3 className='text-xl font-bold mb-2'>Feeling generous?</h3>
       <p>
-        If you wish, you can <a href={Routes.DONATE} target='_blank' rel='noreferrer'>donate</a> so I can buy enough
-        cookies and coffee to stay alive! Donations help paying for the hosting of the website, which isn't free,
-        unlike the extension! 🥰
+        If you wish, you can <a href={Routes.DONATE} target='_blank' rel='noreferrer' className='link'>donate</a> so I
+        can buy enough cookies and coffee to stay alive! Donations help paying for the hosting of the website, which
+        isn't free, unlike the extension! 🥰
       </p>
     </main>
   )

@@ -52,14 +52,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { ExtensionModule } from '../../modules'
+import browser from 'webextension-polyfill'
 import { h, Fragment } from 'preact'
-import { useEffect, useState } from 'preact/hooks'
-import { Endpoints } from '@pronoundb/shared'
+import { useCallback, useEffect, useState } from 'preact/hooks'
+import { WEBSITE, Endpoints } from '@pronoundb/shared'
 import { Header, Footer } from './Layout'
+import { ViewState } from './Views'
 import * as Views from './Views'
+
+import { getModule } from '../../modules'
+
+function Main ({ view }: { view: ViewState }) {
+  const [ mdl, setMdl ] = useState<false | null | ExtensionModule>(false)
+  useEffect(() => void getModule().then((m) => setMdl(m)), [ setMdl ])
+
+  if (view === ViewState.MAIN) {
+    if (mdl === false) return null
+    if (!mdl) return <Views.Unsupported/>
+    return <Views.Main module={mdl}/>
+  }
+
+  if (view === ViewState.SETTINGS) {
+    return <Views.Settings/>
+  }
+
+  return null
+}
 
 export default function Popup () {
   const [ user, setUser ] = useState(null)
+  const [ view, setView ] = useState(ViewState.MAIN)
+  const openPronounsSelector = useCallback(() => void browser.tabs.create({ url: `${WEBSITE}/me` }), [])
+  const openSettings = useCallback(() => void setView(ViewState.SETTINGS), [])
+  const closeSettings = useCallback(() => void setView(ViewState.MAIN), [])
+
   useEffect(() => {
     fetch(Endpoints.SELF)
       .then((r) => r.json())
@@ -67,13 +94,11 @@ export default function Popup () {
       .catch()
   }, [])
 
-  const View = Views.Unsupported
-
   return (
-    <Fragment>
-      <Header/>
-      <View/>
-      <Footer user={user}/>
-    </Fragment>
+    <div className='flex flex-col h-full'>
+      <Header view={view} onOpenSettings={openSettings} onCloseSettings={closeSettings}/>
+      <Main view={view}/>
+      <Footer user={user} onOpenPronounsSelector={openPronounsSelector}/>
+    </div>
   )
 }

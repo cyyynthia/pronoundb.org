@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { Endpoints, WEBSITE } from '@pronoundb/shared'
 
 browser.runtime.onInstalled.addListener((details) => {

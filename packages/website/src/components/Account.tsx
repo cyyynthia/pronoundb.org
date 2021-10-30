@@ -28,18 +28,20 @@
 import type { Attributes } from 'preact'
 import { h } from 'preact'
 import { useContext, useCallback, useState } from 'preact/hooks'
+import { route } from 'preact-router'
 import { useTitle } from 'hoofd/preact'
 import { Platforms, Pronouns } from '@pronoundb/shared'
 import PlatformIcons from '@pronoundb/shared/PlatformIcons'
 
 import UserContext from './UserContext'
+import { usePronouns, formatPronouns } from '../pronouns'
 import { Routes, Endpoints } from '../constants'
 
 import UserPlus from 'feather-icons/dist/icons/user-plus.svg'
 import X from 'feather-icons/dist/icons/x.svg'
-import { route } from 'preact-router'
 
 export default function Account (_: Attributes) {
+  usePronouns()
   useTitle('My Account')
   const user = useContext(UserContext)
   const [ , __ ] = useState(0)
@@ -83,11 +85,10 @@ export default function Account (_: Attributes) {
       <select className='w-full px-2 py-1 mb-8 bg-gray-200 dark:bg-gray-700' value={user.pronouns} onChange={(e) => changePronouns((e.target as any).value)}>
         {Object.keys(Pronouns).map((set) => (
           <option key={set} value={set}>
-            {(Array.isArray(Pronouns[set]) ? Pronouns[set][0] : Pronouns[set]) ?? 'Unspecified'}
+            {formatPronouns(set) ?? 'Unspecified'}
           </option>
         ))}
       </select>
-
 
       <h3 className='text-xl font-bold mb-2'>Linked accounts</h3>
       <p className='mb-2'>

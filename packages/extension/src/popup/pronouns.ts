@@ -26,47 +26,33 @@
  */
 
 import browser from 'webextension-polyfill'
-import { WEBSITE } from '@pronoundb/shared'
-import modules, { getModule } from './modules'
+import { useState, useEffect, useCallback } from 'preact/hooks'
+import { Pronouns } from '@pronoundb/shared'
 
-for (const mdl of modules) mdl.main?.()
-
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    currentMdl.inject()
-    console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
+let styling = 'lower'
+browser.storage.sync.get([ 'styling' ]).then(({ styling: st }) => (styling = st))
+browser.storage.onChanged.addListener((changes) => {
+  if (changes.styling) {
+    styling = changes.styling.newValue
   }
 })
 
-if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'styling' ]).then(({ styling }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.styling',
-        styling: styling ?? 'lower'
-      }
-    }, '*')
-  })
+export function formatPronouns (id: string) {
+  const pronouns = Pronouns[id]
+  const idx = styling === 'lower' ? 0 : 1
+  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+}
 
-  browser.storage.onChanged.addListener((changes) => {
+export function usePronouns () {
+  const forceUpdate = useState(0)[1]
+  const updateFormatted = useCallback((changes: Record<string, { newValue?: string }>) => {
     if (changes.styling) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
-      }, '*')
+      forceUpdate((i) => ++i)
     }
-  })
+  }, [ forceUpdate ])
 
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+  useEffect(() => {
+    browser.storage.onChanged.addListener(updateFormatted)
+    return () => browser.storage.onChanged.removeListener(updateFormatted)
+  }, [ updateFormatted ])
 }

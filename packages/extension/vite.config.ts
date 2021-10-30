@@ -25,20 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Plugin, ESBuildOptions } from 'vite'
+import type { Plugin } from 'vite'
 
 import { join } from 'path'
 import { readFile, rmdir, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
-
-function noJsxInject (): Plugin {
-  return {
-    name: 'no-jsx-inject',
-    config: (c) => void ((c.esbuild as ESBuildOptions).jsxInject = ''),
-  }
-}
 
 function finalizeBuild (): Plugin {
   let isDev = false
@@ -48,7 +41,15 @@ function finalizeBuild (): Plugin {
     generateBundle: async function (_, bundle) {
       const out = Object.entries(bundle)
       let manifest = await readFile(join(__dirname, 'manifest.template.json'), 'utf8')
-      for (const file of out) manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
+      for (const file of out) {
+        if (file[1].name === 'extension') {
+          const names = [ file[0], ...(file[1] as any).imports ].join('", "')
+          manifest = manifest.replace(`@chunk:${file[1].name}`, names)
+          continue
+        }
+
+        manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
+      }
       if (isDev) {
         manifest = manifest
           .replace('PronounDB', 'PronounDB (dev)')
@@ -90,7 +91,6 @@ export default defineConfig({
   },
   plugins: [
     preact(),
-    noJsxInject(),
     finalizeBuild(),
     magicalSvg({ target: 'preact' }),
   ],

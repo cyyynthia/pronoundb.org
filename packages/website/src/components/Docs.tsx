@@ -31,6 +31,7 @@ import type { Attributes } from 'preact'
 import { h, Fragment } from 'preact'
 import { useTitle, useMeta } from 'hoofd/preact'
 import { PlatformIds, Platforms, Pronouns } from '@pronoundb/shared'
+import { usePronouns, formatPronouns } from '../pronouns'
 
 const SupportedFragment = () => {
   const items = PlatformIds.filter((p) => !Platforms[p].soon).map((platformId) => [
@@ -43,6 +44,7 @@ const SupportedFragment = () => {
 }
 
 export default function Docs (_: Attributes) {
+  usePronouns()
   useTitle('API Docs')
   useMeta({ name: 'og:title', content: 'API Docs' })
 
@@ -50,7 +52,7 @@ export default function Docs (_: Attributes) {
     <main className='container-main'>
       <div className='title-context'>About PronounDB</div>
       <h2 className='text-2xl font-bold mb-2'>API Documentation</h2>
-      <div className='mb-8 bg-blue-300 font-semibold p-4'>
+      <div className='mb-4 bg-blue-300 font-semibold p-4'>
         This will be rewritten soon, with a better look and a new API that includes new features. Stay tuned!
       </div>
 
@@ -63,7 +65,7 @@ export default function Docs (_: Attributes) {
         <ul className='list-inside list-disc'>
           {Object.keys(Pronouns).map((setId) => (
             <li key={setId}>
-              <code>{setId}</code>: {(Array.isArray(Pronouns[setId]) ? Pronouns[setId][0] : Pronouns[setId]) ?? 'Unspecified'}
+              <code>{setId}</code>: {formatPronouns(setId) ?? 'Unspecified'}
             </li>
           ))}
         </ul>

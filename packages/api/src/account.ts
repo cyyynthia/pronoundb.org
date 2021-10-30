@@ -31,7 +31,10 @@ import type { MongoAccount } from './database.js'
 
 import { Pronouns, Platforms } from '@pronoundb/shared'
 
-type RequestProps = { TokenizeUser: User }
+type RequestProps = {
+  TokenizeUser: User,
+  Body: { pronouns?: string }
+}
 
 const SUPPORTED_PLATFORMS = Object.keys(Platforms)
 
@@ -44,13 +47,18 @@ function getMe (request: FastifyRequest<RequestProps>, reply: FastifyReply) {
 }
 
 async function updateMe (this: FastifyInstance, request: FastifyRequest<RequestProps>, reply: FastifyReply) {
-  if (typeof request.body !== 'object' && !Object.prototype.hasOwnProperty.call(request.body, 'pronouns')) {
+  if (typeof request.body !== 'object') {
     reply.code(400).send({ error: 400, message: 'Invalid form body' })
     return
   }
 
-  const pronouns = (request.body as Record<string, string>).pronouns
-  if (!Object.prototype.hasOwnProperty.call(Pronouns, pronouns)) {
+  const { pronouns } = request.body;
+  if (typeof pronouns !== 'string') {
+    reply.code(400).send({ error: 400, message: 'Invalid form body' })
+    return
+  }
+
+  if (!(pronouns in Pronouns)) {
     reply.code(400).send({ error: 400, message: 'Invalid form body' })
     return
   }
@@ -59,6 +67,7 @@ async function updateMe (this: FastifyInstance, request: FastifyRequest<RequestP
     { _id: new this.mongo.ObjectId(request.user!._id) },
     { $set: { pronouns: pronouns } }
   )
+
   reply.code(204).send()
 }
 

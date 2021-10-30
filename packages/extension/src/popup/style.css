@@ -33,10 +33,35 @@
 @layer base {
   body {
     width: 360px;
-    height: 540px;
+    height: 480px;
+    --context-color: #f49898;
   }
 }
 
 @layer components {
+  .checkbox {
+    @apply relative m-1 cursor-pointer;
+  }
 
+  .checkbox input {
+    @apply z-10 cursor-pointer appearance-none bg-transparent border-0 shadow-none absolute w-full h-full p-1 -top-1 -left-1 box-content;
+  }
+
+  .checkbox div {
+    @apply w-8 h-3 rounded-lg relative bg-gray-300;
+  }
+
+  .checkbox div::before {
+    content: '';
+    filter: brightness(0.7);
+    @apply w-4 h-4 rounded-full absolute -left-0.5 -top-0.5 bg-gray-300;
+  }
+
+  .checkbox input:checked + div {
+    @apply bg-contextful;
+  }
+
+  .checkbox input:checked + div::before {
+    @apply bg-contextful left-auto -right-0.5;
+  }
 }

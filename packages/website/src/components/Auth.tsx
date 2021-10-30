@@ -49,8 +49,8 @@ const IntentTitles = {
 }
 
 function LinkButton (props: Platform & { id: PlatformId, intent: OAuthIntent }) {
-  const divRef = useRef<HTMLDivElement>()
-  const tooltipRef = useRef<HTMLDivElement>()
+  const divRef = useRef<HTMLDivElement>(null)
+  const tooltipRef = useRef<HTMLDivElement>(null)
   const [ _, forceUpdate ] = useState(false)
 
   const disabled = useMemo(() => {
@@ -64,7 +64,7 @@ function LinkButton (props: Platform & { id: PlatformId, intent: OAuthIntent }) 
   }, [ props, _ ])
 
   const onMouseIn = useCallback(() => {
-    const { x, y, width } = divRef.current.getBoundingClientRect()
+    const { x, y, width } = divRef.current!.getBoundingClientRect()
     const tt = document.createElement('div')
     tt.className = 'tooltip'
     tt.style.left = `${x + (width / 2)}px`

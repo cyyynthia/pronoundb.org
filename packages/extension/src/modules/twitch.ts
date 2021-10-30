@@ -25,48 +25,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
-import { WEBSITE } from '@pronoundb/shared'
-import modules, { getModule } from './modules'
+export const match = /^https:\/\/(.+\.)?twitch\.tv/
 
-for (const mdl of modules) mdl.main?.()
-
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    currentMdl.inject()
-    console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-  }
-})
-
-if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'styling' ]).then(({ styling }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.styling',
-        styling: styling ?? 'lower'
-      }
-    }, '*')
-  })
-
-  browser.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
-      }, '*')
-    }
-  })
-
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+export function inject () {
+  console.log('Twitch!')
 }

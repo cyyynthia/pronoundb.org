@@ -60,7 +60,7 @@ export async function finishUp (this: FastifyInstance, request: FastifyRequest, 
       break
     case 'link':
       // The following should almost never be true, unless someone is deliberately trying to break things up.
-      if (!Object.prototype.hasOwnProperty.call(request, 'user')) return reply.redirect('/?error=ERR_NOT_LOGGED_IN')
+      if (!('user' in request)) return reply.redirect('/?error=ERR_NOT_LOGGED_IN')
       if (account) {
         if (account._id.toString() !== (request as any).user._id.toString()) return reply.redirect('/me?error=ERR_ALREADY_LINKED')
         await updateExternalAccount.call(this, account, user)

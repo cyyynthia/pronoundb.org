@@ -122,7 +122,7 @@ export async function authorize (this: FastifyInstance, request: AuthorizeReques
 }
 
 export async function callback (this: FastifyInstance, request: CallbackRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
-  if (Object.prototype.hasOwnProperty.call(request.query, 'error') || !request.query.code) {
+  if ('error' in request.query || !request.query.code) {
     reply.redirect('/')
     return
   }

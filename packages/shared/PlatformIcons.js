@@ -29,7 +29,6 @@ import Codeberg from 'simple-icons/icons/codeberg.svg'
 import Discord from 'simple-icons/icons/discord.svg'
 import Facebook from 'simple-icons/icons/facebook.svg'
 import GitHub from 'simple-icons/icons/github.svg'
-import GitLab from 'simple-icons/icons/gitlab.svg'
 import Instagram from 'simple-icons/icons/instagram.svg'
 import Mastodon from 'simple-icons/icons/mastodon.svg'
 import Osu from 'simple-icons/icons/osu.svg'
@@ -42,7 +41,6 @@ const PlatformIcons = {
   discord: Discord,
   facebook: Facebook,
   github: GitHub,
-  gitlab: GitLab,
   instagram: Instagram,
   mastodon: Mastodon,
   osu: Osu,
