@@ -25,17 +25,22 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Pronouns } from '@pronoundb/shared'
+export function whisper (props: Record<string, string>) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  svg.setAttribute('viewBox', '0 0 20 20')
+  svg.setAttribute('width', '20px')
+  svg.setAttribute('height', '20px')
+  path.setAttribute('fill-rule', 'evenodd')
+  path.setAttribute('clip-rule', 'evenodd')
+  path.setAttribute('d', 'M7.828 13L10 0 M10 18l-3-3H5a2 2 0 01-2-2V5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2l-3 3z')
+  svg.appendChild(path)
 
-let styling = 'lower'
-window.addEventListener('message', (e) => {
-  if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
-    styling = e.data.payload.styling
+  for (const key in props) {
+    if (Object.prototype.hasOwnProperty.call(props, key)) {
+      svg.setAttribute(key, String(props[key]))
+    }
   }
-})
 
-export function formatPronouns (id: string) {
-  const pronouns = Pronouns[id]
-  const idx = styling === 'lower' ? 0 : 1
-  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+  return svg
 }

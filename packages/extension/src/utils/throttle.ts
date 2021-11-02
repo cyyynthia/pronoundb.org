@@ -25,28 +25,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
-import browser from 'webextension-polyfill'
+export default function throttle (fn: Function): Function {
+  let timer: number | null = null
+  let buffer: any[] = []
 
-export type ExtensionModule = {
-  id: PlatformId
-  match: RegExp
-  inject: () => void
-  main?: () => void
-}
+  return function (arg: any) {
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
+      fn(buffer)
+      timer = null
+      buffer = []
+    }, 200) as any
 
-const modules: ExtensionModule[] = []
-const rawModules = import.meta.globEager('./*.ts')
-for (const mdl in rawModules) modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
-
-export async function getModule (): Promise<(ExtensionModule & { id: PlatformId }) | null> {
-  let loc = location.href
-  if (browser.tabs) {
-    const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
-    loc = tab.url!
+    buffer.push(arg)
   }
-
-  return modules.find((mdl) => mdl.match.test(loc)) || null;
 }
-
-export default modules

@@ -43,3 +43,7 @@ interface Window {
 interface Element {
   wrappedJSObject: Element
 }
+
+interface NodeList {
+  [Symbol.iterator](): Iterator<Node | ParentNode>
+}

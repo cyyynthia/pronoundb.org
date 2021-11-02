@@ -25,28 +25,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
-import browser from 'webextension-polyfill'
+import { Pronouns, PronounsShort } from '@pronoundb/shared'
 
-export type ExtensionModule = {
-  id: PlatformId
-  match: RegExp
-  inject: () => void
-  main?: () => void
-}
-
-const modules: ExtensionModule[] = []
-const rawModules = import.meta.globEager('./*.ts')
-for (const mdl in rawModules) modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
-
-export async function getModule (): Promise<(ExtensionModule & { id: PlatformId }) | null> {
-  let loc = location.href
-  if (browser.tabs) {
-    const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
-    loc = tab.url!
+let styling = 'lower'
+window.addEventListener('message', (e) => {
+  if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
+    styling = e.data.payload.styling
   }
+})
 
-  return modules.find((mdl) => mdl.match.test(loc)) || null;
+export function formatPronouns (id: string) {
+  const pronouns = Pronouns[id]
+  const idx = styling === 'lower' ? 0 : 1
+  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
-export default modules
+export function formatPronounsShort (id: string) {
+  const pronouns = PronounsShort[id]
+  const idx = styling === 'lower' ? 0 : 1
+  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+}
+
+export function formatPronounsLong (id: string) {
+  switch (id) {
+    case 'any':
+      return 'Goes by any pronouns'
+    case 'other':
+      return 'Goes by pronouns not available on PronounDB'
+    case 'ask':
+      return 'Prefers people to ask for their pronouns'
+    case 'avoid':
+      return 'Wants to avoid pronouns'
+    default:
+      return `Goes by "${formatPronouns(id)}" pronouns`
+  }
+}

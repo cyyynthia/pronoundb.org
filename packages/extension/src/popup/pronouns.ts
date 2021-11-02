@@ -30,7 +30,7 @@ import { useState, useEffect, useCallback } from 'preact/hooks'
 import { Pronouns } from '@pronoundb/shared'
 
 let styling = 'lower'
-browser.storage.sync.get([ 'styling' ]).then(({ styling: st }) => (styling = st))
+browser.storage.sync.get([ 'styling' ]).then(({ styling: st }) => (styling = st ?? 'lower'))
 browser.storage.onChanged.addListener((changes) => {
   if (changes.styling) {
     styling = changes.styling.newValue

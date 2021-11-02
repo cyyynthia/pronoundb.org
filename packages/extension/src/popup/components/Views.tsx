@@ -30,9 +30,9 @@ import { h } from 'preact'
 import { Platforms } from '@pronoundb/shared'
 import PlatformIcons from '@pronoundb/shared/PlatformIcons'
 
-import modules from '../../modules'
 import Checkbox from './form/Checkbox'
 import Select from './form/Select'
+import modules from '../../modules'
 
 export enum ViewState {
   MAIN,
@@ -59,9 +59,8 @@ export function Main ({ module }: { module: ExtensionModule }) {
       </div>
 
       <Checkbox label='Enable module'/>
-      {module.settings
-        ? <p>settings yes</p>
-        : <p className='text-base'>There are no specific settings for this integration.</p>}
+      {/* per-module settings */}
+      <p className='text-base'>There are no specific settings for this integration.</p>
     </main>
   )
 }

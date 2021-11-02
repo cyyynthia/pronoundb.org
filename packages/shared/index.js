@@ -116,7 +116,7 @@ export const PronounsShort = {
   ...Pronouns,
   any: [ 'any', 'Any' ],
   other: [ 'other', 'Other' ],
-  ask: [ 'ask me', 'Ask me' ],
+  ask: [ 'ask', 'Ask' ],
   avoid: [ 'avoid', 'Avoid' ],
 }
 

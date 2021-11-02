@@ -25,28 +25,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
-import browser from 'webextension-polyfill'
-
-export type ExtensionModule = {
-  id: PlatformId
-  match: RegExp
-  inject: () => void
-  main?: () => void
-}
-
-const modules: ExtensionModule[] = []
-const rawModules = import.meta.globEager('./*.ts')
-for (const mdl in rawModules) modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
-
-export async function getModule (): Promise<(ExtensionModule & { id: PlatformId }) | null> {
-  let loc = location.href
-  if (browser.tabs) {
-    const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
-    loc = tab.url!
+export function h (tag: string, props: Record<string, any>, ...child: Array<Node | string>): Element {
+  const e = document.createElement(tag)
+  if (props) {
+    for (const key in props) {
+      if (key in props) {
+        if (key.startsWith('on')) {
+          const event = key.slice(2).toLowerCase()
+          e.addEventListener(event, props[key])
+        } else {
+          e.setAttribute(key, String(props[key]))
+        }
+      }
+    }
   }
 
-  return modules.find((mdl) => mdl.match.test(loc)) || null;
+  for (const c of child) {
+    if (!c) continue
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
+  }
+
+  return e
 }
 
-export default modules
+export function css (style: Record<string, string>): string {
+  let res = ''
+  for (const prop in style) {
+    if (Object.prototype.hasOwnProperty.call(style, prop)) {
+      res += `${prop.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`)}:${style[prop]};`
+    }
+  }
+  return res
+}

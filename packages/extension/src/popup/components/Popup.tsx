@@ -54,7 +54,7 @@
 
 import type { ExtensionModule } from '../../modules'
 import browser from 'webextension-polyfill'
-import { h, Fragment } from 'preact'
+import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 import { WEBSITE, Endpoints } from '@pronoundb/shared'
 import { Header, Footer } from './Layout'

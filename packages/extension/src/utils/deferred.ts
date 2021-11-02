@@ -25,28 +25,13 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
-import browser from 'webextension-polyfill'
-
-export type ExtensionModule = {
-  id: PlatformId
-  match: RegExp
-  inject: () => void
-  main?: () => void
+export type Deferred<T = void> = {
+  promise: Promise<T>
+  resolve: (arg: T) => void
 }
 
-const modules: ExtensionModule[] = []
-const rawModules = import.meta.globEager('./*.ts')
-for (const mdl in rawModules) modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
-
-export async function getModule (): Promise<(ExtensionModule & { id: PlatformId }) | null> {
-  let loc = location.href
-  if (browser.tabs) {
-    const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
-    loc = tab.url!
-  }
-
-  return modules.find((mdl) => mdl.match.test(loc)) || null;
+export function createDeferred<T = void> (): Deferred<T> {
+  let deferred: any = {}
+  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
+  return deferred as Deferred<T>
 }
-
-export default modules
