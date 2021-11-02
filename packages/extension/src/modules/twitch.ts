@@ -27,7 +27,7 @@
 
 import { whisper } from '../icons/twitch'
 
-import { __fetchPronouns as fetchPronouns } from '../utils/fetch'
+import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/react'
 import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../utils/pronouns'
 import { h, css } from '../utils/dom'
@@ -76,20 +76,16 @@ async function injectChat (element: HTMLElement) {
       ),
       badgesContainer.firstChild!
     )
-
-    return
+  } else {
+    element.parentElement?.appendChild(
+      h('span', { style: (element.getAttribute('style') || '') + css({ opacity: '0.7' }) }, ` (${formatPronounsShort(pronouns)})`)
+    )
   }
 
-  element.parentElement?.appendChild(
-    h('span', { style: (element.getAttribute('style') || '') + css({ opacity: '0.7' }) }, ` (${formatPronounsShort(pronouns)})`)
-  )
-
-  setTimeout(() => {
-    if (!document.querySelector('.chat-paused-footer')) {
-      const scroller = document.querySelector('[data-a-target="chat-scroller"] .simplebar-scroll-content')
-      scroller?.scrollTo(0, scroller.scrollHeight)
-    }
-  }, 5)
+  if (!document.querySelector('.chat-paused-footer')) {
+    const scroller = document.querySelector('[data-a-target="chat-scroller"] .simplebar-scroll-content')
+    scroller?.scrollTo(0, scroller.scrollHeight)
+  }
 }
 
 async function injectViewerCard (element: HTMLElement) {
