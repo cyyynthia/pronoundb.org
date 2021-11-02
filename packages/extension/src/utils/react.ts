@@ -29,78 +29,47 @@ import { createDeferred } from './deferred'
 
 // @ts-ignore
 const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
+const callbacks = new Map()
+let targetId = 0
 
-const pendingInvokes = new Map()
-
-if (!isFirefox) {
-  window.addEventListener('message', function (e) {
-    if (e.source === window && e.data.source === 'pronoundb') {
-      const data = e.data.payload
-      if (data.action === 'invoke.result') {
-        if (!pendingInvokes.has(data.id)) {
-          console.warn('[PronounDB::invoke] Received unexpected invoke result')
-          return
-        }
-
-        pendingInvokes.get(data.id).call(null, data.res)
-      }
-    }
-  })
-}
-
-function invoke (fn: string, ...args: any[]) {
+function bridgeReactStuff (nodes: HTMLElement[], propPath: string[], args?: any[]): Promise<any[]> {
+  const targets = nodes.map((node) => node.dataset.pronoundbTargetId = String(++targetId))
   const deferred = createDeferred<any>()
   const id = Math.random().toString(36).slice(2)
   const timeout = setTimeout(() => {
     deferred.resolve(null)
-    console.error('[PronounDB::invoke] Invocation timed out after 10 seconds.')
+    console.error('[PronounDB::bridge] Invocation timed out after 10 seconds.')
   }, 10e3)
 
-  pendingInvokes.set(id, (v: any) => {
-    pendingInvokes.delete(id)
+  callbacks.set(id, (v: any) => {
+    callbacks.delete(id)
     deferred.resolve(v)
     clearTimeout(timeout)
   })
 
-  const script = `
-    (function () {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'invoke.result',
-          res: (${fn})(${args.map(a => JSON.stringify(a)).join(',')}),
-          id: '${id}'
-        }
-      })
-    }())
-  `
-
-  const scriptEl = document.createElement('script')
-  scriptEl.textContent = script
-  document.head.appendChild(scriptEl)
-  scriptEl.remove()
+  window.postMessage({
+    source: 'pronoundb',
+    payload: {
+      action: 'bridge.query',
+      targets: targets,
+      props: propPath,
+      args: args,
+      id: id
+    }
+  }, '*')
 
   return deferred.promise
 }
 
-function doFetchReactProp (targets: string[] | Array<Element | null>, propPath: string[]) {
-  if (typeof targets[0] === 'string') {
-    targets = (targets as string[]).map((target) => {
-      const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
-      if (node) node.removeAttribute('data-pronoundb-target-id')
-      return node
-    })
-  }
-
-  const elements = targets as Array<Element | null>
-  const first = elements.find(Boolean)
+function doFetchReactProp (targets: Array<Element | null>, propPath: string[]) {
+  const first = targets.find(Boolean)
   if (!first) return []
 
   const reactKey = Object.keys(first).find(k => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
   if (!reactKey) return []
 
   let props = []
-  for (const element of elements) {
+  for (const element of targets) {
     if (!element) {
       props.push(null)
       continue
@@ -114,27 +83,18 @@ function doFetchReactProp (targets: string[] | Array<Element | null>, propPath: 
   return props
 }
 
-function doExecuteReactProp (targets: string[] | Array<Element | null>, propPath: string[], args: any[]) {
+function doExecuteReactProp (targets: Array<Element | null>, propPath: string[], args: any[]) {
   const fn = propPath.pop()!
   const obj = doFetchReactProp(targets, propPath)
   return obj.map((o) => o[fn].apply(o, args))
 }
-
-const fetchReactPropFn = doFetchReactProp.toString().replace('doFetchReactProp', '')
-const executeReactPropFn = fetchReactPropFn
-  .replace('propPath', 'propPath, args')
-  .replace('if', 'const fn = propPath.pop(); if')
-  .replace('return props', 'return props.map((p) => p[fn](...args))')
-
-let targetId = 0
 
 export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: string[]) {
   if (isFirefox) {
     return doFetchReactProp(nodes.map((node) => node.wrappedJSObject), propPath)
   }
 
-  const targets = nodes.map((node) => node.dataset.pronoundbTargetId = String(++targetId))
-  return invoke(fetchReactPropFn, targets, propPath)
+  return bridgeReactStuff(nodes, propPath)
 }
 
 export async function executeReactPropBulk (nodes: HTMLElement[], propPath: string[], ...args: any[]) {
@@ -143,8 +103,7 @@ export async function executeReactPropBulk (nodes: HTMLElement[], propPath: stri
     return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, cloneInto(args, window))
   }
 
-  const targets = nodes.map((node) => node.dataset.pronoundbTargetId = String(++targetId))
-  return invoke(executeReactPropFn, targets, propPath, args)
+  return bridgeReactStuff(nodes, propPath, args)
 }
 
 export async function fetchReactProp (node: HTMLElement, propPath: string[]) {
@@ -153,4 +112,66 @@ export async function fetchReactProp (node: HTMLElement, propPath: string[]) {
 
 export async function executeReactProp (node: HTMLElement, propPath: string[], ...args: any[]) {
   return executeReactPropBulk([ node ], propPath, ...args).then((res) => res[0])
+}
+
+// Inject main context bridge for Chromium
+if (!isFirefox) {
+  window.addEventListener('message', function (e) {
+    if (e.source === window && e.data.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'bridge.result') {
+        if (!callbacks.has(data.id)) {
+          console.warn('[PronounDB::bridge] Received unexpected bridge result')
+          return
+        }
+
+        callbacks.get(data.id).call(null, data.res)
+      }
+    }
+  })
+
+  const runtime = (() => {
+    // @ts-ignore
+    window.doFetch()
+    // @ts-ignore
+    window.doExecute()
+
+    window.addEventListener('message', function (e) {
+      if (e.source === window && e.data.source === 'pronoundb') {
+        const data = e.data.payload
+        if (data.action === 'bridge.query') {
+          const elements = data.targets.map((target: string) => {
+            const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
+            if (node) node.removeAttribute('data-pronoundb-target-id')
+            return node
+          })
+
+          let res
+          if (data.args) {
+            res = doExecuteReactProp(elements, data.props, data.args)
+          } else {
+            res = doFetchReactProp(elements, data.props)
+          }
+
+          window.postMessage({
+            source: 'pronoundb',
+            payload: {
+              action: 'bridge.result',
+              id: data.id,
+              res: res
+            }
+          }, e.origin)
+        }
+      }
+    })
+  })
+
+  const script = runtime.toString()
+    .replace('window.doFetch(),', doFetchReactProp.toString() + ';')
+    .replace('window.doExecute(),', doExecuteReactProp.toString() + ';')
+
+  const scriptEl = document.createElement('script')
+  scriptEl.textContent = `(${script})()`
+  document.head.appendChild(scriptEl)
+  scriptEl.remove()
 }
