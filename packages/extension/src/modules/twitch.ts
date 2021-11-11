@@ -50,7 +50,7 @@ async function injectChat (element: HTMLElement) {
   }
 
   const pronouns = await fetchPronouns('twitch', usersCache[username])
-  if (!pronouns || pronouns === 'unspecified') return
+  if (pronouns === 'unspecified') return
 
   if (settings.chatStyle === 'badge') {
     const badgesContainer = element.parentElement?.parentElement?.parentElement?.firstChild
@@ -107,7 +107,7 @@ async function injectViewerCard (element: HTMLElement) {
 
   const cardId = await fetchReactProp(card, [ 'child', 'sibling', 'child', 'memoizedProps', 'targetUser', 'id' ])
   const pronouns = await fetchPronouns('twitch', cardId)
-  if (!pronouns || pronouns === 'unspecified') return
+  if (pronouns === 'unspecified') return
 
   container.appendChild(
     h(
@@ -143,7 +143,7 @@ async function injectStreamerAbout () {
   }
 
   const pronouns = await fetchPronouns('twitch', streamerId)
-  if (!pronouns || pronouns === 'unspecified') return
+  if (pronouns === 'unspecified') return
 
   const el = document.querySelector('.about-section div + div span div')
   if (!el) return
