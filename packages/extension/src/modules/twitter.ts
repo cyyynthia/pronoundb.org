@@ -25,11 +25,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { topics } from '../icons/twitter'
+
 import { fetchPronouns } from '../utils/fetch'
 import { formatPronouns } from '../utils/pronouns'
 import { fetchReactProp } from '../utils/react'
 import { h, css } from '../utils/dom'
-import { topics } from '../icons/twitter'
 
 export const match = /^https:\/\/(.+\.)?twitter\.com/
 

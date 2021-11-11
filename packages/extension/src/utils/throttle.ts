@@ -25,18 +25,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export default function throttle (fn: Function): Function {
-  let timer: number | null = null
+export default function throttle (fn: Function, delay = 200, max = 50): Function {
+  let timer: NodeJS.Timeout | null = null
   let buffer: any[] = []
+  function run () {
+    fn(buffer)
+    timer = null
+    buffer = []
+  }
 
   return function (arg: any) {
     if (timer) clearTimeout(timer)
-    timer = setTimeout(() => {
-      fn(buffer)
-      timer = null
-      buffer = []
-    }, 200) as any
-
     buffer.push(arg)
+
+    if (buffer.length === max) run()
+    else timer = setTimeout(run, delay)
   }
 }

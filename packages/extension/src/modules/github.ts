@@ -26,6 +26,7 @@
  */
 
 import { commentDiscussion } from '../icons/octicons'
+
 import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
 import { formatPronouns } from '../utils/pronouns'
 import { css, h } from '../utils/dom'

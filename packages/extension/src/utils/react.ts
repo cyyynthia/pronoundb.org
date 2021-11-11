@@ -65,7 +65,7 @@ function doFetchReactProp (targets: Array<Element | null>, propPath: string[]) {
   const first = targets.find(Boolean)
   if (!first) return []
 
-  const reactKey = Object.keys(first).find(k => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
+  const reactKey = Object.keys(first).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
   if (!reactKey) return []
 
   let props = []

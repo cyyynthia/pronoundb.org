@@ -25,47 +25,50 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
-import { WEBSITE } from '@pronoundb/shared'
-import { getModule } from './modules'
+import { css } from '../utils/dom'
 
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    currentMdl.main?.()
-    currentMdl.inject()
-    console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-  }
-})
-
-if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'styling' ]).then(({ styling }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.styling',
-        styling: styling ?? 'lower'
-      }
-    }, '*')
+export function personCard (width = 20, height = 20) {
+  const style = css({
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yb/r/Nxb0jln7NuU.png)',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    display: 'inline-block',
+    height: `${height}px`,
+    width: `${width}px`,
   })
 
-  browser.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
-      }, '*')
-    }
+  const div = document.createElement('div')
+  div.setAttribute('style', style)
+  return div
+}
+
+export function editThin () {
+  const style = css({
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/ys/r/Zx3_JCwzxMb.png)',
+    backgroundSize: 'auto',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: '-21px -347px',
+    display: 'inline-block',
+    height: `20px`,
+    width: `20px`,
   })
 
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+  const div = document.createElement('div')
+  div.setAttribute('style', style)
+  return div
+}
+
+export function privacyPublic (width = 16, height = 16) {
+  const style = css({
+    backgroundImage: 'url(https://static.xx.fbcdn.net/rsrc.php/v3/yi/r/7wYk0RRj5-g.png)',
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    display: 'inline-block',
+    height: `${height}px`,
+    width: `${width}px`,
+  })
+
+  const div = document.createElement('div')
+  div.setAttribute('style', style)
+  return div
 }
