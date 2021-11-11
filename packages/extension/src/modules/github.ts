@@ -170,8 +170,6 @@ export function inject () {
 
   injectHoverCards()
 
-
-
   document.head.appendChild(
     h('style', null, '.js-hovercard-content .d-flex .overflow-hidden.ml-3 .mt-2 + .mt-2 { margin-top: 4px !important; }')
   )

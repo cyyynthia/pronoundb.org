@@ -189,7 +189,7 @@ function handleMutation (nodes: MutationRecord[]) {
   }
 }
 
-export async function inject () {
+export function inject () {
   // todo: load settings
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
