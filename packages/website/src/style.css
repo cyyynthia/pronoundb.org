@@ -82,6 +82,11 @@
     grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   }
 
+  .platforms-grid {
+    @apply gap-6 flex flex-col xs:grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  }
+
   .accounts-grid {
     @apply gap-3 flex flex-col xs:grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -97,5 +102,9 @@
     @apply absolute w-2 h-2 left-1/2 bg-black transform rotate-45;
     content: '';
     bottom: -4px;
+  }
+
+  .platform-box {
+    @apply flex items-center px-4 pt-3 pb-2 bg-gray-200 dark:bg-gray-700 border-b-8;
   }
 }

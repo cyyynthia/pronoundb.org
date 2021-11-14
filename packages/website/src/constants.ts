@@ -25,20 +25,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { PlatformId } from '@pronoundb/shared'
 import { Endpoints as SharedEndpoints } from '@pronoundb/shared'
 
 export const Routes = {
   HOME: '/',
-  ONBOARDING: '/onboarding',
-  DOCS: '/docs',
 
+  // Account
   LOGIN: '/login',
   REGISTER: '/register',
   LINK: '/me/link',
   ME: '/me',
 
+  // Pages
+  DOCS: '/docs',
   LEGAL: '/legal',
   PRIVACY: '/privacy',
+
+  // Marketing
+  SUPPORTED: '/supported',
+  SUPPORTED_PREVIEW: (platform: PlatformId | `:${string}`) => `/supported/${platform}`,
+
+  // Extension
+  ONBOARDING: '/onboarding',
+  CHANGELOGS: '/changelogs',
+  CHANGELOG: (id: string) => `/changelog/${id}`,
 
   DONATE: 'https://ko-fi.com/cyyynthia',
   GITHUB: 'https://github.com/cyyynthia/pronoundb.org',

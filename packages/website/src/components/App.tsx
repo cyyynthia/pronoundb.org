@@ -36,14 +36,16 @@ import UserContext from './UserContext'
 import Header from './Header'
 import Footer from './Footer'
 
-import Home from './Home'
-import Auth from './Auth'
-import Account from './Account'
-import Docs from './Docs'
-import Onboarding from './Onboarding'
-import Legal from './Legal'
-import Privacy from './Privacy'
-import NotFound from './NotFound'
+import Home from './pages/Home'
+import Auth from './account/Auth'
+import Account from './account/Account'
+import Supported from './marketing/Supported'
+import Onboarding from './extension/Onboarding'
+// todo: changelogs
+import Docs from './pages/Docs'
+import Legal from './pages/Legal'
+import Privacy from './pages/Privacy'
+import NotFound from './pages/NotFound'
 
 import { Routes, Errors } from '../constants'
 
@@ -79,12 +81,16 @@ export default function App (props: AppProps) {
       </p>}
       <Router url={props?.url} onChange={change}>
         <Home path={Routes.HOME}/>
+
         <Auth path={Routes.LOGIN} intent='login'/>
         <Auth path={Routes.REGISTER} intent='register'/>
         <Auth path={Routes.LINK} intent='link'/>
         <Account path={Routes.ME}/>
-        <Docs path={Routes.DOCS}/>
+
+        <Supported path={Routes.SUPPORTED_PREVIEW(':platform?')}/>
         <Onboarding path={Routes.ONBOARDING}/>
+
+        <Docs path={Routes.DOCS}/>
         <Legal path={Routes.LEGAL}/>
         <Privacy path={Routes.PRIVACY}/>
         <NotFound ctx={props.ctx} default/>

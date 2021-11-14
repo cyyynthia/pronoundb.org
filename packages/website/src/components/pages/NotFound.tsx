@@ -28,7 +28,7 @@
 import type { Attributes } from 'preact'
 import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
-import { Routes } from '../constants'
+import { Routes } from '../../constants'
 
 type NotFoundProps = Attributes & { ctx?: Record<string, unknown> }
 

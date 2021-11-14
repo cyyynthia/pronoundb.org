@@ -29,7 +29,8 @@ import type { Attributes } from 'preact'
 import { h } from 'preact'
 import { useTitleTemplate } from 'hoofd/preact'
 
-import { Routes } from '../constants'
+import { SupportedPreview } from '../marketing/Supported'
+import { Routes } from '../../constants'
 
 import Chrome from 'simple-icons/icons/googlechrome.svg'
 import Firefox from 'simple-icons/icons/firefoxbrowser.svg'
@@ -57,20 +58,32 @@ export default function Home (_: Attributes) {
           It's already helping {window.__USERS_COUNT__} people! Join them now!
         </p>
       </div>
-      <div className='flex gap-6 mb-6 font-semibold'>
-        <a href={Routes.EXTENSION_CHROME} target='_blank' rel='noreferrer' className='btn-chrome w-1/3'>
+      <div className='flex flex-col md:flex-row gap-6 mb-6 font-semibold'>
+        <a href={Routes.EXTENSION_CHROME} target='_blank' rel='noreferrer' className='btn-chrome w-full md:w-1/3'>
           <Chrome className='w-5 h-5 mr-2 fill-current'/>
           <span>Get for Chrome</span>
         </a>
-        <a href={Routes.EXTENSION_FIREFOX} target='_blank' rel='noreferrer' className='btn-firefox w-1/3'>
+        <a href={Routes.EXTENSION_FIREFOX} target='_blank' rel='noreferrer' className='btn-firefox w-full md:w-1/3'>
           <Firefox className='w-5 h-5 mr-2 fill-current'/>
           <span>Get for Firefox</span>
         </a>
-        <a href={Routes.EXTENSION_EDGE} target='_blank' rel='noreferrer' className='btn-edge w-1/3'>
+        <a href={Routes.EXTENSION_EDGE} target='_blank' rel='noreferrer' className='btn-edge w-full md:w-1/3'>
           <Edge className='w-5 h-5 mr-2 fill-current'/>
           <span>Get for Edge</span>
         </a>
       </div>
+      <hr/>
+      <h2 className='text-2xl font-bold mt-8 mb-4'>
+        Elegant integrations, as if pronouns were always there
+      </h2>
+      <p className='text-lg mb-4'>
+        PronounDB is carefully designed so pronouns integrate smoothly within websites, matching their design language
+        and injecting in sensible places. You'll find pronouns right where you expect them to be.
+      </p>
+      <p className='text-lg mb-4'>
+        See how it looks for all platforms supported by PronounDB:
+      </p>
+      <SupportedPreview/>
     </main>
   )
 }

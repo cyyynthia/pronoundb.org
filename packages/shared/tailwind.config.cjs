@@ -52,6 +52,7 @@ module.exports = {
         cyan: colors.cyan,
         gray: colors.trueGray,
         emerald: colors.emerald,
+        'dark-blue': '#130e85',
         'red-orange': '#ff9483',
       },
     },

@@ -30,13 +30,15 @@ import { h, Fragment } from 'preact'
 import { useContext } from 'preact/hooks'
 import { useTitleTemplate } from 'hoofd/preact'
 
-import UserContext from './UserContext'
-import { Routes } from '../constants'
+import useHeart from '../../useHeart'
+import UserContext from '../UserContext'
+import { Routes } from '../../constants'
 
 export default function Onboarding (_: Attributes) {
   useTitleTemplate('Welcome to PronounDB!')
   const loggedIn = Boolean(useContext(UserContext))
 
+  const heart = useHeart()
   const how = loggedIn
     ? <a className='link' href={Routes.ME}>going to your account</a>
     : <><a className='link' href={Routes.LOGIN}>logging in</a> or <a className='link' href={Routes.REGISTER}>creating an account</a></>
@@ -63,6 +65,12 @@ export default function Onboarding (_: Attributes) {
       <p className='mb-6'>
         This extension is only useful if people use it! The more people use it, the less people will be hesitant or
         do mistakes about your pronouns!
+      </p>
+
+      <h3 className='text-xl font-bold mb-2'>Rate the extension</h3>
+      <p className='mb-6'>
+        Enjoying the extension? You can leave a review on your extension store to let me know you're appreciating
+        it. {heart}
       </p>
 
       <h3 className='text-xl font-bold mb-2'>Feeling generous?</h3>

@@ -33,9 +33,9 @@ import { useTitle } from 'hoofd/preact'
 import { Platforms, Pronouns } from '@pronoundb/shared'
 import PlatformIcons from '@pronoundb/shared/PlatformIcons'
 
-import UserContext from './UserContext'
-import { usePronouns, formatPronouns } from '../pronouns'
-import { Routes, Endpoints } from '../constants'
+import UserContext from '../UserContext'
+import { usePronouns, formatPronouns } from '../../pronouns'
+import { Routes, Endpoints } from '../../constants'
 
 import UserPlus from 'feather-icons/dist/icons/user-plus.svg'
 import X from 'feather-icons/dist/icons/x.svg'
@@ -67,7 +67,7 @@ export default function Account (_: Attributes) {
 
   if (user === void 0) return null
   if (!user) {
-    route('/')
+    route(Routes.HOME)
     return null
   }
 
@@ -99,18 +99,15 @@ export default function Account (_: Attributes) {
 
       <div className='grid gap-3 lg:grid-cols-2 mb-8'>
         {user.accounts.map((account) => (
-          <div
-            className='flex items-center px-4 pt-3 pb-2 font-semibold bg-gray-200 dark:bg-gray-700 border-bottom border-b-8'
-            style={{ borderBottomColor: Platforms[account.platform].color }}
-          >
+          <div className='platform-box' style={{ borderBottomColor: Platforms[account.platform].color }}>
             {h(PlatformIcons[account.platform], { className: 'w-8 h-8 mr-4 flex-none fill-current' })}
-            <span className='flex-none'>{account.name}</span>
+            <span className='font-semibold flex-none'>{account.name}</span>
             {user.accounts.length > 1 && <X className='ml-auto cursor-pointer w-5 h-5' onClick={() => unlinkExternal(account.platform, account.id)}/>}
           </div>
         ))}
-        <a href={Routes.LINK} className='flex items-center px-4 pt-3 pb-2 font-semibold bg-gray-200 dark:bg-gray-700 border-bottom border-b-8 border-gray-400 dark:border-gray-600'>
+        <a href={Routes.LINK} className='platform-box border-gray-400 dark:border-gray-600'>
           <UserPlus className='w-8 h-8 mr-4 flex-none fill-current'/>
-          <span className='flex-none'>Add a new account</span>
+          <span className='font-semibold flex-none'>Add a new account</span>
         </a>
       </div>
 

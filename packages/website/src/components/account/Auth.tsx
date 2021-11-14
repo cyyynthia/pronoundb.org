@@ -33,10 +33,10 @@ import { useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared'
 import PlatformIcons from '@pronoundb/shared/PlatformIcons'
-import { compareSemver } from '../util'
+import { compareSemver } from '../../util'
 
-import { Routes, Endpoints } from '../constants'
-import UserContext from './UserContext'
+import { Routes, Endpoints } from '../../constants'
+import UserContext from '../UserContext'
 
 type OAuthIntent = 'login' | 'register' | 'link'
 
@@ -101,13 +101,13 @@ function LinkButton (props: Platform & { id: PlatformId, intent: OAuthIntent }) 
     return (
       <div
         ref={divRef}
-        className='flex items-center fill-current px-4 pt-3 pb-2 font-semibold bg-gray-200 dark:bg-gray-700 border-bottom border-b-8 cursor-not-allowed opacity-60'
+        className='platform-box cursor-not-allowed opacity-60'
         style={{ borderBottomColor: props.color }}
         onMouseEnter={onMouseIn}
         onMouseLeave={onMouseOut}
       >
         {h(PlatformIcons[props.id], { className: 'w-8 h-8 mr-4 flex-none' })}
-        <span>Connect with {props.name}</span>
+        <span className='font-semibold'>Connect with {props.name}</span>
       </div>
     )
   }
@@ -116,12 +116,12 @@ function LinkButton (props: Platform & { id: PlatformId, intent: OAuthIntent }) 
     <a
       // @ts-expect-error
       native
-      className='flex items-center fill-current px-4 pt-3 pb-2 font-semibold bg-gray-200 dark:bg-gray-700 border-bottom border-b-8'
+      className='platform-box'
       style={{ borderBottomColor: props.color }}
       href={Endpoints.OAUTH(props.id, props.intent)}
     >
       {h(PlatformIcons[props.id], { className: 'w-8 h-8 mr-4 flex-none' })}
-      <span>Connect with {props.name}</span>
+      <span className='font-semibold'>Connect with {props.name}</span>
     </a>
   )
 }
@@ -132,7 +132,7 @@ export default function Auth (props: OAuthProps) {
   const expectLoggedIn = props.intent === 'link'
 
   if (user !== void 0 && Boolean(user) !== expectLoggedIn) {
-    route(expectLoggedIn ? '/login' : '/me')
+    route(expectLoggedIn ? Routes.LOGIN : Routes.ME)
     return null
   }
 
