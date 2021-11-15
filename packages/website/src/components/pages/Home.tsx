@@ -81,7 +81,7 @@ export default function Home (_: Attributes) {
         and injecting in sensible places. You'll find pronouns right where you expect them to be.
       </p>
       <p className='text-lg mb-4'>
-        See how it looks for all platforms supported by PronounDB:
+        See which platforms PronounDB supports and how it looks on your favorite one:
       </p>
       <SupportedPreview/>
     </main>

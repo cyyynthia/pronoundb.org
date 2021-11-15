@@ -29,7 +29,7 @@ import type { Attributes } from 'preact'
 import type { Platform, PlatformId } from '@pronoundb/shared'
 import { h } from 'preact'
 import { useRef, useMemo, useCallback, useState, useEffect, useContext } from 'preact/hooks'
-import { useTitle } from 'hoofd/preact'
+import { useMeta, useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared'
 import PlatformIcons from '@pronoundb/shared/PlatformIcons'
@@ -128,6 +128,8 @@ function LinkButton (props: Platform & { id: PlatformId, intent: OAuthIntent }) 
 
 export default function Auth (props: OAuthProps) {
   useTitle(IntentTitles[props.intent])
+  useMeta({ name: 'robots', content: 'noindex,nofollow' })
+
   const user = useContext(UserContext)
   const expectLoggedIn = props.intent === 'link'
 
@@ -144,7 +146,9 @@ export default function Auth (props: OAuthProps) {
       {props.intent === 'register' && <p className='mb-2'>Make sure to give the <a className='link' href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of it.</p>}
 
       <div className='auth-grid'>
-        {PlatformIds.map((platform) => <LinkButton key={platform} id={platform} {...Platforms[platform]} intent={props.intent}/>)}
+        {PlatformIds.filter(((p) => import.meta.env?.DEV || !Platforms[p].soon)).map((platform) => (
+          <LinkButton key={platform} id={platform} {...Platforms[platform]} intent={props.intent}/>)
+        )}
       </div>
     </main>
   )

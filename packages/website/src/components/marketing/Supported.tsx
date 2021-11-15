@@ -26,22 +26,30 @@
  */
 
 import type { PlatformId } from '@pronoundb/shared'
-import type { Attributes, JSX } from 'preact'
+import type { Attributes, ComponentType } from 'preact'
 import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
+import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared'
 import PlatformIcons from '@pronoundb/shared/PlatformIcons'
+
+import Twitch from './Twitch'
 
 import { Routes } from '../../constants'
 
 import Globe from 'feather-icons/dist/icons/globe.svg'
-import { route } from 'preact-router'
 
-const Previews: Record<string, () => JSX.Element> = {}
+export type PreviewProps = { pronouns: string }
+
+type PlatformProps = { platform: PlatformId, className: string }
 
 type SupportedProps = Attributes & { platform?: PlatformId }
 
-type PlatformProps = { platform: PlatformId, className: string }
+const CYNTHIAS_PRONOUNS = Math.round(Math.random() * 1e3) === 69 ? 'ii' : 'sh'
+
+const Previews: Record<string, ComponentType<PreviewProps>> = {
+  twitch: Twitch
+}
 
 function Platform ({ platform, className }: PlatformProps) {
   return (
@@ -83,7 +91,16 @@ export default function Supported ({ platform }: SupportedProps) {
       return null
     }
 
-    return h(Previews[platform], null)
+    return (
+      <main className='container-main'>
+        <div className='title-context'>Integration Preview</div>
+        <h2 className='text-2xl font-bold mb-2 flex items-center gap-2'>
+          {h(PlatformIcons[platform], { className: 'w-7 h-7 flex-none fill-current' })}
+          <span>{Platforms[platform].name} Integration</span>
+        </h2>
+        {h(Previews[platform], { pronouns: CYNTHIAS_PRONOUNS })}
+      </main>
+    )
   }
 
   return (
@@ -96,7 +113,9 @@ export default function Supported ({ platform }: SupportedProps) {
       </p>
 
       <div className='platforms-grid'>
-        {PlatformIds.map((platform) => <Platform key={platform} platform={platform} className='w-full'/>)}
+        {PlatformIds.filter((p) => import.meta.env?.DEV || !Platforms[p].soon).map((platform) => (
+          <Platform key={platform} platform={platform} className='w-full'/>
+        ))}
       </div>
     </main>
   )

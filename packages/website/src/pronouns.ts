@@ -26,7 +26,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'preact/hooks'
-import { Pronouns } from '@pronoundb/shared'
+import { Pronouns, PronounsShort } from '@pronoundb/shared'
 
 let styling = 'lower'
 window.addEventListener('message', (e) => {
@@ -39,6 +39,27 @@ export function formatPronouns (id: string) {
   const pronouns = Pronouns[id]
   const idx = styling === 'lower' ? 0 : 1
   return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+}
+
+export function formatPronounsShort (id: string) {
+  const pronouns = PronounsShort[id]
+  const idx = styling === 'lower' ? 0 : 1
+  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+}
+
+export function formatPronounsLong (id: string) {
+  switch (id) {
+    case 'any':
+      return 'Goes by any pronouns'
+    case 'other':
+      return 'Goes by pronouns not available on PronounDB'
+    case 'ask':
+      return 'Prefers people to ask for their pronouns'
+    case 'avoid':
+      return 'Wants to avoid pronouns'
+    default:
+      return `Goes by "${formatPronouns(id)}" pronouns`
+  }
 }
 
 export function usePronouns () {

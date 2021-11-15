@@ -70,15 +70,17 @@ export default function App (props: AppProps) {
   // useMeta({ name: 'og:image', content: logo })
   useMeta({ name: 'og:title', content: 'PronounDB' })
   useMeta({ name: 'og:site_name', content: 'PronounDB' })
-  useMeta({ name: 'og:description', content: 'A browser extension that lets people know how to refer to each other on various places of the Internet.' })
-  useMeta({ name: 'description', content: 'A browser extension that lets people know how to refer to each other on various places of the Internet.' })
+  useMeta({ name: 'og:description', content: 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly. Whether hanging out on a Twitch chat, or on any of the supported platforms, PronounDB will make your life easier.' })
+  useMeta({ name: 'description', content: 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly. Whether hanging out on a Twitch chat, or on any of the supported platforms, PronounDB will make your life easier.' })
 
   return (
     <UserContext.Provider value={props?.user}>
       <Header/>
-      {showError && props.error && <p className='container mx-auto text-red-600 font-semibold text-lg p-2 text-center pb-0'>
-        {Errors[props.error]}
-      </p>}
+      {showError && props.error && (
+        <p className='container mx-auto text-red-600 font-semibold text-lg p-2 text-center pb-0'>
+          {Errors[props.error]}
+        </p>
+      )}
       <Router url={props?.url} onChange={change}>
         <Home path={Routes.HOME}/>
 
