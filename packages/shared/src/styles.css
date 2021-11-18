@@ -26,7 +26,28 @@
  */
 
 @layer base {
-  /* todo: font-faces */
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-display: swap;
+    src: url(../fonts/quicksand-regular.ttf) format('truetype');
+  }
+
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url(../fonts/quicksand-semibold.ttf) format('truetype');
+  }
+
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(../fonts/quicksand-bold.ttf) format('truetype');
+  }
 }
 
 @layer components {

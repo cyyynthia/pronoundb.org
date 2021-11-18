@@ -62,7 +62,10 @@ export default function Docs (_: Attributes) {
         <b className='bold'>Platform:</b> <SupportedFragment/>
       </div>
       <div className='mb-6'>
-        <b className='bold'>Pronouns:</b> Short identifier for a set of pronouns. Here are the identifiers recognized by PronounDB:
+        <p>
+          <b className='bold'>Pronouns:</b> Short identifier for a set of pronouns. Here are the identifiers supported
+          by PronounDB, sorted alphabetically:
+        </p>
         <ul className='list-inside list-disc'>
           {Object.keys(Pronouns).map((setId) => (
             <li key={setId}>
@@ -71,6 +74,12 @@ export default function Docs (_: Attributes) {
           ))}
         </ul>
       </div>
+
+      <div className='mb-4 bg-blue-300 font-semibold p-4'>
+        For privacy reasons, the API will respond successfully regardless of whether the account is linked to a
+        PronounDB account or not.
+      </div>
+
       <h3 className='text-xl font-bold mb-2'>Lookup an account</h3>
       <div className='mb-6'>
         <p>GET /api/v1/lookup</p>
@@ -79,22 +88,22 @@ export default function Docs (_: Attributes) {
           <li><b className='bold'>platform</b>: A supported platform as described above</li>
           <li><b className='bold'>id</b>: Account ID on the platform</li>
         </ul>
-        <p>Response: 404 if not found, 200 otherwise with the following payload</p>
-        <ul>
-          <li><b>pronouns</b>: Short identifier as defined above</li>
-        </ul>
+        <p>Response: A JSON object with a <b>pronouns</b> property.</p>
       </div>
 
       <h3 className='text-xl font-bold mb-2'>Lookup accounts in bulk</h3>
+      <div className='mb-4 bg-blue-300 font-semibold p-4'>
+        It is more efficient to use a simple lookup for single-id queries, and the API may refuse to do bulk lookup
+        for single-id queries in the future.
+      </div>
       <div className='mb-6'>
         <p>GET /api/v1/lookup-bulk</p>
-        <p>Note: you can only lookup multiple account for a single platform.</p>
         <p>Query parameters</p>
         <ul className='list-inside list-disc'>
           <li><b className='bold'>platform</b>: A supported platform as described above</li>
           <li><b className='bold'>ids</b>: Comma-separated Account IDs, will be cropped to 50 max</li>
         </ul>
-        <p>Response: A map of IDs with their corresponding set of pronouns. IDs not found will not be included.</p>
+        <p>Response: A map of IDs with their corresponding set of pronouns.</p>
       </div>
     </main>
   )
