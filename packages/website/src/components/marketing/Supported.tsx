@@ -25,13 +25,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
 import type { Attributes, ComponentType } from 'preact'
 import { h } from 'preact'
 import { useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
-import { Platforms, PlatformIds } from '@pronoundb/shared'
-import PlatformIcons from '@pronoundb/shared/PlatformIcons'
+import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
+import PlatformIcons from '@pronoundb/shared/icons.js'
 
 import Twitch from './Twitch'
 
@@ -39,21 +38,15 @@ import { Routes } from '../../constants'
 
 import Globe from 'feather-icons/dist/icons/globe.svg'
 
-export type PreviewProps = { pronouns: string }
+type PlatformCardProps = { platform: string }
 
-type PlatformProps = { platform: PlatformId, className: string }
+type SupportedProps = Attributes & { platform?: string }
 
-type SupportedProps = Attributes & { platform?: PlatformId }
+const Previews: Record<string, ComponentType> = { twitch: Twitch }
 
-const CYNTHIAS_PRONOUNS = Math.round(Math.random() * 1e3) === 69 ? 'ii' : 'sh'
-
-const Previews: Record<string, ComponentType<PreviewProps>> = {
-  twitch: Twitch
-}
-
-function Platform ({ platform, className }: PlatformProps) {
+function PlatformCard ({ platform }: PlatformCardProps) {
   return (
-    <div className={`platform-box ${className}`} style={{ borderBottomColor: Platforms[platform].color }}>
+    <div className='platform-box' style={{ borderBottomColor: Platforms[platform].color }}>
       {h(PlatformIcons[platform], { className: 'w-8 h-8 mr-4 flex-none fill-current' })}
       <div className='flex-none flex flex-col'>
         <span className='font-semibold'>{Platforms[platform].name}</span>
@@ -67,11 +60,11 @@ function Platform ({ platform, className }: PlatformProps) {
 
 export function SupportedPreview () {
   return (
-    <div class='flex gap-6'>
-      <Platform platform='twitch' className='w-1/4'/>
-      <Platform platform='twitter' className='w-1/4'/>
-      <Platform platform='github' className='w-1/4'/>
-      <div className='platform-box border-gray-400 dark:border-gray-600 w-1/4'>
+    <div class='platforms-prev-grid'>
+      <PlatformCard platform='twitch'/>
+      <PlatformCard platform='twitter'/>
+      <PlatformCard platform='github'/>
+      <div className='platform-box border-gray-400 dark:border-gray-600'>
         <Globe className='w-8 h-8 mr-4 flex-none fill-current'/>
         <div className='flex-none flex flex-col'>
           <span className='font-semibold'>... and many more!</span>
@@ -98,7 +91,7 @@ export default function Supported ({ platform }: SupportedProps) {
           {h(PlatformIcons[platform], { className: 'w-7 h-7 flex-none fill-current' })}
           <span>{Platforms[platform].name} Integration</span>
         </h2>
-        {h(Previews[platform], { pronouns: CYNTHIAS_PRONOUNS })}
+        {h(Previews[platform], null)}
       </main>
     )
   }
@@ -113,9 +106,7 @@ export default function Supported ({ platform }: SupportedProps) {
       </p>
 
       <div className='platforms-grid'>
-        {PlatformIds.filter((p) => import.meta.env?.DEV || !Platforms[p].soon).map((platform) => (
-          <Platform key={platform} platform={platform} className='w-full'/>
-        ))}
+        {PlatformIds.filter((p) => import.meta.env?.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platform={p}/>)}
       </div>
     </main>
   )

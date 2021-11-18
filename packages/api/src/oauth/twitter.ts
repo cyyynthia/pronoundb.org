@@ -26,13 +26,13 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from '../database.js'
+import type { ExternalAccount } from '@pronoundb/shared'
 import register, { securedFetch } from './abstract/oauth10a.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.twitter
 
-async function getSelf (token: string, secret: string): Promise<ExternalUser> {
+async function getSelf (token: string, secret: string): Promise<ExternalAccount> {
   const data = await securedFetch('https://api.twitter.com/1.1/account/verify_credentials.json', 'GET', null, {
     clientId: clientId,
     clientSecret: clientSecret,

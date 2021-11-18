@@ -26,12 +26,12 @@
  */
 
 import type { RestUser } from '@pronoundb/shared'
+import browser from 'webextension-polyfill'
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
-import browser from 'webextension-polyfill'
+import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
 
 import { ViewState } from './Views'
-import { usePronouns, formatPronouns } from '../pronouns'
 
 import Settings from 'feather-icons/dist/icons/settings.svg'
 import ArrowLeft from 'feather-icons/dist/icons/arrow-left.svg'

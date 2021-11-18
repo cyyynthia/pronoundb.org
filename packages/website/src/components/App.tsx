@@ -78,7 +78,7 @@ export default function App (props: AppProps) {
       <Header/>
       {showError && props.error && (
         <p className='container mx-auto text-red-600 font-semibold text-lg p-2 text-center pb-0'>
-          {Errors[props.error]}
+          {Errors[props.error as keyof typeof Errors]}
         </p>
       )}
       <Router url={props?.url} onChange={change}>

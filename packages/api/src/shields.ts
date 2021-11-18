@@ -26,9 +26,10 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { MongoAccount } from './database.js'
+import type { User } from '@pronoundb/shared'
 import { createHash } from 'crypto'
-import { Pronouns } from '@pronoundb/shared'
+
+import { Pronouns } from '@pronoundb/shared/pronouns.js'
 
 import config from './config.js'
 
@@ -40,7 +41,7 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
   }
 
   const id = new this.mongo.ObjectId(params.id)
-  const user = await this.mongo.db!.collection<MongoAccount>('accounts').findOne({ _id: id })
+  const user = await this.mongo.db!.collection<User>('accounts').findOne({ _id: id })
   if (!user) {
     reply.code(404)
     return { error: 404, message: 'Not Found' }

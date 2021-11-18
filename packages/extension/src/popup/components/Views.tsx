@@ -27,8 +27,8 @@
 
 import type { ExtensionModule } from '../../modules'
 import { h } from 'preact'
-import { Platforms } from '@pronoundb/shared'
-import PlatformIcons from '@pronoundb/shared/PlatformIcons'
+import { Platforms } from '@pronoundb/shared/platforms.js'
+import PlatformIcons from '@pronoundb/shared/icons.js'
 
 import Checkbox from './form/Checkbox'
 import Select from './form/Select'

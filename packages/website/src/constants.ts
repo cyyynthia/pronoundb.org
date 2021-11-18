@@ -25,8 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
-import { Endpoints as SharedEndpoints } from '@pronoundb/shared'
+import { Endpoints as SharedEndpoints } from '@pronoundb/shared/constants.js'
 
 export const Routes = {
   HOME: '/',
@@ -44,7 +43,7 @@ export const Routes = {
 
   // Marketing
   SUPPORTED: '/supported',
-  SUPPORTED_PREVIEW: (platform: PlatformId | `:${string}`) => `/supported/${platform}`,
+  SUPPORTED_PREVIEW: (platform: string) => `/supported/${platform}`,
 
   // Extension
   ONBOARDING: '/onboarding',
@@ -65,7 +64,7 @@ export const Endpoints = {
   CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`,
 }
 
-export const Errors: Record<string, string> = {
+export const Errors = {
   ERR_GENERIC: 'Something went wrong!',
   ERR_OAUTH_GENERIC: 'Could not authenticate you with the external platform due to an unknown error.',
   ERR_ALREADY_EXISTS: 'This account already exists. Did you mean to login?',
@@ -73,4 +72,11 @@ export const Errors: Record<string, string> = {
   ERR_LOGGED_IN: 'You are already logged in.',
   ERR_NOT_LOGGED_IN: 'You must be logged in to do this.',
   ERR_ALREADY_LINKED: 'This account has already been linked to another account.',
+}
+
+export const Cynthia = {
+  usernames: { twitch: 'cyyynthia_' },
+  avatar: 'https://avatars.githubusercontent.com/u/9999055?size=128',
+  pronouns: Math.round(Math.random() * 500) === 69 ? 'ii' : 'sh',
+  bio: 'Meow~! Peopwal dwon\'t take mewn seriouswy \'till nyi bite n scwatch ^w^ nyen pwoceed to purr nya~', // feel the catgirl energy
 }

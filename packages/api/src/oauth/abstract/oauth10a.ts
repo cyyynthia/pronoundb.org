@@ -26,8 +26,8 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } from 'fastify'
+import type { ExternalAccount } from '@pronoundb/shared'
 import type { OAuthIntent } from './shared.js'
-import type { ExternalUser } from '../../database.js'
 import type { ConfiguredReply } from '../../util.js'
 import { randomBytes, createHmac } from 'crypto'
 import { encode, decode } from 'querystring'
@@ -58,7 +58,7 @@ export interface OAuth10aOptions {
   authorization: string
   token: string
   scopes: string[]
-  getSelf: (token: string, secret: string) => Promise<ExternalUser>
+  getSelf: (token: string, secret: string) => Promise<ExternalAccount>
 }
 
 interface OAuthToken {

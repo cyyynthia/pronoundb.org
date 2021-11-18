@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from '../database.js'
+import type { ExternalAccount } from '@pronoundb/shared'
 
 import fetch from 'node-fetch'
 import register from './abstract/oauth2.js'
@@ -34,7 +34,7 @@ import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.github
 
-async function getSelf (token: string): Promise<ExternalUser> {
+async function getSelf (token: string): Promise<ExternalAccount> {
   const data = await fetch('https://api.github.com/user', {
     headers: {
       accept: 'application/vnd.github.v3+json',

@@ -27,8 +27,8 @@
 
 import { topics } from '../icons/twitter'
 
+import { formatPronouns } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
-import { formatPronouns } from '../utils/pronouns'
 import { fetchReactProp } from '../utils/react'
 import { h, css } from '../utils/dom'
 
@@ -96,8 +96,8 @@ async function injectProfilePopOut (popout: HTMLElement) {
         style: css({
           display: 'flex',
           alignItems: 'center',
-          marginRight: '4px'
-        })
+          marginRight: '4px',
+        }),
       },
       topics({
         style: css({
@@ -105,8 +105,8 @@ async function injectProfilePopOut (popout: HTMLElement) {
           fill: 'currentColor',
           width: '1.1em',
           height: '1.1em',
-          marginRight: '4px'
-        })
+          marginRight: '4px',
+        }),
       }),
       formatPronouns(pronouns)
     )

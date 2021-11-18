@@ -27,9 +27,9 @@
 
 import { personCard, editThin, privacyPublic } from '../icons/facebook'
 
-import { WEBSITE } from '@pronoundb/shared'
+import { WEBSITE } from '@pronoundb/shared/constants.js'
+import { formatPronouns, formatPronounsLong } from '@pronoundb/shared/format.js'
 import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
-import { formatPronouns, formatPronounsLong } from '../utils/pronouns'
 import { fetchReactProp, fetchReactPropBulk } from '../utils/react'
 import { h } from '../utils/dom'
 import throttle from '../utils/throttle'
@@ -52,27 +52,6 @@ async function handleProfileTilesFeed (node: HTMLElement) {
       h('div', { style: 'align-self: center; padding: 6px; color: var(--primary-text); font-size: .875rem;' }, formatPronounsLong(pronouns))
     )
   )
-}
-
-function preprocessProfileAbout (node: HTMLElement) {
-  const overview = node.querySelector('a[href*="about_overview"]')
-  if (!overview) return
-
-  async function doInject () {
-    let about
-    for (let i = 0; i < 10; i++) {
-      about = document.querySelector<HTMLElement>('[data-pagelet="ProfileAppSection_0"] div + div > div > div')
-      if (about) break
-
-      await new Promise((resolve) => setTimeout(resolve, 100))
-    }
-
-    if (!about) return
-    handleProfileAbout(about)
-  }
-
-  overview.addEventListener('click', () => doInject())
-  doInject()
 }
 
 async function handleProfileAbout (node: HTMLElement) {
@@ -106,6 +85,27 @@ async function handleProfileAbout (node: HTMLElement) {
       )
     )
   )
+}
+
+function preprocessProfileAbout (node: HTMLElement) {
+  const overview = node.querySelector('a[href*="about_overview"]')
+  if (!overview) return
+
+  async function doInject () {
+    let about
+    for (let i = 0; i < 10; i++) {
+      about = document.querySelector<HTMLElement>('[data-pagelet="ProfileAppSection_0"] div + div > div > div')
+      if (about) break
+
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
+
+    if (!about) return
+    handleProfileAbout(about)
+  }
+
+  overview.addEventListener('click', () => doInject())
+  doInject()
 }
 
 async function handlePopOut (popout: HTMLElement) {

@@ -25,11 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
 import browser from 'webextension-polyfill'
 
 export type ExtensionModule = {
-  id: PlatformId
+  id: string
   match: RegExp
   inject: () => void
   main?: () => void
@@ -37,16 +36,20 @@ export type ExtensionModule = {
 
 const modules: ExtensionModule[] = []
 const rawModules = import.meta.globEager('./*.ts')
-for (const mdl in rawModules) modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
+for (const mdl in rawModules) {
+  if (mdl in rawModules) {
+    modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
+  }
+}
 
-export async function getModule (): Promise<(ExtensionModule & { id: PlatformId }) | null> {
+export async function getModule (): Promise<ExtensionModule | null> {
   let loc = location.href
   if (browser.tabs) {
     const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
     loc = tab.url!
   }
 
-  return modules.find((mdl) => mdl.match.test(loc)) || null;
+  return modules.find((mdl) => mdl.match.test(loc)) || null
 }
 
 export default modules

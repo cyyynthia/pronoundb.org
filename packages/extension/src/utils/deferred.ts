@@ -32,6 +32,6 @@ export type Deferred<T = void> = {
 
 export function createDeferred<T = void> (): Deferred<T> {
   let deferred: any = {}
-  deferred.promise = new Promise(resolve => Object.assign(deferred, { resolve }))
+  deferred.promise = new Promise((resolve) => Object.assign(deferred, { resolve: resolve }))
   return deferred as Deferred<T>
 }

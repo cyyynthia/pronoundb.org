@@ -25,29 +25,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { PlatformId } from '@pronoundb/shared'
 import type { Deferred } from './deferred'
 import browser from 'webextension-polyfill'
 import { createDeferred } from './deferred'
 
-async function doFetchSingle (platform: PlatformId, id: string): Promise<string> {
-  const res = await browser.runtime.sendMessage({ kind: 'http', target: 'lookup', platform, id })
-  if (res.success) return res.data.pronouns ?? 'unspecified'
+async function doFetchSingle (platform: string, id: string): Promise<string> {
+  const res = await browser.runtime.sendMessage({
+    kind: 'http',
+    target: 'lookup',
+    platform: platform,
+    id: id,
+  })
 
+  if (res.success) return res.data.pronouns ?? 'unspecified'
   console.error(`[PronounDB::fetch] Failed to fetch: ${res.error.toString()}`)
   return 'unspecified'
 }
 
-async function doFetchBulk (platform: PlatformId, ids: string[]): Promise<Record<string, string>> {
-  const res = await browser.runtime.sendMessage({ kind: 'http', target: 'lookup-bulk', platform, ids })
-  if (res.success) return res.data ?? {}
+async function doFetchBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
+  const res = await browser.runtime.sendMessage({
+    kind: 'http',
+    target: 'lookup-bulk',
+    platform: platform,
+    ids: ids,
+  })
 
+  if (res.success) return res.data ?? {}
   console.error(`[PronounDB::fetch] Failed to fetch: ${res.error.toString()}`)
   return {}
 }
 
 const cache = Object.create(null)
-export function fetchPronouns (platform: PlatformId, id: string): Promise<string> {
+export function fetchPronouns (platform: string, id: string): Promise<string> {
   if (!cache[platform]) cache[platform] = {}
   if (!cache[platform][id]) {
     cache[platform][id] = doFetchSingle(platform, id)
@@ -56,7 +65,7 @@ export function fetchPronouns (platform: PlatformId, id: string): Promise<string
   return cache[platform][id]
 }
 
-export async function fetchPronounsBulk (platform: PlatformId, ids: string[]): Promise<Record<string, string>> {
+export async function fetchPronounsBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
   if (!cache[platform]) cache[platform] = {}
   const toFetch = []
   const res: Record<string, string> = {}
@@ -84,12 +93,12 @@ export async function fetchPronounsBulk (platform: PlatformId, ids: string[]): P
 }
 
 // Dev utils
-export async function __fetchPronouns (platform: PlatformId, id: string): Promise<string> {
+export async function __fetchPronouns (platform: string, id: string): Promise<string> {
   console.log(`fetchPronouns ${platform} ${id}`)
   return 'ii'
 }
 
-export async function __fetchPronounsBulk (platform: PlatformId, ids: string[]): Promise<Record<string, string>> {
+export async function __fetchPronounsBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
   console.log(`fetchPronounsBulk ${platform} ${ids}`)
   return Object.fromEntries(ids.map((id) => [ id, 'ii' ]))
 }

@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "isolatedModules": false
+    "isolatedModules": false,
+    "allowJs": true
   },
-  "include": [ "./*" ]
+  "include": [ "./src/*" ]
 }

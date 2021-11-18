@@ -49,8 +49,8 @@ export function editThin () {
     backgroundRepeat: 'no-repeat',
     backgroundPosition: '-21px -347px',
     display: 'inline-block',
-    height: `20px`,
-    width: `20px`,
+    height: '20px',
+    width: '20px',
   })
 
   const div = document.createElement('div')

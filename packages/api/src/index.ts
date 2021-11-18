@@ -26,7 +26,7 @@
  */
 
 import type { FastifyRequest, FastifyReply } from 'fastify'
-import type { MongoAccount } from './database.js'
+import type { User } from '@pronoundb/shared'
 
 import fastifyFactory from 'fastify'
 import fastifyAuth from 'fastify-auth'
@@ -51,7 +51,7 @@ fastify.register(fastifyTokenize, {
   header: false,
   cookie: 'token',
   fetchAccount: async (id: string) => {
-    const user = await fastify.mongo.db!.collection<MongoAccount>('accounts').findOne({ _id: new fastify.mongo.ObjectId(id) })
+    const user = await fastify.mongo.db!.collection<User>('accounts').findOne({ _id: new fastify.mongo.ObjectId(id) })
     if (user) (user as any).lastTokenReset = 0
     return user
   },

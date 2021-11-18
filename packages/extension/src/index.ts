@@ -26,11 +26,13 @@
  */
 
 import browser from 'webextension-polyfill'
-import { WEBSITE } from '@pronoundb/shared'
+import { WEBSITE } from '@pronoundb/shared/constants.js'
+import { initReact } from './utils/react'
 import { getModule } from './modules'
 
 getModule().then((currentMdl) => {
   if (currentMdl) {
+    initReact()
     currentMdl.main?.()
     currentMdl.inject()
     console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
@@ -43,8 +45,8 @@ if (location.origin === WEBSITE) {
       source: 'pronoundb',
       payload: {
         action: 'settings.styling',
-        styling: styling ?? 'lower'
-      }
+        styling: styling ?? 'lower',
+      },
     }, '*')
   })
 
@@ -54,8 +56,8 @@ if (location.origin === WEBSITE) {
         source: 'pronoundb',
         payload: {
           action: 'settings.styling',
-          styling: changes.styling.newValue
-        }
+          styling: changes.styling.newValue,
+        },
       }, '*')
     }
   })

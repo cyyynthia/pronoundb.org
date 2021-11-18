@@ -25,28 +25,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Pronouns, PronounsShort } from '@pronoundb/shared'
+import { useState, useEffect, useCallback } from 'preact/hooks'
+import { Pronouns, PronounsShort } from './pronouns.js'
 
 let styling = 'lower'
-window.addEventListener('message', (e) => {
-  if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
-    styling = e.data.payload.styling
-  }
-})
+if (chrome.storage) {
+  chrome.storage.sync.get([ 'styling' ], ({ styling: st }) => (styling = st ?? 'lower'))
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.styling) {
+      styling = changes.styling.newValue
+    }
+  })
+} else {
+  window.addEventListener('message', (e) => {
+    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
+      styling = e.data.payload.styling
+    }
+  })
+}
 
-export function formatPronouns (id: string) {
+export function formatPronouns (id) {
   const pronouns = Pronouns[id]
   const idx = styling === 'lower' ? 0 : 1
   return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
-export function formatPronounsShort (id: string) {
+export function formatPronounsShort (id) {
   const pronouns = PronounsShort[id]
   const idx = styling === 'lower' ? 0 : 1
   return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
-export function formatPronounsLong (id: string) {
+export function formatPronounsLong (id) {
   switch (id) {
     case 'any':
       return 'Goes by any pronouns'
@@ -59,4 +69,23 @@ export function formatPronounsLong (id: string) {
     default:
       return `Goes by "${formatPronouns(id)}" pronouns`
   }
+}
+
+export function usePronouns () {
+  const forceUpdate = useState(0)[1]
+  const updateFormatted = useCallback((e) => {
+    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
+      forceUpdate((i) => ++i)
+    }
+  }, [ forceUpdate ])
+
+  useEffect(() => {
+    if (chrome.storage) {
+      chrome.storage.onChanged.addListener(updateFormatted)
+      return () => chrome.storage.onChanged.removeListener(updateFormatted)
+    } else {
+      window.addEventListener('message', updateFormatted)
+      return () => window.removeEventListener('message', updateFormatted)
+    }
+  }, [ updateFormatted ])
 }

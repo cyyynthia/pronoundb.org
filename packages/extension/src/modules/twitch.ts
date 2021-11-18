@@ -27,9 +27,9 @@
 
 import { whisper } from '../icons/twitch'
 
+import { formatPronouns, formatPronounsShort, formatPronounsLong } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/react'
-import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../utils/pronouns'
 import { h, css } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?twitch\.tv/
@@ -38,7 +38,7 @@ const settings = {
   chat: true,
   popout: true,
   streamer: true,
-  chatStyle: 'badge'
+  chatStyle: 'badge',
 }
 
 const usersCache = Object.create(null)
@@ -46,6 +46,7 @@ async function injectChat (element: HTMLElement) {
   const username = element.dataset.aUser
   if (!username) return
   if (!(username in usersCache)) {
+    // eslint-disable-next-line require-atomic-updates
     usersCache[username] = await fetchReactProp(element, [ 'return', 'key' ]).then((s) => s.split('-')[0])
   }
 
@@ -69,8 +70,8 @@ async function injectChat (element: HTMLElement) {
             position: 'relative',
             bottom: '-1px',
             marginRight: '4px',
-            padding: '0 2px'
-          })
+            padding: '0 2px',
+          }),
         },
         formatPronounsShort(pronouns)
       ),
@@ -121,8 +122,8 @@ async function injectViewerCard (element: HTMLElement) {
             marginLeft: '0.5rem',
             marginTop: 'auto',
             color: 'var(--color-text-overlay)',
-            fontSize: 'var(--font-size-6)'
-          })
+            fontSize: 'var(--font-size-6)',
+          }),
         },
         formatPronounsLong(pronouns)
       )
@@ -155,8 +156,8 @@ async function injectStreamerAbout () {
         marginRight: '0.5rem',
         fontSize: 'var(--font-size-5)',
         lineHeight: 'var(--line-height-heading)',
-        fontWeight: 'var(--font-weight-semibold)'
-      })
+        fontWeight: 'var(--font-weight-semibold)',
+      }),
     }, '·')
   )
 

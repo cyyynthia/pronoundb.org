@@ -25,34 +25,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
-import { useState, useEffect, useCallback } from 'preact/hooks'
-import { Pronouns } from '@pronoundb/shared'
+import Codeberg from 'simple-icons/icons/codeberg.svg'
+import Discord from 'simple-icons/icons/discord.svg'
+import Facebook from 'simple-icons/icons/facebook.svg'
+import GitHub from 'simple-icons/icons/github.svg'
+import Instagram from 'simple-icons/icons/instagram.svg'
+import Mastodon from 'simple-icons/icons/mastodon.svg'
+import Osu from 'simple-icons/icons/osu.svg'
+import Reddit from 'simple-icons/icons/reddit.svg'
+import Twitch from 'simple-icons/icons/twitch.svg'
+import Twitter from 'simple-icons/icons/twitter.svg'
 
-let styling = 'lower'
-browser.storage.sync.get([ 'styling' ]).then(({ styling: st }) => (styling = st ?? 'lower'))
-browser.storage.onChanged.addListener((changes) => {
-  if (changes.styling) {
-    styling = changes.styling.newValue
-  }
-})
-
-export function formatPronouns (id: string) {
-  const pronouns = Pronouns[id]
-  const idx = styling === 'lower' ? 0 : 1
-  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+const Icons = {
+  codeberg: Codeberg,
+  discord: Discord,
+  facebook: Facebook,
+  github: GitHub,
+  instagram: Instagram,
+  mastodon: Mastodon,
+  osu: Osu,
+  reddit: Reddit,
+  twitch: Twitch,
+  twitter: Twitter,
 }
 
-export function usePronouns () {
-  const forceUpdate = useState(0)[1]
-  const updateFormatted = useCallback((changes: Record<string, { newValue?: string }>) => {
-    if (changes.styling) {
-      forceUpdate((i) => ++i)
-    }
-  }, [ forceUpdate ])
-
-  useEffect(() => {
-    browser.storage.onChanged.addListener(updateFormatted)
-    return () => browser.storage.onChanged.removeListener(updateFormatted)
-  }, [ updateFormatted ])
-}
+export default Icons

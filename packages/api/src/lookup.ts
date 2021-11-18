@@ -26,9 +26,9 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { MongoAccount } from './database.js'
+import type { User } from '@pronoundb/shared'
 import { createHash } from 'crypto'
-import { Platforms } from '@pronoundb/shared'
+import { Platforms } from '@pronoundb/shared/platforms.js'
 
 import config from './config.js'
 
@@ -55,7 +55,7 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
-  const account = await this.mongo.db!.collection<MongoAccount>('accounts').findOne(
+  const account = await this.mongo.db!.collection<User>('accounts').findOne(
     { accounts: { $elemMatch: { platform: query.platform, id: query.id } } },
     { projection: { _id: 0, pronouns: 1 } }
   )
@@ -88,7 +88,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   }
 
   const ids = query.ids.split(',').slice(0, 50).sort()
-  const accounts = await this.mongo.db!.collection<MongoAccount>('accounts').aggregate([
+  const accounts = await this.mongo.db!.collection<User>('accounts').aggregate([
     { $match: { accounts: { $elemMatch: { platform: query.platform, id: { $in: ids } } } } },
     { $addFields: { ids: '$accounts.id' } },
     { $project: { _id: 0, ids: 1, pronouns: 1 } },
@@ -114,7 +114,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
 }
 
 export default async function (fastify: FastifyInstance) {
-  await fastify.mongo.db!.collection<MongoAccount>('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
+  await fastify.mongo.db!.collection<User>('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 
   fastify.options('/lookup', cors)
   fastify.get('/lookup', lookup)

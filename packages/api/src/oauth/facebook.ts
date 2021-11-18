@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance } from 'fastify'
-import type { ExternalUser } from '../database.js'
+import type { ExternalAccount } from '@pronoundb/shared'
 
 import fetch from 'node-fetch'
 import register from './abstract/oauth2.js'
@@ -39,7 +39,7 @@ function yeetToken (token: string): void {
   fetch('https://graph.facebook.com/v9.0/me/permissions', { method: 'DELETE', headers: { authorization: `Bearer ${token}` } })
 }
 
-async function getSelf (token: string, state: string): Promise<ExternalUser | null> {
+async function getSelf (token: string, state: string): Promise<ExternalAccount | null> {
   const headers = { authorization: `Bearer ${token}` }
   const encodedId = state.split(';;;')[1]
   if (!encodedId) {

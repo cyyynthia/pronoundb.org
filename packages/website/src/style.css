@@ -82,6 +82,10 @@
     grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
   }
 
+  .platforms-prev-grid {
+    @apply gap-6 flex flex-col xs:grid sm:grid-cols-2 xl:grid-cols-4;
+  }
+
   .platforms-grid {
     @apply gap-6 flex flex-col xs:grid;
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));

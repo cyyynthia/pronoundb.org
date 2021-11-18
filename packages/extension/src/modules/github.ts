@@ -27,8 +27,8 @@
 
 import { commentDiscussion } from '../icons/octicons'
 
+import { formatPronouns } from '@pronoundb/shared/format.js'
 import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
-import { formatPronouns } from '../utils/pronouns'
 import { css, h } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?github\.com/
@@ -47,7 +47,7 @@ async function injectUserProfile () {
       class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
       itemprop: 'pronouns',
       show_title: false,
-      'aria-label': `Pronouns: ${formatPronouns(pronouns)}`
+      'aria-label': `Pronouns: ${formatPronouns(pronouns)}`,
     },
     commentDiscussion({ class: 'octicon' }),
     h('span', { class: 'p-label' }, formatPronouns(pronouns))
@@ -65,10 +65,8 @@ async function injectUserProfile () {
       const interval = setInterval(() => {
         if (!document.querySelector('.vcard-details [itemprop="pronouns"]')) {
           clearInterval(interval)
-          const list = document.querySelector<HTMLElement>('.vcard-details')
-          if (!list) return
-
-          list.appendChild(el)
+          const details = document.querySelector<HTMLElement>('.vcard-details')
+          details?.appendChild(el)
         }
       }, 100)
     })
@@ -111,7 +109,7 @@ function injectHoverCards () {
   const popover = document.querySelector<HTMLElement>('.js-hovercard-content > .Popover-message')!
 
   const observer = new MutationObserver(
-    async function () {
+    async () => {
       const startHeight = popover.getBoundingClientRect().height
       const tracking = popover.querySelector<HTMLElement>('[data-hovercard-tracking]')?.dataset?.hovercardTracking
       const hv = popover.querySelector<HTMLElement>('[data-hydro-view]')?.dataset?.hydroView
@@ -138,7 +136,7 @@ function injectHoverCards () {
             'div',
             {
               class: 'mt-2 color-fg-muted text-small',
-              style: css({ marginTop: '8px !important', marginLeft: item ? '8px' : '0' })
+              style: css({ marginTop: '8px !important', marginLeft: item ? '8px' : '0' }),
             },
             commentDiscussion({ class: 'octicon' }),
             '\n  ',
@@ -150,7 +148,7 @@ function injectHoverCards () {
       if (popover.className.includes('Popover-message--bottom')) {
         const delta = popover.getBoundingClientRect().height - startHeight
         if (delta > 0 && popover.parentElement) {
-          popover.parentElement.style.top = `${parseInt(popover.parentElement.style.top) - delta}px`
+          popover.parentElement.style.top = `${parseInt(popover.parentElement.style.top, 10) - delta}px`
         }
       }
     }

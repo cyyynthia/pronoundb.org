@@ -26,9 +26,9 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } from 'fastify'
+import type { ExternalAccount } from '@pronoundb/shared'
 import type { OAuthIntent } from './shared.js'
 import type { ConfiguredReply } from '../../util.js'
-import type { ExternalUser } from '../../database.js'
 import { randomBytes } from 'crypto'
 import { encode } from 'querystring'
 import fetch from 'node-fetch'
@@ -56,7 +56,7 @@ export interface OAuth2Options {
   authorization: string
   token: string
   scopes: string[]
-  getSelf: (token: string, state: string) => Promise<ExternalUser | null>
+  getSelf: (token: string, state: string) => Promise<ExternalAccount | null>
 
   // The extension sometimes use the nonce to carry additional data
   transformState?: (state: string) => string

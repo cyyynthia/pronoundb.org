@@ -27,12 +27,12 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { User } from '@pronoundb/shared'
-import type { MongoAccount } from './database.js'
 
-import { Pronouns, Platforms } from '@pronoundb/shared'
+import { Platforms } from '@pronoundb/shared/platforms.js'
+import { Pronouns } from '@pronoundb/shared/pronouns.js'
 
 type RequestProps = {
-  TokenizeUser: User,
+  TokenizeUser: User
   Body: { pronouns?: string }
 }
 
@@ -52,7 +52,7 @@ async function updateMe (this: FastifyInstance, request: FastifyRequest<RequestP
     return
   }
 
-  const { pronouns } = request.body;
+  const { pronouns } = request.body
   if (typeof pronouns !== 'string') {
     reply.code(400).send({ error: 400, message: 'Invalid form body' })
     return
@@ -63,7 +63,7 @@ async function updateMe (this: FastifyInstance, request: FastifyRequest<RequestP
     return
   }
 
-  await this.mongo.db!.collection<MongoAccount>('accounts').updateOne(
+  await this.mongo.db!.collection<User>('accounts').updateOne(
     { _id: new this.mongo.ObjectId(request.user!._id) },
     { $set: { pronouns: pronouns } }
   )
@@ -72,7 +72,7 @@ async function updateMe (this: FastifyInstance, request: FastifyRequest<RequestP
 }
 
 async function deleteMe (this: FastifyInstance, request: FastifyRequest<RequestProps>, reply: FastifyReply) {
-  await this.mongo.db!.collection<MongoAccount>('accounts').deleteOne({ _id: new this.mongo.ObjectId(request.user!._id) })
+  await this.mongo.db!.collection<User>('accounts').deleteOne({ _id: new this.mongo.ObjectId(request.user!._id) })
   reply.code(204).send()
 }
 
@@ -88,10 +88,11 @@ async function deleteConnection (this: FastifyInstance, request: FastifyRequest<
     return
   }
 
-  await this.mongo.db!.collection<MongoAccount>('accounts').updateOne(
+  await this.mongo.db!.collection<User>('accounts').updateOne(
     { _id: new this.mongo.ObjectId(request.user!._id) },
     { $pull: { accounts: { platform: query.platform, id: query.id } } }
   )
+
   reply.code(204).send()
 }
 

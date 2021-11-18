@@ -30,8 +30,9 @@
 import type { Attributes } from 'preact'
 import { h, Fragment } from 'preact'
 import { useTitle, useMeta } from 'hoofd/preact'
-import { PlatformIds, Platforms, Pronouns } from '@pronoundb/shared'
-import { usePronouns, formatPronouns } from '../../pronouns'
+import { Pronouns } from '@pronoundb/shared/pronouns.js'
+import { PlatformIds, Platforms } from '@pronoundb/shared/platforms.js'
+import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
 
 const SupportedFragment = () => {
   const items = PlatformIds.filter((p) => !Platforms[p].soon).map((platformId) => [

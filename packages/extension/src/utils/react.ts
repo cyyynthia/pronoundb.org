@@ -33,7 +33,7 @@ const callbacks = new Map()
 let targetId = 0
 
 function bridgeReactStuff (nodes: HTMLElement[], propPath: string[], args?: any[]): Promise<any[]> {
-  const targets = nodes.map((node) => node.dataset.pronoundbTargetId = String(++targetId))
+  const targets = nodes.map((node) => (node.dataset.pronoundbTargetId = String(++targetId)))
   const deferred = createDeferred<any>()
   const id = Math.random().toString(36).slice(2)
   const timeout = setTimeout(() => {
@@ -54,8 +54,8 @@ function bridgeReactStuff (nodes: HTMLElement[], propPath: string[], args?: any[
       targets: targets,
       props: propPath,
       args: args,
-      id: id
-    }
+      id: id,
+    },
   }, '*')
 
   return deferred.promise
@@ -115,63 +115,65 @@ export async function executeReactProp (node: HTMLElement, propPath: string[], .
 }
 
 // Inject main context bridge for Chromium
-if (!isFirefox) {
-  window.addEventListener('message', function (e) {
-    if (e.source === window && e.data.source === 'pronoundb') {
-      const data = e.data.payload
-      if (data.action === 'bridge.result') {
-        if (!callbacks.has(data.id)) {
-          console.warn('[PronounDB::bridge] Received unexpected bridge result')
-          return
-        }
-
-        callbacks.get(data.id).call(null, data.res)
-      }
-    }
-  })
-
-  const runtime = (() => {
-    // @ts-ignore
-    window.doFetch()
-    // @ts-ignore
-    window.doExecute()
-
-    window.addEventListener('message', function (e) {
+export function initReact () {
+  if (!isFirefox) {
+    window.addEventListener('message', (e) => {
       if (e.source === window && e.data.source === 'pronoundb') {
         const data = e.data.payload
-        if (data.action === 'bridge.query') {
-          const elements = data.targets.map((target: string) => {
-            const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
-            if (node) node.removeAttribute('data-pronoundb-target-id')
-            return node
-          })
-
-          let res
-          if (data.args) {
-            res = doExecuteReactProp(elements, data.props, data.args)
-          } else {
-            res = doFetchReactProp(elements, data.props)
+        if (data.action === 'bridge.result') {
+          if (!callbacks.has(data.id)) {
+            console.warn('[PronounDB::bridge] Received unexpected bridge result')
+            return
           }
 
-          window.postMessage({
-            source: 'pronoundb',
-            payload: {
-              action: 'bridge.result',
-              id: data.id,
-              res: res
-            }
-          }, e.origin)
+          callbacks.get(data.id).call(null, data.res)
         }
       }
     })
-  })
 
-  const script = runtime.toString()
-    .replace('window.doFetch(),', doFetchReactProp.toString() + ';')
-    .replace('window.doExecute(),', doExecuteReactProp.toString() + ';')
+    const runtime = () => {
+      // @ts-ignore
+      window.doFetch()
+      // @ts-ignore
+      window.doExecute()
 
-  const scriptEl = document.createElement('script')
-  scriptEl.textContent = `(${script})()`
-  document.head.appendChild(scriptEl)
-  scriptEl.remove()
+      window.addEventListener('message', (e) => {
+        if (e.source === window && e.data.source === 'pronoundb') {
+          const data = e.data.payload
+          if (data.action === 'bridge.query') {
+            const elements = data.targets.map((target: string) => {
+              const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
+              if (node) node.removeAttribute('data-pronoundb-target-id')
+              return node
+            })
+
+            let res
+            if (data.args) {
+              res = doExecuteReactProp(elements, data.props, data.args)
+            } else {
+              res = doFetchReactProp(elements, data.props)
+            }
+
+            window.postMessage({
+              source: 'pronoundb',
+              payload: {
+                action: 'bridge.result',
+                id: data.id,
+                res: res,
+              },
+            }, e.origin)
+          }
+        }
+      })
+    }
+
+    const script = runtime.toString()
+      .replace('window.doFetch(),', `${doFetchReactProp.toString()};`)
+      .replace('window.doExecute(),', `${doExecuteReactProp.toString()};`)
+
+    const scriptEl = document.createElement('script')
+    scriptEl.textContent = `(${script})()`
+    document.head.appendChild(scriptEl)
+    scriptEl.remove()
+  }
 }

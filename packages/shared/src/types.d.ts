@@ -25,53 +25,66 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useState, useEffect, useCallback } from 'preact/hooks'
-import { Pronouns, PronounsShort } from '@pronoundb/shared'
+declare module '@pronoundb/shared' {
+  import type { ObjectId } from 'mongodb'
 
-let styling = 'lower'
-window.addEventListener('message', (e) => {
-  if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
-    styling = e.data.payload.styling
+  export type Platform = {
+    name: string
+    color: string
+    since: string
+    requiresExt?: boolean
+    soon?: boolean
   }
-})
 
-export function formatPronouns (id: string) {
-  const pronouns = Pronouns[id]
-  const idx = styling === 'lower' ? 0 : 1
-  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+  export type User = {
+    _id: ObjectId
+    pronouns: string
+    accounts: ExternalAccount[]
+  }
+
+  export type ExternalAccount = {
+    id: string
+    name: string
+    platform: string
+  }
+
+  export type RestUser = Omit<User, '_id'> & { id: string }
 }
 
-export function formatPronounsShort (id: string) {
-  const pronouns = PronounsShort[id]
-  const idx = styling === 'lower' ? 0 : 1
-  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
-}
+declare module '@pronoundb/shared/constants.js' {
+  export const WEBSITE: string
 
-export function formatPronounsLong (id: string) {
-  switch (id) {
-    case 'any':
-      return 'Goes by any pronouns'
-    case 'other':
-      return 'Goes by pronouns not available on PronounDB'
-    case 'ask':
-      return 'Prefers people to ask for their pronouns'
-    case 'avoid':
-      return 'Wants to avoid pronouns'
-    default:
-      return `Goes by "${formatPronouns(id)}" pronouns`
+  export const Endpoints: {
+    SELF: string
+    LOOKUP: (platform: string, id: string) => string
+    LOOKUP_BULK: (platform: string, ids: string[]) => string
   }
 }
 
-export function usePronouns () {
-  const forceUpdate = useState(0)[1]
-  const updateFormatted = useCallback((e: MessageEvent) => {
-    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
-      forceUpdate((i) => ++i)
-    }
-  }, [ forceUpdate ])
+declare module '@pronoundb/shared/pronouns.js' {
+  export const Pronouns: Record<string, [ string, string ] | string>
+  export const PronounsShort: typeof Pronouns
+}
 
-  useEffect(() => {
-    window.addEventListener('message', updateFormatted)
-    return () => window.removeEventListener('message', updateFormatted)
-  }, [ updateFormatted ])
+declare module '@pronoundb/shared/platforms.js' {
+  import type { Platform } from '@pronoundb/shared'
+
+  export const Platforms: Record<string, Platform>
+  export const PlatformIds: string[]
+}
+
+declare module '@pronoundb/shared/icons.js' {
+  import type { JSX } from 'preact'
+
+  export type Icon = (props: JSX.SVGAttributes) => JSX.Element
+
+  const PlatformIcons: Record<string, Icon>
+  export default PlatformIcons
+}
+
+declare module '@pronoundb/shared/format.js' {
+  export function formatPronouns (id: string): string
+  export function formatPronounsShort (id: string): string
+  export function formatPronounsLong (id: string): string
+  export function usePronouns (): void
 }

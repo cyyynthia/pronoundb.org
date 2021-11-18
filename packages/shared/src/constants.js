@@ -25,63 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-declare module '@pronoundb/shared' {
-  import type { ObjectId } from 'mongodb'
+export const WEBSITE = import.meta.env?.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
 
-  export type PlatformId =
-    | 'codeberg'
-    | 'discord'
-    | 'facebook'
-    | 'github'
-    | 'gitlab'
-    | 'instagram'
-    | 'mastodon'
-    | 'osu'
-    | 'reddit'
-    | 'twitch'
-    | 'twitter'
-
-  export type Platform = {
-    name: string
-    color: string
-    since: string
-    requiresExt?: boolean
-    soon?: boolean
-  }
-
-  export type User = {
-    _id: ObjectId
-    pronouns: string
-    accounts: ExternalAccount[]
-  }
-
-  export type ExternalAccount = {
-    platform: PlatformId
-    id: string
-    name: string
-  }
-
-  export type RestUser = Omit<User, '_id'> & { id: string }
-
-  export const PlatformIds: PlatformId[]
-
-  export const Platforms: Record<PlatformId, Platform>
-
-  export const Pronouns: Record<string, [ string, string ]> & {
-    unspecified: null
-    any: string
-    other: string
-    ask: string
-    avoid: string
-  }
-
-  export const PronounsShort: typeof Pronouns
-
-  export const WEBSITE: string
-
-  export const Endpoints: {
-    SELF: string
-    LOOKUP: (platform: string, id: string) => string
-    LOOKUP_BULK: (platform: string, ids: string[]) => string
-  }
+export const Endpoints = {
+  SELF: `${WEBSITE}/api/v1/accounts/me`,
+  LOOKUP: (platform, id) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
+  LOOKUP_BULK: (platform, ids) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
 }

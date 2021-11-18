@@ -26,7 +26,7 @@
  */
 
 import browser from 'webextension-polyfill'
-import { Endpoints, WEBSITE } from '@pronoundb/shared'
+import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
 
 browser.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
