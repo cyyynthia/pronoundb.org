@@ -109,7 +109,7 @@ function preprocessProfileAbout (node: HTMLElement) {
 }
 
 async function handlePopOut (popout: HTMLElement) {
-  const id = await fetchReactProp(popout, [ 'child', 'child', 'child', 'memoizedProps', 'entryPointParams', 'actorID' ])
+  const id = await fetchReactProp(popout, [ 'child', 'child', 'child', 'child', 'child', 'memoizedProps', 'entity', '__id' ])
   const list = popout.querySelector('a[role="link"]')?.parentElement?.parentElement?.lastElementChild?.firstChild?.firstChild?.lastChild?.firstChild
   if (!id || !list) return
 
@@ -128,6 +128,7 @@ async function handlePopOut (popout: HTMLElement) {
 }
 
 async function handleArticles (articles: HTMLElement[]) {
+  console.log(articles)
   const targets = articles
     .filter((article) => article.isConnected)
     .map((a: any) => a.ariaDescribedByElements[0])
@@ -162,15 +163,7 @@ async function handleMutation (nodes: MutationRecord[]) {
           continue
         }
 
-        if (added.tagName === 'DIV' && added.attributes.length === 1 && added.className && added.querySelector('image')) {
-          const hoverCardProp = await fetchReactProp(added, [ 'child', 'memoizedProps', 'children', 'props', 'entryPoint', 'root' ])
-          if (hoverCardProp) {
-            handlePopOut(added)
-            continue
-          }
-        }
-
-        const articles = added.querySelectorAll?.('[role="article"]')
+        const articles = added.querySelectorAll?.('[role="article"][aria-describedby]')
         if (articles && articles.length !== 0) {
           articles.forEach((article) => handleArticle(article))
           continue
@@ -182,6 +175,11 @@ async function handleMutation (nodes: MutationRecord[]) {
             preprocessProfileAbout(section!)
             continue
           }
+        }
+
+        if (added.tagName === 'DIV' && added.className && added.querySelector('image') && added.parentElement?.hasAttribute('hidden')) {
+          handlePopOut(added)
+          continue
         }
       }
     }
@@ -202,7 +200,7 @@ export function inject () {
     }
   }
 
-  const articles = document.querySelectorAll('[role="article"]')
+  const articles = document.querySelectorAll('[role="article"][aria-describedby]')
   handleArticles(Array.from(articles) as HTMLElement[])
 }
 

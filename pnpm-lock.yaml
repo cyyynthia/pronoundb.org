@@ -56,7 +56,7 @@ importers:
       tailwindcss: ^2.2.19
       typescript: ^4.5.2
       vite: ^2.6.14
-      vite-plugin-magical-svg: ^0.3.0
+      vite-plugin-magical-svg: ^0.4.0
       webextension-polyfill: ^0.8.0
     devDependencies:
       '@preact/preset-vite': 2.1.5_preact@10.5.15+vite@2.6.14
@@ -76,7 +76,7 @@ importers:
       tailwindcss: 2.2.19_0c54bdadaf9d9c9c6c134cb2c6c061a3
       typescript: 4.5.2
       vite: 2.6.14
-      vite-plugin-magical-svg: 0.3.0_vite@2.6.14
+      vite-plugin-magical-svg: 0.4.0_vite@2.6.14
       webextension-polyfill: 0.8.0
 
   packages/shared:
@@ -3194,17 +3194,6 @@ packages:
 
   /v8-compile-cache/2.3.0:
     resolution: {integrity: sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==}
-    dev: true
-
-  /vite-plugin-magical-svg/0.3.0_vite@2.6.14:
-    resolution: {integrity: sha512-n05+PVlPe9gE3dJf4XKDv7wp1pgtvIP8pHzajTUEMF2LVzniYaNn3BWHuQICvi5WJd5sy85VHk7HMj1NMOHixw==}
-    peerDependencies:
-      vite: '>= 2.0.0'
-    dependencies:
-      magic-string: 0.25.7
-      svgo: 2.8.0
-      vite: 2.6.14
-      xml2js: 0.4.23
     dev: true
 
   /vite-plugin-magical-svg/0.4.0_vite@2.6.14:

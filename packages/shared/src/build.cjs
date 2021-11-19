@@ -56,10 +56,14 @@ function renderLicense (deps) {
   return str
 }
 
+// rollup-plugin-license doesn't do a great job w/ Vite :<
 function finishLicense ({ workingDirectory }) {
-  // rollup-plugin-license doesn't do a great job w/ Vite :<
+  let skip = false
   return {
     name: 'finish-license',
+    configResolved (cfg) {
+      skip = !cfg.isProduction
+    },
     generateBundle (_, bundle) {
       if (process.argv.includes('--ssr')) return
       const header = [
@@ -86,7 +90,7 @@ function finishLicense ({ workingDirectory }) {
       }
     },
     closeBundle: async () => {
-      if (!process.argv.includes('--ssr')) {
+      if (!skip) {
         await rename(baseLicensePath, join(workingDirectory, 'dist', finalLicensePath))
       }
     },
