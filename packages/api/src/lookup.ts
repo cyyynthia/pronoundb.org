@@ -61,7 +61,7 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
   )
 
   const pronouns = account?.pronouns ?? 'unspecified'
-  const etag = `W/"${createHash('sha1').update(config.secret).update(query.platform).update(query.id).update(pronouns).digest('base64')}"`
+  const etag = `W/"${createHash('sha256').update(config.secret).update(query.platform).update(query.id).update(pronouns).digest('base64')}"`
   reply.header('cache-control', 'public, max-age=60')
   if (request.headers['if-none-match'] === etag) {
     reply.code(304).send()
@@ -94,7 +94,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     { $project: { _id: 0, ids: 1, pronouns: 1 } },
   ]).toArray()
 
-  const hash = createHash('sha1').update(config.secret).update(query.platform)
+  const hash = createHash('sha256').update(config.secret).update(query.platform)
   const res: Record<string, string> = {}
   for (const id of ids) {
     const acc = accounts.find((a) => a.ids.includes(id))

@@ -36,7 +36,9 @@ import Chrome from 'simple-icons/icons/googlechrome.svg'
 import Firefox from 'simple-icons/icons/firefoxbrowser.svg'
 import Edge from 'simple-icons/icons/microsoftedge.svg'
 
-export default function Home (_: Attributes) {
+type HomeProps = Attributes & { usersCount: number }
+
+export default function Home ({ usersCount }: HomeProps) {
   useTitleTemplate('PronounDB')
 
   return (
@@ -55,7 +57,7 @@ export default function Home (_: Attributes) {
           It also helps you knowing the pronouns of the people you discuss with.
         </p>
         <p className='text-center text-xl mt-1'>
-          It's already helping {window.__USERS_COUNT__} people! Join them now!
+          It's already helping {usersCount} people! Join them now!
         </p>
       </div>
       <div className='flex flex-col md:flex-row gap-6 mb-6 font-semibold'>

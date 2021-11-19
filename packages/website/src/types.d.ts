@@ -36,6 +36,8 @@ declare module '*.svg?file' {
 }
 
 interface Window {
-  __USERS_COUNT__: number
+  ServerData: {
+    usersCount: number
+  }
   __PRONOUNDB_EXTENSION_VERSION__: string
 }

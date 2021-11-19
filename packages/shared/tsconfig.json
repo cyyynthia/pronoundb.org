@@ -5,5 +5,5 @@
     "isolatedModules": false,
     "allowJs": true
   },
-  "include": [ "./src/*", "build/build.d.ts" ]
+  "include": [ "./src/*" ]
 }

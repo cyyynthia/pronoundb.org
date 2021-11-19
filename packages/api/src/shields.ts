@@ -27,8 +27,8 @@
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { User } from '@pronoundb/shared'
-import { createHash } from 'crypto'
 
+import { createHash } from 'crypto'
 import { Pronouns } from '@pronoundb/shared/pronouns.js'
 
 import config from './config.js'
@@ -42,13 +42,8 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
 
   const id = new this.mongo.ObjectId(params.id)
   const user = await this.mongo.db!.collection<User>('accounts').findOne({ _id: id })
-  if (!user) {
-    reply.code(404)
-    return { error: 404, message: 'Not Found' }
-  }
-
-  const pronouns = user.pronouns ?? 'unspecified'
-  const etag = `W/"${createHash('sha1').update(config.secret).update('1').update(params.id).update(pronouns).digest('base64')}"`
+  const pronouns = user?.pronouns ?? 'unspecified'
+  const etag = `W/"${createHash('sha256').update(config.secret).update('1').update(params.id).update(pronouns).digest('base64')}"`
   reply.header('cache-control', 'public, max-age=60')
   if (request.headers['if-none-match'] === etag) {
     reply.code(304).send()

@@ -61,7 +61,7 @@ async function fetchUser (): Promise<User> {
 }
 
 if (import.meta.env.DEV) {
-  window.__USERS_COUNT__ = Math.ceil(Math.random() * 1337) + 1337
+  window.ServerData = { usersCount: Math.ceil(Math.random() * 1337) + 1337 }
 
   // eslint-disable-next-line no-inner-declarations
   function Wrapper () {

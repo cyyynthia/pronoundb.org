@@ -25,16 +25,42 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const WEBSITE = import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import type { Db } from 'mongodb'
 
-export const Endpoints = {
-  SELF: `${WEBSITE}/api/v1/accounts/me`,
-  LOOKUP: (platform, id) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform, ids) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
+import { createHash } from 'crypto'
+
+import config from './config.js'
+
+type StatsData = { users: number }
+
+let lastFetch: number
+let stats: StatsData = { users: 0 }
+
+async function fetchStats (db: Db) {
+  lastFetch = Date.now() // Update last fetch immediately to prevent concurrent re-fetches
+  const usersCount = await db.collection('accounts').estimatedDocumentCount()
+  stats = { users: usersCount }
 }
 
-export const Extensions = {
-  CHROME: 'nblkbiljcjfemkfjnhoobnojjgjdmknf',
-  FIREFOX: 'pronoundb',
-  EDGE: 'jbgjogfdlgjohdacngknlohahhaiaodn',
+async function getStats (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+  if ((Date.now() - lastFetch) > 3600e3) {
+    // Initiate a re-fetch in background, but don't wait for new data
+    // We can serve stale data and wait for new one to arrive
+    fetchStats(this.mongo.db!)
+  }
+
+  const etag = `W/"${createHash('sha256').update(config.secret).update(stats.users.toString()).digest('base64')}"`
+  reply.header('cache-control', 'public, max-age=60')
+  if (request.headers['if-none-match'] === etag) {
+    reply.code(304).send()
+    return
+  }
+
+  reply.header('etag', etag).send(stats)
+}
+
+export default async function (fastify: FastifyInstance) {
+  await fetchStats(fastify.mongo.db!)
+  fastify.get('/', getStats)
 }

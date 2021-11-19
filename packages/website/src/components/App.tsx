@@ -51,7 +51,7 @@ import { Routes, Errors } from '../constants'
 
 // import logo from '../assets/powercord.png'
 
-type AppProps = { user?: User, url?: string, ctx?: Record<string, unknown>, error?: string | null }
+type AppProps = { user?: User, url?: string, ctx?: Record<string, any>, error?: string | null }
 
 export default function App (props: AppProps) {
   const [ showError, setShowError ] = useState(Boolean(props.error))
@@ -73,6 +73,8 @@ export default function App (props: AppProps) {
   useMeta({ name: 'og:description', content: 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly. Whether hanging out on a Twitch chat, or on any of the supported platforms, PronounDB will make your life easier.' })
   useMeta({ name: 'description', content: 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly. Whether hanging out on a Twitch chat, or on any of the supported platforms, PronounDB will make your life easier.' })
 
+  const usersCount = import.meta.env.SSR ? props.ctx?.usersCount ?? 0 : window.ServerData.usersCount
+
   return (
     <UserContext.Provider value={props?.user}>
       <Header/>
@@ -82,7 +84,7 @@ export default function App (props: AppProps) {
         </p>
       )}
       <Router url={props?.url} onChange={change}>
-        <Home path={Routes.HOME}/>
+        <Home path={Routes.HOME} usersCount={usersCount}/>
 
         <Auth path={Routes.LOGIN} intent='login'/>
         <Auth path={Routes.REGISTER} intent='register'/>

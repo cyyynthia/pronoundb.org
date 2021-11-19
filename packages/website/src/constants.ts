@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Endpoints as SharedEndpoints } from '@pronoundb/shared/constants.js'
+import { Endpoints as SharedEndpoints, Extensions } from '@pronoundb/shared/constants.js'
 
 export const Routes = {
   HOME: '/',
@@ -53,9 +53,9 @@ export const Routes = {
   DONATE: 'https://ko-fi.com/cyyynthia',
   GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
 
-  EXTENSION_CHROME: 'https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf',
-  EXTENSION_FIREFOX: 'https://addons.mozilla.org/firefox/addon/pronoundb',
-  EXTENSION_EDGE: 'https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn',
+  EXTENSION_CHROME: `https://chrome.google.com/webstore/detail/pronoundb/${Extensions.CHROME}`,
+  EXTENSION_FIREFOX: `https://addons.mozilla.org/firefox/addon/${Extensions.FIREFOX}`,
+  EXTENSION_EDGE: `https://microsoftedge.microsoft.com/addons/detail/${Extensions.EDGE}`,
 }
 
 export const Endpoints = {

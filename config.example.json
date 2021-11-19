@@ -1,7 +1,9 @@
 {
-  "port": 80,
+  "apiPort": 8080,
+  "webPort": 3000,
   "bind": "127.0.0.1",
-  "host": "http://localhost",
+  "host": "http://localhost:8080",
+  "api": "http://localhost:8080",
   "mongo": "mongodb://localhost:27017/pronoundb",
   "secret": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
   "oauth": {

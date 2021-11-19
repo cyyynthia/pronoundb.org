@@ -25,16 +25,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const WEBSITE = import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
+import type Config from '../../../config.example.json'
+import { URL } from 'url'
+import { existsSync, readFileSync } from 'fs'
 
-export const Endpoints = {
-  SELF: `${WEBSITE}/api/v1/accounts/me`,
-  LOOKUP: (platform, id) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform, ids) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
+let path = new URL('../', import.meta.url)
+let cfgFile: URL | null = null
+while (!cfgFile && path.pathname !== '/') {
+  const attempt = new URL('config.json', path)
+  if (existsSync(attempt)) {
+    cfgFile = attempt
+  } else {
+    path = new URL('../', path)
+  }
 }
 
-export const Extensions = {
-  CHROME: 'nblkbiljcjfemkfjnhoobnojjgjdmknf',
-  FIREFOX: 'pronoundb',
-  EDGE: 'jbgjogfdlgjohdacngknlohahhaiaodn',
+if (!cfgFile) {
+  console.log('Unable to locate config file! Exiting.')
+  process.exit(1)
 }
+
+const blob = readFileSync(cfgFile, 'utf8')
+export default JSON.parse(blob) as typeof Config

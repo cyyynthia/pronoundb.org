@@ -7,14 +7,14 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@types/node": "^16.10.8",
-    "@typescript-eslint/eslint-plugin": "^5.0.0",
-    "@typescript-eslint/parser": "^5.0.0",
-    "eslint": "^8.0.0",
-    "mongodb": "^4.1.3",
+    "@types/node": "^16.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "eslint": "^8.2.0",
+    "mongodb": "^4.2.0",
     "preact": "^10.5.15",
-    "simple-icons": "^5.18.0",
-    "tailwindcss": "^2.2.17"
+    "simple-icons": "^5.23.0",
+    "tailwindcss": "^2.2.19"
   },
   "types": "./src/types.d.ts",
   "exports": {

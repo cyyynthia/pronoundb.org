@@ -25,6 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { Plugin } from 'vite'
 import { defineConfig } from 'vite'
 import { join } from 'path'
 import { rename } from 'fs/promises'
@@ -35,7 +36,7 @@ import sriPlugin from 'rollup-plugin-sri'
 
 import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
 
-function moveIndex () {
+function moveIndex (): Plugin {
   return {
     name: 'move-index',
     closeBundle: async () => {

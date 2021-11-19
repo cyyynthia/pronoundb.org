@@ -59,6 +59,12 @@ declare module '@pronoundb/shared/constants.js' {
     LOOKUP: (platform: string, id: string) => string
     LOOKUP_BULK: (platform: string, ids: string[]) => string
   }
+
+  export const Extensions: {
+    CHROME: string
+    FIREFOX: string
+    EDGE: string
+  }
 }
 
 declare module '@pronoundb/shared/pronouns.js' {

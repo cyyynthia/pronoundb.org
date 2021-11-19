@@ -37,7 +37,9 @@ import fastifyTokenize from 'fastify-tokenize'
 import lookup from './lookup.js'
 import oauth from './oauth/index.js'
 import account from './account.js'
+import stats from './stats.js'
 import shields from './shields.js'
+
 import config from './config.js'
 
 const fastify = fastifyFactory({ logger: true })
@@ -60,10 +62,11 @@ fastify.register(fastifyTokenize, {
 fastify.register(lookup, { prefix: '/api/v1' })
 fastify.register(oauth, { prefix: '/api/v1/oauth' })
 fastify.register(account, { prefix: '/api/v1/accounts' })
+fastify.register(stats, { prefix: '/api/v1/stats' })
 fastify.register(shields, { prefix: '/shields' })
 
 fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void reply.code(404).send({ error: 404, message: 'Not Found' }))
-fastify.listen(config.port, config.bind, (e) => {
+fastify.listen(config.apiPort, config.bind, (e) => {
   if (e) {
     console.error(e)
     process.exit(1)
