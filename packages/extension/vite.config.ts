@@ -32,6 +32,9 @@ import { readFile, rmdir, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
+import licensePlugin from 'rollup-plugin-license'
+
+import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
 
 function finalizeBuild (): Plugin {
   let isDev = false
@@ -50,6 +53,7 @@ function finalizeBuild (): Plugin {
 
         manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
       }
+
       if (isDev) {
         manifest = manifest
           .replace('PronounDB', 'PronounDB (dev)')
@@ -91,7 +95,18 @@ export default defineConfig({
   },
   plugins: [
     preact(),
-    finalizeBuild(),
     magicalSvg({ target: 'preact' }),
+    licensePlugin({
+      thirdParty: process.argv.includes('--ssr') ? void 0 : {
+        includePrivate: false,
+        allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
+        output: {
+          file: join(__dirname, baseLicensePath),
+          template: renderLicense,
+        },
+      }
+    }),
+    finishLicense({ workingDirectory: __dirname }),
+    finalizeBuild(),
   ],
 })

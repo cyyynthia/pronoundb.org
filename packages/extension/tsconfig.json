@@ -7,5 +7,5 @@
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment"
   },
-  "include": [ "./src/**/*", "./pack/**/*" ],
+  "include": [ "./src/**/*", "./pack/**/*", "vite.config.ts" ],
 }

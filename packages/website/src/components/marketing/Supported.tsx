@@ -106,7 +106,7 @@ export default function Supported ({ platform }: SupportedProps) {
       </p>
 
       <div className='platforms-grid'>
-        {PlatformIds.filter((p) => import.meta.env?.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platform={p}/>)}
+        {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platform={p}/>)}
       </div>
     </main>
   )

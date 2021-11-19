@@ -25,15 +25,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Plugin } from 'vite'
-
 import { defineConfig } from 'vite'
-import { rename } from 'fs/promises'
 import { join } from 'path'
+import { rename } from 'fs/promises'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
+import licensePlugin from 'rollup-plugin-license'
+import sriPlugin from 'rollup-plugin-sri'
 
-function moveIndex (): Plugin {
+import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
+
+function moveIndex () {
   return {
     name: 'move-index',
     closeBundle: async () => {
@@ -54,6 +56,21 @@ export default defineConfig({
   plugins: [
     preact(),
     magicalSvg({ target: 'preact' }),
+    licensePlugin({
+      thirdParty: process.argv.includes('--ssr') ? void 0 : {
+        includePrivate: false,
+        allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
+        output: {
+          file: join(__dirname, baseLicensePath),
+          template: renderLicense,
+        },
+      }
+    }),
+    finishLicense({ workingDirectory: __dirname }),
+    {
+      ...sriPlugin({ publicPath: '/', algorithms: [ 'sha256', 'sha512' ] }),
+      enforce: 'post'
+    },
     moveIndex(),
   ],
 })

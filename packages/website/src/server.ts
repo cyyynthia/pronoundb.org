@@ -31,6 +31,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import { join } from 'path'
 import { readFileSync } from 'fs'
 import { createServer } from 'http'
+import { createHash } from 'crypto'
 import { render } from 'preact-render-to-string'
 import { toStatic } from 'hoofd/preact'
 import { h, Fragment } from 'preact'
@@ -40,19 +41,22 @@ import App from './components/App'
 const template = readFileSync(join(__dirname, 'index.html'), 'utf8')
 
 function handler (req: IncomingMessage, res: ServerResponse) {
-  res.setHeader('content-type', 'text/html')
-  res.setHeader('content-security-policy', 'default-src \'self\'; img-src \'self\' https://avatars.githubusercontent.com; style-src \'self\' \'unsafe-inline\'')
-  res.setHeader('permissions-policy', 'interest-cohort=()')
-  res.setHeader('x-frame-options', 'DENY')
-
   if (req.method?.toLowerCase() !== 'get') {
     res.writeHead(405, 'method not allowed')
     res.end()
     return
   }
 
+  // todo: fetch users count?
+  // I guess an internal http call to the API is ok-ish...
+  const count = 69
+  const script = `window.__USERS_COUNT__ = ${count}`
+  const hash = createHash('sha256').update(script).digest('base64')
+
   const ctx: Record<string, unknown> = {}
   const body = render(h(App, { url: req.url ?? '/', ctx: ctx }))
+  if (ctx.notFound) res.writeHead(404, 'Not Found')
+
   const helmet = toStatic()
   const head = render(h(
     Fragment,
@@ -62,8 +66,18 @@ function handler (req: IncomingMessage, res: ServerResponse) {
     helmet.links.map((l) => h('link', l))
   ))
 
-  if (ctx.notFound) res.writeHead(404, 'Not Found')
-  res.write(template.replace('<!--ssr-head-->', head).replace('<!--ssr-body-->', body), () => res.end())
+  res.setHeader('content-type', 'text/html')
+  res.setHeader('content-security-policy', `default-src \'self\'; script-src \'self\' \'sha256-${hash}\'; style-src \'self\' \'unsafe-inline\'; img-src \'self\' https://avatars.githubusercontent.com;`)
+  res.setHeader('permissions-policy', 'interest-cohort=()')
+  res.setHeader('x-frame-options', 'DENY')
+
+  res.write(
+    template
+      .replace('/*ssr-script*/', script)
+      .replace('<!--ssr-head-->', head)
+      .replace('<!--ssr-body-->', body),
+    () => res.end()
+  )
 }
 
 createServer(handler).listen(process.env.PORT ?? 8000)

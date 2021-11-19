@@ -88,3 +88,22 @@ declare module '@pronoundb/shared/format.js' {
   export function formatPronounsLong (id: string): string
   export function usePronouns (): void
 }
+
+declare module '@pronoundb/shared/build.js' {
+  type Dependency = {
+    name: string | null
+    homepage: string | null
+    licenseText: string | null
+  }
+
+  type Plugin = {
+    name: string
+    generateBundle?: () => void
+    closeBundle?: () => void
+  }
+
+  export const baseLicensePath: string
+
+  export function renderLicense (deps: Dependency[]): string
+  export function finishLicense (opts: { workingDirectory: string }): Plugin
+}

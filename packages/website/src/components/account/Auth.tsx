@@ -146,7 +146,7 @@ export default function Auth (props: OAuthProps) {
       {props.intent === 'register' && <p className='mb-2'>Make sure to give the <a className='link' href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of it.</p>}
 
       <div className='auth-grid'>
-        {PlatformIds.filter((p) => import.meta.env?.DEV || !Platforms[p].soon).map((platform) =>
+        {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((platform) =>
           <LinkButton key={platform} id={platform} {...Platforms[platform]} intent={props.intent}/>)}
       </div>
     </main>

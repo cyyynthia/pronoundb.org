@@ -23,6 +23,7 @@
     "./platforms.js": "./src/platforms.js",
     "./icons.js": "./src/icons.js",
     "./format.js": "./src/format.js",
+    "./build.js": "./src/build.cjs",
     "./tailwind.config.cjs": "./tailwind.config.cjs",
     "./postcss.config.cjs": "./postcss.config.cjs",
     "./styles.css": "./src/styles.css"

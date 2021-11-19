@@ -24,6 +24,7 @@
     "feather-icons": "^4.28.0",
     "postcss": "^8.3.9",
     "preact": "^10.5.15",
+    "rollup-plugin-license": "^2.6.0",
     "tailwindcss": "^2.2.17",
     "typescript": "^4.4.4",
     "vite": "^2.6.7",
