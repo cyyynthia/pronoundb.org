@@ -27,9 +27,10 @@
 
 /// <reference types="node" />
 
+import type Config from '../../../config.example.json'
 import type { IncomingMessage, ServerResponse } from 'http'
-import { join } from 'path'
-import { readFileSync } from 'fs'
+import { join, dirname } from 'path'
+import { existsSync, readFileSync } from 'fs'
 import { createServer, get as httpGet } from 'http'
 import { createHash } from 'crypto'
 import { render } from 'preact-render-to-string'
@@ -37,8 +38,26 @@ import { toStatic } from 'hoofd/preact'
 import { h, Fragment } from 'preact'
 
 import App from './components/App'
-import config from './config.js'
 
+// Read config
+let path = dirname(__dirname)
+let cfgFile: string | null = null
+while (!cfgFile && path !== '/') {
+  const attempt = join(path, 'config.json')
+  if (existsSync(attempt)) {
+    cfgFile = attempt
+  } else {
+    path = dirname(path)
+  }
+}
+
+if (!cfgFile) {
+  console.log('Unable to locate config file! Exiting.')
+  process.exit(1)
+}
+
+const blob = readFileSync(cfgFile, 'utf8')
+const config = JSON.parse(blob) as typeof Config
 const template = readFileSync(join(__dirname, 'index.html'), 'utf8')
 
 let lastFetch = 0
