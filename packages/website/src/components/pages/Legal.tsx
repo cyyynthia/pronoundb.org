@@ -42,11 +42,11 @@ export default function Legal (_: Attributes) {
         website pronoundb.org is:
       </p>
       <p>
-        DigitalOcean LLC<br/>
-        101 Avenue of the Americas, 10th Floor<br/>
-        New York, NY 10013<br/>
-        United States of America<br/>
-        Phone: +1 212-226-2794
+        OVH SAS<br/>
+        2, rue Kellermann<br/>
+        59100 Roubaix<br/>
+        France<br/>
+        RCS Lille Métropole 424 761 419
       </p>
     </main>
   )
