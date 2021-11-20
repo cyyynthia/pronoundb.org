@@ -28,9 +28,10 @@
 import { topics } from '../icons/twitter'
 
 import { formatPronouns } from '@pronoundb/shared/format.js'
-import { fetchPronouns } from '../utils/fetch'
-import { fetchReactProp } from '../utils/react'
+import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
+import { fetchReactProp,fetchReactPropBulk } from '../utils/react'
 import { h, css } from '../utils/dom'
+import throttle from '../utils/throttle'
 
 export const match = /^https:\/\/(.+\.)?twitter\.com/
 
@@ -53,23 +54,28 @@ async function injectProfileHeader (header: HTMLElement) {
   )
 }
 
-async function injectTweet (tweet: HTMLElement) {
-  const parent = tweet.parentElement!
-  const directId = await fetchReactProp(parent!, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
-  const retweetId = await fetchReactProp(parent!, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
-  const id = retweetId || directId
-  if (!id) return
+async function injectTweets (tweets: HTMLElement[]) {
+  tweets = tweets.filter((t) => t.isConnected)
+  const parents = tweets.map((t) => t.parentElement!)
+  const directIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
+  const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
+  const ids = tweets.map((_, i) => retweetIds[i] || directIds[i])
 
-  const pronouns = await fetchPronouns('twitter', id)
-  if (pronouns === 'unspecified') return
+  const pronouns = await fetchPronounsBulk('twitter', Array.from(new Set(ids)))
+  for (let i = 0; i < tweets.length; i++) {
+    const id = ids[i]
+    const tweet = tweets[i]
 
-  let sep = tweet.querySelector<HTMLElement>('div + div[aria-hidden="true"]')!
-  const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
-  if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
+    if (!id || pronouns[id] === 'unspecified') continue
 
-  sep.parentElement!.appendChild(sep.cloneNode(true))
-  const classes = (sep.nextElementSibling as HTMLElement).classList
-  sep.parentElement!.appendChild(h('span', { class: classes, 'data-pronoundb': 'true' }, formatPronouns(pronouns)))
+    let sep = tweet.querySelector<HTMLElement>('div + div[aria-hidden="true"]')!
+    const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
+    if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
+
+    sep.parentElement!.appendChild(sep.cloneNode(true))
+    const classes = (sep.nextElementSibling as HTMLElement).classList
+    sep.parentElement!.appendChild(h('span', { class: classes, 'data-pronoundb': 'true' }, formatPronouns(pronouns[id])))
+  }
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
@@ -113,6 +119,8 @@ async function injectProfilePopOut (popout: HTMLElement) {
   )
   popout.insertBefore(element, popout.children[2])
 }
+
+const injectTweet = throttle(injectTweets)
 
 function handleMutation (nodes: MutationRecord[]) {
   const layers = document.querySelector<HTMLElement>('#layers')

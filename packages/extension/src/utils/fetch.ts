@@ -66,6 +66,11 @@ export function fetchPronouns (platform: string, id: string): Promise<string> {
 }
 
 export async function fetchPronounsBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
+  if (ids.length === 1) {
+    const pronouns = await fetchPronouns(platform, ids[0])
+    return { [ids[0]]: pronouns }
+  }
+
   if (!cache[platform]) cache[platform] = {}
   const toFetch = []
   const res: Record<string, string> = {}

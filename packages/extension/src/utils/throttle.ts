@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export default function throttle (fn: Function, delay = 200, max = 50): Function {
+export default function throttle (fn: Function, delay = 200, max = 20): Function {
   let timer: NodeJS.Timeout | null = null
   let buffer: any[] = []
   function run () {
