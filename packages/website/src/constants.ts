@@ -52,6 +52,7 @@ export const Routes = {
 
   DONATE: 'https://ko-fi.com/cyyynthia',
   GITHUB: 'https://github.com/cyyynthia/pronoundb.org',
+  GH_TRACKER: 'https://github.com/cyyynthia/pronoundb.org/issues',
 
   EXTENSION_CHROME: `https://chrome.google.com/webstore/detail/pronoundb/${Extensions.CHROME}`,
   EXTENSION_FIREFOX: `https://addons.mozilla.org/firefox/addon/${Extensions.FIREFOX}`,

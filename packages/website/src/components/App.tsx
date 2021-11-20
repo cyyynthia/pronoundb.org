@@ -41,7 +41,7 @@ import Auth from './account/Auth'
 import Account from './account/Account'
 import Supported from './marketing/Supported'
 import Onboarding from './extension/Onboarding'
-// todo: changelogs
+import Changelog from './extension/Changelog'
 import Docs from './pages/Docs'
 import Legal from './pages/Legal'
 import Privacy from './pages/Privacy'
@@ -93,6 +93,7 @@ export default function App (props: AppProps) {
 
         <Supported path={Routes.SUPPORTED_PREVIEW(':platform?')}/>
         <Onboarding path={Routes.ONBOARDING}/>
+        <Changelog path={Routes.CHANGELOG('2021-11')}/>
 
         <Docs path={Routes.DOCS}/>
         <Legal path={Routes.LEGAL}/>
