@@ -42,7 +42,7 @@ export default function Select ({ name, options, value, onInput }: SelectProps) 
   const onInputHandler = useCallback((e: SelectInputEvent) => onInput?.(e.currentTarget.value, e), [ onInput ])
 
   return (
-    <div className='flex flex-col text-base pb-3 border-b border-gray-200 mb-3'>
+    <div class='flex flex-col text-base pb-3 border-b border-gray-200 mb-3'>
       <select name={name} onInput={onInputHandler}>
         {options.map(([ k, v ]) => <option value={k} selected={value === k}>{v}</option>)}
       </select>

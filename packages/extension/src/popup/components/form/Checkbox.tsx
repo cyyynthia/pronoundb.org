@@ -42,9 +42,9 @@ export default function Checkbox ({ name, label, value, onInput }: CheckboxProps
   const onInputHandler = useCallback((e: InputInputEvent) => onInput?.(e.currentTarget.checked, e), [ onInput ])
 
   return (
-    <div className='flex items-center justify-between text-base pb-3 border-b border-gray-200 mb-3'>
+    <div class='flex items-center justify-between text-base pb-3 border-b border-gray-200 mb-3'>
       <label>{label}</label>
-      <div className='checkbox'>
+      <div class='checkbox'>
         <input name={name} type='checkbox' checked={value} onClick={onInputHandler}/>
         <div/>
       </div>

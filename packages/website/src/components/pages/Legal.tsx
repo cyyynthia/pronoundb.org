@@ -33,10 +33,10 @@ export default function Legal (_: Attributes) {
   useTitle('Legal Notice')
 
   return (
-    <main className='container-main'>
-      <div className='title-context'>Legal</div>
-      <h2 className='text-2xl font-bold mb-2'>Legal Notice</h2>
-      <p className='mb-3'>
+    <main class='container-main'>
+      <div class='title-context'>Legal</div>
+      <h2 class='text-2xl font-bold mb-2'>Legal Notice</h2>
+      <p class='mb-3'>
         Complying with the article 6 of French law No. 2004-575 of June 21, 2004 for Confidence in the Digital Economy
         (Loi n°2004-575 du 21 juin 2004 pour la Confiance dans l'Économie Numérique), the hosting provider for the
         website pronoundb.org is:

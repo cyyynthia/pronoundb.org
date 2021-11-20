@@ -36,17 +36,17 @@ export default function Footer () {
   const heart = useHeart()
 
   return (
-    <footer className='container-head border-t py-3'>
-      <div className='flex-none flex items-center mr-6 text-gray-600 dark:text-gray-400'>
-        <Paw className='w-5 h-5 mr-2'/>
+    <footer class='container-head border-t py-3'>
+      <div class='flex-none flex items-center mr-6 text-gray-600 dark:text-gray-400'>
+        <Paw class='w-5 h-5 mr-2'/>
         <span>Copyright &copy; {new Date().getUTCFullYear()} Cynthia K. Rey </span>
       </div>
-      <div className='flex-none flex items-center gap-4'>
-        <a href={Routes.DOCS} className='link'>API Docs</a>
-        <a href={Routes.LEGAL} className='link'>Legal</a>
-        <a href={Routes.PRIVACY} className='link'>Privacy</a>
-        <a href={Routes.GITHUB} target='_blank' rel='noreferrer' className='link'>GitHub</a>
-        <a href={Routes.DONATE} target='_blank' rel='noreferrer' className='link'>Donate {heart}</a>
+      <div class='flex-none flex items-center gap-4'>
+        <a href={Routes.DOCS} class='link'>API Docs</a>
+        <a href={Routes.LEGAL} class='link'>Legal</a>
+        <a href={Routes.PRIVACY} class='link'>Privacy</a>
+        <a href={Routes.GITHUB} target='_blank' rel='noreferrer' class='link'>GitHub</a>
+        <a href={Routes.DONATE} target='_blank' rel='noreferrer' class='link'>Donate {heart}</a>
       </div>
     </footer>
   )

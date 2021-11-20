@@ -79,7 +79,7 @@ export default function App (props: AppProps) {
     <UserContext.Provider value={props?.user}>
       <Header/>
       {showError && props.error && (
-        <p className='container mx-auto text-red-600 font-semibold text-lg p-2 text-center pb-0'>
+        <p class='container mx-auto text-red-600 font-semibold text-lg p-2 text-center pb-0'>
           {Errors[props.error as keyof typeof Errors]}
         </p>
       )}

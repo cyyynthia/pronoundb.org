@@ -46,12 +46,12 @@ const Previews: Record<string, ComponentType> = { twitch: Twitch }
 
 function PlatformCard ({ platform }: PlatformCardProps) {
   return (
-    <div className='platform-box' style={{ borderBottomColor: Platforms[platform].color }}>
-      {h(PlatformIcons[platform], { className: 'w-8 h-8 mr-4 flex-none fill-current' })}
-      <div className='flex-none flex flex-col'>
-        <span className='font-semibold'>{Platforms[platform].name}</span>
+    <div class='platform-box' style={{ borderBottomColor: Platforms[platform].color }}>
+      {h(PlatformIcons[platform], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
+      <div class='flex-none flex flex-col'>
+        <span class='font-semibold'>{Platforms[platform].name}</span>
         {platform in Previews
-          ? <a className='text-dark-blue link' href={Routes.SUPPORTED_PREVIEW(platform)}>See the integration</a>
+          ? <a class='text-dark-blue link' href={Routes.SUPPORTED_PREVIEW(platform)}>See the integration</a>
           : <span>No preview available</span>}
       </div>
     </div>
@@ -64,11 +64,11 @@ export function SupportedPreview () {
       <PlatformCard platform='twitch'/>
       <PlatformCard platform='twitter'/>
       <PlatformCard platform='github'/>
-      <div className='platform-box border-gray-400 dark:border-gray-600'>
-        <Globe className='w-8 h-8 mr-4 flex-none fill-current'/>
-        <div className='flex-none flex flex-col'>
-          <span className='font-semibold'>... and many more!</span>
-          <a className='text-dark-blue link' href={Routes.SUPPORTED}>See all supported platforms</a>
+      <div class='platform-box border-gray-400 dark:border-gray-600'>
+        <Globe class='w-8 h-8 mr-4 flex-none fill-current'/>
+        <div class='flex-none flex flex-col'>
+          <span class='font-semibold'>... and many more!</span>
+          <a class='text-dark-blue link' href={Routes.SUPPORTED}>See all supported platforms</a>
         </div>
       </div>
     </div>
@@ -85,10 +85,10 @@ export default function Supported ({ platform }: SupportedProps) {
     }
 
     return (
-      <main className='container-main'>
-        <div className='title-context'>Integration Preview</div>
-        <h2 className='text-2xl font-bold mb-2 flex items-center gap-2'>
-          {h(PlatformIcons[platform], { className: 'w-7 h-7 flex-none fill-current' })}
+      <main class='container-main'>
+        <div class='title-context'>Integration Preview</div>
+        <h2 class='text-2xl font-bold mb-2 flex items-center gap-2'>
+          {h(PlatformIcons[platform], { class: 'w-7 h-7 flex-none fill-current' })}
           <span>{Platforms[platform].name} Integration</span>
         </h2>
         {h(Previews[platform], null)}
@@ -97,15 +97,15 @@ export default function Supported ({ platform }: SupportedProps) {
   }
 
   return (
-    <main className='container-main'>
-      <div className='title-context'>About PronounDB</div>
-      <h2 className='text-2xl font-bold mb-2'>Supported platforms</h2>
-      <p className='mb-4'>
+    <main class='container-main'>
+      <div class='title-context'>About PronounDB</div>
+      <h2 class='text-2xl font-bold mb-2'>Supported platforms</h2>
+      <p class='mb-4'>
         PronounDB aims to support as many platforms as possible, so pronouns can easily be shared and changed
         everywhere by just a few clicks. Here's the full list of platforms supported by PronounDB:
       </p>
 
-      <div className='platforms-grid'>
+      <div class='platforms-grid'>
         {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platform={p}/>)}
       </div>
     </main>

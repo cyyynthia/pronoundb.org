@@ -60,16 +60,16 @@ const specialNotes = {
 
 export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) {
   return (
-    <header className='px-4 py-2 border-b border-gray-200 flex'>
+    <header class='px-4 py-2 border-b border-gray-200 flex'>
       {view === ViewState.SETTINGS && (
-        <button className='mr-4' onClick={onCloseSettings}>
-          <ArrowLeft className='w-5'/>
+        <button class='mr-4' onClick={onCloseSettings}>
+          <ArrowLeft class='w-5'/>
         </button>
       )}
-      <h1 className='text-2xl font-bold'>{view === ViewState.SETTINGS ? 'Settings' : 'PronounDB'}</h1>
+      <h1 class='text-2xl font-bold'>{view === ViewState.SETTINGS ? 'Settings' : 'PronounDB'}</h1>
       {view !== ViewState.SETTINGS && (
-        <button className='ml-auto' onClick={onOpenSettings}>
-          <Settings className='w-5'/>
+        <button class='ml-auto' onClick={onOpenSettings}>
+          <Settings class='w-5'/>
         </button>
       )}
     </header>
@@ -81,32 +81,32 @@ export function Footer ({ user, onOpenPronounsSelector }: FooterProps) {
   const cute = useMemo(() => Math.floor(Math.random() * CUTE_COMMENTS.length), [])
 
   return (
-    <footer className='text-gray-600 text-sm'>
+    <footer class='text-gray-600 text-sm'>
       {user
         ? (
-          <div className='py-2 px-4 border-t border-gray-200'>
+          <div class='py-2 px-4 border-t border-gray-200'>
             {user.pronouns in specialNotes
               ? <p>{specialNotes[user.pronouns as keyof typeof specialNotes]}</p>
               : <p>You're going by {formatPronouns(user.pronouns)}. {CUTE_COMMENTS[cute]}</p>}
-            <button className='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
+            <button class='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
           </div>
         )
         : (
-          <div className='py-2 px-4 border-t border-gray-200'>
+          <div class='py-2 px-4 border-t border-gray-200'>
             <p>You're not logged in on pronoundb.org</p>
-            <div className='flex gap-3'>
-              <a className='link' href='https://pronoundb.org/login' target='_blank' rel='noreferrer'>Login</a>
-              <a className='link' href='https://pronoundb.org/register' target='_blank' rel='noreferrer'>Register</a>
+            <div class='flex gap-3'>
+              <a class='link' href='https://pronoundb.org/login' target='_blank' rel='noreferrer'>Login</a>
+              <a class='link' href='https://pronoundb.org/register' target='_blank' rel='noreferrer'>Register</a>
             </div>
           </div>
         )}
 
-      <div className='py-2 px-4 flex border-t border-gray-200'>
+      <div class='py-2 px-4 flex border-t border-gray-200'>
         <p>v{browser.runtime.getManifest().version}</p>
-        <div className='ml-auto flex gap-3'>
-          <a className='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>
-          <a className='hover:underline' href='https://github.com/cyyynthia/pronoundb.org' target='_blank' rel='noreferrer'>GitHub</a>
-          <a className='hover:underline' href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer'>Donate</a>
+        <div class='ml-auto flex gap-3'>
+          <a class='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>
+          <a class='hover:underline' href='https://github.com/cyyynthia/pronoundb.org' target='_blank' rel='noreferrer'>GitHub</a>
+          <a class='hover:underline' href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer'>Donate</a>
         </div>
       </div>
     </footer>

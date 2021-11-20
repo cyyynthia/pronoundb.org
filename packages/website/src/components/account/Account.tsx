@@ -73,17 +73,17 @@ export default function Account (_: Attributes) {
   }
 
   return (
-    <main className='container-main'>
-      <h2 className='text-2xl font-bold mb-2'>My Account</h2>
-      <p className='mb-1'>Welcome back! Want to change your pronouns, or link a new account? You're at the right place!</p>
-      <p className='mb-4'>
+    <main class='container-main'>
+      <h2 class='text-2xl font-bold mb-2'>My Account</h2>
+      <p class='mb-1'>Welcome back! Want to change your pronouns, or link a new account? You're at the right place!</p>
+      <p class='mb-4'>
         All of the changes are saved automatically, and should take no more than a minute to apply on our end.
         In some cases, users may have pronouns in cache and will need a page reload to see the change (e.g.: on a Twitch chat)
       </p>
 
-      <h3 className='text-xl font-bold mb-2'>Pronouns</h3>
-      <p className='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically.</p>
-      <select className='w-full px-2 py-1 mb-8 bg-gray-200 dark:bg-gray-700' value={user.pronouns} onChange={(e) => changePronouns((e.target as any).value)}>
+      <h3 class='text-xl font-bold mb-2'>Pronouns</h3>
+      <p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically.</p>
+      <select class='w-full px-2 py-1 mb-8 bg-gray-200 dark:bg-gray-700' value={user.pronouns} onChange={(e) => changePronouns((e.target as any).value)}>
         {Object.keys(Pronouns).map((set) => (
           <option key={set} value={set}>
             {formatPronouns(set) ?? 'Unspecified'}
@@ -91,35 +91,35 @@ export default function Account (_: Attributes) {
         ))}
       </select>
 
-      <h3 className='text-xl font-bold mb-2'>Linked accounts</h3>
-      <p className='mb-2'>
+      <h3 class='text-xl font-bold mb-2'>Linked accounts</h3>
+      <p class='mb-2'>
         {user.accounts.length > 1
           ? 'You can add or remove accounts at any time.'
           : 'You can add a new account at any time. Because you only have a single account linked, you cannot unlink it without adding a new account.'}
       </p>
 
-      <div className='grid gap-3 lg:grid-cols-2 mb-8'>
+      <div class='grid gap-3 lg:grid-cols-2 mb-8'>
         {user.accounts.map((account) => (
-          <div className='platform-box' style={{ borderBottomColor: Platforms[account.platform].color }}>
-            {h(PlatformIcons[account.platform], { className: 'w-8 h-8 mr-4 flex-none fill-current' })}
-            <span className='font-semibold flex-none'>{account.name}</span>
-            {user.accounts.length > 1 && <X className='ml-auto cursor-pointer w-5 h-5' onClick={() => unlinkExternal(account.platform, account.id)}/>}
+          <div class='platform-box' style={{ borderBottomColor: Platforms[account.platform].color }}>
+            {h(PlatformIcons[account.platform], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
+            <span class='font-semibold flex-none'>{account.name}</span>
+            {user.accounts.length > 1 && <X class='ml-auto cursor-pointer w-5 h-5' onClick={() => unlinkExternal(account.platform, account.id)}/>}
           </div>
         ))}
-        <a href={Routes.LINK} className='platform-box border-gray-400 dark:border-gray-600'>
-          <UserPlus className='w-8 h-8 mr-4 flex-none fill-current'/>
-          <span className='font-semibold flex-none'>Add a new account</span>
+        <a href={Routes.LINK} class='platform-box border-gray-400 dark:border-gray-600'>
+          <UserPlus class='w-8 h-8 mr-4 flex-none fill-current'/>
+          <span class='font-semibold flex-none'>Add a new account</span>
         </a>
       </div>
 
-      <h3 className='text-xl font-bold mb-2'>Advanced settings</h3>
-      <p className='mb-1'>PronounDB ID: <code className='bg-gray-200 px-1 rounded dark:bg-gray-700'>{user.id}</code></p>
-      <p className='mb-4'>This ID may be useful for some of the <a href={Routes.DOCS} className='link'>API endpoints</a>.</p>
+      <h3 class='text-xl font-bold mb-2'>Advanced settings</h3>
+      <p class='mb-1'>PronounDB ID: <code class='bg-gray-200 px-1 rounded dark:bg-gray-700'>{user.id}</code></p>
+      <p class='mb-4'>This ID may be useful for some of the <a href={Routes.DOCS} class='link'>API endpoints</a>.</p>
 
-      <h4 className='text-lg font-semibold mb-2'>Delete my account</h4>
-      <p className='mb-1'>Want to delete your account? That's fine, I won't blame you. You can delete your account at any time by pressing the button below.</p>
-      <p className='mb-4'>Be careful, the action is immediate and irreversible!</p>
-      <button onClick={deleteAccount} className='text-red-600 border-red-600 font-semibold py-1 px-3 border rounded dark:text-red-orange dark:border-red-orange'>
+      <h4 class='text-lg font-semibold mb-2'>Delete my account</h4>
+      <p class='mb-1'>Want to delete your account? That's fine, I won't blame you. You can delete your account at any time by pressing the button below.</p>
+      <p class='mb-4'>Be careful, the action is immediate and irreversible!</p>
+      <button onClick={deleteAccount} class='text-red-600 border-red-600 font-semibold py-1 px-3 border rounded dark:text-red-orange dark:border-red-orange'>
         Delete my account
       </button>
     </main>

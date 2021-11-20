@@ -52,6 +52,7 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
+    minify: 'terser'
   },
   server: { hmr: { port: 8080 } },
   plugins: [

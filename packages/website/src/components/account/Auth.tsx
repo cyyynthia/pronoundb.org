@@ -66,7 +66,7 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
   const onMouseIn = useCallback(() => {
     const { x, y, width } = divRef.current!.getBoundingClientRect()
     const tt = document.createElement('div')
-    tt.className = 'tooltip'
+    tt.class = 'tooltip'
     tt.style.left = `${x + (width / 2)}px`
     tt.style.top = `${y}px`
     tt.style.opacity = '0'
@@ -101,13 +101,13 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
     return (
       <div
         ref={divRef}
-        className='platform-box cursor-not-allowed opacity-60'
+        class='platform-box cursor-not-allowed opacity-60'
         style={{ borderBottomColor: props.color }}
         onMouseEnter={onMouseIn}
         onMouseLeave={onMouseOut}
       >
-        {h(PlatformIcons[props.id], { className: 'w-8 h-8 mr-4 flex-none' })}
-        <span className='font-semibold'>Connect with {props.name}</span>
+        {h(PlatformIcons[props.id], { class: 'w-8 h-8 mr-4 flex-none' })}
+        <span class='font-semibold'>Connect with {props.name}</span>
       </div>
     )
   }
@@ -116,12 +116,12 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
     <a
       // @ts-expect-error
       native
-      className='platform-box'
+      class='platform-box'
       style={{ borderBottomColor: props.color }}
       href={Endpoints.OAUTH(props.id, props.intent)}
     >
-      {h(PlatformIcons[props.id], { className: 'w-8 h-8 mr-4 flex-none' })}
-      <span className='font-semibold'>Connect with {props.name}</span>
+      {h(PlatformIcons[props.id], { class: 'w-8 h-8 mr-4 flex-none' })}
+      <span class='font-semibold'>Connect with {props.name}</span>
     </a>
   )
 }
@@ -139,13 +139,13 @@ export default function Auth (props: OAuthProps) {
   }
 
   return (
-    <main className='container-main'>
-      <div className='title-context'>Authentication</div>
-      <h2 className='text-2xl font-bold mb-6'>{IntentTitles[props.intent]}</h2>
-      {props.intent === 'login' && <p className='mb-2'>Make sure to select an account you already linked on PronounDB.</p>}
-      {props.intent === 'register' && <p className='mb-2'>Make sure to give the <a className='link' href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of it.</p>}
+    <main class='container-main'>
+      <div class='title-context'>Authentication</div>
+      <h2 class='text-2xl font-bold mb-6'>{IntentTitles[props.intent]}</h2>
+      {props.intent === 'login' && <p class='mb-2'>Make sure to select an account you already linked on PronounDB.</p>}
+      {props.intent === 'register' && <p class='mb-2'>Make sure to give the <a class='link' href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of it.</p>}
 
-      <div className='auth-grid'>
+      <div class='auth-grid'>
         {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((platform) =>
           <LinkButton key={platform} id={platform} {...Platforms[platform]} intent={props.intent}/>)}
       </div>

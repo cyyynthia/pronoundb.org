@@ -38,22 +38,22 @@ export default function Header () {
   }, [])
 
   return (
-    <header className='container-head border-b'>
-      <div className='flex-none flex items-center mr-6'> {/* todo: icon */}
-        <a href={Routes.HOME} className='text-3xl font-bold'>PronounDB</a>
+    <header class='container-head border-b'>
+      <div class='flex-none flex items-center mr-6'> {/* todo: icon */}
+        <a href={Routes.HOME} class='text-3xl font-bold'>PronounDB</a>
       </div>
-      <div className='flex-none flex items-center gap-4'>
+      <div class='flex-none flex items-center gap-4'>
         {user
           ? (
             <Fragment>
-              <a href={Routes.ME} className='link'>My account</a>
-              <button onClick={logout} className='link'>Logout</button>
+              <a href={Routes.ME} class='link'>My account</a>
+              <button onClick={logout} class='link'>Logout</button>
             </Fragment>
           )
           : (
             <Fragment>
-              <a href={Routes.LOGIN} className='link'>Login</a>
-              <a href={Routes.REGISTER} className='link'>Create account</a>
+              <a href={Routes.LOGIN} class='link'>Login</a>
+              <a href={Routes.REGISTER} class='link'>Create account</a>
             </Fragment>
           )}
       </div>

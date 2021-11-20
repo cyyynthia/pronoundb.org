@@ -68,7 +68,7 @@ export default function Popup () {
   }, [])
 
   return (
-    <div className='flex flex-col h-full'>
+    <div class='flex flex-col h-full'>
       <Header view={view} onOpenSettings={openSettings} onCloseSettings={closeSettings}/>
       <Main view={view}/>
       <Footer user={user} onOpenPronounsSelector={openPronounsSelector}/>

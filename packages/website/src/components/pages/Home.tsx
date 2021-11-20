@@ -42,47 +42,47 @@ export default function Home ({ usersCount }: HomeProps) {
   useTitleTemplate('PronounDB')
 
   return (
-    <main className='container-main'>
-      <div className='mx-auto m-12'>
-        <h1 className='text-center text-3xl font-semibold my-6'>
+    <main class='container-main'>
+      <div class='mx-auto m-12'>
+        <h1 class='text-center text-3xl font-semibold my-6'>
           Get people's pronouns right, all the time, without struggling
         </h1>
-        <p className='text-center text-xl mt-1'>
+        <p class='text-center text-xl mt-1'>
           Keeping track of everyone's pronouns can be complicated, and unfortunate mistakes can happen.
         </p>
-        <p className='text-center text-xl mt-1'>
+        <p class='text-center text-xl mt-1'>
           PronounDB makes it for you to share your pronouns, so people can use the right ones without even asking.
         </p>
-        <p className='text-center text-xl mt-1'>
+        <p class='text-center text-xl mt-1'>
           It also helps you knowing the pronouns of the people you discuss with.
         </p>
-        <p className='text-center text-xl mt-1'>
+        <p class='text-center text-xl mt-1'>
           It's already helping {usersCount} people! Join them now!
         </p>
       </div>
-      <div className='flex flex-col md:flex-row gap-6 mb-6 font-semibold'>
-        <a href={Routes.EXTENSION_CHROME} target='_blank' rel='noreferrer' className='btn-chrome w-full md:w-1/3'>
-          <Chrome className='w-5 h-5 mr-2 fill-current'/>
+      <div class='flex flex-col md:flex-row gap-6 mb-6 font-semibold'>
+        <a href={Routes.EXTENSION_CHROME} target='_blank' rel='noreferrer' class='btn-chrome w-full md:w-1/3'>
+          <Chrome class='w-5 h-5 mr-2 fill-current'/>
           <span>Get for Chrome</span>
         </a>
-        <a href={Routes.EXTENSION_FIREFOX} target='_blank' rel='noreferrer' className='btn-firefox w-full md:w-1/3'>
-          <Firefox className='w-5 h-5 mr-2 fill-current'/>
+        <a href={Routes.EXTENSION_FIREFOX} target='_blank' rel='noreferrer' class='btn-firefox w-full md:w-1/3'>
+          <Firefox class='w-5 h-5 mr-2 fill-current'/>
           <span>Get for Firefox</span>
         </a>
-        <a href={Routes.EXTENSION_EDGE} target='_blank' rel='noreferrer' className='btn-edge w-full md:w-1/3'>
-          <Edge className='w-5 h-5 mr-2 fill-current'/>
+        <a href={Routes.EXTENSION_EDGE} target='_blank' rel='noreferrer' class='btn-edge w-full md:w-1/3'>
+          <Edge class='w-5 h-5 mr-2 fill-current'/>
           <span>Get for Edge</span>
         </a>
       </div>
       <hr/>
-      <h2 className='text-2xl font-bold mt-8 mb-4'>
+      <h2 class='text-2xl font-bold mt-8 mb-4'>
         Elegant integrations, as if pronouns were always there
       </h2>
-      <p className='text-lg mb-4'>
+      <p class='text-lg mb-4'>
         PronounDB is carefully designed so pronouns integrate smoothly within websites, matching their design language
         and injecting in sensible places. You'll find pronouns right where you expect them to be.
       </p>
-      <p className='text-lg mb-4'>
+      <p class='text-lg mb-4'>
         See which platforms PronounDB supports and how it looks on your favorite one:
       </p>
       <SupportedPreview/>

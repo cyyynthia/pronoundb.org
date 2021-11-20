@@ -39,10 +39,10 @@ export default function NotFound (props: NotFoundProps) {
   }
 
   return (
-    <main className='container-main'>
-      <h2 className='text-2xl font-bold mb-2'>Seems like you're lost</h2>
+    <main class='container-main'>
+      <h2 class='text-2xl font-bold mb-2'>Seems like you're lost</h2>
       <p>
-        There is nothing here... <a href={Routes.HOME} className='link'>Go home</a>
+        There is nothing here... <a href={Routes.HOME} class='link'>Go home</a>
       </p>
     </main>
   )

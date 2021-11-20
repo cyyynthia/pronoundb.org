@@ -44,8 +44,8 @@ export enum ViewState {
 
 export function Unsupported () {
   return (
-    <main className='flex-grow p-4 flex flex-col items-center'>
-      <p className='font-semibold text-xl text-center m-4 p-4 mt-0 pt-0 border-b border-gray-200'>This website is not supported by PronounDB</p>
+    <main class='flex-grow p-4 flex flex-col items-center'>
+      <p class='font-semibold text-xl text-center m-4 p-4 mt-0 pt-0 border-b border-gray-200'>This website is not supported by PronounDB</p>
     </main>
   )
 }
@@ -66,15 +66,15 @@ export function Main ({ module }: { module: ExtensionModule }) {
   }, [])
 
   return (
-    <main className='flex-grow border-t-8 border-contextful px-4 py-2' style={{ '--context-color': platform.color, marginTop: -1 }}>
-      <div className='flex gap-2 items-center mb-3'>
+    <main class='flex-grow border-t-8 border-contextful px-4 py-2' style={{ '--context-color': platform.color, marginTop: -1 }}>
+      <div class='flex gap-2 items-center mb-3'>
         {h(PlatformIcons[module.id], { class: 'w-6 h-6' })}
-        <h2 className='text-xl font-semibold tracking-wide'>{platform.name}</h2>
+        <h2 class='text-xl font-semibold tracking-wide'>{platform.name}</h2>
       </div>
 
       <Checkbox onInput={onInput} name='enabled' value={enabled} label='Enable module'/>
       {/* per-module settings */}
-      <p className='text-base'>There are no specific settings for this integration.</p>
+      <p class='text-base'>There are no specific settings for this integration.</p>
     </main>
   )
 }
@@ -93,9 +93,9 @@ export function Settings () {
   }, [])
 
   return (
-    <main className='flex-grow px-4 py-2'>
-      <div className='flex gap-2 items-center mb-2'>
-        <h2 className='text-xl font-semibold tracking-wide'>Appearance</h2>
+    <main class='flex-grow px-4 py-2'>
+      <div class='flex gap-2 items-center mb-2'>
+        <h2 class='text-xl font-semibold tracking-wide'>Appearance</h2>
       </div>
       <Select
         onInput={onInput}
@@ -104,8 +104,8 @@ export function Settings () {
         options={[ [ 'lower', 'aaa/aaa' ], [ 'pascal', 'Aaa/Aaa' ] ]}
       />
 
-      <div className='flex gap-2 items-center mb-3'>
-        <h2 className='text-xl font-semibold tracking-wide'>Enabled modules</h2>
+      <div class='flex gap-2 items-center mb-3'>
+        <h2 class='text-xl font-semibold tracking-wide'>Enabled modules</h2>
       </div>
       {modules.map((mdl) => (
         <Checkbox
@@ -114,7 +114,7 @@ export function Settings () {
           value={settings[`${mdl.id}.enabled`] ?? true}
           key={mdl.id}
           label={
-            <span className='flex gap-2 items-center'>
+            <span class='flex gap-2 items-center'>
               {h(PlatformIcons[mdl.id], { class: 'w-4 h-4' })} {Platforms[mdl.id].name}
             </span>
           }

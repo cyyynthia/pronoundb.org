@@ -35,7 +35,7 @@ export default function Changelogs (_: Attributes) {
   useTitle('Changelog')
 
   return (
-    <main className='container-main'>
+    <main class='container-main'>
       <Changelog060/>
     </main>
   )
