@@ -29,20 +29,23 @@ import type { JSX } from 'preact'
 import { h } from 'preact'
 import { useCallback } from 'preact/hooks'
 
+type InputInputEvent = JSX.TargetedEvent<HTMLInputElement, Event>
+
 type CheckboxProps = {
+  name: string
   label: JSX.Element | string | null
   value?: boolean
-  onChange?: (v: boolean) => void
+  onInput?: (v: boolean, evt: InputInputEvent) => void
 }
 
-export default function Checkbox ({ label, value, onChange }: CheckboxProps) {
-  const onChangeHandler = useCallback((e: Event) => onChange?.((e.target as any).value), [ onChange ])
+export default function Checkbox ({ name, label, value, onInput }: CheckboxProps) {
+  const onInputHandler = useCallback((e: InputInputEvent) => onInput?.(e.currentTarget.checked, e), [ onInput ])
 
   return (
     <div className='flex items-center justify-between text-base pb-3 border-b border-gray-200 mb-3'>
       <label>{label}</label>
       <div className='checkbox'>
-        <input type='checkbox' checked={value} onClick={onChangeHandler}/>
+        <input name={name} type='checkbox' checked={value} onClick={onInputHandler}/>
         <div/>
       </div>
     </div>

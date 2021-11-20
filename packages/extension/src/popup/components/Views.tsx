@@ -26,8 +26,10 @@
  */
 
 import type { ExtensionModule } from '../../modules'
+import browser from 'webextension-polyfill'
 import { h } from 'preact'
-import { Platforms } from '@pronoundb/shared/platforms.js'
+import { useCallback, useEffect, useState } from 'preact/hooks'
+import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
 import PlatformIcons from '@pronoundb/shared/icons.js'
 
 import Checkbox from './form/Checkbox'
@@ -50,6 +52,18 @@ export function Unsupported () {
 
 export function Main ({ module }: { module: ExtensionModule }) {
   const platform = Platforms[module.id]
+  const enabledKey = `${module.id}.enabled`
+
+  const [ enabled, setEnabled ] = useState(true)
+  const onInput = useCallback((val: any) => {
+    browser.storage.sync.set({ [enabledKey]: val })
+    setEnabled(val)
+  }, [ setEnabled ])
+
+  useEffect(() => {
+    browser.storage.sync.get([ enabledKey ])
+      .then((s) => setEnabled(s[enabledKey] ?? true))
+  }, [])
 
   return (
     <main className='flex-grow border-t-8 border-contextful px-4 py-2' style={{ '--context-color': platform.color, marginTop: -1 }}>
@@ -58,7 +72,7 @@ export function Main ({ module }: { module: ExtensionModule }) {
         <h2 className='text-xl font-semibold tracking-wide'>{platform.name}</h2>
       </div>
 
-      <Checkbox label='Enable module'/>
+      <Checkbox onInput={onInput} name='enabled' value={enabled} label='Enable module'/>
       {/* per-module settings */}
       <p className='text-base'>There are no specific settings for this integration.</p>
     </main>
@@ -66,18 +80,38 @@ export function Main ({ module }: { module: ExtensionModule }) {
 }
 
 export function Settings () {
+  const [ settings, setSettings ] = useState<Record<string, any>>({})
+  const onInput = useCallback((val: any, e: Event) => {
+    const key = (e.target as any).name
+    browser.storage.sync.set({ [key]: val })
+    setSettings((s) => ({ ...s, [key]: val }))
+  }, [ setSettings ])
+
+  useEffect(() => {
+    browser.storage.sync.get([ 'pronouns.case', ...PlatformIds.map((p) => `${p}.enabled`) ])
+      .then((s) => setSettings(s))
+  }, [])
+
   return (
     <main className='flex-grow px-4 py-2'>
       <div className='flex gap-2 items-center mb-2'>
         <h2 className='text-xl font-semibold tracking-wide'>Appearance</h2>
       </div>
-      <Select options={[ [ 'lower', 'aaa/aaa' ], [ 'pascal', 'Aaa/Aaa' ] ]}/>
+      <Select
+        onInput={onInput}
+        name='pronouns.case'
+        value={settings['pronouns.case']}
+        options={[ [ 'lower', 'aaa/aaa' ], [ 'pascal', 'Aaa/Aaa' ] ]}
+      />
 
       <div className='flex gap-2 items-center mb-3'>
         <h2 className='text-xl font-semibold tracking-wide'>Enabled modules</h2>
       </div>
       {modules.map((mdl) => (
         <Checkbox
+          onInput={onInput}
+          name={`${mdl.id}.enabled`}
+          value={settings[`${mdl.id}.enabled`] ?? true}
           key={mdl.id}
           label={
             <span className='flex gap-2 items-center'>

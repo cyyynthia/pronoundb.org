@@ -31,10 +31,18 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
+    @apply font-sans text-black bg-white h-full;
     width: 360px;
     height: 480px;
+    max-width: 360px;
+    max-height: 480px;
+    overflow: hidden;
     --context-color: #f49898;
+  }
+
+  main {
+    overflow-y: auto;
   }
 }
 

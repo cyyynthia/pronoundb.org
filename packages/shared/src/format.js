@@ -28,31 +28,31 @@
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { Pronouns, PronounsShort } from './pronouns.js'
 
-let styling = 'lower'
+let pronounsCase = 'lower'
 if (chrome.storage) {
-  chrome.storage.sync.get([ 'styling' ], ({ styling: st }) => (styling = st ?? 'lower'))
+  chrome.storage.sync.get([ 'pronouns.case' ], ({ 'pronouns.case': pCase }) => (pronounsCase = pCase ?? 'lower'))
   chrome.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
-      styling = changes.styling.newValue
+    if (changes['pronouns.case']) {
+      pronounsCase = changes['pronouns.case'].newValue
     }
   })
 } else {
   window.addEventListener('message', (e) => {
-    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
-      styling = e.data.payload.styling
+    if (e.data?.source === 'pronoundb' && e.data.payload.action === 'settings.pronouns.case') {
+      pronounsCase = e.data.payload.pronounsCase
     }
   })
 }
 
 export function formatPronouns (id) {
   const pronouns = Pronouns[id]
-  const idx = styling === 'lower' ? 0 : 1
+  const idx = pronounsCase === 'lower' ? 0 : 1
   return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
 export function formatPronounsShort (id) {
   const pronouns = PronounsShort[id]
-  const idx = styling === 'lower' ? 0 : 1
+  const idx = pronounsCase === 'lower' ? 0 : 1
   return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
@@ -74,7 +74,7 @@ export function formatPronounsLong (id) {
 export function usePronouns () {
   const forceUpdate = useState(0)[1]
   const updateFormatted = useCallback((e) => {
-    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.styling') {
+    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.pronouns.case') {
       forceUpdate((i) => ++i)
     }
   }, [ forceUpdate ])

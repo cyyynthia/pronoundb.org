@@ -30,33 +30,39 @@ import { WEBSITE } from '@pronoundb/shared/constants.js'
 import { initReact } from './utils/react'
 import { getModule } from './modules'
 
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    initReact()
-    currentMdl.main?.()
-    currentMdl.inject()
-    console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-  }
-})
+if (!browser.tabs) {
+  getModule().then(async (currentMdl) => {
+    if (currentMdl) {
+      const key = `${currentMdl.id}.enabled`
+      const { [key]: enabled } = await browser.storage.sync.get([ key ])
+      if (enabled ?? true) {
+        initReact()
+        currentMdl.main?.()
+        currentMdl.inject()
+        console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
+      }
+    }
+  })
+}
 
 if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'styling' ]).then(({ styling }) => {
+  browser.storage.sync.get([ 'pronouns.case' ]).then(({ 'pronouns.case': pronounsCase }) => {
     window.postMessage({
       source: 'pronoundb',
       payload: {
-        action: 'settings.styling',
-        styling: styling ?? 'lower',
+        action: 'settings.pronouns.case',
+        pronounsCase: pronounsCase ?? 'lower',
       },
     }, '*')
   })
 
   browser.storage.onChanged.addListener((changes) => {
-    if (changes.styling) {
+    if (changes['pronouns.case']) {
       window.postMessage({
         source: 'pronoundb',
         payload: {
-          action: 'settings.styling',
-          styling: changes.styling.newValue,
+          action: 'settings.pronouns.case',
+          pronounsCase: changes['pronouns.case'].newValue,
         },
       }, '*')
     }

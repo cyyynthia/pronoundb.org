@@ -32,6 +32,13 @@ browser.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     browser.tabs.create({ url: `${WEBSITE}/onboarding` })
   }
+
+  if (details.reason === 'update') {
+    const prev = details.previousVersion!.split('.').map(Number)
+    if (prev[0] === 0 && prev[1] < 6) {
+      browser.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
+    }
+  }
 })
 
 browser.runtime.onMessage.addListener((request) => {

@@ -25,21 +25,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { JSX } from 'preact'
 import { h } from 'preact'
 import { useCallback } from 'preact/hooks'
 
+type SelectInputEvent = JSX.TargetedEvent<HTMLSelectElement, Event>
+
 type SelectProps = {
+  name: string
   options: [ string, string ][]
   value?: string
-  onChange?: (v: string) => void
+  onInput?: (v: string, evt: SelectInputEvent) => void
 }
 
-export default function Select ({ options, value, onChange }: SelectProps) {
-  const onChangeHandler = useCallback((e: Event) => onChange?.((e.target as any).value), [ onChange ])
+export default function Select ({ name, options, value, onInput }: SelectProps) {
+  const onInputHandler = useCallback((e: SelectInputEvent) => onInput?.(e.currentTarget.value, e), [ onInput ])
 
   return (
     <div className='flex flex-col text-base pb-3 border-b border-gray-200 mb-3'>
-      <select onChange={onChangeHandler}>
+      <select name={name} onInput={onInputHandler}>
         {options.map(([ k, v ]) => <option value={k} selected={value === k}>{v}</option>)}
       </select>
     </div>
