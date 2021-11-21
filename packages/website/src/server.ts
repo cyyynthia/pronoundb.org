@@ -92,7 +92,6 @@ function handler (req: IncomingMessage, res: ServerResponse) {
 
   const ctx: Record<string, any> = { usersCount: count }
   const body = render(h(App, { url: req.url ?? '/', ctx: ctx }))
-  if (ctx.notFound) res.writeHead(404, 'Not Found')
 
   const helmet = toStatic()
   const head = render(h(
@@ -104,11 +103,15 @@ function handler (req: IncomingMessage, res: ServerResponse) {
   ))
 
   res.setHeader('content-type', 'text/html')
-  res.setHeader('content-security-policy', `default-src 'none'; script-src 'self' 'sha256-${hash}'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://avatars.githubusercontent.com;`)
+  // CSP note: I cannot set default-src to none because furryfox decided it'd be a good
+  // idea to make svg' <use> be governed exclusively by default-src. Sigh...
+  res.setHeader('content-security-policy', `default-src 'self'; script-src 'self' 'sha256-${hash}'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://avatars.githubusercontent.com`)
   res.setHeader('permissions-policy', 'interest-cohort=()')
   res.setHeader('referrer-policy', 'no-referrer')
   res.setHeader('x-content-type-options', 'nosniff')
   res.setHeader('x-frame-options', 'DENY')
+
+  if (ctx.notFound) res.writeHead(404, 'Not Found')
 
   res.write(
     template

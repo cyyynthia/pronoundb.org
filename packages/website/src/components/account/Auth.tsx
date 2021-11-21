@@ -66,7 +66,7 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
   const onMouseIn = useCallback(() => {
     const { x, y, width } = divRef.current!.getBoundingClientRect()
     const tt = document.createElement('div')
-    tt.class = 'tooltip'
+    tt.className = 'tooltip'
     tt.style.left = `${x + (width / 2)}px`
     tt.style.top = `${y}px`
     tt.style.opacity = '0'

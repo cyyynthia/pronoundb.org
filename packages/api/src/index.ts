@@ -42,7 +42,7 @@ import shields from './shields.js'
 
 import config from './config.js'
 
-const fastify = fastifyFactory({ logger: true })
+const fastify = fastifyFactory({ logger: { level: 'warn' } })
 
 fastify.register(fastifyAuth)
 fastify.register(fastifyCookie)
