@@ -90,7 +90,7 @@ function finishLicense ({ workingDirectory }) {
       }
     },
     closeBundle: async () => {
-      if (!skip) {
+      if (!skip && !process.argv.includes('--ssr')) {
         await rename(baseLicensePath, join(workingDirectory, 'dist', finalLicensePath))
       }
     },

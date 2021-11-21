@@ -29,19 +29,21 @@ import { useState, useEffect, useCallback } from 'preact/hooks'
 import { Pronouns, PronounsShort } from './pronouns.js'
 
 let pronounsCase = 'lower'
-if (chrome.storage) {
-  chrome.storage.sync.get([ 'pronouns.case' ], ({ 'pronouns.case': pCase }) => (pronounsCase = pCase ?? 'lower'))
-  chrome.storage.onChanged.addListener((changes) => {
-    if (changes['pronouns.case']) {
-      pronounsCase = changes['pronouns.case'].newValue
-    }
-  })
-} else {
-  window.addEventListener('message', (e) => {
-    if (e.data?.source === 'pronoundb' && e.data.payload.action === 'settings.pronouns.case') {
-      pronounsCase = e.data.payload.pronounsCase
-    }
-  })
+if (typeof chrome !== 'undefined') {
+  if (chrome.storage) {
+    chrome.storage.sync.get([ 'pronouns.case' ], ({ 'pronouns.case': pCase }) => (pronounsCase = pCase ?? 'lower'))
+    chrome.storage.onChanged.addListener((changes) => {
+      if (changes['pronouns.case']) {
+        pronounsCase = changes['pronouns.case'].newValue
+      }
+    })
+  } else {
+    window.addEventListener('message', (e) => {
+      if (e.data?.source === 'pronoundb' && e.data.payload.action === 'settings.pronouns.case') {
+        pronounsCase = e.data.payload.pronounsCase
+      }
+    })
+  }
 }
 
 export function formatPronouns (id) {
@@ -80,12 +82,14 @@ export function usePronouns () {
   }, [ forceUpdate ])
 
   useEffect(() => {
-    if (chrome.storage) {
-      chrome.storage.onChanged.addListener(updateFormatted)
-      return () => chrome.storage.onChanged.removeListener(updateFormatted)
-    } else {
-      window.addEventListener('message', updateFormatted)
-      return () => window.removeEventListener('message', updateFormatted)
+    if (typeof chrome !== 'undefined') {
+      if (chrome.storage) {
+        chrome.storage.onChanged.addListener(updateFormatted)
+        return () => chrome.storage.onChanged.removeListener(updateFormatted)
+      } else {
+        window.addEventListener('message', updateFormatted)
+        return () => window.removeEventListener('message', updateFormatted)
+      }
     }
   }, [ updateFormatted ])
 }
