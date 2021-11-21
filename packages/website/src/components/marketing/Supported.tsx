@@ -51,7 +51,7 @@ function PlatformCard ({ platform }: PlatformCardProps) {
       <div class='flex-none flex flex-col'>
         <span class='font-semibold'>{Platforms[platform].name}</span>
         {platform in Previews
-          ? <a class='text-dark-blue link' href={Routes.SUPPORTED_PREVIEW(platform)}>See the integration</a>
+          ? <a class='text-deep-blue dark:text-cyan-100 link' href={Routes.SUPPORTED_PREVIEW(platform)}>See the integration</a>
           : <span>No preview available</span>}
       </div>
     </div>
@@ -68,7 +68,7 @@ export function SupportedPreview () {
         <Globe class='w-8 h-8 mr-4 flex-none fill-current'/>
         <div class='flex-none flex flex-col'>
           <span class='font-semibold'>... and many more!</span>
-          <a class='text-dark-blue link' href={Routes.SUPPORTED}>See all supported platforms</a>
+          <a class='text-deep-blue dark:text-cyan-100 link' href={Routes.SUPPORTED}>See all supported platforms</a>
         </div>
       </div>
     </div>
