@@ -26,6 +26,6 @@
  */
 
 // @ts-ignore
-const ext = window.browser || window.chrome
+const ext = typeof browser !== 'undefined' ? browser : chrome
 const script = (ext.runtime.getManifest() as any).web_accessible_resources[0]
 import(ext.runtime.getURL(script))

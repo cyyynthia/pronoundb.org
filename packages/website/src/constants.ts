@@ -61,6 +61,7 @@ export const Routes = {
 
 export const Endpoints = {
   ...SharedEndpoints,
+  SELF: '/api/v1/accounts/me',
   OAUTH: (platform: string, intent?: 'register' | 'login' | 'link') => `/api/v1/oauth/${platform}/authorize${intent ? `?intent=${intent}` : ''}`,
   CONNECTION: (platform: string, id: string) => `/api/v1/accounts/me/connection?platform=${platform}&id=${id}`,
 }

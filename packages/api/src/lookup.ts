@@ -39,6 +39,20 @@ function cors (_: FastifyRequest, reply: FastifyReply) {
   reply.send()
 }
 
+function corsCred (request: FastifyRequest, reply: FastifyReply) {
+  if (request.headers.origin?.startsWith('moz-extension://')) {
+    reply.header('access-control-allow-origin', request.headers.origin)
+    reply.header('access-control-allow-credentials', 'true')
+  } else {
+    reply.header('access-control-allow-origin', '*')
+  }
+
+  reply.header('access-control-allow-methods', 'GET')
+  reply.header('access-control-allow-headers', 'x-pronoundb-source')
+  reply.header('vary', 'origin')
+  reply.send()
+}
+
 async function lookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   reply.header('access-control-allow-origin', '*')
   reply.header('access-control-allow-methods', 'GET')
@@ -113,6 +127,20 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   reply.header('etag', etag).send(res)
 }
 
+async function lookupMe (this: FastifyInstance, request: FastifyRequest<{ TokenizeUser: User }>, reply: FastifyReply) {
+  if (request.headers.origin?.startsWith('moz-extension://')) {
+    reply.header('access-control-allow-origin', request.headers.origin)
+    reply.header('access-control-allow-credentials', 'true')
+  } else {
+    reply.header('access-control-allow-origin', '*')
+  }
+
+  reply.header('access-control-allow-methods', 'GET')
+  reply.header('access-control-allow-headers', 'x-pronoundb-source')
+  reply.header('vary', 'origin')
+  reply.send({ pronouns: request.user ? request.user.pronouns ?? 'unspecified' : null })
+}
+
 export default async function (fastify: FastifyInstance) {
   await fastify.mongo.db!.collection<User>('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 
@@ -121,4 +149,7 @@ export default async function (fastify: FastifyInstance) {
 
   fastify.options('/lookup-bulk', cors)
   fastify.get('/lookup-bulk', lookupBulk)
+
+  fastify.options('/lookup/me', corsCred)
+  fastify.get<{ TokenizeUser: User }>('/lookup/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, lookupMe)
 }

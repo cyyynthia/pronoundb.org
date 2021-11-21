@@ -54,16 +54,16 @@ function Main ({ view }: { view: ViewState }) {
 }
 
 export default function Popup () {
-  const [ user, setUser ] = useState(null)
+  const [ selfPronouns, setSelfPronouns ] = useState(null)
   const [ view, setView ] = useState(ViewState.MAIN)
   const openPronounsSelector = useCallback(() => void browser.tabs.create({ url: `${WEBSITE}/me` }), [])
   const openSettings = useCallback(() => void setView(ViewState.SETTINGS), [])
   const closeSettings = useCallback(() => void setView(ViewState.MAIN), [])
 
   useEffect(() => {
-    fetch(Endpoints.SELF)
+    fetch(Endpoints.LOOKUP_SELF, { credentials: 'include' })
       .then((r) => r.json())
-      .then((u) => u.id && setUser(u))
+      .then((u) => setSelfPronouns(u.pronouns ?? null))
       .catch()
   }, [])
 
@@ -71,7 +71,7 @@ export default function Popup () {
     <div class='flex flex-col h-full'>
       <Header view={view} onOpenSettings={openSettings} onCloseSettings={closeSettings}/>
       <Main view={view}/>
-      <Footer user={user} onOpenPronounsSelector={openPronounsSelector}/>
+      <Footer selfPronouns={selfPronouns} onOpenPronounsSelector={openPronounsSelector}/>
     </div>
   )
 }

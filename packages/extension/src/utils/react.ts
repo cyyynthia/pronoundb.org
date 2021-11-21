@@ -118,7 +118,7 @@ export async function executeReactProp (node: HTMLElement, propPath: string[], .
 export function initReact () {
   if (!isFirefox) {
     window.addEventListener('message', (e) => {
-      if (e.source === window && e.data.source === 'pronoundb') {
+      if (e.source === window && e.data?.source === 'pronoundb') {
         const data = e.data.payload
         if (data.action === 'bridge.result') {
           if (!callbacks.has(data.id)) {
@@ -138,7 +138,7 @@ export function initReact () {
       window.doExecute()
 
       window.addEventListener('message', (e) => {
-        if (e.source === window && e.data.source === 'pronoundb') {
+        if (e.source === window && e.data?.source === 'pronoundb') {
           const data = e.data.payload
           if (data.action === 'bridge.query') {
             const elements = data.targets.map((target: string) => {

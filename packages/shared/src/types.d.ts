@@ -55,9 +55,9 @@ declare module '@pronoundb/shared/constants.js' {
   export const WEBSITE: string
 
   export const Endpoints: {
-    SELF: string
     LOOKUP: (platform: string, id: string) => string
     LOOKUP_BULK: (platform: string, ids: string[]) => string
+    LOOKUP_SELF: string
   }
 
   export const Extensions: {

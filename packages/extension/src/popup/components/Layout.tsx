@@ -25,7 +25,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { RestUser } from '@pronoundb/shared'
 import browser from 'webextension-polyfill'
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
@@ -42,7 +41,7 @@ type HeaderProps = {
   onCloseSettings: () => void
 }
 
-type FooterProps = { user: RestUser | null, onOpenPronounsSelector: () => void }
+type FooterProps = { selfPronouns: string | null, onOpenPronounsSelector: () => void }
 
 const CUTE_COMMENTS = [
   'So cute!',
@@ -76,18 +75,18 @@ export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) 
   )
 }
 
-export function Footer ({ user, onOpenPronounsSelector }: FooterProps) {
+export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
   usePronouns()
   const cute = useMemo(() => Math.floor(Math.random() * CUTE_COMMENTS.length), [])
 
   return (
     <footer class='text-gray-600 text-sm'>
-      {user
+      {selfPronouns
         ? (
           <div class='py-2 px-4 border-t border-gray-200'>
-            {user.pronouns in specialNotes
-              ? <p>{specialNotes[user.pronouns as keyof typeof specialNotes]}</p>
-              : <p>You're going by {formatPronouns(user.pronouns)}. {CUTE_COMMENTS[cute]}</p>}
+            {selfPronouns in specialNotes
+              ? <p>{specialNotes[selfPronouns as keyof typeof specialNotes]}</p>
+              : <p>You're going by {formatPronouns(selfPronouns)}. {CUTE_COMMENTS[cute]}</p>}
             <button class='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
           </div>
         )

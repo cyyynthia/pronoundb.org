@@ -43,10 +43,10 @@ export default function Legal (_: Attributes) {
       </p>
       <p>
         OVH SAS<br/>
-        2, rue Kellermann<br/>
+        RCS Lille Métropole 424 761 419<br/>
+        2 Rue Kellermann<br/>
         59100 Roubaix<br/>
-        France<br/>
-        RCS Lille Métropole 424 761 419
+        France
       </p>
     </main>
   )

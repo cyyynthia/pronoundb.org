@@ -27,18 +27,18 @@
 
 export default function throttle (fn: Function, delay = 200, max = 20): Function {
   let timer: NodeJS.Timeout | null = null
-  let buffer: any[] = []
+  let buffer: Set<any> = new Set()
   function run () {
-    fn(buffer)
+    fn(Array.from(buffer))
     timer = null
-    buffer = []
+    buffer.clear()
   }
 
   return function (arg: any) {
     if (timer) clearTimeout(timer)
-    buffer.push(arg)
+    buffer.add(arg)
 
-    if (buffer.length === max) run()
+    if (buffer.size === max) run()
     else timer = setTimeout(run, delay)
   }
 }

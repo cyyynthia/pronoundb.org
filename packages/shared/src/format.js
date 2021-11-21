@@ -76,7 +76,7 @@ export function formatPronounsLong (id) {
 export function usePronouns () {
   const forceUpdate = useState(0)[1]
   const updateFormatted = useCallback((e) => {
-    if (e.data.source === 'pronoundb' && e.data.payload.action === 'settings.pronouns.case') {
+    if (e.data?.source === 'pronoundb' && e.data.payload.action === 'settings.pronouns.case') {
       forceUpdate((i) => ++i)
     }
   }, [ forceUpdate ])
