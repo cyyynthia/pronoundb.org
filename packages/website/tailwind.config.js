@@ -26,3 +26,4 @@
  */
 
 module.exports = require('@pronoundb/shared/tailwind.config.cjs')
+module.exports.purge.safelist = [ 'btn-chrome', 'btn-firefox', 'btn-edge' ]

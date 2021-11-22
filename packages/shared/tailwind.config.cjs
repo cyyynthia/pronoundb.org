@@ -30,7 +30,7 @@ const colors = require('tailwindcss/colors')
 module.exports = {
   mode: 'jit',
   darkMode: 'media',
-  purge: [ './**/*.html', './src/**/*.tsx' ],
+  purge: { content: [ './**/*.html', './src/**/*.tsx' ] },
   theme: {
     fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
     container: {
