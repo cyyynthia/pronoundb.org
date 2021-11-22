@@ -49,6 +49,19 @@ declare module '@pronoundb/shared' {
   }
 
   export type RestUser = Omit<User, '_id'> & { id: string }
+
+  export type RestExtensionStats = {
+    version: string
+    users: number
+    rating: number
+  }
+
+  export type RestStatsData = {
+    users: number
+    chrome: RestExtensionStats
+    firefox: RestExtensionStats
+    edge: RestExtensionStats
+  }
 }
 
 declare module '@pronoundb/shared/constants.js' {

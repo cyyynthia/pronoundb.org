@@ -25,27 +25,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Attributes } from 'preact'
-import { h } from 'preact'
-import { useContext } from 'preact/hooks'
-import { useTitle } from 'hoofd/preact'
+import type { RestStatsData } from '@pronoundb/shared'
 
-import AppContext from '../AppContext'
-import { Routes } from '../../constants'
-
-export default function NotFound (_: Attributes) {
-  useTitle('404 Not Found')
-  const { ctx } = useContext(AppContext)
-  if (import.meta.env.SSR) {
-    ctx.notFound = true
+declare global {
+  interface Window {
+    ServerData: {
+      ctx: Record<string, any>
+      stats: RestStatsData
+    }
+    __PRONOUNDB_EXTENSION_VERSION__: string
   }
-
-  return (
-    <main class='container-main'>
-      <h2 class='text-2xl font-bold mb-2'>Seems like you're lost</h2>
-      <p>
-        There is nothing here... <a href={Routes.HOME} class='link'>Go home</a>
-      </p>
-    </main>
-  )
 }

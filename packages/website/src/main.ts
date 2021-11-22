@@ -60,24 +60,22 @@ async function fetchUser (): Promise<User> {
     })
 }
 
+
+function DevWrapper () {
+  const [ user, setUser ] = useState<User>(void 0)
+  useEffect(() => {
+    if (document.cookie.includes('token=')) {
+      fetchUser().then(setUser)
+    } else {
+      setUser(null)
+    }
+  }, [])
+
+  return h(App, { error: error, user: user })
+}
+
 if (import.meta.env.DEV) {
-  window.ServerData = { usersCount: Math.ceil(Math.random() * 1337) + 1337 }
-
-  // eslint-disable-next-line no-inner-declarations
-  function Wrapper () {
-    const [ user, setUser ] = useState<User>(void 0)
-    useEffect(() => {
-      if (document.cookie.includes('token=')) {
-        fetchUser().then(setUser)
-      } else {
-        setUser(null)
-      }
-    }, [])
-
-    return h(App, { error: error, user: user })
-  }
-
-  render(h(Wrapper, null), document.querySelector('#app')!)
+  render(h(DevWrapper, null), document.querySelector('#app')!)
 } else {
   (async function () {
     const user = document.cookie.includes('token=')

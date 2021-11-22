@@ -34,10 +34,3 @@ declare module '*.svg?file' {
   const asset: string
   export default asset
 }
-
-interface Window {
-  ServerData: {
-    usersCount: number
-  }
-  __PRONOUNDB_EXTENSION_VERSION__: string
-}

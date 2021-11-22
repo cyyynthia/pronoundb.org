@@ -26,20 +26,60 @@
  */
 
 import type { Attributes } from 'preact'
+import type { RestExtensionStats } from '@pronoundb/shared'
 import { h } from 'preact'
+import { useContext } from 'preact/hooks'
 import { useTitleTemplate } from 'hoofd/preact'
 
+import AppContext from '../AppContext'
 import { SupportedPreview } from '../marketing/Supported'
 import { Routes } from '../../constants'
 
 import Chrome from 'simple-icons/icons/googlechrome.svg'
 import Firefox from 'simple-icons/icons/firefoxbrowser.svg'
 import Edge from 'simple-icons/icons/microsoftedge.svg'
+import Star from 'feather-icons/dist/icons/star.svg'
+import StarFull from '../../../assets/star-full.svg'
 
-type HomeProps = Attributes & { usersCount: number }
+type ExtensionProps = { browser: string, link: string, style: string, icon: typeof Chrome, stats: RestExtensionStats }
 
-export default function Home ({ usersCount }: HomeProps) {
+function ExtensionDownload ({ browser, link, style, icon, stats }: ExtensionProps) {
+  return (
+    <div class='w-full md:w-1/3'>
+      <a href={link} target='_blank' rel='noreferrer' class={`btn-${style} font-semibold`}>
+        {h(icon, { class: 'w-5 h-5 mr-2 fill-current' })}
+        <span>Get for {browser}</span>
+      </a>
+      <div class='flex gap-2 items-center mt-1 text-gray-700 text-sm'>
+        <span>Version {stats.version}</span>
+        <span>•</span>
+        <span>{stats.users.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}+ users</span>
+        <span>•</span>
+        <div class='h-3.5'>
+          <div class='flex gap-0.5 items-center'>
+            <Star class='w-3.5 h-3.5'/>
+            <Star class='w-3.5 h-3.5'/>
+            <Star class='w-3.5 h-3.5'/>
+            <Star class='w-3.5 h-3.5'/>
+            <Star class='w-3.5 h-3.5'/>
+          </div>
+
+          <div class='flex gap-0.5 items-center -translate-y-full overflow-hidden' style={{ width: `${((stats.rating / 5) * 100) + 1}%` }}>
+            <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
+            <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
+            <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
+            <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
+            <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default function Home (_: Attributes) {
   useTitleTemplate('PronounDB')
+  const { stats } = useContext(AppContext)
 
   return (
     <main class='container-main'>
@@ -57,22 +97,31 @@ export default function Home ({ usersCount }: HomeProps) {
           It also helps you knowing the pronouns of the people you discuss with.
         </p>
         <p class='text-center text-xl mt-1'>
-          It's already helping {usersCount} people! Join them now!
+          There's {stats.users} people sharing their pronouns! Join them now!
         </p>
       </div>
-      <div class='flex flex-col md:flex-row gap-6 mb-6 font-semibold'>
-        <a href={Routes.EXTENSION_CHROME} target='_blank' rel='noreferrer' class='btn-chrome w-full md:w-1/3'>
-          <Chrome class='w-5 h-5 mr-2 fill-current'/>
-          <span>Get for Chrome</span>
-        </a>
-        <a href={Routes.EXTENSION_FIREFOX} target='_blank' rel='noreferrer' class='btn-firefox w-full md:w-1/3'>
-          <Firefox class='w-5 h-5 mr-2 fill-current'/>
-          <span>Get for Firefox</span>
-        </a>
-        <a href={Routes.EXTENSION_EDGE} target='_blank' rel='noreferrer' class='btn-edge w-full md:w-1/3'>
-          <Edge class='w-5 h-5 mr-2 fill-current'/>
-          <span>Get for Edge</span>
-        </a>
+      <div class='flex flex-col md:flex-row gap-6 mb-6'>
+        <ExtensionDownload
+          icon={Chrome}
+          browser='Chrome'
+          link={Routes.EXTENSION_CHROME}
+          style='chrome'
+          stats={stats.chrome}
+        />
+        <ExtensionDownload
+          icon={Firefox}
+          browser='Firefox'
+          link={Routes.EXTENSION_FIREFOX}
+          style='firefox'
+          stats={stats.firefox}
+        />
+        <ExtensionDownload
+          icon={Edge}
+          browser='Edge'
+          link={Routes.EXTENSION_EDGE}
+          style='edge'
+          stats={stats.edge}
+        />
       </div>
       <hr/>
       <h2 class='text-2xl font-bold mt-8 mb-4'>

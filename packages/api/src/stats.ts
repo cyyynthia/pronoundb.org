@@ -28,19 +28,86 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { Db } from 'mongodb'
 
+import type { RestExtensionStats, RestStatsData } from '@pronoundb/shared'
+import { Extensions } from '@pronoundb/shared/constants.js'
 import { createHash } from 'crypto'
+import fetch from 'node-fetch'
 
 import config from './config.js'
 
-type StatsData = { users: number }
+const CHROME = `https://chrome.google.com/webstore/detail/${Extensions.CHROME}?hl=en`
+const FIREFOX = `https://addons.mozilla.org/api/v5/addons/addon/${Extensions.FIREFOX}`
+const EDGE = `https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/${Extensions.EDGE}`
 
 let lastFetch: number
-let stats: StatsData = { users: 0 }
+let computedHash: string
+let stats: RestStatsData = {
+  users: 0,
+  chrome: {
+    version: '0.0.0',
+    users: 0,
+    rating: 0,
+  },
+  firefox: {
+    version: '0.0.0',
+    users: 0,
+    rating: 0,
+  },
+  edge: {
+    version: '0.0.0',
+    users: 0,
+    rating: 0,
+  },
+}
+
+async function fetchChromeStats (): Promise<RestExtensionStats> {
+  const data = await fetch(CHROME).then((r) => r.text())
+  const version = data.match(/itemprop="version" content="([0-9.]+)/)?.[1] ?? '0.0.0'
+  const install = data.match(/itemprop="interactionCount" content="UserDownloads:([0-9,]+)/)?.[1].replace(/,/g, '') ?? '0'
+  const stars = Number(data.match(/class="rsw-stars".*?([0-9.]+)/)?.[1] ?? 0)
+
+  return {
+    version: version,
+    users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
+    rating: Math.round(stars * 2) / 2,
+  }
+}
+
+async function fetchFirefoxStats (): Promise<RestExtensionStats> {
+  const data = await fetch(FIREFOX).then((r) => r.json()) as any
+  const install = data.average_daily_users.toString()
+
+  return {
+    version: data.current_version.version,
+    users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
+    rating: Math.round(data.ratings.average * 2) / 2,
+  }
+}
+
+async function fetchEdgeStats (): Promise<RestExtensionStats> {
+  const data = await fetch(EDGE).then((r) => r.json()) as any
+  const install = data.activeInstallCount.toString()
+
+  return {
+    version: data.version,
+    users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
+    rating: Math.round(data.averageRating * 2) / 2,
+  }
+}
 
 async function fetchStats (db: Db) {
   lastFetch = Date.now() // Update last fetch immediately to prevent concurrent re-fetches
   const usersCount = await db.collection('accounts').estimatedDocumentCount()
-  stats = { users: usersCount }
+  const [ chrome, firefox, edge ] = await Promise.all([ fetchChromeStats(), fetchFirefoxStats(), fetchEdgeStats() ])
+
+  stats = {
+    users: usersCount,
+    chrome: chrome,
+    firefox: firefox,
+    edge: edge,
+  }
+
+  computedHash = `W/"${createHash('sha256').update(config.secret).update(JSON.stringify(stats)).digest('base64')}"`
 }
 
 async function getStats (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
@@ -50,14 +117,13 @@ async function getStats (this: FastifyInstance, request: FastifyRequest, reply: 
     fetchStats(this.mongo.db!)
   }
 
-  const etag = `W/"${createHash('sha256').update(config.secret).update(stats.users.toString()).digest('base64')}"`
-  reply.header('cache-control', 'public, max-age=60')
-  if (request.headers['if-none-match'] === etag) {
+  reply.header('cache-control', 'public, max-age=600')
+  if (request.headers['if-none-match'] === computedHash) {
     reply.code(304).send()
     return
   }
 
-  reply.header('etag', etag).send(stats)
+  reply.header('etag', computedHash).send(stats)
 }
 
 export default async function (fastify: FastifyInstance) {

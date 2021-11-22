@@ -27,8 +27,9 @@
 
 /// <reference types="node" />
 
-import type Config from '../../../config.example.json'
+import type { RestStatsData } from '@pronoundb/shared'
 import type { IncomingMessage, ServerResponse } from 'http'
+import type Config from '../../../config.example.json'
 import { join, dirname } from 'path'
 import { existsSync, readFileSync } from 'fs'
 import { createServer, get as httpGet } from 'http'
@@ -37,6 +38,7 @@ import { render } from 'preact-render-to-string'
 import { toStatic } from 'hoofd/preact'
 import { h, Fragment } from 'preact'
 
+import AppContext from './components/AppContext'
 import App from './components/App'
 
 // Read config
@@ -61,22 +63,19 @@ const config = JSON.parse(blob) as typeof Config
 const template = readFileSync(join(__dirname, 'index.html'), 'utf8')
 
 let lastFetch = 0
-let usersCount = 0
-function fetchUsersCount () {
+let cachedStats: RestStatsData
+function fetchStats () {
   if ((Date.now() - lastFetch) > 3600e3) {
     lastFetch = Date.now()
     httpGet(`${config.api}/api/v1/stats`, (res) => {
       let data = ''
       res.setEncoding('utf8')
       res.on('data', (chk) => (data += chk))
-      res.on('end', () => {
-        const stats = JSON.parse(data)
-        usersCount = stats.users
-      })
+      res.on('end', () => (cachedStats = JSON.parse(data)))
     })
   }
 
-  return usersCount
+  return cachedStats
 }
 
 function handler (req: IncomingMessage, res: ServerResponse) {
@@ -86,12 +85,13 @@ function handler (req: IncomingMessage, res: ServerResponse) {
     return
   }
 
-  const count = fetchUsersCount()
-  const script = `window.ServerData = { usersCount: ${count} }`
-  const hash = createHash('sha256').update(script).digest('base64')
+  const stats = fetchStats()
+  const ctx: Record<string, any> = {}
+  const data = { ctx: ctx, stats: stats };
+  const body = render(h(AppContext.Provider, { value: data, children: h(App, { url: req.url ?? '/' }) }))
 
-  const ctx: Record<string, any> = { usersCount: count }
-  const body = render(h(App, { url: req.url ?? '/', ctx: ctx }))
+  const script = `window.ServerData = ${JSON.stringify(data)}`
+  const hash = createHash('sha256').update(script).digest('base64')
 
   const helmet = toStatic()
   const head = render(h(
@@ -122,5 +122,5 @@ function handler (req: IncomingMessage, res: ServerResponse) {
   )
 }
 
-fetchUsersCount()
+fetchStats()
 createServer(handler).listen(process.env.PORT ?? 8000)

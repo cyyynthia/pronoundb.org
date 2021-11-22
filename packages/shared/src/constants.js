@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const WEBSITE = import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
+export const WEBSITE = import.meta.env && import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
 
 export const Endpoints = {
   LOOKUP: (platform, id) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
