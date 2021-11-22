@@ -25,29 +25,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from 'preact'
+import { useContext, useMemo } from 'preact/hooks'
+import AppContext from './components/AppContext'
 
-import { Routes } from '../constants'
-import useHeart from '../useHeart'
+export default function useRandom (id: string, max: number) {
+  const ctxId = `random.${id}`
 
-import Paw from '/assets/paw.svg'
-
-export default function Footer () {
-  const heart = useHeart('footer.donate')
-
-  return (
-    <footer class='container-head border-t py-3'>
-      <div class='flex-none flex items-center mr-6 text-gray-600 dark:text-gray-400'>
-        <Paw class='w-5 h-5 mr-2'/>
-        <span>Copyright &copy; {new Date().getUTCFullYear()} Cynthia K. Rey </span>
-      </div>
-      <div class='flex-none flex items-center gap-4'>
-        <a href={Routes.DOCS} class='link'>API Docs</a>
-        <a href={Routes.LEGAL} class='link'>Legal</a>
-        <a href={Routes.PRIVACY} class='link'>Privacy</a>
-        <a href={Routes.GITHUB} target='_blank' rel='noreferrer' class='link'>GitHub</a>
-        <a href={Routes.DONATE} target='_blank' rel='noreferrer' class='link'>Donate {heart}</a>
-      </div>
-    </footer>
-  )
+  const { ctx } = useContext(AppContext)
+  return useMemo(() => {
+    if (!(ctxId in ctx)) ctx[ctxId] = Math.floor(Math.random() * max)
+    return ctx[ctxId]
+  }, [ id, max ])
 }

@@ -123,4 +123,4 @@ function handler (req: IncomingMessage, res: ServerResponse) {
 }
 
 fetchStats()
-createServer(handler).listen(process.env.PORT ?? 8000)
+createServer(handler).listen(config.webPort)

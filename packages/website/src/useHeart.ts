@@ -25,11 +25,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useMemo } from 'preact/hooks'
+import useRandom from './useRandom'
 
 const HEARTS = [ '❤️', '🧡', '💛', '💚', '💙', '💜', '💗', '💖', '💝' ]
 
-export default function useHeart () {
-  const heart = useMemo(() => Math.floor(Math.random() * HEARTS.length), [])
+export default function useHeart (id: string) {
+  const heart = useRandom(id, HEARTS.length)
   return HEARTS[heart]
 }

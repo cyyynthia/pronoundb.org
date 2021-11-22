@@ -38,7 +38,7 @@ export default function Onboarding (_: Attributes) {
   useTitleTemplate('Welcome to PronounDB!')
   const loggedIn = Boolean(useContext(UserContext))
 
-  const heart = useHeart()
+  const heart = useHeart('onboarding')
   const how = loggedIn
     ? <a class='link' href={Routes.ME}>going to your account</a>
     : <><a class='link' href={Routes.LOGIN}>logging in</a> or <a class='link' href={Routes.REGISTER}>creating an account</a></>

@@ -32,7 +32,7 @@ import useHeart from '../../../useHeart'
 import { Routes } from '../../../constants'
 
 export default function Changelog060 (_: Attributes) {
-  const heart = useHeart()
+  const heart = useHeart('changelog.060')
 
   return (
     <Fragment>

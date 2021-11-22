@@ -26,6 +26,7 @@
  */
 
 import { Endpoints as SharedEndpoints, Extensions } from '@pronoundb/shared/constants.js'
+import useRandom from './useRandom'
 
 export const Routes = {
   HOME: '/',
@@ -79,6 +80,9 @@ export const Errors = {
 export const Cynthia = {
   usernames: { twitch: 'cyyynthia_' },
   avatar: 'https://avatars.githubusercontent.com/u/9999055?size=128',
-  pronouns: Math.round(Math.random() * 500) === 69 ? 'ii' : 'sh',
   bio: 'Meow~! Peopwal dwon\'t take mewn seriouswy \'till nyi bite n scwatch ^w^ nyen pwoceed to purr nya~', // feel the catgirl energy
+  get pronouns () {
+    const random = useRandom('cynthia.pronouns', 500)
+    return random === 69 ? 'ii' : 'sh'
+  },
 }
