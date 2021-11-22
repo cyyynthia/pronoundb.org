@@ -60,9 +60,6 @@ function finalizeBuild (): Plugin {
           .replace('https://pronoundb.org', 'http://pronoundb.localhost:8080')
       }
 
-      const FF_MANIFEST = '"browser_specific_settings": { "gecko": { "id": "firefox-addon@pronoundb.org" } }'
-      manifest = manifest.replace('{', `{\n  ${FF_MANIFEST},`)
-
       this.emitFile({ type: 'asset', fileName: 'manifest.json', source: manifest })
     },
     closeBundle: async () => {
