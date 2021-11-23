@@ -32,31 +32,27 @@ import { Platforms } from '@pronoundb/shared/platforms.js'
 
 import config from './config.js'
 
-function cors (_: FastifyRequest, reply: FastifyReply) {
+const PRONOUNS_CACHE_DURATION = '60'
+
+function cors (request: FastifyRequest, reply: FastifyReply, allowCreds: boolean) {
   reply.header('access-control-allow-origin', '*')
   reply.header('access-control-allow-methods', 'GET')
   reply.header('access-control-allow-headers', 'x-pronoundb-source')
-  reply.send()
-}
+  reply.header('access-control-max-age', '600')
 
-function corsCred (request: FastifyRequest, reply: FastifyReply) {
-  if (request.headers.origin?.startsWith('moz-extension://')) {
+  if (allowCreds && request.headers.origin?.startsWith('moz-extension://')) {
+    reply.header('vary', 'origin')
     reply.header('access-control-allow-origin', request.headers.origin)
     reply.header('access-control-allow-credentials', 'true')
-  } else {
-    reply.header('access-control-allow-origin', '*')
   }
-
-  reply.header('access-control-allow-methods', 'GET')
-  reply.header('access-control-allow-headers', 'x-pronoundb-source')
-  reply.header('vary', 'origin')
-  reply.send()
 }
 
 async function lookup (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  reply.header('access-control-allow-origin', '*')
-  reply.header('access-control-allow-methods', 'GET')
-  reply.header('access-control-allow-headers', 'x-pronoundb-source')
+  cors(request, reply, false)
+  if (request.method === 'OPTIONS') {
+    reply.code(204)
+    return
+  }
 
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
@@ -76,7 +72,7 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
 
   const pronouns = account?.pronouns ?? 'unspecified'
   const etag = `W/"${createHash('sha256').update(config.secret).update(query.platform).update(query.id).update(pronouns).digest('base64')}"`
-  reply.header('cache-control', 'public, max-age=60')
+  reply.header('cache-control', `public, max-age=${PRONOUNS_CACHE_DURATION}`)
   if (request.headers['if-none-match'] === etag) {
     reply.code(304).send()
     return
@@ -86,9 +82,11 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
 }
 
 async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
-  reply.header('access-control-allow-origin', '*')
-  reply.header('access-control-allow-methods', 'GET')
-  reply.header('access-control-allow-headers', 'x-pronoundb-source')
+  cors(request, reply, false)
+  if (request.method === 'OPTIONS') {
+    reply.code(204)
+    return
+  }
 
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
@@ -118,7 +116,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   }
 
   const etag = `W/"${hash.digest('base64')}"`
-  reply.header('cache-control', 'public, max-age=60')
+  reply.header('cache-control', `public, max-age=${PRONOUNS_CACHE_DURATION}`)
   if (request.headers['if-none-match'] === etag) {
     reply.code(304).send()
     return
@@ -128,28 +126,24 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
 }
 
 async function lookupMe (this: FastifyInstance, request: FastifyRequest<{ TokenizeUser: User }>, reply: FastifyReply) {
-  if (request.headers.origin?.startsWith('moz-extension://')) {
-    reply.header('access-control-allow-origin', request.headers.origin)
-    reply.header('access-control-allow-credentials', 'true')
-  } else {
-    reply.header('access-control-allow-origin', '*')
+  cors(request, reply, true)
+  if (request.method === 'OPTIONS') {
+    reply.code(204)
+    return
   }
 
-  reply.header('access-control-allow-methods', 'GET')
-  reply.header('access-control-allow-headers', 'x-pronoundb-source')
-  reply.header('vary', 'origin')
   reply.send({ pronouns: request.user ? request.user.pronouns ?? 'unspecified' : null })
 }
 
 export default async function (fastify: FastifyInstance) {
   await fastify.mongo.db!.collection<User>('accounts').createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 
-  fastify.options('/lookup', cors)
+  fastify.options('/lookup', lookup)
   fastify.get('/lookup', lookup)
 
-  fastify.options('/lookup-bulk', cors)
+  fastify.options('/lookup-bulk', lookupBulk)
   fastify.get('/lookup-bulk', lookupBulk)
 
-  fastify.options('/lookup/me', corsCred)
+  fastify.options('/lookup/me', lookupMe)
   fastify.get<{ TokenizeUser: User }>('/lookup/me', { preHandler: fastify.auth([ fastify.verifyTokenizeToken, (_, __, next) => next() ]) }, lookupMe)
 }

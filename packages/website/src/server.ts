@@ -78,6 +78,41 @@ function fetchStats () {
   return cachedStats
 }
 
+function makeCsp (scriptHash: string) {
+  const rules = {
+    'default-src': [ '\'self\'' ], // I cannot set default-src to none because furryfox governs <use> exclusively by this. Sigh...
+    'img-src': [ '\'self\'', 'https://avatars.githubusercontent.com' ],
+    'script-src': [ '\'self\'', `'sha256-${scriptHash}'` ],
+    'style-src': [ '\'self\'', '\'unsafe-inline\'' ],
+    'font-src': [ '\'self\'' ],
+    'connect-src': [ '\'self\'' ],
+
+    'child-src': [ '\'none\'' ],
+    'frame-src': [ '\'none\'' ],
+    'manifest-src': [ '\'none\'' ],
+    'media-src': [ '\'none\'' ],
+    'object-src': [ '\'none\'' ],
+    'worker-src': [ '\'none\'' ],
+
+    'base-uri': [ '\'none\'' ],
+    'form-action': [ '\'none\'' ],
+    'frame-ancestors': [ '\'none\'' ],
+
+    'navigate-to': [
+      '\'self\'',
+      'https://github.com',
+      'https://ko-fi.com',
+      'https://chrome.google.com',
+      'https://addons.mozilla.org',
+      'https://microsoftedge.microsoft.com'
+    ],
+  }
+
+  return Object.entries(rules)
+    .map(([ directive, values ]) => `${directive} ${values.join(' ')};`)
+    .join(' ')
+}
+
 function handler (req: IncomingMessage, res: ServerResponse) {
   if (req.method?.toLowerCase() !== 'get') {
     res.writeHead(405, 'method not allowed')
@@ -103,9 +138,7 @@ function handler (req: IncomingMessage, res: ServerResponse) {
   ))
 
   res.setHeader('content-type', 'text/html')
-  // CSP note: I cannot set default-src to none because furryfox decided it'd be a good
-  // idea to make svg' <use> be governed exclusively by default-src. Sigh...
-  res.setHeader('content-security-policy', `default-src 'self'; script-src 'self' 'sha256-${hash}'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://avatars.githubusercontent.com`)
+  res.setHeader('content-security-policy', makeCsp(hash))
   res.setHeader('permissions-policy', 'interest-cohort=()')
   res.setHeader('referrer-policy', 'no-referrer')
   res.setHeader('x-content-type-options', 'nosniff')

@@ -50,7 +50,7 @@ function ExtensionDownload ({ browser, link, style, icon, stats }: ExtensionProp
         {h(icon, { class: 'w-5 h-5 mr-2 fill-current' })}
         <span>Get for {browser}</span>
       </a>
-      <div class='flex gap-2 items-center mt-1 text-gray-700 text-sm'>
+      <div class='flex gap-2 items-center mt-1 text-gray-700 dark:text-gray-100 text-sm'>
         <span>Version {stats.version}</span>
         <span>•</span>
         <span>{stats.users.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1,')}+ users</span>
