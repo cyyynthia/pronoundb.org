@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "isolatedModules": false,
-    "allowJs": true
-  },
-  "include": [ "./src/*" ]
-}

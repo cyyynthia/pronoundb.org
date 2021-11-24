@@ -128,7 +128,6 @@ async function handlePopOut (popout: HTMLElement) {
 }
 
 async function handleArticles (articles: HTMLElement[]) {
-  console.log(articles)
   const targets = articles
     .filter((article) => article.isConnected)
     .map((a: any) => a.ariaDescribedByElements[0])

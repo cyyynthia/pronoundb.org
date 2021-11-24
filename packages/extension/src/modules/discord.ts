@@ -99,7 +99,6 @@ async function handleUserPopOut (node: HTMLElement) {
 }
 
 async function handleUserModal (node: HTMLElement) {
-  console.log('modal', node)
   const id = await fetchReactProp(node, [ 'child', 'memoizedProps', 'user', 'id' ])
   const pronouns = await fetchPronouns('discord', id)
   if (pronouns === 'unspecified') return
@@ -148,7 +147,6 @@ function handleMutation (mutations: MutationRecord[]) {
   for (const { addedNodes } of mutations) {
     for (const node of addedNodes) {
       if (node instanceof HTMLElement) {
-        console.log(node)
         if (node.id.startsWith('chat-messages-')) {
           handleMessage(node)
           continue

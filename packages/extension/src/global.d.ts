@@ -25,12 +25,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-declare module '*.svg' {
-  import type { JSX } from 'preact'
-  export default function (props: JSX.SVGAttributes): JSX.Element
-}
+import '@pronoundb/shared'
 
-declare module '*.svg?file' {
-  const asset: string
-  export default asset
+declare global {
+  interface Window {
+    __PRONOUNDB_EXTENSION_VERSION__: string
+    wrappedJSObject: Window
+  }
+
+  interface Element {
+    wrappedJSObject: Element
+  }
+
+  interface NodeList {
+    [Symbol.iterator](): Iterator<Node | ParentNode>
+  }
 }

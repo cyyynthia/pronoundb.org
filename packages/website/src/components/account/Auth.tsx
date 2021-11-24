@@ -26,7 +26,6 @@
  */
 
 import type { Attributes } from 'preact'
-import type { Platform } from '@pronoundb/shared'
 import { h } from 'preact'
 import { useRef, useMemo, useCallback, useState, useEffect, useContext } from 'preact/hooks'
 import { useMeta, useTitle } from 'hoofd/preact'
@@ -52,7 +51,7 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
   const platform = Platforms[platformId]
 
   const divRef = useRef<HTMLDivElement>(null)
-  const tooltipRef = useRef<HTMLDivElement>(null)
+  const tooltipRef = useRef<HTMLDivElement>()
   const [ _, forceUpdate ] = useState(false)
 
   const disabled = useMemo(() => {

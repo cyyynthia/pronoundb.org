@@ -26,7 +26,6 @@
  */
 
 import type { Plugin } from 'vite'
-
 import { join } from 'path'
 import { readFile, rmdir, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
