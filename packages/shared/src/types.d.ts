@@ -81,8 +81,8 @@ declare module '@pronoundb/shared/constants.js' {
 }
 
 declare module '@pronoundb/shared/pronouns.js' {
-  export const Pronouns: Record<string, [ string, string ] | string>
-  export const PronounsShort: typeof Pronouns
+  export const LegacyPronouns: Record<string, [ string, string ] | string>
+  export const LegacyPronounsShort: typeof LegacyPronouns
 }
 
 declare module '@pronoundb/shared/platforms.js' {

@@ -25,7 +25,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const Pronouns = {
+export const LegacyPronouns = {
   unspecified: null,
   // -- Contributors: please keep the list sorted alphabetically.
   hh: [ 'he/him', 'He/Him' ],
@@ -51,8 +51,8 @@ export const Pronouns = {
   avoid: 'Avoid pronouns, use my name',
 }
 
-export const PronounsShort = {
-  ...Pronouns,
+export const LegacyPronounsShort = {
+  ...LegacyPronouns,
   any: [ 'any', 'Any' ],
   other: [ 'other', 'Other' ],
   ask: [ 'ask', 'Ask' ],

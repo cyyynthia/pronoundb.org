@@ -29,7 +29,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { User } from '@pronoundb/shared'
 
 import { Platforms } from '@pronoundb/shared/platforms.js'
-import { Pronouns } from '@pronoundb/shared/pronouns.js'
+import { LegacyPronouns } from '@pronoundb/shared/pronouns.js'
 
 type RequestProps = {
   TokenizeUser: User
@@ -58,7 +58,7 @@ async function updateMe (this: FastifyInstance, request: FastifyRequest<RequestP
     return
   }
 
-  if (!(pronouns in Pronouns)) {
+  if (!(pronouns in LegacyPronouns)) {
     reply.code(400).send({ error: 400, message: 'Invalid form body' })
     return
   }

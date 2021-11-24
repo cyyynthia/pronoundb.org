@@ -29,7 +29,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { User } from '@pronoundb/shared'
 
 import { createHash } from 'crypto'
-import { Pronouns } from '@pronoundb/shared/pronouns.js'
+import { LegacyPronouns } from '@pronoundb/shared/pronouns.js'
 
 import config from './config.js'
 
@@ -53,7 +53,7 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
   reply.header('etag', etag).send({
     schemaVersion: 1,
     label: 'pronouns',
-    message: (Array.isArray(Pronouns[pronouns]) ? Pronouns[pronouns][0] : Pronouns[pronouns]) ?? 'unspecified',
+    message: (Array.isArray(LegacyPronouns[pronouns]) ? LegacyPronouns[pronouns][0] : LegacyPronouns[pronouns]) ?? 'unspecified',
   })
 }
 

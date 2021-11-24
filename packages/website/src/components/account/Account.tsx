@@ -30,8 +30,7 @@ import { h } from 'preact'
 import { useContext, useCallback, useState } from 'preact/hooks'
 import { route } from 'preact-router'
 import { useTitle } from 'hoofd/preact'
-import { Pronouns } from '@pronoundb/shared/pronouns.js'
-import { Platforms } from '@pronoundb/shared/platforms.js'
+import { LegacyPronouns } from '@pronoundb/shared/pronouns.js'
 import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
 import PlatformIcons from '@pronoundb/shared/icons.js'
 
@@ -84,7 +83,7 @@ export default function Account (_: Attributes) {
       <h3 class='text-xl font-bold mb-2'>Pronouns</h3>
       <p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically.</p>
       <select class='w-full px-2 py-1 mb-8 bg-gray-200 dark:bg-gray-700' value={user.pronouns} onChange={(e) => changePronouns((e.target as any).value)}>
-        {Object.keys(Pronouns).map((set) => (
+        {Object.keys(LegacyPronouns).map((set) => (
           <option key={set} value={set}>
             {formatPronouns(set) ?? 'Unspecified'}
           </option>

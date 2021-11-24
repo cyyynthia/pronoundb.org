@@ -25,12 +25,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// todo: New API & rewrite
-
 import type { Attributes } from 'preact'
 import { h, Fragment } from 'preact'
 import { useTitle, useMeta } from 'hoofd/preact'
-import { Pronouns } from '@pronoundb/shared/pronouns.js'
+import { LegacyPronouns } from '@pronoundb/shared/pronouns.js'
 import { PlatformIds, Platforms } from '@pronoundb/shared/platforms.js'
 import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
 
@@ -67,7 +65,7 @@ export default function Docs (_: Attributes) {
           by PronounDB, sorted alphabetically:
         </p>
         <ul class='list-inside list-disc'>
-          {Object.keys(Pronouns).map((setId) => (
+          {Object.keys(LegacyPronouns).map((setId) => (
             <li key={setId}>
               <code>{setId}</code>: {formatPronouns(setId) ?? 'Unspecified'}
             </li>

@@ -40,9 +40,7 @@ const DevData = {
     chrome: { version: '1.0.0', users: 1000, rating: 4.5 },
     firefox: { version: '1.0.0', users: 500, rating: 3 },
     edge: { version: '1.0.0', users: 200, rating: 2 },
-  }
+  },
 }
 
-export default createContext<AppData>(
-  (import.meta.env.DEV || import.meta.env.SSR) ? DevData : window.ServerData
-)
+export default createContext<AppData>(import.meta.env.DEV || import.meta.env.SSR ? DevData : window.ServerData)

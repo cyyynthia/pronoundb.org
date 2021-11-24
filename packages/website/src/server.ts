@@ -113,7 +113,7 @@ function handler (req: IncomingMessage, res: ServerResponse) {
 
   const stats = fetchStats()
   const ctx: Record<string, any> = {}
-  const data = { ctx: ctx, stats: stats };
+  const data = { ctx: ctx, stats: stats }
   const body = render(h(AppContext.Provider, { value: data, children: h(App, { url: req.url ?? '/' }) }))
 
   const script = `window.ServerData = ${JSON.stringify(data)}`

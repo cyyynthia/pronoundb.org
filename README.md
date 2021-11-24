@@ -42,17 +42,16 @@ These projects are either dead or unmaintained for the time being.
  - May contains stains of coffee and a few cookie crumbs :whistle:
 
 ## FAQ
-### Neo-pronouns and/or custom pronouns support?
-Based on the current architecture, and the features I want to implement, neo-pronouns support is not something I'll
-be adding. The list of sets would grow exponentially and would become unmaintainable, or I'd need to add custom
-pronouns and moderate the platform usage (for offensive stuff) and this is a strict no from me.
+### Neo-pronouns support
+For the time being, neo-pronouns are not supported by PronounDB. However, they might get added in the future.
 
-I want to add internationalization support in the future, and neo-pronouns are very much english-only and make for
-not very amazing i18n. Just with the current sets it's a problem for some languages! Sure I can skip them, but it's
-not a path I want to take.
+In my [original statement](https://github.com/cyyynthia/pronoundb.org/blob/f8eaea19/README.md#faq), I stated that
+they would not be something I'll be adding - this is (probably) no longer the case.
 
-PronounDB is a side project I don't want to put tons of time in it, and that's sadly incompatible with adding support
-of neo-pronouns. Some people will say there are sets that are less used than some neo-pronouns. Maybe, maybe not. I
-just made all combinations possible.
+I'll be changing the way pronouns are internally handled and formatted soon, which should allow for this to happen.
+I also revised some of my plans regarding internationalization and found some compromises there too.
 
-Some suggested supporting "popular" neo-pronouns, which is something I don't feel confident with either.
+### Custom pronouns
+There won't be a way to use pronouns that aren't available in PronounDB. The only way would be to have a free text
+input for people to type their pronouns in, which would require me to start moderating the platform for abusive
+content which is a strict no from me.

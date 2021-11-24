@@ -48,7 +48,7 @@ const Styles = {
     fontWeight: '400',
     color: 'var(--text-normal)',
     marginBottom: '8px',
-  })
+  }),
 }
 
 async function handleMessages (nodes: HTMLElement[]) {
@@ -94,7 +94,7 @@ async function handleUserPopOut (node: HTMLElement) {
   setTimeout(() => {
     const { y, height } = node.getBoundingClientRect()
     const bottom = window.innerHeight - y - height - 16
-    if (bottom < 0) node.style.top = `${parseInt(node.style.top) + bottom}px`
+    if (bottom < 0) node.style.top = `${parseInt(node.style.top, 10) + bottom}px`
   }, 5)
 }
 
@@ -169,7 +169,7 @@ function handleMutation (mutations: MutationRecord[]) {
 
         if (node.className.startsWith('autocomplete-')) {
           const rows = Array.from(node.querySelectorAll('[class*="autocompleteRow-"]')) as HTMLElement[]
-          handleAutocompleteRows(rows.filter((node) => node?.querySelector('[role="img"]')))
+          handleAutocompleteRows(rows.filter((row) => row?.querySelector('[role="img"]')))
           continue
         }
 

@@ -29,7 +29,7 @@ import { topics } from '../icons/twitter'
 
 import { formatPronouns } from '@pronoundb/shared/format.js'
 import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
-import { fetchReactProp,fetchReactPropBulk } from '../utils/react'
+import { fetchReactProp, fetchReactPropBulk } from '../utils/react'
 import { h, css } from '../utils/dom'
 import throttle from '../utils/throttle'
 
