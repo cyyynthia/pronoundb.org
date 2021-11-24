@@ -83,7 +83,7 @@ function makeCsp (scriptHash: string) {
     'default-src': [ '\'self\'' ], // I cannot set default-src to none because furryfox governs <use> exclusively by this. Sigh...
     'img-src': [ '\'self\'', 'https://avatars.githubusercontent.com' ],
     'script-src': [ '\'self\'', `'sha256-${scriptHash}'` ],
-    'style-src': [ '\'self\'', '\'unsafe-inline\'' ],
+    'style-src': [ '\'self\'' ],
     'font-src': [ '\'self\'' ],
     'connect-src': [ '\'self\'' ],
 
@@ -97,15 +97,6 @@ function makeCsp (scriptHash: string) {
     'base-uri': [ '\'none\'' ],
     'form-action': [ '\'none\'' ],
     'frame-ancestors': [ '\'none\'' ],
-
-    'navigate-to': [
-      '\'self\'',
-      'https://github.com',
-      'https://ko-fi.com',
-      'https://chrome.google.com',
-      'https://addons.mozilla.org',
-      'https://microsoftedge.microsoft.com'
-    ],
   }
 
   return Object.entries(rules)

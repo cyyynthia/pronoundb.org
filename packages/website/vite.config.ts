@@ -49,6 +49,9 @@ function moveIndex (): Plugin {
 
 export default defineConfig({
   publicDir: process.argv.includes('--ssr') ? '_' : 'public',
+  optimizeDeps: {
+    include: [ '@pronoundb/shared/platforms.js' ]
+  },
   build: {
     assetsInlineLimit: 0,
     outDir: process.argv.includes('--ssr') ? 'server' : 'dist',

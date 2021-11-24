@@ -38,20 +38,20 @@ import { Routes } from '../../constants'
 
 import Globe from 'feather-icons/dist/icons/globe.svg'
 
-type PlatformCardProps = { platform: string }
+type PlatformCardProps = { platformId: string }
 
 type SupportedProps = Attributes & { platform?: string }
 
 const Previews: Record<string, ComponentType> = { twitch: Twitch }
 
-function PlatformCard ({ platform }: PlatformCardProps) {
+function PlatformCard ({ platformId }: PlatformCardProps) {
   return (
-    <div class='platform-box' style={{ borderBottomColor: Platforms[platform].color }}>
-      {h(PlatformIcons[platform], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
+    <div class={`platform-box border-platform-${platformId}`}>
+      {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
       <div class='flex-none flex flex-col'>
-        <span class='font-semibold'>{Platforms[platform].name}</span>
-        {platform in Previews
-          ? <a class='text-deep-blue dark:text-cyan-100 link' href={Routes.SUPPORTED_PREVIEW(platform)}>See the integration</a>
+        <span class='font-semibold'>{Platforms[platformId].name}</span>
+        {platformId in Previews
+          ? <a class='text-deep-blue dark:text-cyan-100 link' href={Routes.SUPPORTED_PREVIEW(platformId)}>See the integration</a>
           : <span>No preview available</span>}
       </div>
     </div>
@@ -61,9 +61,9 @@ function PlatformCard ({ platform }: PlatformCardProps) {
 export function SupportedPreview () {
   return (
     <div class='platforms-prev-grid'>
-      <PlatformCard platform='twitch'/>
-      <PlatformCard platform='twitter'/>
-      <PlatformCard platform='github'/>
+      <PlatformCard platformId='twitch'/>
+      <PlatformCard platformId='twitter'/>
+      <PlatformCard platformId='github'/>
       <div class='platform-box border-gray-400 dark:border-gray-600'>
         <Globe class='w-8 h-8 mr-4 flex-none fill-current'/>
         <div class='flex-none flex flex-col'>
@@ -106,7 +106,7 @@ export default function Supported ({ platform }: SupportedProps) {
       </p>
 
       <div class='platforms-grid'>
-        {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platform={p}/>)}
+        {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platformId={p}/>)}
       </div>
     </main>
   )

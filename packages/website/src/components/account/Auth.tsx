@@ -48,20 +48,22 @@ const IntentTitles = {
   link: 'Link another account',
 }
 
-function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
+function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuthIntent }) {
+  const platform = Platforms[platformId]
+
   const divRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const [ _, forceUpdate ] = useState(false)
 
   const disabled = useMemo(() => {
-    if (typeof window !== 'undefined' && props.requiresExt) {
+    if (typeof window !== 'undefined' && platform.requiresExt) {
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) setTimeout(() => forceUpdate(true), 200)
 
       if (!window.__PRONOUNDB_EXTENSION_VERSION__) return true
-      if (compareSemver(props.since, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
+      if (compareSemver(platform.since, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
     }
     return false
-  }, [ props, _ ])
+  }, [ platformId, _ ])
 
   const onMouseIn = useCallback(() => {
     const { x, y, width } = divRef.current!.getBoundingClientRect()
@@ -71,8 +73,8 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
     tt.style.top = `${y}px`
     tt.style.opacity = '0'
     tt.innerText = window.__PRONOUNDB_EXTENSION_VERSION__
-      ? `You need to update the PronounDB extension to link a ${props.name} account.`
-      : `You need to install the PronounDB extension to link a ${props.name} account.`
+      ? `You need to update the PronounDB extension to link a ${platform.name} account.`
+      : `You need to install the PronounDB extension to link a ${platform.name} account.`
     document.body.appendChild(tt)
 
     setTimeout(() => (tt.style.opacity = '1'), 0)
@@ -93,21 +95,16 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
     }
   }, [ disabled, tooltipRef.current ])
 
-  if (props.soon && import.meta.env.PROD) {
-    return null
-  }
-
   if (disabled) {
     return (
       <div
         ref={divRef}
-        class='platform-box cursor-not-allowed opacity-60'
-        style={{ borderBottomColor: props.color }}
+        class={`platform-box cursor-not-allowed opacity-60 border-platform-${platformId}`}
         onMouseEnter={onMouseIn}
         onMouseLeave={onMouseOut}
       >
-        {h(PlatformIcons[props.id], { class: 'w-8 h-8 mr-4 flex-none' })}
-        <span class='font-semibold'>Connect with {props.name}</span>
+        {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none' })}
+        <span class='font-semibold'>Connect with {platform.name}</span>
       </div>
     )
   }
@@ -116,12 +113,11 @@ function LinkButton (props: Platform & { id: string, intent: OAuthIntent }) {
     <a
       // @ts-expect-error
       native
-      class='platform-box'
-      style={{ borderBottomColor: props.color }}
-      href={Endpoints.OAUTH(props.id, props.intent)}
+      class={`platform-box border-platform-${platformId}`}
+      href={Endpoints.OAUTH(platformId, intent)}
     >
-      {h(PlatformIcons[props.id], { class: 'w-8 h-8 mr-4 flex-none' })}
-      <span class='font-semibold'>Connect with {props.name}</span>
+      {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none' })}
+      <span class='font-semibold'>Connect with {platform.name}</span>
     </a>
   )
 }
@@ -147,7 +143,7 @@ export default function Auth (props: OAuthProps) {
 
       <div class='auth-grid'>
         {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((platform) =>
-          <LinkButton key={platform} id={platform} {...Platforms[platform]} intent={props.intent}/>)}
+          <LinkButton key={platform} platformId={platform} intent={props.intent}/>)}
       </div>
     </main>
   )

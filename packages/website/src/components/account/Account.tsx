@@ -100,7 +100,7 @@ export default function Account (_: Attributes) {
 
       <div class='grid gap-3 lg:grid-cols-2 mb-8'>
         {user.accounts.map((account) => (
-          <div class='platform-box' style={{ borderBottomColor: Platforms[account.platform].color }}>
+          <div class={`platform-box border-platform-${account.platform}`}>
             {h(PlatformIcons[account.platform], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
             <span class='font-semibold flex-none'>{account.name}</span>
             {user.accounts.length > 1 && <X class='ml-auto cursor-pointer w-5 h-5' onClick={() => unlinkExternal(account.platform, account.id)}/>}

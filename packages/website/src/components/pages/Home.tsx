@@ -64,7 +64,7 @@ function ExtensionDownload ({ browser, link, style, icon, stats }: ExtensionProp
             <Star class='w-3.5 h-3.5'/>
           </div>
 
-          <div class='flex gap-0.5 items-center -translate-y-full overflow-hidden' style={{ width: `${((stats.rating / 5) * 100) + 1}%` }}>
+          <div class={`flex gap-0.5 items-center -translate-y-full overflow-hidden rating-${stats.rating}`}>
             <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
             <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
             <StarFull class='flex-shrink-0 w-3.5 h-3.5'/>
