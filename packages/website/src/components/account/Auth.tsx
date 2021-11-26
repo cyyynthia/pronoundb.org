@@ -27,15 +27,16 @@
 
 import type { Attributes } from 'preact'
 import { h } from 'preact'
-import { useRef, useMemo, useCallback, useState, useEffect, useContext } from 'preact/hooks'
+import { useRef, useCallback, useState, useEffect, useContext } from 'preact/hooks'
 import { useMeta, useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
 import PlatformIcons from '@pronoundb/shared/icons.js'
 import { compareSemver } from '../../util'
 
-import { Routes, Endpoints } from '../../constants'
 import UserContext from '../UserContext'
+import AppContext from '../AppContext'
+import { Routes, Endpoints } from '../../constants'
 
 type OAuthIntent = 'login' | 'register' | 'link'
 
@@ -48,21 +49,23 @@ const IntentTitles = {
 }
 
 function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuthIntent }) {
+  const pdbExtVer = window.__PRONOUNDB_EXTENSION_VERSION__
   const platform = Platforms[platformId]
 
   const divRef = useRef<HTMLDivElement>(null)
   const tooltipRef = useRef<HTMLDivElement>()
-  const [ _, forceUpdate ] = useState(false)
+  const [ disabled, setDisabled ] = useState(platform.requiresExt)
 
-  const disabled = useMemo(() => {
-    if (typeof window !== 'undefined' && platform.requiresExt) {
-      if (!window.__PRONOUNDB_EXTENSION_VERSION__) setTimeout(() => forceUpdate(true), 200)
+  function check () {
+    setDisabled(Boolean(pdbExtVer && compareSemver(platform.since, pdbExtVer) !== 1))
+  }
 
-      if (!window.__PRONOUNDB_EXTENSION_VERSION__) return true
-      if (compareSemver(platform.since, window.__PRONOUNDB_EXTENSION_VERSION__) === 1) return true
+  useEffect(() => {
+    if (platform.requiresExt) {
+      if (pdbExtVer) check()
+      else setTimeout(check, 200)
     }
-    return false
-  }, [ platformId, _ ])
+  }, [ platformId ])
 
   const onMouseIn = useCallback(() => {
     const { x, y, width } = divRef.current!.getBoundingClientRect()
@@ -71,7 +74,7 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
     tt.style.left = `${x + (width / 2)}px`
     tt.style.top = `${y}px`
     tt.style.opacity = '0'
-    tt.innerText = window.__PRONOUNDB_EXTENSION_VERSION__
+    tt.innerText = pdbExtVer
       ? `You need to update the PronounDB extension to link a ${platform.name} account.`
       : `You need to install the PronounDB extension to link a ${platform.name} account.`
     document.body.appendChild(tt)
@@ -126,10 +129,13 @@ export default function Auth (props: OAuthProps) {
   useMeta({ name: 'robots', content: 'noindex,nofollow' })
 
   const user = useContext(UserContext)
+  const { ctx } = useContext(AppContext)
   const expectLoggedIn = props.intent === 'link'
 
   if (user !== void 0 && Boolean(user) !== expectLoggedIn) {
-    route(expectLoggedIn ? Routes.LOGIN : Routes.ME)
+    const redirectTo = expectLoggedIn ? Routes.LOGIN : Routes.ME
+    ctx.redirect = redirectTo
+    route(redirectTo)
     return null
   }
 

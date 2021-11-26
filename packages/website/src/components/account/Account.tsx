@@ -35,6 +35,7 @@ import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
 import PlatformIcons from '@pronoundb/shared/icons.js'
 
 import UserContext from '../UserContext'
+import AppContext from '../AppContext'
 import { Routes, Endpoints } from '../../constants'
 
 import UserPlus from 'feather-icons/dist/icons/user-plus.svg'
@@ -44,6 +45,7 @@ export default function Account (_: Attributes) {
   usePronouns()
   useTitle('My Account')
   const user = useContext(UserContext)
+  const { ctx } = useContext(AppContext)
   const [ , __ ] = useState(0)
   const update = __.bind(null, (i) => ++i)
 
@@ -67,6 +69,7 @@ export default function Account (_: Attributes) {
 
   if (user === void 0) return null
   if (!user) {
+    ctx.redirect = Routes.HOME
     route(Routes.HOME)
     return null
   }

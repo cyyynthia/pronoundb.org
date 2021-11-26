@@ -116,6 +116,13 @@ function handler (req: IncomingMessage, res: ServerResponse) {
   const data = { ctx: ctx, stats: stats }
   const body = render(h(AppContext.Provider, { value: data, children: h(App, { url: req.url ?? '/' }) }))
 
+  if (ctx.redirect) {
+    res.writeHead(302, 'Found')
+    res.setHeader('location', ctx.redirect)
+    res.write(`Redirecting to ${ctx.redirect}`, () => res.end())
+    return
+  }
+
   const script = `window.ServerData = ${JSON.stringify(data)}`
   const hash = createHash('sha256').update(script).digest('base64')
 

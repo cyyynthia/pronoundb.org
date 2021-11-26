@@ -27,13 +27,14 @@
 
 import type { Attributes, ComponentType } from 'preact'
 import { h } from 'preact'
+import { useContext } from 'preact/hooks'
 import { useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
 import PlatformIcons from '@pronoundb/shared/icons.js'
 
 import Twitch from './Twitch'
-
+import AppContext from '../AppContext'
 import { Routes } from '../../constants'
 
 import Globe from 'feather-icons/dist/icons/globe.svg'
@@ -77,9 +78,11 @@ export function SupportedPreview () {
 
 export default function Supported ({ platform }: SupportedProps) {
   useTitle(platform ? `${Platforms[platform].name} Integration` : 'Supported')
+  const { ctx } = useContext(AppContext)
 
   if (platform) {
     if (!(platform in Previews)) {
+      ctx.redirect = Routes.SUPPORTED
       route(Routes.SUPPORTED)
       return null
     }
