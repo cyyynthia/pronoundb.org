@@ -129,10 +129,21 @@ function handleMutation (nodes: MutationRecord[]) {
   for (const { addedNodes } of nodes) {
     for (const added of addedNodes) {
       if (added instanceof HTMLElement) {
-        if (added.getAttribute('property') === 'al:android:url' && added.getAttribute('content')?.startsWith('twitter://user?')) {
+        if (added.tagName === 'META' && added.getAttribute('property') === 'al:android:url' && added.getAttribute('content')?.startsWith('twitter://user?')) {
           const header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
           const prevPronouns = header.querySelector('[data-pronoundb]')
           if (prevPronouns) prevPronouns.remove()
+          injectProfileHeader(header)
+          continue
+        }
+
+        if (
+          added.tagName === 'LINK'
+          && added.getAttribute('rel') === 'canonical'
+          && document.head.querySelector('meta[property="al:android:url"]')?.getAttribute('content')?.startsWith('twitter://user?')
+        ) {
+          const header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
+          if (header.querySelector('[data-pronoundb]')) continue
           injectProfileHeader(header)
           continue
         }
@@ -156,6 +167,9 @@ function handleMutation (nodes: MutationRecord[]) {
 }
 
 export function inject () {
+  const header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')
+  if (header) injectProfileHeader(header)
+
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 }
