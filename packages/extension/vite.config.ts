@@ -96,14 +96,16 @@ export default defineConfig({
     preact(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
-      thirdParty: process.argv.includes('--ssr') ? void 0 : {
-        includePrivate: false,
-        allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
-        output: {
-          file: join(__dirname, baseLicensePath),
-          template: renderLicense,
+      thirdParty: process.argv.includes('--ssr')
+        ? void 0
+        : {
+          includePrivate: false,
+          allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
+          output: {
+            file: join(__dirname, baseLicensePath),
+            template: renderLicense,
+          },
         },
-      }
     }),
     finishLicense({ workingDirectory: __dirname }),
     finalizeBuild(),

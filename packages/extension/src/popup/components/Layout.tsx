@@ -59,7 +59,7 @@ const specialNotes = {
 
 export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) {
   return (
-    <header class='px-4 py-2 border-b border-gray-200 flex'>
+    <header class='px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex'>
       {view === ViewState.SETTINGS && (
         <button class='mr-4' onClick={onCloseSettings}>
           <ArrowLeft class='w-5'/>
@@ -80,10 +80,10 @@ export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
   const cute = useMemo(() => Math.floor(Math.random() * CUTE_COMMENTS.length), [])
 
   return (
-    <footer class='text-gray-600 text-sm'>
+    <footer class='text-gray-600 dark:text-gray-200 text-sm'>
       {selfPronouns
         ? (
-          <div class='py-2 px-4 border-t border-gray-200'>
+          <div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
             {selfPronouns in specialNotes
               ? <p>{specialNotes[selfPronouns as keyof typeof specialNotes]}</p>
               : <p>You're going by {formatPronouns(selfPronouns)}. {CUTE_COMMENTS[cute]}</p>}
@@ -91,7 +91,7 @@ export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
           </div>
         )
         : (
-          <div class='py-2 px-4 border-t border-gray-200'>
+          <div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
             <p>You're not logged in on pronoundb.org</p>
             <div class='flex gap-3'>
               <a class='link' href='https://pronoundb.org/login' target='_blank' rel='noreferrer'>Login</a>
@@ -100,7 +100,7 @@ export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
           </div>
         )}
 
-      <div class='py-2 px-4 flex border-t border-gray-200'>
+      <div class='py-2 px-4 flex border-t border-gray-200 dark:border-gray-700'>
         <p>v{browser.runtime.getManifest().version}</p>
         <div class='ml-auto flex gap-3'>
           <a class='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>

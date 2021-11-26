@@ -38,7 +38,6 @@
     max-width: 360px;
     max-height: 480px;
     overflow: hidden;
-    --context-color: #f49898;
   }
 
   main {
@@ -66,10 +65,10 @@
   }
 
   .checkbox input:checked + div {
-    @apply bg-contextful;
+    @apply bg-pink;
   }
 
   .checkbox input:checked + div::before {
-    @apply bg-contextful left-auto -right-0.5;
+    @apply bg-pink left-auto -right-0.5;
   }
 }

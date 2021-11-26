@@ -26,4 +26,3 @@
  */
 
 module.exports = require('@pronoundb/shared/tailwind.config.cjs')
-module.exports.theme.extend.colors.contextful = 'var(--context-color)'

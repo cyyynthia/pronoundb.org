@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "PronounDB",
   "description": "A browser extension that lets people know how to refer to each other on various places of the Internet",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "permissions": [ "activeTab", "storage", "https://pronoundb.org/api/v1/*" ],
   "browser_action": { "default_popup": "popup.html" },
   "background": { "page": "background.html" },

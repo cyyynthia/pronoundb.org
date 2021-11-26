@@ -49,9 +49,7 @@ function moveIndex (): Plugin {
 
 export default defineConfig({
   publicDir: process.argv.includes('--ssr') ? '_' : 'public',
-  optimizeDeps: {
-    include: [ '@pronoundb/shared/platforms.js' ]
-  },
+  optimizeDeps: { include: [ '@pronoundb/shared/platforms.js' ] },
   build: {
     assetsInlineLimit: 0,
     outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
@@ -62,19 +60,21 @@ export default defineConfig({
     preact(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
-      thirdParty: process.argv.includes('--ssr') ? void 0 : {
-        includePrivate: false,
-        allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
-        output: {
-          file: join(__dirname, baseLicensePath),
-          template: renderLicense,
+      thirdParty: process.argv.includes('--ssr')
+        ? void 0
+        : {
+          includePrivate: false,
+          allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
+          output: {
+            file: join(__dirname, baseLicensePath),
+            template: renderLicense,
+          },
         },
-      }
     }),
     finishLicense({ workingDirectory: __dirname }),
     {
       ...sriPlugin({ publicPath: '/', algorithms: [ 'sha256', 'sha512' ] }),
-      enforce: 'post'
+      enforce: 'post',
     },
     moveIndex(),
   ],
