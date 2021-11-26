@@ -60,14 +60,11 @@ async function fetchUser (): Promise<User> {
     })
 }
 
-
-function DevWrapper () {
-  const [ user, setUser ] = useState<User>(void 0)
+function AppWrapper () {
+  const [ user, setUser ] = useState<User>(document.cookie.includes('token=') ? void 0 : null)
   useEffect(() => {
     if (document.cookie.includes('token=')) {
       fetchUser().then(setUser)
-    } else {
-      setUser(null)
     }
   }, [])
 
@@ -75,13 +72,7 @@ function DevWrapper () {
 }
 
 if (import.meta.env.DEV) {
-  render(h(DevWrapper, null), document.querySelector('#app')!)
+  render(h(AppWrapper, null), document.querySelector('#app')!)
 } else {
-  (async function () {
-    const user = document.cookie.includes('token=')
-      ? await fetchUser()
-      : null
-
-    hydrate(h(App, { error: error, user: user }), document.querySelector('#app')!)
-  }())
+  hydrate(h(AppWrapper, null), document.querySelector('#app')!)
 }
