@@ -61,6 +61,7 @@ async function injectChat (element: HTMLElement) {
       h(
         'span',
         {
+          class: 'pronoundb-chat-badge',
           style: css({
             display: 'inline-block',
             borderRadius: 'var(--border-radius-medium)',
@@ -79,7 +80,14 @@ async function injectChat (element: HTMLElement) {
     )
   } else {
     element.parentElement?.appendChild(
-      h('span', { style: (element.getAttribute('style') || '') + css({ opacity: '0.7' }) }, ` (${formatPronounsShort(pronouns)})`)
+      h(
+        'span',
+        {
+          class: 'pronoundb-chat-inline',
+          style: (element.getAttribute('style') || '') + css({ opacity: '0.7' }),
+        },
+        ` (${formatPronounsShort(pronouns)})`
+      )
     )
   }
 
@@ -113,7 +121,10 @@ async function injectViewerCard (element: HTMLElement) {
   container.appendChild(
     h(
       'div',
-      { style: css({ display: 'flex', color: 'var(--color-text-overlay)' }) },
+      {
+        class: 'pronoundb-viewer-card',
+        style: css({ display: 'flex', color: 'var(--color-text-overlay)' }),
+      },
       whisper({ fill: 'var(--color-fill-current)' }),
       h(
         'p',
@@ -151,6 +162,7 @@ async function injectStreamerAbout () {
 
   el.appendChild(
     h('div', {
+      class: 'pronoundb-streamer-about',
       style: css({
         marginLeft: '0.5rem',
         marginRight: '0.5rem',
