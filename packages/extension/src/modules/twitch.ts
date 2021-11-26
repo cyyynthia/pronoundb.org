@@ -43,18 +43,29 @@ const settings = {
 
 const usersCache = Object.create(null)
 async function injectChat (element: HTMLElement) {
-  const username = element.dataset.aUser
-  if (!username) return
-  if (!(username in usersCache)) {
-    // eslint-disable-next-line require-atomic-updates
-    usersCache[username] = await fetchReactProp(element, [ 'return', 'key' ]).then((s) => s.split('-')[0])
+  const isFFZ = !element.dataset.aUser
+
+  let userId
+  if (isFFZ) {
+    userId = element.parentElement?.parentElement?.dataset.userId
+  } else {
+    const username = element.dataset.aUser
+    if (!username) return
+    if (!(username in usersCache)) {
+      // eslint-disable-next-line require-atomic-updates
+      usersCache[username] = await fetchReactProp(element, [ 'return', 'key' ]).then((s) => s.split('-')[0])
+    }
+
+    userId = usersCache[username]
   }
 
-  const pronouns = await fetchPronouns('twitch', usersCache[username])
+  const pronouns = await fetchPronouns('twitch', userId)
   if (pronouns === 'unspecified') return
 
   if (settings.chatStyle === 'badge') {
-    const badgesContainer = element.parentElement?.parentElement?.parentElement?.firstChild
+    const badgesContainer = isFFZ
+      ? element.parentElement?.parentElement?.querySelector('.chat-line__message--badges')
+      : element.parentElement?.parentElement?.parentElement?.firstChild
     if (!badgesContainer) return
 
     badgesContainer.insertBefore(
