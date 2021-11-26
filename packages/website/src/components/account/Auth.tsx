@@ -49,7 +49,7 @@ const IntentTitles = {
 }
 
 function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuthIntent }) {
-  const pdbExtVer = window.__PRONOUNDB_EXTENSION_VERSION__
+  const pdbExtVer = import.meta.env.SSR ? void 0 : window.__PRONOUNDB_EXTENSION_VERSION__
   const platform = Platforms[platformId]
 
   const divRef = useRef<HTMLDivElement>(null)
