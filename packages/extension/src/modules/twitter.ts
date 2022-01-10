@@ -43,6 +43,9 @@ async function injectProfileHeader (header: HTMLElement) {
   const pronouns = await fetchPronouns('twitter', id)
   if (pronouns === 'unspecified') return
 
+  const prevPronouns = header.querySelector('[data-pronoundb]')
+  if (prevPronouns) prevPronouns.remove()
+
   const template = header.children[header.children.length - 1]
   header.appendChild(
     h(
@@ -61,7 +64,6 @@ async function injectTweets (tweets: HTMLElement[]) {
   const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
   const quoteIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
   const ids = tweets.map((_, i) => retweetIds[i] || directIds[i] || quoteIds[i])
-  console.log(tweets, ids)
 
   const pronouns = await fetchPronounsBulk('twitter', Array.from(new Set(ids)))
   for (let i = 0; i < tweets.length; i++) {
@@ -100,8 +102,6 @@ async function injectTweets (tweets: HTMLElement[]) {
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
-  if (popout.querySelector('[data-pronoundb]')) return
-
   const template = popout.querySelector<HTMLElement>('div + div [dir=ltr]')
   if (!template) return
 
@@ -138,6 +138,9 @@ async function injectProfilePopOut (popout: HTMLElement) {
       formatPronouns(pronouns)
     )
   )
+
+  const prevPronouns = popout.querySelector('[data-pronoundb]')
+  if (prevPronouns) prevPronouns.remove()
   popout.insertBefore(element, popout.children[2])
 }
 
