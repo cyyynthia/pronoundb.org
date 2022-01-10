@@ -26,14 +26,14 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { User, ExternalAccount } from '@pronoundb/shared'
+import type { User, MongoUser, ExternalAccount } from '@pronoundb/shared'
 
 export type OAuthIntent = 'register' | 'login' | 'link'
 
 async function updateExternalAccount (this: FastifyInstance, account: User, user: ExternalAccount) {
   const savedAccount = account.accounts.find((a) => a.id === user.id && a.platform === user.platform)
   if (savedAccount && savedAccount.name !== user.name) {
-    await this.mongo.db!.collection<User>('accounts').updateOne(
+    await this.mongo.db!.collection<MongoUser>('accounts').updateOne(
       { _id: account._id },
       { $set: { 'accounts.$[account].name': user.name } },
       { arrayFilters: [ { 'account.platform': savedAccount.platform, 'account.id': savedAccount.id } ] }
@@ -42,7 +42,7 @@ async function updateExternalAccount (this: FastifyInstance, account: User, user
 }
 
 export async function finishUp (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply, intent: OAuthIntent, user: ExternalAccount) {
-  const collection = this.mongo.db!.collection<User>('accounts')
+  const collection = this.mongo.db!.collection<MongoUser>('accounts')
   const account = await collection.findOne({ 'accounts.id': user.id, 'accounts.platform': user.platform })
 
   let id = null

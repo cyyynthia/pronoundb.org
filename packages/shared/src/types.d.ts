@@ -42,6 +42,8 @@ declare module '@pronoundb/shared' {
     accounts: ExternalAccount[]
   }
 
+  export type MongoUser = Omit<User, '_id'>
+
   export type ExternalAccount = {
     id: string
     name: string

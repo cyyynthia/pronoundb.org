@@ -26,7 +26,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import type { User } from '@pronoundb/shared'
+import type { MongoUser } from '@pronoundb/shared'
 
 import { createHash } from 'crypto'
 import { LegacyPronouns } from '@pronoundb/shared/pronouns.js'
@@ -41,7 +41,7 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
   }
 
   const id = new this.mongo.ObjectId(params.id)
-  const user = await this.mongo.db!.collection<User>('accounts').findOne({ _id: id })
+  const user = await this.mongo.db!.collection<MongoUser>('accounts').findOne({ _id: id })
   const pronouns = user?.pronouns ?? 'unspecified'
   const etag = `W/"${createHash('sha256').update(config.secret).update('1').update(params.id).update(pronouns).digest('base64')}"`
   reply.header('cache-control', 'public, max-age=60')
