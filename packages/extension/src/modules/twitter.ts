@@ -72,9 +72,21 @@ async function injectTweets (tweets: HTMLElement[]) {
     const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
     if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
 
-    sep.parentElement!.appendChild(sep.cloneNode(true))
-    const classes = (sep.nextElementSibling as HTMLElement).classList
-    sep.parentElement!.appendChild(h('span', { class: classes, 'data-pronoundb': 'true' }, formatPronouns(pronouns[id])))
+    const next = <HTMLElement> sep.nextElementSibling
+    if (!next) return
+
+    const classes = next.classList
+    const after = <HTMLElement> next.nextElementSibling
+    const sepEl = sep.cloneNode(true)
+    const pronounsEl = h('span', { class: classes, 'data-pronoundb': 'true' }, formatPronouns(pronouns[id]))
+    if (after) {
+      sep.parentElement!.insertBefore(sepEl, after)
+      sep.parentElement!.insertBefore(pronounsEl, after)
+      return
+    }
+
+    sep.parentElement!.appendChild(sepEl)
+    sep.parentElement!.appendChild(pronounsEl)
   }
 }
 
