@@ -59,7 +59,9 @@ async function injectTweets (tweets: HTMLElement[]) {
   const parents = tweets.map((t) => t.parentElement!)
   const directIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
   const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
-  const ids = tweets.map((_, i) => retweetIds[i] || directIds[i])
+  const quoteIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
+  const ids = tweets.map((_, i) => retweetIds[i] || directIds[i] || quoteIds[i])
+  console.log(tweets, ids)
 
   const pronouns = await fetchPronounsBulk('twitter', Array.from(new Set(ids)))
   for (let i = 0; i < tweets.length; i++) {
@@ -68,24 +70,31 @@ async function injectTweets (tweets: HTMLElement[]) {
 
     if (!id || pronouns[id] === 'unspecified') continue
 
-    let sep = tweet.querySelector<HTMLElement>('div + div[aria-hidden="true"]')!
-    const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
-    if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
+    let separator: Node
+    let sep = tweet.querySelector<HTMLElement>('time')?.parentElement?.previousElementSibling!
+    if (tweet.dataset.testid === 'tweet') {
+      const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
+      if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
+      separator = sep.cloneNode(true)
+    } else {
+      separator = document.createDocumentFragment()
+      separator.appendChild(sep.previousElementSibling!.cloneNode(true))
+      separator.appendChild(sep.cloneNode(true))
+    }
 
     const next = <HTMLElement> sep.nextElementSibling
     if (!next) return
 
     const classes = next.classList
     const after = <HTMLElement> next.nextElementSibling
-    const sepEl = sep.cloneNode(true)
     const pronounsEl = h('span', { class: classes, 'data-pronoundb': 'true' }, formatPronouns(pronouns[id]))
     if (after) {
-      sep.parentElement!.insertBefore(sepEl, after)
+      sep.parentElement!.insertBefore(separator, after)
       sep.parentElement!.insertBefore(pronounsEl, after)
       return
     }
 
-    sep.parentElement!.appendChild(sepEl)
+    sep.parentElement!.appendChild(separator)
     sep.parentElement!.appendChild(pronounsEl)
   }
 }
@@ -165,6 +174,12 @@ function handleMutation (nodes: MutationRecord[]) {
           const prevPronouns = tweet.querySelector('[data-pronoundb]')
           if (prevPronouns) prevPronouns.remove()
           injectTweet(tweet)
+
+          const quoteTweet = tweet.querySelector('div[dir="auto"] + div[tabindex="0"]')
+          if (quoteTweet && quoteTweet.querySelector('time')) {
+            injectTweet(quoteTweet)
+          }
+
           continue
         }
 
