@@ -29,12 +29,9 @@ const colors = require('tailwindcss/colors')
 const { Platforms, PlatformIds } = require('./src/platforms.cjs')
 
 module.exports = {
-  mode: 'jit',
   darkMode: 'media',
-  purge: {
-    content: [ './**/*.html', './src/**/*.tsx' ],
-    safelist: PlatformIds.map((p) => `border-platform-${p}`)
-  },
+  content: [ './**/*.html', './src/**/*.tsx' ],
+  safelist: PlatformIds.map((p) => `border-platform-${p}`),
   theme: {
     fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
     container: {
@@ -54,7 +51,7 @@ module.exports = {
           dark: '#bb6570',
         },
         cyan: colors.cyan,
-        gray: colors.trueGray,
+        gray: colors.neutral,
         emerald: colors.emerald,
         'deep-blue': '#130e85',
         'red-orange': '#ff9483',

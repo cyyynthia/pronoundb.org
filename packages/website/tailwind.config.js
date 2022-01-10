@@ -26,9 +26,9 @@
  */
 
 module.exports = require('@pronoundb/shared/tailwind.config.cjs')
-const safelist = new Set(module.exports.purge.safelist)
+const safelist = new Set(module.exports.safelist)
 for (let i = 0; i <= 10; i++) safelist.add(`rating-${i / 2}`)
 safelist.add('btn-chrome')
 safelist.add('btn-firefox')
 safelist.add('btn-edge')
-module.exports.purge.safelist = Array.from(safelist)
+module.exports.safelist = Array.from(safelist)
