@@ -39,12 +39,12 @@ function yeetToken (token: string): void {
   fetch('https://graph.facebook.com/v9.0/me/permissions', { method: 'DELETE', headers: { authorization: `Bearer ${token}` } })
 }
 
-async function getSelf (token: string, state: string): Promise<ExternalAccount | null> {
+async function getSelf (token: string, state: string): Promise<ExternalAccount | string | null> {
   const headers = { authorization: `Bearer ${token}` }
   const encodedId = state.split(';;;')[1]
   if (!encodedId) {
     yeetToken(token)
-    return null
+    return 'ERR_NO_EXT_DATA'
   }
 
   const realId = Buffer.from(encodedId, 'base64').toString()

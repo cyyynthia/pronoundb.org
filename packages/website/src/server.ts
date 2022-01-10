@@ -81,7 +81,7 @@ function fetchStats () {
 function makeCsp (scriptHash: string) {
   const rules = {
     'default-src': [ '\'self\'' ], // I cannot set default-src to none because furryfox governs <use> exclusively by this. Sigh...
-    'img-src': [ '\'self\'', 'https://avatars.githubusercontent.com' ],
+    'img-src': [ '\'self\'', 'https://cdn.cynthia.dev' ],
     'script-src': [ '\'self\'', `'sha256-${scriptHash}'` ],
     'style-src': [ '\'self\'' ],
     'font-src': [ '\'self\'' ],

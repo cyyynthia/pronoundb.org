@@ -75,11 +75,12 @@ export const Errors = {
   ERR_LOGGED_IN: 'You are already logged in.',
   ERR_NOT_LOGGED_IN: 'You must be logged in to do this.',
   ERR_ALREADY_LINKED: 'This account has already been linked to another account.',
+  ERR_NO_EXT_DATA: 'Some data supposed to be provided by the extension is missing. Do you have the extension installed and up to date?',
 }
 
 export const Cynthia = {
   usernames: { twitch: 'cyyynthia_' },
-  avatar: 'https://avatars.githubusercontent.com/u/9999055?size=128',
+  avatar: 'https://cdn.cynthia.dev/avatars/avatar.128.webp',
   bio: 'Meow~! Peopwal dwon\'t take mewn seriouswy \'till nyi bite n scwatch ^w^ nyen pwoceed to purr nya~', // feel the catgirl energy
   get pronouns () {
     const random = useRandom('cynthia.pronouns', 500)

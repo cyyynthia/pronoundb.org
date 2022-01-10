@@ -49,7 +49,7 @@ const IntentTitles = {
 }
 
 function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuthIntent }) {
-  const pdbExtVer = import.meta.env.SSR ? void 0 : window.__PRONOUNDB_EXTENSION_VERSION__
+  const getPdbExtVer = () => import.meta.env.SSR ? void 0 : window.__PRONOUNDB_EXTENSION_VERSION__
   const platform = Platforms[platformId]
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -57,12 +57,13 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
   const [ disabled, setDisabled ] = useState(platform.requiresExt)
 
   function check () {
-    setDisabled(Boolean(pdbExtVer && compareSemver(platform.since, pdbExtVer) !== 1))
+    const ver = getPdbExtVer()
+    setDisabled(!ver || compareSemver(platform.since, ver) === 1)
   }
 
   useEffect(() => {
     if (platform.requiresExt) {
-      if (pdbExtVer) check()
+      if (getPdbExtVer()) check()
       else setTimeout(check, 200)
     }
   }, [ platformId ])
@@ -74,7 +75,7 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
     tt.style.left = `${x + (width / 2)}px`
     tt.style.top = `${y}px`
     tt.style.opacity = '0'
-    tt.innerText = pdbExtVer
+    tt.innerText = getPdbExtVer()
       ? `You need to update the PronounDB extension to link a ${platform.name} account.`
       : `You need to install the PronounDB extension to link a ${platform.name} account.`
     document.body.appendChild(tt)

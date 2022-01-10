@@ -33,6 +33,7 @@ declare global {
       ctx: Record<string, any>
       stats: RestStatsData
     }
-    __PRONOUNDB_EXTENSION_VERSION__: string
+
+    __PRONOUNDB_EXTENSION_VERSION__?: string
   }
 }

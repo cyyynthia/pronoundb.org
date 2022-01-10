@@ -56,7 +56,7 @@ export interface OAuth2Options {
   authorization: string
   token: string
   scopes: string[]
-  getSelf: (token: string, state: string) => Promise<ExternalAccount | null>
+  getSelf: (token: string, state: string) => Promise<ExternalAccount | string | null>
 
   // The extension sometimes use the nonce to carry additional data
   transformState?: (state: string) => string
@@ -181,8 +181,8 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
   }
 
   const user = await reply.context.config.getSelf(accessToken, request.query.state)
-  if (!user) {
-    reply.redirect('/?error=ERR_OAUTH_GENERIC')
+  if (!user || typeof user === 'string') {
+    reply.redirect(`/?error=${user || 'ERR_OAUTH_GENERIC'}`)
     return
   }
 
