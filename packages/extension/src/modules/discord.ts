@@ -38,6 +38,7 @@ const Styles = {
     fontFamily: 'var(--font-display)',
     fontSize: '12px',
     fontWeight: '700',
+    lineHeight: '16px',
     color: 'var(--header-secondary)',
     textTransform: 'uppercase',
     marginBottom: '8px',
@@ -162,8 +163,14 @@ function handleMutation (mutations: MutationRecord[]) {
           continue
         }
 
-        if (node.querySelector('[aria-modal="true"]') && node.querySelector('div[class^="userInfoSection-"]')) {
-          handleUserModal(node)
+        if (node.querySelector('div[class^="userInfoSection-"]')) {
+          if (node.querySelector('[aria-modal="true"]')) {
+            handleUserModal(node)
+            continue
+          }
+
+          const modal = node.parentElement?.parentElement?.parentElement?.parentElement
+          if (modal) handleUserModal(modal)
           continue
         }
 
