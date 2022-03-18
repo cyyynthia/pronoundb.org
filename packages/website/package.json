@@ -19,6 +19,7 @@
     "preact-router": "^4.0.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.17.3",
     "@preact/preset-vite": "^2.1.7",
     "@prefresh/vite": "^2.2.8",
     "@pronoundb/shared": "workspace:*",
@@ -26,6 +27,7 @@
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",
     "autoprefixer": "^10.4.4",
+    "babel-plugin-transform-hook-names": "^1.0.2",
     "eslint": "^8.11.0",
     "feather-icons": "^4.28.0",
     "postcss": "^8.4.12",

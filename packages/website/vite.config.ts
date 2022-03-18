@@ -54,9 +54,11 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
-    minify: process.argv.includes('--ssr') ? false : 'terser',
   },
-  server: { hmr: { port: 8080 } },
+  server: {
+    hmr: { port: 8080 },
+    fs: { allow: [ '..' ] },
+  },
   plugins: [
     preact(),
     magicalSvg({ target: 'preact' }),

@@ -97,6 +97,7 @@ importers:
 
   packages/website:
     specifiers:
+      '@babel/plugin-transform-react-jsx': ^7.17.3
       '@preact/preset-vite': ^2.1.7
       '@prefresh/vite': ^2.2.8
       '@pronoundb/shared': workspace:*
@@ -104,6 +105,7 @@ importers:
       '@typescript-eslint/eslint-plugin': ^5.15.0
       '@typescript-eslint/parser': ^5.15.0
       autoprefixer: ^10.4.4
+      babel-plugin-transform-hook-names: ^1.0.2
       eslint: ^8.11.0
       feather-icons: ^4.28.0
       hoofd: ^1.4.0
@@ -124,6 +126,7 @@ importers:
       preact-render-to-string: 5.1.20_preact@10.6.6
       preact-router: 4.0.1_preact@10.6.6
     devDependencies:
+      '@babel/plugin-transform-react-jsx': 7.17.3
       '@preact/preset-vite': 2.1.7_preact@10.6.6+vite@2.8.6
       '@prefresh/vite': 2.2.8_preact@10.6.6+vite@2.8.6
       '@pronoundb/shared': link:../shared
@@ -131,6 +134,7 @@ importers:
       '@typescript-eslint/eslint-plugin': 5.15.0_f2c49ce7d0e93ebcfdb4b7d25b131b28
       '@typescript-eslint/parser': 5.15.0_eslint@8.11.0+typescript@4.6.2
       autoprefixer: 10.4.4_postcss@8.4.12
+      babel-plugin-transform-hook-names: 1.0.2
       eslint: 8.11.0
       feather-icons: 4.28.0
       postcss: 8.4.12

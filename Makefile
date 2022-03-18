@@ -1,15 +1,11 @@
 
 .PHONY: dev
 dev:
-	docker-compose up -d
-
-.PHONY: dev-rebuild
-dev-rebuild:
-	docker-compose up --build -d
+	USER_ID="$$(id -u)" GROUP_ID="$$(id -g)" docker compose up -d
 
 .PHONY: down
 down:
-	docker-compose down
+	USER_ID="$$(id -u)" GROUP_ID="$$(id -g)" docker compose down
 
 .PHONY: lint
 lint:
