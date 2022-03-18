@@ -31,7 +31,7 @@
     font-family: 'Quicksand';
     font-style: normal;
     font-display: swap;
-    src: url(../fonts/quicksand-regular.ttf) format('truetype');
+    src: url(../fonts/quicksand-regular.woff2) format('woff2');
   }
 
   @font-face {
@@ -39,7 +39,7 @@
     font-style: normal;
     font-weight: 600;
     font-display: swap;
-    src: url(../fonts/quicksand-semibold.ttf) format('truetype');
+    src: url(../fonts/quicksand-semibold.woff2) format('woff2');
   }
 
   @font-face {
@@ -47,7 +47,7 @@
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url(../fonts/quicksand-bold.ttf) format('truetype');
+    src: url(../fonts/quicksand-bold.woff2) format('woff2');
   }
 }
 
