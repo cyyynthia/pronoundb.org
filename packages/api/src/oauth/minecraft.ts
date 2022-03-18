@@ -74,10 +74,7 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
     }),
   })
 
-  if (!xstsReq.ok) {
-    console.log('xsts error', xstsReq.status, await xstsReq.text())
-    return null
-  }
+  if (!xstsReq.ok) return null
   const xsts = await xstsReq.json() as any
 
   // Sign into Minecraft
@@ -93,10 +90,7 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
     }),
   })
 
-  if (!minecraftReq.ok) {
-    console.log('mc error', minecraftReq.status, await minecraftReq.text())
-    return null
-  }
+  if (!minecraftReq.ok) return null
   const minecraftToken = await minecraftReq.json() as any
 
   // User data wooo
@@ -115,7 +109,7 @@ export default async function (fastify: FastifyInstance) {
   register(fastify, {
     clientId: clientId,
     clientSecret: clientSecret,
-    platform: 'twitch',
+    platform: 'minecraft',
     authorization: 'https://login.live.com/oauth20_authorize.srf',
     token: 'https://login.live.com/oauth20_token.srf',
     scopes: [ 'XboxLive.signin' ],
