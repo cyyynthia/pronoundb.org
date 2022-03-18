@@ -29,7 +29,7 @@
 import type { Attributes } from 'preact'
 import { h, Fragment } from 'preact'
 
-import useHeart from '../../../useHeart'
+import useHeart from '../../../hooks/useHeart'
 import { Routes } from '../../../constants'
 
 export default function Changelog060 (_: Attributes) {

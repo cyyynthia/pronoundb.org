@@ -26,70 +26,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const Platforms = {
-  codeberg: {
-    name: 'Codeberg',
-    color: '#2185D0',
-    since: '0.0.0',
-    soon: true,
-  },
-  discord: {
-    name: 'Discord',
-    color: '#5865F2', // Degraded blurple, real blurple is 7289da.
-    since: '0.2.0',
-  },
-  facebook: {
-    name: 'Facebook',
-    color: '#4267B2',
-    since: '0.5.0',
-    requiresExt: true,
-  },
-  github: {
-    name: 'GitHub',
-    color: '#211F1F',
-    since: '0.2.0',
-  },
-  instagram: {
-    name: 'Instagram',
-    color: '#E4405F',
-    since: '0.0.0',
-    soon: true,
-  },
-  mastodon: {
-    name: 'Mastodon',
-    color: '#3088D4',
-    since: '0.0.0',
-    soon: true,
-  },
-  minecraft: {
-    name: 'Minecraft',
-    color: '#854F2B',
-    since: '0.0.0',
-  },
-  osu: {
-    name: 'osu!',
-    color: '#FF66AA',
-    since: '0.0.0',
-    soon: true,
-  },
-  reddit: {
-    name: 'Reddit',
-    color: '#FF4500',
-    since: '0.0.0',
-    soon: true,
-  },
-  twitch: {
-    name: 'Twitch',
-    color: '#9146FF',
-    since: '0.0.0',
-  },
-  twitter: {
-    name: 'Twitter',
-    color: '#1DA1F2',
-    since: '0.3.0',
-  },
+import { useContext, useMemo } from 'preact/hooks'
+import AppContext from '../components/AppContext'
+
+export default function useRandom (id: string, max: number) {
+  const ctxId = `random.${id}`
+
+  const { ctx } = useContext(AppContext)
+  return useMemo(() => {
+    if (!(ctxId in ctx)) ctx[ctxId] = Math.floor(Math.random() * max)
+    return ctx[ctxId]
+  }, [ id, max ])
 }
-
-const PlatformIds = Object.keys(Platforms).sort()
-
-module.exports = { Platforms: Platforms, PlatformIds: PlatformIds }

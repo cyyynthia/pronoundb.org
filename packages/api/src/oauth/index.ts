@@ -31,6 +31,7 @@ import type { FastifyInstance } from 'fastify'
 import discordModule from './discord.js'
 import facebookModule from './facebook.js'
 import githubModule from './github.js'
+import minecraftModule from './minecraft.js'
 import twitchModule from './twitch.js'
 import twitterModule from './twitter.js'
 
@@ -40,6 +41,7 @@ export default async function (fastify: FastifyInstance) {
   fastify.register(discordModule, { prefix: '/discord' })
   fastify.register(facebookModule, { prefix: '/facebook' })
   fastify.register(githubModule, { prefix: '/github' })
+  fastify.register(minecraftModule, { prefix: '/minecraft' })
   fastify.register(twitchModule, { prefix: '/twitch' })
   fastify.register(twitterModule, { prefix: '/twitter' })
 }

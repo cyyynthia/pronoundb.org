@@ -11,6 +11,7 @@
     "github": [ "client id", "client secret", "token" ],
     "twitch": [ "client id", "client secret" ],
     "twitter": [ "client id", "client secret" ],
-    "facebook": [ "client id", "client secret" ]
+    "facebook": [ "client id", "client secret" ],
+    "microsoft": [ "client id", "client secret" ]
   }
 }

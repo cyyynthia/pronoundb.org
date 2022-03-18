@@ -26,15 +26,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { useContext, useMemo } from 'preact/hooks'
-import AppContext from './components/AppContext'
+import type { Ref } from 'preact'
+import { useRef, useCallback, useEffect } from 'preact/hooks'
 
-export default function useRandom (id: string, max: number) {
-  const ctxId = `random.${id}`
+type Fn = () => void
 
-  const { ctx } = useContext(AppContext)
-  return useMemo(() => {
-    if (!(ctxId in ctx)) ctx[ctxId] = Math.floor(Math.random() * max)
-    return ctx[ctxId]
-  }, [ id, max ])
+export default function useTooltip (tooltipText: string): [ Ref<any>, Fn, Fn ] {
+  const divRef = useRef<HTMLElement>(null)
+  const tooltipRef = useRef<HTMLElement>()
+
+  const onMouseEnter = useCallback(() => {
+    const { x, y, width } = divRef.current!.getBoundingClientRect()
+    const tt = document.createElement('div')
+    tt.className = 'tooltip'
+    tt.style.left = `${x + (width / 2)}px`
+    tt.style.top = `${y}px`
+    tt.style.opacity = '0'
+    tt.innerText = tooltipText
+    document.body.appendChild(tt)
+
+    setTimeout(() => (tt.style.opacity = '1'), 0)
+    tooltipRef.current = tt
+  }, [ tooltipText ])
+
+  const onMouseLeave = useCallback(() => {
+    const tooltip = tooltipRef.current
+    if (!tooltip) return
+
+    tooltip.style.opacity = '0'
+    setTimeout(() => tooltip.remove(), 150)
+  }, [ tooltipRef ])
+
+  useEffect(() => () => tooltipRef.current?.remove(), [ tooltipRef ])
+
+  return [ divRef, onMouseEnter, onMouseLeave ]
 }

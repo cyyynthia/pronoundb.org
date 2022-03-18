@@ -29,7 +29,7 @@
 import { h } from 'preact'
 
 import { Routes } from '../constants'
-import useHeart from '../useHeart'
+import useHeart from '../hooks/useHeart'
 
 import Paw from '/assets/paw.svg'
 

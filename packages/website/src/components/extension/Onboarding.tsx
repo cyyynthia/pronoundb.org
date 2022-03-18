@@ -31,7 +31,7 @@ import { h, Fragment } from 'preact'
 import { useContext } from 'preact/hooks'
 import { useTitleTemplate } from 'hoofd/preact'
 
-import useHeart from '../../useHeart'
+import useHeart from '../../hooks/useHeart'
 import UserContext from '../UserContext'
 import { Routes } from '../../constants'
 

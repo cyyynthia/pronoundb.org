@@ -27,17 +27,20 @@
  */
 
 import type { Attributes } from 'preact'
-import { h } from 'preact'
-import { useRef, useCallback, useState, useEffect, useContext } from 'preact/hooks'
+import { h, Fragment } from 'preact'
+import { useState, useEffect, useContext } from 'preact/hooks'
 import { useMeta, useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
 import PlatformIcons from '@pronoundb/shared/icons.js'
+import useTooltip from '../../hooks/useTooltip'
 import { compareSemver } from '../../util'
 
 import UserContext from '../UserContext'
 import AppContext from '../AppContext'
 import { Routes, Endpoints } from '../../constants'
+
+import Info from 'feather-icons/dist/icons/info.svg'
 
 type OAuthIntent = 'login' | 'register' | 'link'
 
@@ -53,8 +56,12 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
   const getPdbExtVer = () => import.meta.env.SSR ? void 0 : window.__PRONOUNDB_EXTENSION_VERSION__
   const platform = Platforms[platformId]
 
-  const divRef = useRef<HTMLDivElement>(null)
-  const tooltipRef = useRef<HTMLDivElement>()
+  const extMessage = getPdbExtVer()
+    ? `You need to update the PronounDB extension to link a ${platform.name} account.`
+    : `You need to install the PronounDB extension to link a ${platform.name} account.`
+  const [ buttonRef, onMouseEnterButton, onMouseLeaveButton ] = useTooltip(extMessage)
+  const [ infoRef, onMouseEnterInfo, onMouseLeaveInfo ] = useTooltip(platform.info ?? '')
+
   const [ disabled, setDisabled ] = useState(platform.requiresExt)
 
   function check () {
@@ -69,46 +76,33 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
     }
   }, [ platformId ])
 
-  const onMouseIn = useCallback(() => {
-    const { x, y, width } = divRef.current!.getBoundingClientRect()
-    const tt = document.createElement('div')
-    tt.className = 'tooltip'
-    tt.style.left = `${x + (width / 2)}px`
-    tt.style.top = `${y}px`
-    tt.style.opacity = '0'
-    tt.innerText = getPdbExtVer()
-      ? `You need to update the PronounDB extension to link a ${platform.name} account.`
-      : `You need to install the PronounDB extension to link a ${platform.name} account.`
-    document.body.appendChild(tt)
-
-    setTimeout(() => (tt.style.opacity = '1'), 0)
-    tooltipRef.current = tt
-  }, [ disabled ])
-
-  const onMouseOut = useCallback(() => {
-    const tooltip = tooltipRef.current
-    if (!tooltip) return
-
-    tooltip.style.opacity = '0'
-    setTimeout(() => tooltip.remove(), 150)
-  }, [ tooltipRef ])
-
   useEffect(() => {
-    if (!disabled && tooltipRef.current) {
-      tooltipRef.current.remove()
-    }
-  }, [ disabled, tooltipRef.current ])
+    if (!disabled) onMouseLeaveButton()
+  }, [ disabled, onMouseLeaveButton ])
 
+  const contents = (
+    <Fragment>
+      {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none' })}
+      <span class='font-semibold flex-1'>Connect with {platform.name}</span>
+      {platform.info && (
+        <Info
+          ref={infoRef}
+          class='w-4 h-4 ml-4 flex-none'
+          onMouseEnter={onMouseEnterInfo}
+          onMouseLeave={onMouseLeaveInfo}
+        />
+      )}
+    </Fragment>
+  )
   if (disabled) {
     return (
       <div
-        ref={divRef}
+        ref={buttonRef}
         class={`platform-box cursor-not-allowed opacity-60 border-platform-${platformId}`}
-        onMouseEnter={onMouseIn}
-        onMouseLeave={onMouseOut}
+        onMouseEnter={onMouseEnterButton}
+        onMouseLeave={onMouseLeaveButton}
       >
-        {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none' })}
-        <span class='font-semibold'>Connect with {platform.name}</span>
+        {contents}
       </div>
     )
   }
@@ -120,8 +114,7 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
       class={`platform-box border-platform-${platformId}`}
       href={Endpoints.OAUTH(platformId, intent)}
     >
-      {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none' })}
-      <span class='font-semibold'>Connect with {platform.name}</span>
+      {contents}
     </a>
   )
 }
@@ -144,7 +137,7 @@ export default function Auth (props: OAuthProps) {
   return (
     <main class='container-main'>
       <div class='title-context'>Authentication</div>
-      <h2 class='text-2xl font-bold mb-6'>{IntentTitles[props.intent]}</h2>
+      <h2 class='text-2xl font-bold mb-4'>{IntentTitles[props.intent]}</h2>
       {props.intent === 'login' && <p class='mb-2'>Make sure to select an account you already linked on PronounDB.</p>}
       {props.intent === 'register' && <p class='mb-2'>Make sure to give the <a class='link' href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of it.</p>}
 

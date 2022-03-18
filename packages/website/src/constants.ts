@@ -27,7 +27,7 @@
  */
 
 import { Endpoints as SharedEndpoints, Extensions } from '@pronoundb/shared/constants.js'
-import useRandom from './useRandom'
+import useRandom from './hooks/useRandom'
 
 export const Routes = {
   HOME: '/',

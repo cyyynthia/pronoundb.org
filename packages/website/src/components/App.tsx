@@ -50,7 +50,7 @@ import NotFound from './pages/NotFound'
 
 import { Routes, Errors } from '../constants'
 
-// import logo from '../assets/powercord.png'
+// import logo from '../assets/logo.png'
 
 type AppProps = { user?: User, url?: string, error?: string | null }
 

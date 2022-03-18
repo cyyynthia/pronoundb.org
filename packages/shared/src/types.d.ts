@@ -35,6 +35,7 @@ declare module '@pronoundb/shared' {
     since: string
     requiresExt?: boolean
     soon?: boolean
+    info?: string
   }
 
   export type User = {
