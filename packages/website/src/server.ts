@@ -154,4 +154,4 @@ function handler (req: IncomingMessage, res: ServerResponse) {
 }
 
 fetchStats()
-createServer(handler).listen(config.webPort)
+createServer(handler).listen(config.webPort, '127.0.0.1')
