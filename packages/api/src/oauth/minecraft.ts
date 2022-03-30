@@ -94,12 +94,16 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
   const minecraftToken = await minecraftReq.json() as any
 
   // User data wooo
-  const data = await fetch('https://api.minecraftservices.com/minecraft/profile', {
+  const profileReq = await fetch('https://api.minecraftservices.com/minecraft/profile', {
     headers: {
       authorization: `Bearer ${minecraftToken.access_token}`,
       accept: 'application/json',
     },
-  }).then((r) => r.json() as any)
+  })
+
+  if (!profileReq.ok) return null
+  const data = await profileReq.json() as any
+  if (!data.id) return null
 
   const uuid = `${data.id.slice(0, 8)}-${data.id.slice(8, 12)}-${data.id.slice(12, 16)}-${data.id.slice(16, 20)}-${data.id.slice(20)}`
   return { id: uuid, name: data.name, platform: 'minecraft' }
@@ -112,7 +116,7 @@ export default async function (fastify: FastifyInstance) {
     platform: 'minecraft',
     authorization: 'https://login.live.com/oauth20_authorize.srf',
     token: 'https://login.live.com/oauth20_token.srf',
-    scopes: [ 'XboxLive.signin' ],
+    scopes: [ 'XboxLive.signin', 'offline_access' ],
     getSelf: getSelf,
   })
 }
