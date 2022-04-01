@@ -77,6 +77,11 @@ export const Errors = {
   ERR_NOT_LOGGED_IN: 'You must be logged in to do this.',
   ERR_ALREADY_LINKED: 'This account has already been linked to another account.',
   ERR_NO_EXT_DATA: 'Some data supposed to be provided by the extension is missing. Do you have the extension installed and up to date?',
+
+  ERR_XLIVE_NO_ACCOUNT: 'There are no Xbox Live account associated to your Microsoft account.',
+  ERR_XLIVE_CHILD: 'Your Xbox Live account cannot be processed unless it is added to a Family by an adult.',
+  ERR_XLIVE_UNAVAILABLE: 'Xbox Live is unavailable in your country.',
+  ERR_XLIVE_NO_MC_LICENSE: 'You do not have a Minecraft account associated with this Xbox Live account.',
 }
 
 export const Cynthia = {

@@ -35,7 +35,7 @@ import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.microsoft
 
-async function getSelf (token: string): Promise<ExternalAccount | null> {
+async function getSelf (token: string): Promise<ExternalAccount | string | null> {
   // Sign into Xbox Live
   const xliveReq = await fetch('https://user.auth.xboxlive.com/user/authenticate', {
     method: 'POST',
@@ -74,7 +74,15 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
     }),
   })
 
-  if (!xstsReq.ok) return null
+  if (!xstsReq.ok) {
+    if (xstsReq.status === 401) {
+      const error = await xstsReq.json() as any
+      if (error.XErr === 2148916233) return 'ERR_XLIVE_NO_ACCOUNT'
+      if (error.XErr === 2148916235) return 'ERR_XLIVE_UNAVAILABLE'
+      if (error.XErr === 2148916238) return 'ERR_XLIVE_CHILD'
+    }
+    return null
+  }
   const xsts = await xstsReq.json() as any
 
   // Sign into Minecraft
@@ -84,10 +92,7 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
       'content-type': 'application/json',
       accept: 'application/json',
     },
-    body: JSON.stringify({
-      identityToken: `XBL3.0 x=${xsts.DisplayClaims.xui[0].uhs};${xsts.Token}`,
-      ensureLegacyEnabled: true,
-    }),
+    body: JSON.stringify({ identityToken: `XBL3.0 x=${xlive.DisplayClaims.xui[0].uhs};${xsts.Token}` }),
   })
 
   if (!minecraftReq.ok) return null
@@ -103,7 +108,7 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
 
   if (!profileReq.ok) return null
   const data = await profileReq.json() as any
-  if (!data.id) return null
+  if (!data.id) return 'ERR_XLIVE_NO_MC_LICENSE'
 
   const uuid = `${data.id.slice(0, 8)}-${data.id.slice(8, 12)}-${data.id.slice(12, 16)}-${data.id.slice(16, 20)}-${data.id.slice(20)}`
   return { id: uuid, name: data.name, platform: 'minecraft' }

@@ -65,6 +65,7 @@ const Platforms = {
     name: 'Minecraft',
     color: '#854F2B',
     since: '0.0.0',
+    info: 'Authentication via Xbox Live. Bedrock accounts are not supported.',
   },
   osu: {
     name: 'osu!',
