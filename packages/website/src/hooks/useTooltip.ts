@@ -47,7 +47,7 @@ export default function useTooltip (tooltipText: string): [ Ref<any>, Fn, Fn ] {
 
     setTimeout(() => (tt.style.opacity = '1'), 0)
     tooltipRef.current = tt
-  }, [ tooltipText ])
+  }, [ divRef, tooltipRef, tooltipText ])
 
   const onMouseLeave = useCallback(() => {
     const tooltip = tooltipRef.current
