@@ -61,8 +61,8 @@ async function injectProfileHeader (header: HTMLElement) {
 async function injectTweets (tweets: HTMLElement[]) {
   tweets = tweets.filter((t) => t.isConnected)
   const parents = tweets.map((t) => t.parentElement!)
-  const directIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
-  const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
+  const directIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
+  const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
   const quoteIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
   const ids = tweets.map((_, i) => retweetIds[i] || directIds[i] || quoteIds[i])
 
