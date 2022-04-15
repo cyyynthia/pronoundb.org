@@ -200,7 +200,6 @@ export function inject () {
 
   const style = document.createElement('style')
   style.textContent += '[class^="headerText-"] + .pronoundb-pronouns { margin-right: .6rem; }'
-  style.textContent += '[class^="userInfoSection-"] { display: grid; grid-template-columns: 3fr 1fr; grid-column-gap: 16px; }'
   style.textContent += '[class^="userInfoSection-"] [class^="userInfoSectionHeader-"] { grid-row: 1; }'
   style.textContent += '[class^="userInfoSection-"] [class^="note-"]:last-child { grid-column: 1 / 3; }'
   style.textContent += '[class^="userBio-"] { grid-row: 2; }'
