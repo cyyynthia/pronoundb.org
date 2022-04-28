@@ -61,8 +61,8 @@ async function injectProfileHeader (header: HTMLElement) {
 async function injectTweets (tweets: HTMLElement[]) {
   tweets = tweets.filter((t) => t.isConnected)
   const parents = tweets.map((t) => t.parentElement!)
-  const directIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
-  const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
+  const directIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
+  const retweetIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
   const quoteIds = await fetchReactPropBulk(parents, [ 'return', 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
   const ids = tweets.map((_, i) => retweetIds[i] || directIds[i] || quoteIds[i])
 
@@ -103,10 +103,11 @@ async function injectTweets (tweets: HTMLElement[]) {
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
-  const template = popout.querySelector<HTMLElement>('div + div [dir=ltr]')
-  if (!template) return
+  const userInfo = popout.querySelector('a + div')?.parentElement
+  const template = userInfo?.querySelector<HTMLElement>('a [dir=ltr]')
+  if (!template || !userInfo) return
 
-  const id = await fetchReactProp(popout, [ 'memoizedProps', 'children', '3', 'props', 'children', 'props', 'userId' ])
+  const id = await fetchReactProp(popout, [ 'memoizedProps', 'children', '2', 'props', 'children', 'props', 'userId' ])
   if (!id) return
 
   const pronouns = await fetchPronouns('twitter', id)
@@ -142,7 +143,7 @@ async function injectProfilePopOut (popout: HTMLElement) {
 
   const prevPronouns = popout.querySelector('[data-pronoundb]')
   if (prevPronouns) prevPronouns.remove()
-  popout.insertBefore(element, popout.children[2])
+  userInfo.appendChild(element)
 }
 
 const injectTweet = throttle(injectTweets)

@@ -8,9 +8,11 @@
   "scripts": {
     "dev": "vite build --watch --mode dev",
     "build": "vite build",
+    "test": "playwright test",
     "lint": "eslint --ext ts --ext tsx src"
   },
   "devDependencies": {
+    "@playwright/test": "^1.21.1",
     "@preact/preset-vite": "^2.1.7",
     "@prefresh/vite": "^2.2.8",
     "@pronoundb/shared": "workspace:*",
