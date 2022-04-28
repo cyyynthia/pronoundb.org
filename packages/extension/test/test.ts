@@ -40,7 +40,10 @@ export default test.extend({
   context: async ({}, use) => {
     const launchOptions = {
       headless: false,
-      args: [ `--disable-extensions-except=${join(__dirname, '..', 'dist')}` ],
+      args: [
+        '--headless=chrome', // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
+        `--disable-extensions-except=${join(__dirname, '..', 'dist')}`,
+      ],
     }
 
     const context = await chromium.launchPersistentContext('', launchOptions)

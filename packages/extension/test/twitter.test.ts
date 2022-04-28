@@ -27,10 +27,9 @@
  */
 
 import test from './test.js'
-import { setTimeout as wait } from 'timers/promises'
 import { expect } from '@playwright/test'
 
-test.describe('Twitter integration', () => {
+test.describe.parallel('Twitter integration', () => {
   test('Profile shows pronouns', async ({ page }) => {
     await page.goto('https://twitter.com/cyyynthia_')
     await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toBeVisible()
@@ -53,17 +52,23 @@ test.describe('Twitter integration', () => {
 
   test('Hovercard shows pronouns', async ({ page }) => {
     await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-    await page.locator('article a', { has: page.locator('img') }).hover()
-    await wait(1000)
+
+    // This is a hacky way of doing it due to .hover() not working as expected when in headless mode.
+    await page.locator('article a').nth(1).evaluate((el) => {
+      const div = el.parentElement!
+      const key = Object.keys(div).find((k) => k.startsWith('__reactFiber'))
+      div[key].return.return.memoizedProps.onHoverIn()
+    })
+
     await expect(page.locator('#layers >> text=Cynthia @cyyynthia_ >> text=it/its')).toBeVisible()
   })
 
-  test.describe('Implementation quirks', () => {
+  test.describe.parallel('Implementation quirks', () => {
     // Test is here because internally, a retweet is considered posted by the "retweeter" rather than OP.
     // Relevant issue describing this issue: https://github.com/cyyynthia/pronoundb.org/issues/55
     test('Retweets show pronouns of the poster', async ({ page }) => {
       await page.goto('https://twitter.com/cyyynthia_')
-      while (!await page.locator('[data-testid="tweet"]').count()) await wait(100)
+      while (!await page.locator('[data-testid="tweet"]').count()) await page.waitForTimeout(100)
 
       const locator = page.locator('[data-testid="socialContext"]:has-text("Retweeted")')
       while (!await locator.count()) await page.mouse.wheel(0, 100)
