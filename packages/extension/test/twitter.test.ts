@@ -29,54 +29,52 @@
 import test from './test.js'
 import { expect } from '@playwright/test'
 
-test.describe.parallel('Twitter integration', () => {
-  test('Profile shows pronouns', async ({ page }) => {
+test('Profile shows pronouns', async ({ page }) => {
+  await page.goto('https://twitter.com/cyyynthia_')
+  await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toBeVisible()
+})
+
+test('Tweet show pronouns (full view)', async ({ page }) => {
+  await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+  await expect(page.locator('article >> text=TweetDeck >> xpath=../.. >> text=it/its')).toBeVisible()
+})
+
+test('Tweet show pronouns (inline view)', async ({ page }) => {
+  await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+  await expect(page.locator('article:has-text("Meow!!!") >> time >> xpath=../.. >> text=it/its')).toBeVisible()
+})
+
+test('Quoted tweet show pronouns', async ({ page }) => {
+  await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+  await expect(page.locator('text=Out of Context Cats@OocCats · >> text=they/them')).toBeVisible()
+})
+
+test('Hovercard shows pronouns', async ({ page }) => {
+  await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+
+  // This is a hacky way of doing it due to .hover() not working as expected when in headless mode.
+  await page.locator('article a').nth(1).evaluate((el) => {
+    const div = el.parentElement!
+    const key = Object.keys(div).find((k) => k.startsWith('__reactFiber'))
+    div[key].return.return.memoizedProps.onHoverIn()
+  })
+
+  await expect(page.locator('#layers >> text=Cynthia @cyyynthia_ >> text=it/its')).toBeVisible()
+})
+
+test.describe('Implementation quirks', () => {
+  // Test is here because internally, a retweet is considered posted by the "retweeter" rather than OP.
+  // Relevant issue: https://github.com/cyyynthia/pronoundb.org/issues/55
+  test('Retweets show pronouns of the poster (#55)', async ({ page }) => {
     await page.goto('https://twitter.com/cyyynthia_')
-    await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toBeVisible()
-  })
+    await page.locator('[data-testid="tweet"]').isVisible()
 
-  test('Tweet show pronouns (full view)', async ({ page }) => {
-    await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-    await expect(page.locator('article >> text=TweetDeck >> xpath=../.. >> text=it/its')).toBeVisible()
-  })
+    const locator = page.locator('[data-testid="socialContext"]:has-text("Retweeted")')
+    while (!await locator.count()) await page.mouse.wheel(0, 100)
 
-  test('Tweet show pronouns (inline view)', async ({ page }) => {
-    await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-    await expect(page.locator('article:has-text("Meow!!!") >> time >> xpath=../.. >> text=it/its')).toBeVisible()
-  })
+    const tweet = page.locator('[data-testid="tweet"]', { has: locator })
+    const el = tweet.locator('time >> xpath=../..').first()
 
-  test('Quoted tweet show pronouns', async ({ page }) => {
-    await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-    await expect(page.locator('text=Out of Context Cats@OocCats · >> text=they/them')).toBeVisible()
-  })
-
-  test('Hovercard shows pronouns', async ({ page }) => {
-    await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-
-    // This is a hacky way of doing it due to .hover() not working as expected when in headless mode.
-    await page.locator('article a').nth(1).evaluate((el) => {
-      const div = el.parentElement!
-      const key = Object.keys(div).find((k) => k.startsWith('__reactFiber'))
-      div[key].return.return.memoizedProps.onHoverIn()
-    })
-
-    await expect(page.locator('#layers >> text=Cynthia @cyyynthia_ >> text=it/its')).toBeVisible()
-  })
-
-  test.describe.parallel('Implementation quirks', () => {
-    // Test is here because internally, a retweet is considered posted by the "retweeter" rather than OP.
-    // Relevant issue: https://github.com/cyyynthia/pronoundb.org/issues/55
-    test('Retweets show pronouns of the poster (#55)', async ({ page }) => {
-      await page.goto('https://twitter.com/cyyynthia_')
-      await page.locator('[data-testid="tweet"]').isVisible()
-
-      const locator = page.locator('[data-testid="socialContext"]:has-text("Retweeted")')
-      while (!await locator.count()) await page.mouse.wheel(0, 100)
-
-      const tweet = page.locator('[data-testid="tweet"]', { has: locator })
-      const el = tweet.locator('time >> xpath=../..').first()
-
-      await expect(el.locator('text=they/them')).toBeVisible()
-    })
+    await expect(el.locator('text=they/them')).toBeVisible()
   })
 })

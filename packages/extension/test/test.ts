@@ -33,6 +33,7 @@ import { join } from 'path'
 
 const CYNTHIA_IDS = [
   'twitter::1300929324154060800',
+  'github::9999055',
 ]
 
 export default test.extend({
@@ -40,10 +41,12 @@ export default test.extend({
   context: async ({}, use) => {
     const launchOptions = {
       headless: false,
-      args: [
-        '--headless=chrome', // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
-        `--disable-extensions-except=${join(__dirname, '..', 'dist')}`,
-      ],
+      args: [ `--disable-extensions-except=${join(__dirname, '..', 'dist')}` ],
+    }
+
+    if (!process.argv.includes('--headed')) {
+      launchOptions.headless = true
+      launchOptions.args.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
     }
 
     const context = await chromium.launchPersistentContext('', launchOptions)

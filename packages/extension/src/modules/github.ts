@@ -29,7 +29,7 @@
 import { commentDiscussion } from '../icons/octicons'
 
 import { formatPronouns } from '@pronoundb/shared/format.js'
-import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
+import { fetchPronouns } from '../utils/fetch'
 import { css, h } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?github\.com/
@@ -66,8 +66,7 @@ async function injectUserProfile () {
       const interval = setInterval(() => {
         if (!document.querySelector('.vcard-details [itemprop="pronouns"]')) {
           clearInterval(interval)
-          const details = document.querySelector<HTMLElement>('.vcard-details')
-          details?.appendChild(el)
+          injectUserProfile()
         }
       }, 100)
     })
@@ -76,34 +75,29 @@ async function injectUserProfile () {
 
 async function injectProfileLists () {
   const items = Array.from(document.querySelectorAll('.user-profile-nav + div .d-table')) as HTMLElement[]
-  const ids = items.map((item) => {
-    const id = item.querySelector('img')!.src.match(/\/u\/(\d+)/)![1]
-    item.dataset.userId = id
-    return id
-  })
 
-  const pronouns = await fetchPronounsBulk('github', ids)
-  for (const item of items) {
-    if (pronouns[item.dataset.userId!] !== 'unspecified') {
-      const col = item.querySelector<HTMLElement>('.d-table-cell + .d-table-cell')!
-      let about = col.querySelector('.mb-0')
-      const margin = Boolean(about)
-      if (!about) {
-        about = h('p', { class: 'color-fg-muted text-small mb-0' })
-        col.appendChild(about)
-      }
+  items.forEach(async (item) => {
+    const pronouns = await fetchPronouns('github', item.querySelector('img')!.src.match(/\/u\/(\d+)/)![1])
+    if (pronouns === 'unspecified') return
 
-      about.appendChild(
-        h(
-          'span',
-          { class: margin ? 'ml-3' : '' },
-          commentDiscussion({ class: 'octicon' }),
-          '\n  ',
-          formatPronouns(pronouns[item.dataset.userId!])
-        )
-      )
+    const col = item.querySelector<HTMLElement>('.d-table-cell + .d-table-cell')!
+    let about = col.querySelector('.mb-0')
+    const margin = Boolean(about)
+    if (!about) {
+      about = h('p', { class: 'color-fg-muted text-small mb-0' })
+      col.appendChild(about)
     }
-  }
+
+    about.appendChild(
+      h(
+        'span',
+        { class: margin ? 'ml-3' : '' },
+        commentDiscussion({ class: 'octicon' }),
+        '\n  ',
+        formatPronouns(pronouns)
+      )
+    )
+  })
 }
 
 function injectHoverCards () {
@@ -159,7 +153,7 @@ function injectHoverCards () {
 }
 
 export function inject () {
-  if (document.querySelector('.user-profile-nav')) {
+  if (document.querySelector('.user-profile-bio')) {
     injectUserProfile()
 
     const tab = new URLSearchParams(location.search).get('tab')

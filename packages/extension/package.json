@@ -8,7 +8,9 @@
   "scripts": {
     "dev": "vite build --watch --mode dev",
     "build": "vite build",
+    "pack": "node pack/index.mjs",
     "test": "playwright test",
+    "test-headed": "playwright test --headed",
     "lint": "eslint --ext ts --ext tsx src"
   },
   "devDependencies": {
