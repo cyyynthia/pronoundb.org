@@ -26,6 +26,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * @deprecated
+ */
 export default function throttle (fn: Function, delay = 200, max = 20): Function {
   let timer: NodeJS.Timeout | null = null
   let buffer: Set<any> = new Set()

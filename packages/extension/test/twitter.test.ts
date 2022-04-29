@@ -65,10 +65,10 @@ test.describe.parallel('Twitter integration', () => {
 
   test.describe.parallel('Implementation quirks', () => {
     // Test is here because internally, a retweet is considered posted by the "retweeter" rather than OP.
-    // Relevant issue describing this issue: https://github.com/cyyynthia/pronoundb.org/issues/55
-    test('Retweets show pronouns of the poster', async ({ page }) => {
+    // Relevant issue: https://github.com/cyyynthia/pronoundb.org/issues/55
+    test('Retweets show pronouns of the poster (#55)', async ({ page }) => {
       await page.goto('https://twitter.com/cyyynthia_')
-      while (!await page.locator('[data-testid="tweet"]').count()) await page.waitForTimeout(100)
+      await page.locator('[data-testid="tweet"]').isVisible()
 
       const locator = page.locator('[data-testid="socialContext"]:has-text("Retweeted")')
       while (!await locator.count()) await page.mouse.wheel(0, 100)

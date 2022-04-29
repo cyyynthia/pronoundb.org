@@ -79,6 +79,19 @@ function finalizeBuild (): Plugin {
   }
 }
 
+function noInnerHtml (): Plugin {
+  let isDev = false
+  return {
+    name: 'no-inner-html',
+    configResolved: (cfg) => void (isDev = Boolean(cfg.build.watch)),
+    transform: (code) => {
+      if (!isDev && code.includes('dangerouslySetInnerHTML')) {
+        return code.replace(/;[^;]+innerHTML.*?}/, '}')
+      }
+    },
+  }
+}
+
 export default defineConfig({
   build: {
     assetsInlineLimit: 0,
@@ -95,6 +108,7 @@ export default defineConfig({
   },
   plugins: [
     preact(),
+    noInnerHtml(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
       thirdParty: process.argv.includes('--ssr')

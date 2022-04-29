@@ -30,19 +30,6 @@ import type { Deferred } from './deferred'
 import browser from 'webextension-polyfill'
 import { createDeferred } from './deferred'
 
-async function doFetchSingle (platform: string, id: string): Promise<string> {
-  const res = await browser.runtime.sendMessage({
-    kind: 'http',
-    target: 'lookup',
-    platform: platform,
-    id: id,
-  })
-
-  if (res.success) return res.data.pronouns ?? 'unspecified'
-  console.error(`[PronounDB::fetch] Failed to fetch: ${res.error.toString()}`)
-  return 'unspecified'
-}
-
 async function doFetchBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
   const res = await browser.runtime.sendMessage({
     kind: 'http',
@@ -52,20 +39,72 @@ async function doFetchBulk (platform: string, ids: string[]): Promise<Record<str
   })
 
   if (res.success) return res.data ?? {}
-  console.error(`[PronounDB::fetch] Failed to fetch: ${res.error.toString()}`)
+  console.error(`[PronounDB::fetch] Failed to fetch: ${res.error}`)
   return {}
+}
+
+async function doFetch (platform: string, queue: Map<string, Deferred<string>>) {
+  queue = new Map(queue) // clone the map
+  const res = await browser.runtime.sendMessage({
+    kind: 'http',
+    target: 'lookup',
+    platform: platform,
+    ids: Array.from(queue.keys()),
+  })
+
+  if (!res.success) {
+    console.error('[PronounDB::fetch] Failed to fetch: %o', res.error)
+    for (const v of queue.values()) v.resolve('unspecified')
+    return
+  }
+
+  for (const k in res.data) {
+    if (k in res.data) {
+      queue.get(k)?.resolve(res.data[k])
+    }
+  }
+}
+
+type State = { timer: NodeJS.Timer | null, queue: Map<string, Deferred<string>> }
+const state: Record<string, State> = {}
+async function queueFetch (platform: string, id: string): Promise<string> {
+  if (!state[platform]) state[platform] = { timer: null, queue: new Map() }
+  const deferred = createDeferred<string>()
+  if (!state[platform].timer) {
+    state[platform].timer = setTimeout(() => {
+      doFetch(platform, state[platform].queue)
+      state[platform].timer = null
+      state[platform].queue.clear()
+    }, 10)
+  }
+
+  state[platform].queue.set(id, deferred)
+  if (state[platform].queue.size === 50) {
+    clearTimeout(state[platform].timer!)
+    doFetch(platform, state[platform].queue)
+    state[platform].timer = null
+    state[platform].queue.clear()
+  }
+
+  return deferred.promise
 }
 
 const cache = Object.create(null)
 export function fetchPronouns (platform: string, id: string): Promise<string> {
   if (!cache[platform]) cache[platform] = {}
   if (!cache[platform][id]) {
-    cache[platform][id] = doFetchSingle(platform, id)
+    cache[platform][id] = queueFetch(platform, id)
   }
 
   return cache[platform][id]
 }
 
+// BULK
+
+/**
+ * Deprecated in favor of transparent bulking
+ * @deprecated
+ */
 export async function fetchPronounsBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
   if (ids.length === 1) {
     const pronouns = await fetchPronouns(platform, ids[0])
@@ -96,15 +135,4 @@ export async function fetchPronounsBulk (platform: string, ids: string[]): Promi
   }
 
   return res
-}
-
-// Dev utils
-export async function __fetchPronouns (platform: string, id: string): Promise<string> {
-  console.log(`fetchPronouns ${platform} ${id}`)
-  return 'ii'
-}
-
-export async function __fetchPronounsBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
-  console.log(`fetchPronounsBulk ${platform} ${ids}`)
-  return Object.fromEntries(ids.map((id) => [ id, 'ii' ]))
 }

@@ -90,6 +90,11 @@ function doExecuteReactProp (targets: Array<Element | null>, propPath: string[],
   return obj.map((o) => o[fn].apply(o, args))
 }
 
+/**
+ * Deprecated in favor of transparent bulking at request-level.
+ * New react fetch impl is light enough that the footprint can be ignored.
+ * @deprecated
+ */
 export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: string[]) {
   if (isFirefox) {
     return doFetchReactProp(nodes.map((node) => node.wrappedJSObject), propPath)
@@ -98,6 +103,11 @@ export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: string
   return bridgeReactStuff(nodes, propPath)
 }
 
+/**
+ * Deprecated in favor of transparent bulking at request-level.
+ * New react fetch impl is light enough that the footprint can be ignored.
+ * @deprecated
+ */
 export async function executeReactPropBulk (nodes: HTMLElement[], propPath: string[], ...args: any[]) {
   if (isFirefox) {
     // @ts-expect-error

@@ -44,13 +44,13 @@ browser.runtime.onInstalled.addListener((details) => {
 
 browser.runtime.onMessage.addListener((request) => {
   if (request.kind === 'http') {
-    const url = request.target === 'lookup'
-      ? Endpoints.LOOKUP(request.platform, request.id)
+    const url = request.ids.length === 1
+      ? Endpoints.LOOKUP(request.platform, request.ids[0])
       : Endpoints.LOOKUP_BULK(request.platform, request.ids)
 
     return fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${browser.runtime.getManifest().version}` } })
       .then((r) => r.json())
-      .then((d) => ({ success: true, data: d }))
+      .then((d) => ({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
       .catch((e) => ({ success: false, error: e }))
   }
 })
