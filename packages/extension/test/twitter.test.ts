@@ -56,7 +56,9 @@ test('Hovercard shows pronouns', async ({ page }) => {
   await page.locator('article a').nth(1).evaluate((el) => {
     const div = el.parentElement!
     const key = Object.keys(div).find((k) => k.startsWith('__reactFiber'))
-    div[key].return.return.memoizedProps.onHoverIn()
+    const reactInstance: any = (<any> div)[key!]
+
+    reactInstance.return.return.memoizedProps.onHoverIn()
   })
 
   await expect(page.locator('#layers >> text=Cynthia @cyyynthia_ >> text=it/its')).toBeVisible()

@@ -67,9 +67,9 @@ export default test.extend({
     ext.route('https://pronoundb.org/api/v1/lookup-bulk?*', async (route, req) => {
       const params = new URL(req.url()).searchParams
       const platform = params.get('platform')
-      const ids = params.get('ids').split(',')
+      const ids = params.get('ids')?.split(',') ?? []
 
-      const pronouns = {}
+      const pronouns: Record<string, string> = {}
       for (const id of ids) {
         pronouns[id] = CYNTHIA_IDS.includes(`${platform}::${id}`) ? 'ii' : 'tt'
       }

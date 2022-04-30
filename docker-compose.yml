@@ -34,6 +34,7 @@ services:
       - ./packages:/opt/pronoundb.org/packages
       - ./node_modules:/opt/pronoundb.org/node_modules
       - ./config.example.json:/opt/pronoundb.org/config.example.json
+      - ./pnpm-workspace.yaml:/opt/pronoundb.org/pnpm-workspace.yaml
       - ./tsconfig.json:/opt/pronoundb.org/tsconfig.json
 
 volumes:

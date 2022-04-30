@@ -30,9 +30,9 @@ import type { FastifyRequest, FastifyReply } from 'fastify'
 import type { MongoUser } from '@pronoundb/shared'
 
 import fastifyFactory from 'fastify'
-import fastifyAuth from 'fastify-auth'
-import fastifyMongo from 'fastify-mongodb'
-import fastifyCookie from 'fastify-cookie'
+import fastifyAuth from '@fastify/auth'
+import fastifyMongo from '@fastify/mongodb'
+import fastifyCookie from '@fastify/cookie'
 import fastifyTokenize from 'fastify-tokenize'
 
 import lookup from './lookup.js'

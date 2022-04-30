@@ -56,8 +56,7 @@ export default defineConfig({
     outDir: process.argv.includes('--ssr') ? 'server' : 'dist',
   },
   server: {
-    hmr: { port: 8080 },
-    fs: { allow: [ '..' ] },
+    hmr: { clientPort: 8080 },
   },
   plugins: [
     preact(),

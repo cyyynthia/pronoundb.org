@@ -31,10 +31,10 @@ import type { User, MongoUser, ExternalAccount } from '@pronoundb/shared'
 
 export type OAuthIntent = 'register' | 'login' | 'link'
 
-async function updateExternalAccount (this: FastifyInstance, account: User, user: ExternalAccount) {
+async function updateExternalAccount (fastify: FastifyInstance, account: User, user: ExternalAccount) {
   const savedAccount = account.accounts.find((a) => a.id === user.id && a.platform === user.platform)
   if (savedAccount && savedAccount.name !== user.name) {
-    await this.mongo.db!.collection<MongoUser>('accounts').updateOne(
+    await fastify.mongo.db!.collection<MongoUser>('accounts').updateOne(
       { _id: account._id },
       { $set: { 'accounts.$[account].name': user.name } },
       { arrayFilters: [ { 'account.platform': savedAccount.platform, 'account.id': savedAccount.id } ] }
@@ -48,15 +48,14 @@ export async function finishUp (this: FastifyInstance, request: FastifyRequest, 
 
   let id = null
   switch (intent) {
-    case 'register': {
+    case 'register':
       if (account) return reply.redirect('/?error=ERR_ALREADY_EXISTS')
-      const res = await collection.insertOne({ accounts: [ user ], pronouns: 'unspecified' })
-      id = res.insertedId.toString()
+      id = await collection.insertOne({ accounts: [ user ], pronouns: 'unspecified' })
+        .then((res) => res.insertedId.toString())
       break
-    }
     case 'login':
       if (!account) return reply.redirect('/?error=ERR_NOT_FOUND')
-      await updateExternalAccount.call(this, account, user)
+      await updateExternalAccount(this, account, user)
       id = account._id.toString()
       break
     case 'link':
@@ -64,7 +63,7 @@ export async function finishUp (this: FastifyInstance, request: FastifyRequest, 
       if (!('user' in request)) return reply.redirect('/?error=ERR_NOT_LOGGED_IN')
       if (account) {
         if (account._id.toString() !== (request as any).user._id.toString()) return reply.redirect('/me?error=ERR_ALREADY_LINKED')
-        await updateExternalAccount.call(this, account, user)
+        await updateExternalAccount(this, account, user)
       } else {
         await collection.updateOne({ _id: (request as any).user._id }, { $push: { accounts: user } })
       }

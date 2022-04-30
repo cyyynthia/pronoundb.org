@@ -36,13 +36,13 @@ import config from './config.js'
 const PRONOUNS_CACHE_DURATION = '60'
 
 function cors (request: FastifyRequest, reply: FastifyReply, allowCreds: boolean) {
+  reply.header('vary', 'origin')
   reply.header('access-control-allow-origin', '*')
   reply.header('access-control-allow-methods', 'GET')
   reply.header('access-control-allow-headers', 'x-pronoundb-source')
   reply.header('access-control-max-age', '600')
 
   if (allowCreds && request.headers.origin?.startsWith('moz-extension://')) {
-    reply.header('vary', 'origin')
     reply.header('access-control-allow-origin', request.headers.origin)
     reply.header('access-control-allow-credentials', 'true')
   }
