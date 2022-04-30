@@ -18,28 +18,17 @@ https://pronoundb.org/supported.
 ## Get the extension
  - [Chrome Web Store](https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf)
  - [Mozilla Add-ons](https://addons.mozilla.org/firefox/addon/pronoundb)
- (Android support coming soon, see [this issue](https://github.com/cyyynthia/pronoundb.org/issues/10))
+ (Android support coming soon, see [issue #10](https://github.com/cyyynthia/pronoundb.org/issues/10))
  - [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn)
-
-## Other resources
-These resources are non-official and are **not** endorsed by pronoundb.org. Please reach out to the respective owners
-for help or support regarding these.
-
-**Warning**: These Discord plugins are in direct violation of Discord's Terms of Service. Use them at your own risk.
- - [Powercord](https://powercord.dev) plugin: https://github.com/cyyynthia/pronoundb-powercord
- - [BetterDiscord](http://betterdiscord.app) plugin by [@Strencher](https://github.com/Strencher): https://betterdiscord.app/plugin/PronounDB
- - [Aliucord](https://github.com/Aliucord/Aliucord) plugin by [@Juby210](https://github.com/Juby210): https://github.com/Juby210/Aliucord-plugins#pronoundb
-
-### Dead/unmaintained
-These projects are either dead or unmaintained for the time being.
-
- - Discord bot by [@NurMarvin](https://github.com/NurMarvin): https://github.com/NurMarvin/pronoundb-bot ([Invite](https://nurmarv.in/invite-pronoundb-bot))
 
 ## Structure
  - The backend is built using [fastify](https://fastify.io)
  - The frontend and the extension are built using [preact](https://preactjs.com), [tailwindcss](https://tailwindcss.com), and [vite](https://vitejs.dev)
  - Data is stored using [mongodb](https://mongodb.com)
  - May contains stains of coffee and a few cookie crumbs :whistle:
+
+For more details about how it works internally, and for clues on how to get started with modifying the code, check
+[HACKING.md](HACKING.md)
 
 ## FAQ
 ### Neo-pronouns support

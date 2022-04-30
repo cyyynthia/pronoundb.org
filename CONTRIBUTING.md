@@ -21,6 +21,8 @@ Thanks for your interest in contributing! First, make sure to read the [Code of 
  for the attention, issues aren't the ideal place for it. Shoot me an email at cynthia@cynthia.dev instead! <3
 
 ## Pull Requests
+See [HACKING.md](HACKING.md) for a technical overview of the project.
+
 ### Do
  - Propose a new feature which is in scope with the project
  - Fix bugs within the codebase, which you found by yourself or by scrolling on the issue tracker
