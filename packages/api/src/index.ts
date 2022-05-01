@@ -88,13 +88,6 @@ fastify.register(async () => {
       labelNames: [ 'cache', 'method', 'count' ],
     })
   )
-  register.registerMetric(
-    new Histogram({
-      name: 'pronoundb_lookup_bulk_query_duration_seconds',
-      help: 'bulk lookup request duration in seconds',
-      labelNames: [ 'cache', 'count' ],
-    })
-  )
 
   fastify.addHook('onResponse', (request, reply) => {
     const cfg = <any> reply.context.config

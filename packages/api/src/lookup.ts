@@ -101,7 +101,7 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   }
 
   const counter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
-  const histogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_bulk_query_duration_seconds')
+  const histogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_query_duration_seconds')
 
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
