@@ -33,6 +33,7 @@ import fastifyFactory from 'fastify'
 import fastifyAuth from '@fastify/auth'
 import fastifyMongo from '@fastify/mongodb'
 import fastifyCookie from '@fastify/cookie'
+import fastifyMetrics from 'fastify-metrics'
 import fastifyTokenize from 'fastify-tokenize'
 
 import lookup from './lookup.js'
@@ -44,6 +45,73 @@ import shields from './shields.js'
 import config from './config.js'
 
 const fastify = fastifyFactory({ logger: { level: 'warn' } })
+
+fastify.register(fastifyMetrics, {
+  prefix: 'pronoundb_',
+  endpoint: '/metrics',
+  blacklist: [ '/metrics' ],
+  invalidRouteGroup: '*',
+})
+
+fastify.register(async () => {
+  const { register, Counter, Histogram } = fastify.metrics.client
+  const requestCounter = new Counter({
+    name: 'pronoundb_requests_total',
+    help: 'requests count',
+    labelNames: [ 'method', 'status_code', 'route' ],
+  })
+  const incomingBandwidthHistogram = new Histogram({
+    name: 'pronoundb_incoming_bytes',
+    help: 'incoming bandwidth in bytes',
+    labelNames: [ 'method', 'status_code', 'route' ],
+  })
+  const outgoingBandwidthHistogram = new Histogram({
+    name: 'pronoundb_outgoing_bytes',
+    help: 'outgoing bandwidth in bytes',
+    labelNames: [ 'method', 'status_code', 'route' ],
+  })
+
+  register.registerMetric(requestCounter)
+  register.registerMetric(incomingBandwidthHistogram)
+  register.registerMetric(outgoingBandwidthHistogram)
+  register.registerMetric(
+    new Counter({
+      name: 'pronoundb_lookup_requests_total',
+      help: 'lookup requests count',
+      labelNames: [ 'cache', 'platform', 'method', 'count' ],
+    })
+  )
+  register.registerMetric(
+    new Histogram({
+      name: 'pronoundb_lookup_query_duration_seconds',
+      help: 'single lookup request duration in seconds',
+      labelNames: [ 'cache', 'method', 'count' ],
+    })
+  )
+  register.registerMetric(
+    new Histogram({
+      name: 'pronoundb_lookup_bulk_query_duration_seconds',
+      help: 'bulk lookup request duration in seconds',
+      labelNames: [ 'cache', 'count' ],
+    })
+  )
+
+  fastify.addHook('onResponse', (request, reply) => {
+    const cfg = <any> reply.context.config
+    const url = cfg.url || '*'
+
+    if (url === '/metrics') return
+    const labels = {
+      method: request.method,
+      status_code: reply.statusCode,
+      route: url,
+    }
+
+    incomingBandwidthHistogram.observe(labels, request.raw.socket.bytesRead)
+    outgoingBandwidthHistogram.observe(labels, request.raw.socket.bytesWritten)
+    requestCounter.inc(labels)
+  })
+})
 
 fastify.register(fastifyAuth)
 fastify.register(fastifyCookie)

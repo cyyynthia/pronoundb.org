@@ -27,6 +27,7 @@
  */
 
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import type { Counter, Histogram } from 'prom-client'
 import type { User, MongoUser } from '@pronoundb/shared'
 import { createHash } from 'crypto'
 import { Platforms } from '@pronoundb/shared/platforms.js'
@@ -55,6 +56,9 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
+  const counter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
+  const histogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_query_duration_seconds')
+
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
     reply.code(400).send({ error: 400, message: 'Unsupported platform' })
@@ -66,6 +70,8 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
+  const histEnd = histogram.startTimer()
+
   const account = await this.mongo.db!.collection<MongoUser>('accounts').findOne(
     { accounts: { $elemMatch: { platform: query.platform, id: query.id } } },
     { projection: { _id: 0, pronouns: 1 } }
@@ -75,10 +81,15 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
   const etag = `W/"${createHash('sha256').update(config.secret).update(query.platform).update(query.id).update(pronouns).digest('base64')}"`
   reply.header('cache-control', `public, max-age=${PRONOUNS_CACHE_DURATION}`)
   if (request.headers['if-none-match'] === etag) {
+    // note: cache does not mean HTTP cache but upcoming Redis caching.
+    histEnd({ cache: 'miss', method: 'single', count: 1 })
+    counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: 1 })
     reply.code(304).send()
     return
   }
 
+  histEnd({ cache: 'miss', method: 'single', count: 1 })
+  counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: 1 })
   reply.header('etag', etag).send({ pronouns: pronouns })
 }
 
@@ -88,6 +99,9 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     reply.code(204)
     return
   }
+
+  const counter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
+  const histogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_bulk_query_duration_seconds')
 
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
@@ -99,6 +113,8 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     reply.code(400).send({ error: 400, message: 'Invalid ID' })
     return
   }
+
+  const histEnd = histogram.startTimer()
 
   const ids = query.ids.split(',').slice(0, 50).sort()
   const accounts = await this.mongo.db!.collection<MongoUser>('accounts').aggregate([
@@ -119,10 +135,15 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
   const etag = `W/"${hash.digest('base64')}"`
   reply.header('cache-control', `public, max-age=${PRONOUNS_CACHE_DURATION}`)
   if (request.headers['if-none-match'] === etag) {
+    // note: cache does not mean HTTP cache but upcoming Redis caching.
+    histEnd({ cache: 'miss', method: 'bulk', count: ids.length })
+    counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: ids.length })
     reply.code(304).send()
     return
   }
 
+  histEnd({ cache: 'miss', method: 'bulk', count: ids.length })
+  counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: ids.length })
   reply.header('etag', etag).send(res)
 }
 

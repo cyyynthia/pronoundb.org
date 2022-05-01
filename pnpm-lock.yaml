@@ -13,9 +13,11 @@ importers:
       '@typescript-eslint/parser': ^5.21.0
       eslint: ^8.14.0
       fastify: ^3.29.0
+      fastify-metrics: ^8.0.0
       fastify-tokenize: ^1.4.0
       mongodb: ^4.5.0
       node-fetch: ^3.2.4
+      prom-client: ^14.0.1
       tsc-watch: ^5.0.3
       typescript: ^4.6.4
     dependencies:
@@ -24,8 +26,10 @@ importers:
       '@fastify/mongodb': 5.0.0
       '@pronoundb/shared': link:../shared
       fastify: 3.29.0
+      fastify-metrics: 8.0.0
       fastify-tokenize: 1.4.0_32c763bad41e38595accc22520739061
       node-fetch: 3.2.4
+      prom-client: 14.0.1
     devDependencies:
       '@types/node': 17.0.30
       '@typescript-eslint/eslint-plugin': 5.21.0_ade6595cb7be1524e723c025c098ae5d
@@ -1469,6 +1473,10 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /bintrees/1.0.1:
+    resolution: {integrity: sha1-DmVcm5wkNeqraL9AJyJtK1WjRSQ=}
+    dev: false
+
   /bl/4.1.0:
     resolution: {integrity: sha512-1W07cM9gS6DcLperZfFSj+bWLtaPGSOHWhPiGzXmvVJbRLdG82sH/Kn8EtW1VqWVA54AKf2h5k5BbnIbwF3h6w==}
     dependencies:
@@ -2311,6 +2319,13 @@ packages:
 
   /fast-safe-stringify/2.1.1:
     resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==}
+    dev: false
+
+  /fastify-metrics/8.0.0:
+    resolution: {integrity: sha512-k0J1cm7gYyidzJMg5g9eIMaq7Bx2nj0yNXtMjnVsIuyctrrONzDBabWOgTG489bXE9a2fZ9xKkaHR0zti1SddA==}
+    dependencies:
+      fastify-plugin: 3.0.1
+      prom-client: 14.0.1
     dev: false
 
   /fastify-plugin/3.0.1:
@@ -3273,6 +3288,13 @@ packages:
     engines: {node: '>=0.4.0'}
     dev: true
 
+  /prom-client/14.0.1:
+    resolution: {integrity: sha512-HxTArb6fkOntQHoRGvv4qd/BkorjliiuO2uSWC2KC17MUTKYttWdDoXX/vxOhQdkoECEM9BBH0pj2l8G8kev6w==}
+    engines: {node: '>=10'}
+    dependencies:
+      tdigest: 0.1.1
+    dev: false
+
   /proper-lockfile/4.1.2:
     resolution: {integrity: sha512-TjNPblN4BwAWMXU8s9AEz4JmQxnD1NNL7bNOY/AKUzyamc379FWASUhc/K1pL2noVb+XmZKLL68cjzLsiOAMaA==}
     dependencies:
@@ -3757,6 +3779,12 @@ packages:
       inherits: 2.0.4
       readable-stream: 3.6.0
     dev: true
+
+  /tdigest/0.1.1:
+    resolution: {integrity: sha1-Ljyyw56kSeVdHmzZEReszKRYgCE=}
+    dependencies:
+      bintrees: 1.0.1
+    dev: false
 
   /text-table/0.2.0:
     resolution: {integrity: sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=}
