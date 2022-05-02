@@ -29,10 +29,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { MongoUser } from '@pronoundb/shared'
 
-import { createHash } from 'crypto'
 import { LegacyPronouns } from '@pronoundb/shared/pronouns.js'
-
-import config from './config.js'
 
 async function generateShield (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   const params = request.params as Record<string, string>
@@ -44,14 +41,7 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
   const id = new this.mongo.ObjectId(params.id)
   const user = await this.mongo.db!.collection<MongoUser>('accounts').findOne({ _id: id })
   const pronouns = user?.pronouns ?? 'unspecified'
-  const etag = `W/"${createHash('sha256').update(config.secret).update('1').update(params.id).update(pronouns).digest('base64')}"`
-  reply.header('cache-control', 'public, max-age=60')
-  if (request.headers['if-none-match'] === etag) {
-    reply.code(304).send()
-    return
-  }
-
-  reply.header('etag', etag).send({
+  reply.send({
     schemaVersion: 1,
     label: 'pronouns',
     message: (Array.isArray(LegacyPronouns[pronouns]) ? LegacyPronouns[pronouns][0] : LegacyPronouns[pronouns]) ?? 'unspecified',

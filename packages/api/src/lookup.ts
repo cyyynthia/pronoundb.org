@@ -29,12 +29,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import type { Counter, Histogram } from 'prom-client'
 import type { User, MongoUser } from '@pronoundb/shared'
-import { createHash } from 'crypto'
 import { Platforms } from '@pronoundb/shared/platforms.js'
-
-import config from './config.js'
-
-const PRONOUNS_CACHE_DURATION = '60'
 
 function cors (request: FastifyRequest, reply: FastifyReply, allowCreds: boolean) {
   reply.header('vary', 'origin')
@@ -78,19 +73,9 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
   )
 
   const pronouns = account?.pronouns ?? 'unspecified'
-  const etag = `W/"${createHash('sha256').update(config.secret).update(query.platform).update(query.id).update(pronouns).digest('base64')}"`
-  reply.header('cache-control', `public, max-age=${PRONOUNS_CACHE_DURATION}`)
-  if (request.headers['if-none-match'] === etag) {
-    // note: cache does not mean HTTP cache but upcoming Redis caching.
-    histEnd({ cache: 'miss', method: 'single', count: 1 })
-    counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: 1 })
-    reply.code(304).send()
-    return
-  }
-
   histEnd({ cache: 'miss', method: 'single', count: 1 })
   counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: 1 })
-  reply.header('etag', etag).send({ pronouns: pronouns })
+  reply.send({ pronouns: pronouns })
 }
 
 async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
@@ -116,35 +101,23 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
 
   const histEnd = histogram.startTimer()
 
-  const ids = query.ids.split(',').slice(0, 50).sort()
+  const ids = query.ids.split(',').slice(0, 50)
   const accounts = await this.mongo.db!.collection<MongoUser>('accounts').aggregate([
     { $match: { accounts: { $elemMatch: { platform: query.platform, id: { $in: ids } } } } },
     { $addFields: { ids: '$accounts.id' } },
     { $project: { _id: 0, ids: 1, pronouns: 1 } },
   ]).toArray()
 
-  const hash = createHash('sha256').update(config.secret).update(query.platform)
   const res: Record<string, string> = {}
   for (const id of ids) {
     const acc = accounts.find((a) => a.ids.includes(id))
     const pronouns = acc?.pronouns ?? 'unspecified'
-    hash.update(id).update(pronouns)
     res[id] = pronouns
-  }
-
-  const etag = `W/"${hash.digest('base64')}"`
-  reply.header('cache-control', `public, max-age=${PRONOUNS_CACHE_DURATION}`)
-  if (request.headers['if-none-match'] === etag) {
-    // note: cache does not mean HTTP cache but upcoming Redis caching.
-    histEnd({ cache: 'miss', method: 'bulk', count: ids.length })
-    counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: ids.length })
-    reply.code(304).send()
-    return
   }
 
   histEnd({ cache: 'miss', method: 'bulk', count: ids.length })
   counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: ids.length })
-  reply.header('etag', etag).send(res)
+  reply.send(res)
 }
 
 async function lookupMe (this: FastifyInstance, request: FastifyRequest<{ TokenizeUser: User }>, reply: FastifyReply) {
