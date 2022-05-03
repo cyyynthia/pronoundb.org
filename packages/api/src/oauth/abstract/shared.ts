@@ -50,8 +50,7 @@ export async function finishUp (this: FastifyInstance, request: FastifyRequest, 
   switch (intent) {
     case 'register':
       if (account) return reply.redirect('/?error=ERR_ALREADY_EXISTS')
-      id = await collection.insertOne({ accounts: [ user ], pronouns: 'unspecified' })
-        .then((res) => res.insertedId.toString())
+      id = await collection.insertOne({ accounts: [ user ], pronouns: 'unspecified' }).then((res) => res.insertedId.toString())
       break
     case 'login':
       if (!account) return reply.redirect('/?error=ERR_NOT_FOUND')

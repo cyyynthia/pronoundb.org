@@ -20,7 +20,7 @@
     "fastify": "^3.29.0",
     "fastify-metrics": "^8.0.0",
     "fastify-tokenize": "^1.4.0",
-    "node-fetch": "^3.2.4"
+    "undici": "^5.1.1"
   },
   "devDependencies": {
     "@types/node": "^17.0.30",

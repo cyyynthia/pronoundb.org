@@ -28,31 +28,45 @@
 
 import type { FastifyInstance } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
-import register, { securedFetch } from './abstract/oauth10a.js'
+import oauth10a, { SecuredClient } from './abstract/oauth10a.js'
+import { httpClientOptions } from '../util.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.twitter
 
-async function getSelf (token: string, secret: string): Promise<ExternalAccount> {
-  const data = await securedFetch('https://api.twitter.com/1.1/account/verify_credentials.json', 'GET', null, {
-    clientId: clientId,
-    clientSecret: clientSecret,
-    tokenSecret: secret,
-    token: token,
-  }).then((r) => r.response.json() as any)
+const apiClient = new SecuredClient('https://api.twitter.com:443', httpClientOptions)
+
+async function getSelf (token: string, secret: string): Promise<ExternalAccount | null> {
+  const { response } = await apiClient.securedRequest({
+    method: 'GET',
+    path: '/1.1/account/verify_credentials.json',
+    token: {
+      clientId: clientId,
+      clientSecret: clientSecret,
+      tokenSecret: secret,
+      token: token,
+    },
+  })
+
+  if (response.statusCode !== 200) return null
+  const data = await response.body.json()
 
   return { id: data.id_str, name: `${data.name} (@${data.screen_name})`, platform: 'twitter' }
 }
 
 export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId: clientId,
-    clientSecret: clientSecret,
-    platform: 'twitter',
-    request: 'https://api.twitter.com/oauth/request_token',
-    authorization: 'https://api.twitter.com/oauth/authorize',
-    token: 'https://api.twitter.com/oauth/access_token',
-    scopes: [],
-    getSelf: getSelf,
+  fastify.register(oauth10a, {
+    data: {
+      platform: 'twitter',
+      clientId: clientId,
+      clientSecret: clientSecret,
+      authorizationEndpoint: 'https://api.twitter.com/oauth/authorize',
+      scopes: [],
+
+      httpClient: apiClient,
+      requestPath: '/oauth/request_token',
+      tokenPath: '/oauth/access_token',
+      getSelf: getSelf,
+    },
   })
 }

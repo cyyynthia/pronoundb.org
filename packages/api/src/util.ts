@@ -26,15 +26,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { Client } from 'undici'
 import type { FastifyReply } from 'fastify'
 import type { ParsedUrlQueryInput } from 'querystring'
 import { encode as qsEncode } from 'querystring'
 
+// Types
 export type ConfiguredReply<TReply extends FastifyReply, TConfig> =
   TReply extends FastifyReply<infer TServer, infer TRequest, infer TRawReply, infer TGeneric>
     ? FastifyReply<TServer, TRequest, TRawReply, TGeneric, TConfig>
     : never
 
+// Constants
+export const httpClientOptions: Client.Options = { keepAliveTimeout: 30e3, keepAliveMaxTimeout: 300e3 }
+
+// Functions
 export function rfcUriEncode (data: string | ParsedUrlQueryInput) {
   return (typeof data === 'string' ? encodeURIComponent(data) : qsEncode(data))
     .replace(/!/g, '%21')

@@ -29,31 +29,44 @@
 import type { FastifyInstance } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
 
-import fetch from 'node-fetch'
-import register from './abstract/oauth2.js'
+import { Client } from 'undici'
+import oauth2 from './abstract/oauth2.js'
+import { httpClientOptions } from '../util.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.github
 
-async function getSelf (token: string): Promise<ExternalAccount> {
-  const data = await fetch('https://api.github.com/user', {
+const githubClient = new Client('https://github.com:443', httpClientOptions)
+const apiClient = new Client('https://api.github.com:443', httpClientOptions)
+
+async function getSelf (token: string): Promise<ExternalAccount | null> {
+  const request = await apiClient.request({
+    method: 'GET',
+    path: '/user',
     headers: {
       accept: 'application/vnd.github.v3+json',
       authorization: `token ${token}`,
     },
-  }).then((r) => r.json() as any)
+  })
+
+  if (request.statusCode !== 200) return null
+  const data = await request.body.json()
 
   return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
 }
 
 export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId: clientId,
-    clientSecret: clientSecret,
-    platform: 'github',
-    authorization: 'https://github.com/login/oauth/authorize',
-    token: 'https://github.com/login/oauth/access_token',
-    scopes: [],
-    getSelf: getSelf,
+  fastify.register(oauth2, {
+    data: {
+      platform: 'github',
+      clientId: clientId,
+      clientSecret: clientSecret,
+      authorizationEndpoint: 'https://github.com/login/oauth/authorize',
+      scopes: [],
+
+      httpClient: githubClient,
+      tokenPath: '/login/oauth/access_token',
+      getSelf: getSelf,
+    },
   })
 }

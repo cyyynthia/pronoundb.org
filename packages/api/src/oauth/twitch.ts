@@ -29,31 +29,44 @@
 import type { FastifyInstance } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
 
-import fetch from 'node-fetch'
-import register from './abstract/oauth2.js'
+import { Client } from 'undici'
+import oauth2 from './abstract/oauth2.js'
+import { httpClientOptions } from '../util.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.twitch
 
-async function getSelf (token: string): Promise<ExternalAccount> {
-  const data = await fetch('https://api.twitch.tv/helix/users', {
+const apiClient = new Client('https://api.twitch.tv:443', httpClientOptions)
+const idClient = new Client('https://id.twitch.tv:443', httpClientOptions)
+
+async function getSelf (token: string): Promise<ExternalAccount | null> {
+  const request = await apiClient.request({
+    method: 'GET',
+    path: '/helix/users',
     headers: {
       authorization: `Bearer ${token}`,
       'client-id': clientId,
     },
-  }).then((r) => r.json() as any)
+  })
+
+  if (request.statusCode !== 200) return null
+  const data = await request.body.json()
 
   return { id: data.data[0].id, name: data.data[0].display_name, platform: 'twitch' }
 }
 
 export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId: clientId,
-    clientSecret: clientSecret,
-    platform: 'twitch',
-    authorization: 'https://id.twitch.tv/oauth2/authorize',
-    token: 'https://id.twitch.tv/oauth2/token',
-    scopes: [],
-    getSelf: getSelf,
+  fastify.register(oauth2, {
+    data: {
+      platform: 'twitch',
+      clientId: clientId,
+      clientSecret: clientSecret,
+      authorizationEndpoint: 'https://id.twitch.tv/oauth2/authorize',
+      scopes: [],
+
+      httpClient: idClient,
+      tokenPath: '/oauth2/token',
+      getSelf: getSelf,
+    },
   })
 }

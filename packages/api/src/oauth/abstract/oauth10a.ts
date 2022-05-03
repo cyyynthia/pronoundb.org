@@ -26,13 +26,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { Dispatcher } from 'undici'
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
 import type { OAuthIntent } from './shared.js'
 import type { ConfiguredReply } from '../../util.js'
 import { randomBytes, createHmac } from 'crypto'
 import { encode, decode } from 'querystring'
-import fetch from 'node-fetch'
+import { Client } from 'undici'
 import { finishUp } from './shared.js'
 import { rfcUriEncode } from '../../util.js'
 import config from '../../config.js'
@@ -55,14 +56,16 @@ export interface OAuth10aOptions {
   platform: string
   clientId: string
   clientSecret: string
-  request: string
-  authorization: string
-  token: string
+  authorizationEndpoint: string
   scopes: string[]
-  getSelf: (token: string, secret: string) => Promise<ExternalAccount>
+
+  httpClient: SecuredClient
+  requestPath: string
+  tokenPath: string
+  getSelf: (token: string, state: string) => Promise<ExternalAccount | string | null>
 }
 
-interface OAuthToken {
+type OAuthToken = {
   clientId: string
   clientSecret: string
   token?: string
@@ -71,7 +74,7 @@ interface OAuthToken {
 
 type Authorization = { nonce: string, secret: string }
 
-interface ProviderResponse {
+type ProviderResponse = {
   oauth_token: string
   oauth_token_secret: string
   oauth_callback_confirmed?: boolean
@@ -99,48 +102,55 @@ const callbackSchema: FastifySchema = {
   },
 }
 
-function authorizeRequest (method: string, url: string, body: Record<string, any>, token: OAuthToken) {
-  const tokenSecret = token.tokenSecret ? rfcUriEncode(token.tokenSecret) : ''
-  const secret = rfcUriEncode(token.clientSecret)
+export type SecuredRequestOptions = Omit<Dispatcher.RequestOptions, 'body'> & { body?: Record<string, any> | null, token: OAuthToken }
+export type SecuredResponse = { nonce: string, response: Dispatcher.ResponseData }
+export class SecuredClient extends Client {
+  #base: string
 
-  const nonce = randomBytes(16).toString('hex')
-  const params: Record<string, any> = {
-    ...body,
-    oauth_timestamp: String(Math.floor(Date.now() / 1000)),
-    oauth_nonce: nonce,
-    oauth_version: '1.0A',
-    oauth_signature_method: 'HMAC-SHA1',
-    oauth_consumer_key: token.clientId,
+  constructor (url: string | URL, options?: Client.Options) {
+    super(url, options)
+    this.#base = new URL(url).origin
   }
 
-  if (token.token) params.oauth_token = token.token
+  async securedRequest (options: SecuredRequestOptions): Promise<SecuredResponse> {
+    const tokenSecret = options.token.tokenSecret ? rfcUriEncode(options.token.tokenSecret) : ''
+    const secret = rfcUriEncode(options.token.clientSecret)
 
-  const paramsPair = Object.entries(params).sort(
-    ([ ka, va ], [ kb, vb ]) =>
-      ka === kb
-        ? va > vb ? 1 : -1
-        : ka > kb ? 1 : -1
-  )
+    const nonce = randomBytes(16).toString('hex')
+    const params: Record<string, any> = {
+      ...options.body || {},
+      oauth_timestamp: String(Math.floor(Date.now() / 1000)),
+      oauth_nonce: nonce,
+      oauth_version: '1.0A',
+      oauth_signature_method: 'HMAC-SHA1',
+      oauth_consumer_key: options.token.clientId,
+    }
 
-  const paramsString = paramsPair.map(([ k, v ]) => `${rfcUriEncode(k)}=${rfcUriEncode(v)}`).join('&')
-  const sigBase = `${method.toUpperCase()}&${rfcUriEncode(url)}&${rfcUriEncode(paramsString)}`
-  paramsPair.push([ 'oauth_signature', createHmac('sha1', `${secret}&${tokenSecret}`).update(sigBase).digest('base64') ])
-  const authorization = paramsPair.filter(([ k ]) => k.startsWith('oauth_')).map(([ k, v ]) => `${k}="${rfcUriEncode(v)}"`).join(',')
-  return { nonce: nonce, authorization: authorization }
-}
+    if (options.token.token) params.oauth_token = options.token.token
 
-export async function securedFetch (url: string, method: string, body: Record<string, any> | null, token: OAuthToken) {
-  const { nonce, authorization } = authorizeRequest(method, url, body ?? {}, token)
-  return {
-    nonce: nonce,
-    response: await fetch(url, {
-      method: method,
+    const paramsPair = Object.entries(params).sort(
+      ([ ka, va ], [ kb, vb ]) =>
+        ka === kb
+          ? va > vb ? 1 : -1
+          : ka > kb ? 1 : -1
+    )
+
+    const paramsString = paramsPair.map(([ k, v ]) => `${rfcUriEncode(k)}=${rfcUriEncode(v)}`).join('&')
+    const sigBase = `${options.method.toUpperCase()}&${rfcUriEncode(this.#base + options.path)}&${rfcUriEncode(paramsString)}`
+    paramsPair.push([ 'oauth_signature', createHmac('sha1', `${secret}&${tokenSecret}`).update(sigBase).digest('base64') ])
+    const authorization = paramsPair.filter(([ k ]) => k.startsWith('oauth_')).map(([ k, v ]) => `${k}="${rfcUriEncode(v)}"`).join(',')
+
+    const response = await this.request({
+      ...options,
       headers: {
+        ...options.headers || {},
         authorization: `OAuth ${authorization}`,
         'content-type': 'application/x-www-form-urlencoded',
       },
-      body: body ? encode(body) : void 0,
-    }),
+      body: options.body ? encode(options.body) : void 0,
+    })
+
+    return { nonce: nonce, response: response }
   }
 }
 
@@ -160,28 +170,31 @@ export async function authorize (this: FastifyInstance, request: AuthorizeReques
   }
 
   const redirect = request.routerPath.replace('authorize', 'callback')
-  const body = { oauth_callback: `${config.host}${redirect}` }
-  const token = { clientId: reply.context.config.clientId, clientSecret: reply.context.config.clientSecret }
-  const requestToken = await securedFetch(reply.context.config.request, 'POST', body, token)
+  const { nonce, response } = await reply.context.config.httpClient.securedRequest({
+    method: 'POST',
+    path: reply.context.config.requestPath,
+    token: { clientId: reply.context.config.clientId, clientSecret: reply.context.config.clientSecret },
+    body: { oauth_callback: `${config.host}${redirect}` },
+  })
 
-  if (requestToken.response.status !== 200) {
+  if (response.statusCode !== 200) {
     reply.redirect('/?error=ERR_OAUTH_GENERIC')
     return
   }
 
-  const response = decode(await requestToken.response.text()) as unknown as ProviderResponse
-  if (!response.oauth_callback_confirmed) {
+  const requestToken = decode(await response.body.text()) as unknown as ProviderResponse
+  if (!requestToken.oauth_callback_confirmed) {
     reply.redirect('/?error=ERR_OAUTH_GENERIC')
     return
   }
 
-  const fullToken = `${reply.context.config.platform}-${response.oauth_token}`
-  pending.set(fullToken, { nonce: requestToken.nonce, secret: response.oauth_token_secret })
+  const fullToken = `${reply.context.config.platform}-${requestToken.oauth_token}`
+  pending.set(fullToken, { nonce: nonce, secret: requestToken.oauth_token_secret })
   setTimeout(() => pending.delete(fullToken), 300e3)
 
-  reply.setCookie('nonce', requestToken.nonce, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
+  reply.setCookie('nonce', nonce, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
     .setCookie('intent', intent, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
-    .redirect(`${reply.context.config.authorization}?oauth_token=${response.oauth_token}`)
+    .redirect(`${reply.context.config.authorizationEndpoint}?oauth_token=${requestToken.oauth_token}`)
 }
 
 export async function callback (this: FastifyInstance, request: CallbackRequest, reply: ConfiguredReply<FastifyReply, OAuth10aOptions>) {
@@ -205,31 +218,34 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
     return
   }
 
-  const body = { oauth_verifier: request.query.oauth_verifier }
-  const token = {
-    clientId: reply.context.config.clientId,
-    clientSecret: reply.context.config.clientSecret,
-    token: request.query.oauth_token,
-    tokenSecret: authorization.secret,
-  }
+  const { response } = await reply.context.config.httpClient.securedRequest({
+    method: 'POST',
+    path: reply.context.config.tokenPath,
+    token: {
+      clientId: reply.context.config.clientId,
+      clientSecret: reply.context.config.clientSecret,
+      token: request.query.oauth_token,
+      tokenSecret: authorization.secret,
+    },
+    body: { oauth_verifier: request.query.oauth_verifier },
+  })
 
-  const { response } = await securedFetch(reply.context.config.token, 'POST', body, token)
-  if (response.status !== 200) {
+  if (response.statusCode !== 200) {
     reply.redirect('/?error=ERR_OAUTH_GENERIC')
     return
   }
 
-  const tokens = decode(await response.text()) as unknown as ProviderResponse
+  const tokens = decode(await response.body.text()) as unknown as ProviderResponse
   const user = await reply.context.config.getSelf(tokens.oauth_token, tokens.oauth_token_secret)
-  if (!user) {
-    reply.redirect('/?error=ERR_OAUTH_GENERIC')
+  if (!user || typeof user === 'string') {
+    reply.redirect(`/?error=${user || 'ERR_OAUTH_GENERIC'}`)
     return
   }
 
   return finishUp.call(this, request, reply, intentCookie.value as OAuthIntent, user)
 }
 
-export default function (fastify: FastifyInstance, cfg: OAuth10aOptions) {
+export default async function (fastify: FastifyInstance, { data: cfg }: { data: OAuth10aOptions }) {
   fastify.get<AuthorizeRequestProps, OAuth10aOptions>('/authorize', { schema: authorizeSchema, config: cfg }, authorize)
   fastify.get<CallbackRequestProps, OAuth10aOptions>('/callback', { schema: callbackSchema, config: cfg }, callback)
 }

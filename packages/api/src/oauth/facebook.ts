@@ -29,15 +29,22 @@
 import type { FastifyInstance } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
 
-import fetch from 'node-fetch'
-import register from './abstract/oauth2.js'
+import { Client } from 'undici'
+import oauth2 from './abstract/oauth2.js'
+import { httpClientOptions } from '../util.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.facebook
 
+const graphClient = new Client('https://graph.facebook.com:443', httpClientOptions)
+
 function yeetToken (token: string): void {
   // Don't even bother awaiting the Promise
-  fetch('https://graph.facebook.com/v9.0/me/permissions', { method: 'DELETE', headers: { authorization: `Bearer ${token}` } })
+  graphClient.request({
+    method: 'DELETE',
+    path: '/v9.0/me/permissions',
+    headers: { authorization: `Bearer ${token}` },
+  })
 }
 
 async function getSelf (token: string, state: string): Promise<ExternalAccount | string | null> {
@@ -54,8 +61,20 @@ async function getSelf (token: string, state: string): Promise<ExternalAccount |
     return null
   }
 
-  const data = await fetch('https://graph.facebook.com/v9.0/me', { headers: headers }).then((r) => r.json() as any)
-  const check = await fetch(`https://graph.facebook.com/v9.0/?ids=${data.id},${realId}`, { headers: headers }).then((r) => r.json() as any)
+  const selfResponse = await graphClient.request({ method: 'GET', path: '/v9.0/me', headers: headers })
+  if (selfResponse.statusCode !== 200) {
+    yeetToken(token)
+    return null
+  }
+
+  const data = await selfResponse.body.json()
+  const checkResponse = await graphClient.request({ method: 'GET', path: `/v9.0/?ids=${data.id},${realId}`, headers: headers })
+  if (checkResponse.statusCode !== 200) {
+    yeetToken(token)
+    return null
+  }
+
+  const check = await checkResponse.body.json()
   if (Object.keys(check).length !== 1) {
     yeetToken(token)
     return null
@@ -66,14 +85,19 @@ async function getSelf (token: string, state: string): Promise<ExternalAccount |
 }
 
 export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId: clientId,
-    clientSecret: clientSecret,
-    platform: 'facebook',
-    authorization: 'https://www.facebook.com/v9.0/dialog/oauth',
-    token: 'https://graph.facebook.com/v9.0/oauth/access_token',
-    scopes: [],
-    getSelf: getSelf,
-    transformState: (state) => state.split(';;;')[0],
+  fastify.register(oauth2, {
+    data: {
+      platform: 'facebook',
+      clientId: clientId,
+      clientSecret: clientSecret,
+      authorizationEndpoint: 'https://www.facebook.com/v9.0/dialog/oauth',
+      scopes: [],
+
+      httpClient: graphClient,
+      tokenPath: '/v9.0/oauth/access_token',
+      getSelf: getSelf,
+
+      transformState: (state) => state.split(';;;')[0],
+    },
   })
 }

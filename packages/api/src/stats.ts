@@ -32,7 +32,7 @@ import type { Db } from 'mongodb'
 import type { RestExtensionStats, RestStatsData } from '@pronoundb/shared'
 import { Extensions } from '@pronoundb/shared/constants.js'
 import { createHash } from 'crypto'
-import fetch from 'node-fetch'
+import { fetch } from 'undici'
 
 import config from './config.js'
 

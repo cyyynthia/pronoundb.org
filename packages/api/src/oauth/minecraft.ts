@@ -29,21 +29,57 @@
 import type { FastifyInstance } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
 
-import fetch from 'node-fetch'
-import register from './abstract/oauth2.js'
+import { PassThrough } from 'stream'
+import { Client } from 'undici'
+import oauth2 from './abstract/oauth2.js'
+import { httpClientOptions } from '../util.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.microsoft
 
+const loginLiveClient = new Client('https://login.live.com:443', httpClientOptions)
+const userAuthXblClient = new Client('https://user.auth.xboxlive.com:443', httpClientOptions)
+const xstsAuthXblClient = new Client('https://xsts.auth.xboxlive.com:443', httpClientOptions)
+const minecraftClient = new Client('https://api.minecraftservices.com:443', httpClientOptions)
+
 async function getSelf (token: string): Promise<ExternalAccount | string | null> {
-  // Sign into Xbox Live
-  const xliveReq = await fetch('https://user.auth.xboxlive.com/user/authenticate', {
+  // We initiate all requests at the same time to handle authentication more efficiently
+  // Bodies are fed when available thanks to the FutureBody interface
+
+  const xliveBody = new PassThrough()
+  const xstsBody = new PassThrough()
+  const minecraftBody = new PassThrough()
+  const headers = { 'content-type': 'application/json', accept: 'application/json' }
+  const abortCtrl = new AbortController()
+
+  const xliveReq = userAuthXblClient.request({
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      accept: 'application/json',
-    },
-    body: JSON.stringify({
+    path: '/user/authenticate',
+    headers: headers,
+    body: xliveBody,
+  })
+
+  const xstsReq = xstsAuthXblClient.request({
+    method: 'POST',
+    path: '/xsts/authorize',
+    headers: headers,
+    body: xstsBody,
+    signal: abortCtrl.signal,
+  })
+
+  const minecraftReq = minecraftClient.request({
+    method: 'POST',
+    path: '/authentication/login_with_xbox',
+    headers: headers,
+    body: minecraftBody,
+    signal: abortCtrl.signal,
+  })
+
+  /// AUTHENTICATION PIPELINE BEGIN
+
+  // Begin Xbox Live Auth
+  xliveBody.end(
+    JSON.stringify({
       Properties: {
         AuthMethod: 'RPS',
         SiteName: 'user.auth.xboxlive.com',
@@ -51,63 +87,75 @@ async function getSelf (token: string): Promise<ExternalAccount | string | null>
       },
       RelyingParty: 'http://auth.xboxlive.com',
       TokenType: 'JWT',
-    }),
-  })
+    })
+  )
 
-  if (!xliveReq.ok) return null
-  const xlive = await xliveReq.json() as any
+  const xliveRes = await xliveReq
+  console.log(xliveRes)
+  if (xliveRes.statusCode !== 200) {
+    abortCtrl.abort()
+    xstsBody.destroy()
+    minecraftBody.destroy()
+    return null
+  }
 
-  // Get a security token
-  const xstsReq = await fetch('https://xsts.auth.xboxlive.com/xsts/authorize', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      accept: 'application/json',
-    },
-    body: JSON.stringify({
+  const xlive = await xliveRes.body.json()
+  // End Xbox Live Auth
+
+  // Begin Xbox XSTS Auth
+  xstsBody.end(
+    JSON.stringify({
       Properties: {
         SandboxId: 'RETAIL',
         UserTokens: [ xlive.Token ],
       },
       RelyingParty: 'rp://api.minecraftservices.com/',
       TokenType: 'JWT',
-    }),
-  })
+    })
+  )
 
-  if (!xstsReq.ok) {
-    if (xstsReq.status === 401) {
-      const error = await xstsReq.json() as any
+  const xstsRes = await xstsReq
+  console.log(xstsRes)
+  if (xstsRes.statusCode !== 200) {
+    abortCtrl.abort()
+    minecraftBody.destroy()
+
+    if (xstsRes.statusCode === 401) {
+      const error = await xstsRes.body.json()
       if (error.XErr === 2148916233) return 'ERR_XLIVE_NO_ACCOUNT'
       if (error.XErr === 2148916235) return 'ERR_XLIVE_UNAVAILABLE'
       if (error.XErr === 2148916238) return 'ERR_XLIVE_CHILD'
     }
+
     return null
   }
-  const xsts = await xstsReq.json() as any
 
-  // Sign into Minecraft
-  const minecraftReq = await fetch('https://api.minecraftservices.com/authentication/login_with_xbox', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      accept: 'application/json',
-    },
-    body: JSON.stringify({ identityToken: `XBL3.0 x=${xlive.DisplayClaims.xui[0].uhs};${xsts.Token}` }),
-  })
+  const xsts = await xstsRes.body.json()
+  // End Xbox XSTS Auth
 
-  if (!minecraftReq.ok) return null
-  const minecraftToken = await minecraftReq.json() as any
+  // Begin Minecraft Auth
+  minecraftBody.end(JSON.stringify({ identityToken: `XBL3.0 x=${xlive.DisplayClaims.xui[0].uhs};${xsts.Token}` }))
+  const minecraftRes = await minecraftReq
+  console.log(minecraftRes)
+  if (minecraftRes.statusCode !== 200) return null
+
+  const minecraftToken = await minecraftRes.body.json()
+  // End Minecraft Auth
+
+  /// AUTHENTICATION PIPELINE END
 
   // User data wooo
-  const profileReq = await fetch('https://api.minecraftservices.com/minecraft/profile', {
+  const profileRes = await minecraftClient.request({
+    method: 'GET',
+    path: '/minecraft/profile',
     headers: {
       authorization: `Bearer ${minecraftToken.access_token}`,
       accept: 'application/json',
     },
   })
 
-  if (!profileReq.ok) return null
-  const data = await profileReq.json() as any
+  if (profileRes.statusCode !== 200) return null
+  const data = await profileRes.body.json()
   if (!data.id) return 'ERR_XLIVE_NO_MC_LICENSE'
 
   const uuid = `${data.id.slice(0, 8)}-${data.id.slice(8, 12)}-${data.id.slice(12, 16)}-${data.id.slice(16, 20)}-${data.id.slice(20)}`
@@ -115,13 +163,17 @@ async function getSelf (token: string): Promise<ExternalAccount | string | null>
 }
 
 export default async function (fastify: FastifyInstance) {
-  register(fastify, {
-    clientId: clientId,
-    clientSecret: clientSecret,
-    platform: 'minecraft',
-    authorization: 'https://login.live.com/oauth20_authorize.srf',
-    token: 'https://login.live.com/oauth20_token.srf',
-    scopes: [ 'XboxLive.signin', 'offline_access' ],
-    getSelf: getSelf,
+  fastify.register(oauth2, {
+    data: {
+      platform: 'minecraft',
+      clientId: clientId,
+      clientSecret: clientSecret,
+      authorizationEndpoint: 'https://login.live.com/oauth20_authorize.srf',
+      scopes: [ 'XboxLive.signin' ],
+
+      httpClient: loginLiveClient,
+      tokenPath: '/oauth20_token.srf',
+      getSelf: getSelf,
+    },
   })
 }
