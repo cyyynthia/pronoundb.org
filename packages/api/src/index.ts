@@ -44,7 +44,11 @@ import shields from './shields.js'
 
 import config from './config.js'
 
-const fastify = fastifyFactory({ logger: { level: 'warn' } })
+const fastify = fastifyFactory({
+  keepAliveTimeout: 60,
+  trustProxy: true,
+  logger: { level: 'warn' },
+})
 
 fastify.register(fastifyMetrics, {
   prefix: 'pronoundb_',
@@ -78,14 +82,21 @@ fastify.register(async () => {
     new Counter({
       name: 'pronoundb_lookup_requests_total',
       help: 'lookup requests count',
-      labelNames: [ 'cache', 'platform', 'method', 'count' ],
+      labelNames: [ 'platform', 'method' ],
+    })
+  )
+  register.registerMetric(
+    new Counter({
+      name: 'pronoundb_lookup_ids_total',
+      help: 'looked up ids count',
+      labelNames: [ 'platform', 'method' ],
     })
   )
   register.registerMetric(
     new Histogram({
-      name: 'pronoundb_lookup_query_duration_seconds',
-      help: 'single lookup request duration in seconds',
-      labelNames: [ 'cache', 'method', 'count' ],
+      name: 'pronoundb_lookup_bulk_ids_count',
+      help: 'amount of ids looked up per bulk request',
+      labelNames: [ 'platform' ],
     })
   )
 
@@ -100,9 +111,9 @@ fastify.register(async () => {
       route: url,
     }
 
+    requestCounter.inc(labels)
     incomingBandwidthHistogram.observe(labels, request.raw.socket.bytesRead)
     outgoingBandwidthHistogram.observe(labels, request.raw.socket.bytesWritten)
-    requestCounter.inc(labels)
   })
 })
 

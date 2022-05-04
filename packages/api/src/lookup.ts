@@ -51,9 +51,6 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
-  const counter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
-  const histogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_query_duration_seconds')
-
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
     reply.code(400).send({ error: 400, message: 'Unsupported platform' })
@@ -65,17 +62,21 @@ async function lookup (this: FastifyInstance, request: FastifyRequest, reply: Fa
     return
   }
 
-  const histEnd = histogram.startTimer()
-
   const account = await this.mongo.db!.collection<MongoUser>('accounts').findOne(
     { accounts: { $elemMatch: { platform: query.platform, id: query.id } } },
     { projection: { _id: 0, pronouns: 1 } }
   )
 
   const pronouns = account?.pronouns ?? 'unspecified'
-  histEnd({ cache: 'miss', method: 'single', count: 1 })
-  counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: 1 })
   reply.send({ pronouns: pronouns })
+
+  // Metrics
+  const metricsLabels = { platform: query.platform, method: 'single' }
+  const requestsCounter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
+  const idsCounter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_ids_total')
+
+  requestsCounter.inc(metricsLabels)
+  idsCounter.inc(metricsLabels)
 }
 
 async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
@@ -84,9 +85,6 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     reply.code(204)
     return
   }
-
-  const counter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
-  const histogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_query_duration_seconds')
 
   const query = request.query as Record<string, string>
   if (!Object.keys(Platforms).includes(query.platform)) {
@@ -98,8 +96,6 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     reply.code(400).send({ error: 400, message: 'Invalid ID' })
     return
   }
-
-  const histEnd = histogram.startTimer()
 
   const ids = query.ids.split(',').slice(0, 50)
   const accounts = await this.mongo.db!.collection<MongoUser>('accounts').aggregate([
@@ -115,9 +111,17 @@ async function lookupBulk (this: FastifyInstance, request: FastifyRequest, reply
     res[id] = pronouns
   }
 
-  histEnd({ cache: 'miss', method: 'bulk', count: ids.length })
-  counter.inc({ cache: 'miss', platform: query.platform, method: 'single', count: ids.length })
   reply.send(res)
+
+  // Metrics
+  const metricsLabels = { platform: query.platform, method: 'single' }
+  const requestsCounter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_requests_total')
+  const idsCounter = <Counter<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_ids_total')
+  const bulkSizeHistogram = <Histogram<string>> this.metrics.client.register.getSingleMetric('pronoundb_lookup_bulk_ids_count')
+
+  requestsCounter.inc(metricsLabels)
+  idsCounter.inc(metricsLabels, ids.length)
+  bulkSizeHistogram.observe({ platform: query.platform }, ids.length)
 }
 
 async function lookupMe (this: FastifyInstance, request: FastifyRequest<{ TokenizeUser: User }>, reply: FastifyReply) {
