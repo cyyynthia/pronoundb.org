@@ -44,7 +44,6 @@ const minecraftClient = new Client('https://api.minecraftservices.com:443', http
 
 async function getSelf (token: string): Promise<ExternalAccount | string | null> {
   // We initiate all requests at the same time to handle authentication more efficiently
-  // Bodies are fed when available thanks to the FutureBody interface
 
   const xliveBody = new PassThrough()
   const xstsBody = new PassThrough()

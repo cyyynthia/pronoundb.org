@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Client } from 'undici'
+import type { Dispatcher } from 'undici'
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
 import type { OAuthIntent } from './shared.js'
@@ -57,7 +57,7 @@ export interface OAuth2Options {
   authorizationEndpoint: string
   scopes: string[]
 
-  httpClient: Client
+  httpClient: Dispatcher
   tokenPath: string
   getSelf: (token: string, state: string) => Promise<ExternalAccount | string | null>
 

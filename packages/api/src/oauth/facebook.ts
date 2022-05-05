@@ -42,7 +42,7 @@ function yeetToken (token: string): void {
   // Don't even bother awaiting the Promise
   graphClient.request({
     method: 'DELETE',
-    path: '/v9.0/me/permissions',
+    path: '/v13.0/me/permissions',
     headers: { authorization: `Bearer ${token}` },
   })
 }
@@ -61,14 +61,14 @@ async function getSelf (token: string, state: string): Promise<ExternalAccount |
     return null
   }
 
-  const selfResponse = await graphClient.request({ method: 'GET', path: '/v9.0/me', headers: headers })
+  const selfResponse = await graphClient.request({ method: 'GET', path: '/v13.0/me', headers: headers })
   if (selfResponse.statusCode !== 200) {
     yeetToken(token)
     return null
   }
 
   const data = await selfResponse.body.json()
-  const checkResponse = await graphClient.request({ method: 'GET', path: `/v9.0/?ids=${data.id},${realId}`, headers: headers })
+  const checkResponse = await graphClient.request({ method: 'GET', path: `/v13.0/?ids=${data.id},${realId}`, headers: headers })
   if (checkResponse.statusCode !== 200) {
     yeetToken(token)
     return null
@@ -90,11 +90,11 @@ export default async function (fastify: FastifyInstance) {
       platform: 'facebook',
       clientId: clientId,
       clientSecret: clientSecret,
-      authorizationEndpoint: 'https://www.facebook.com/v9.0/dialog/oauth',
+      authorizationEndpoint: 'https://www.facebook.com/v13.0/dialog/oauth',
       scopes: [],
 
       httpClient: graphClient,
-      tokenPath: '/v9.0/oauth/access_token',
+      tokenPath: '/v13.0/oauth/access_token',
       getSelf: getSelf,
 
       transformState: (state) => state.split(';;;')[0],
