@@ -26,52 +26,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Page } from '@playwright/test'
-import { test, chromium } from '@playwright/test'
-import { setTimeout as wait } from 'timers/promises'
-import { join } from 'path'
+import type { LaunchOptions, Page, Project } from '@playwright/test'
+import type { TestArgs } from '../playwright.config.js'
+import { test as base, chromium } from '@playwright/test'
+import { readFile } from 'fs/promises'
+import { join, basename } from 'path'
 
-const CYNTHIA_IDS = [
-  'twitter::1300929324154060800',
-  'github::9999055',
-]
+import { TestPronouns } from './data.js'
 
-export default test.extend({
+const test = base.extend({
   // eslint-disable-next-line no-empty-pattern
-  context: async ({}, use) => {
-    const launchOptions = {
-      headless: false,
-      args: [ `--disable-extensions-except=${join(__dirname, '..', 'dist')}` ],
-    }
+  context: async ({}, use, testInfo) => {
+    const project = testInfo.project as Project<TestArgs>
+    const platform = basename(testInfo.file).split('.')[0]
+    testInfo.skip(Boolean(project.use.authenticated && !project.use.credentials?.[platform]), 'No credentials available')
 
-    if (!process.argv.includes('--headed')) {
-      launchOptions.headless = true
+    const launchOptions: LaunchOptions = { args: [ `--disable-extensions-except=${join(__dirname, '..', 'dist')}` ] }
+
+    if (testInfo.project.use.headless) {
       launchOptions.args.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
     }
 
-    const context = await chromium.launchPersistentContext('', launchOptions)
-
     let ext: Page
-    while (!(ext = context.backgroundPages()[0])) await wait(10)
+    const context = await chromium.launchPersistentContext('', launchOptions)
+    while (!(ext = context.backgroundPages()[0])) await testInfo.setTimeout(10)
 
     ext.route('https://pronoundb.org/api/v1/lookup?*', async (route, req) => {
       const params = new URL(req.url()).searchParams
-      const id = `${params.get('platform')}::${params.get('id')}`
-
       await route.fulfill({
-        body: JSON.stringify({ pronouns: CYNTHIA_IDS.includes(id) ? 'ii' : 'tt' }),
+        body: JSON.stringify({ pronouns: TestPronouns[params.get('platform')]?.[params.get('id')] ?? 'tt' }),
         contentType: 'application/json',
       })
     })
 
     ext.route('https://pronoundb.org/api/v1/lookup-bulk?*', async (route, req) => {
       const params = new URL(req.url()).searchParams
-      const platform = params.get('platform')
       const ids = params.get('ids')?.split(',') ?? []
-
       const pronouns: Record<string, string> = {}
       for (const id of ids) {
-        pronouns[id] = CYNTHIA_IDS.includes(`${platform}::${id}`) ? 'ii' : 'tt'
+        pronouns[id] = TestPronouns[params.get('platform')]?.[id] ?? 'tt'
       }
 
       await route.fulfill({
@@ -80,7 +73,15 @@ export default test.extend({
       })
     })
 
+    if (project.use.authenticated) {
+      // https://github.com/microsoft/playwright/issues/7634
+      const blob = await readFile(`.testdata/${platform}StorageState.json`, 'utf8')
+      context.addCookies(JSON.parse(blob).cookies)
+    }
+
     await use(context)
     await context.close()
   },
 })
+
+export default test

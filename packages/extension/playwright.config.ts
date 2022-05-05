@@ -27,13 +27,53 @@
  */
 
 import type { PlaywrightTestConfig } from '@playwright/test'
+import { LoginProcedures } from './test/data.js'
 
-const config: PlaywrightTestConfig = {
+export type TestArgs = { authenticated: boolean, credentials: Record<string, boolean> }
+
+const credentials = {}
+const authenticated = []
+const authenticatedOnly = []
+for (const platform in LoginProcedures) {
+  if (platform in LoginProcedures) {
+    authenticated.push(platform)
+    if (LoginProcedures[platform].loggedInOnly) authenticatedOnly.push(platform)
+
+    const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
+    const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
+    const ignore = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
+    credentials[platform] = Boolean(ignore) || Boolean(username && password)
+  }
+}
+
+const config: PlaywrightTestConfig<TestArgs> = {
   timeout: 30e3,
+  retries: 3,
+  globalSetup: require.resolve('./test/login.js'),
   forbidOnly: Boolean(process.env.CI),
+  projects: [
+    {
+      name: 'Chromium without authentication',
+      testMatch: new RegExp(`.*\\/(?!${authenticatedOnly.join('|')})[^/]*\\.test\\.ts`, 'gm'),
+      use: {
+        browserName: 'chromium',
+        authenticated: false,
+      },
+    },
+    {
+      name: 'Chromium with authentication',
+      testMatch: new RegExp(`.*(?:${authenticated.join('|')})\\.test\\.ts`, 'gm'),
+      use: {
+        browserName: 'chromium',
+        authenticated: true,
+      },
+    },
+  ],
   use: {
+    headless: !process.argv.includes('--headed'),
     launchOptions: { devtools: true },
     actionTimeout: 5e3,
+    credentials: credentials,
   },
 }
 
