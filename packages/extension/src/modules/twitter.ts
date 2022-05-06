@@ -58,12 +58,12 @@ async function injectProfileHeader (header: HTMLElement) {
 }
 
 async function injectTweet (tweet: HTMLElement) {
-  const directId = await fetchReactProp(tweet.parentElement!, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
-  const retweetId = await fetchReactProp(tweet.parentElement!, [ 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'retweeted_status', 'user', 'id_str' ])
-  const quoteId = await fetchReactProp(tweet.parentElement!, [ 'return', 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'tweet', 'user', 'id_str' ])
-  console.log(tweet.parentElement, directId, retweetId, quoteId)
+  const [ directId, retweetId ] = await Promise.all([
+    fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ]),
+    fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ]),
+  ])
 
-  const pronouns = await fetchPronouns('twitter', retweetId || directId || quoteId)
+  const pronouns = await fetchPronouns('twitter', retweetId || directId)
   if (pronouns === 'unspecified') return
 
   let separator: Node

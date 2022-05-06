@@ -28,12 +28,14 @@
 
 import { createDeferred } from './deferred'
 
+type QueryElement = string | { $find: string, $in: string[] }
+
 // @ts-ignore
 const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 const callbacks = new Map()
 let targetId = 0
 
-function bridgeReactStuff (nodes: HTMLElement[], propPath: string[], args?: any[]): Promise<any[]> {
+function bridgeReactStuff (nodes: HTMLElement[], propPath: QueryElement[], args?: any[]): Promise<any[]> {
   const targets = nodes.map((node) => (node.dataset.pronoundbTargetId = String(++targetId)))
   const deferred = createDeferred<any>()
   const id = Math.random().toString(36).slice(2)
@@ -62,7 +64,7 @@ function bridgeReactStuff (nodes: HTMLElement[], propPath: string[], args?: any[
   return deferred.promise
 }
 
-function doFetchReactProp (targets: Array<Element | null>, propPath: string[]) {
+function doFetchReactProp (targets: Array<Element | null>, propPath: QueryElement[]) {
   const first = targets.find(Boolean)
   if (!first) return []
 
@@ -77,15 +79,37 @@ function doFetchReactProp (targets: Array<Element | null>, propPath: string[]) {
     }
 
     let res = (element as any)[reactKey]
-    for (const prop of propPath) res = res?.[prop]
+    for (const prop of propPath) {
+      if (!res) break
+      if (typeof prop === 'string') {
+        res = res[prop]
+        continue
+      }
+
+      const queue = [ res ]
+      res = null
+      while (queue.length) {
+        const el = queue.shift()
+        if (prop.$find in el) {
+          res = el
+          break
+        }
+
+        for (const p of prop.$in) {
+          if (p in el) queue.push(el[p])
+        }
+      }
+    }
+
     props.push(res)
   }
 
   return props
 }
 
-function doExecuteReactProp (targets: Array<Element | null>, propPath: string[], args: any[]) {
+function doExecuteReactProp (targets: Array<Element | null>, propPath: QueryElement[], args: any[]) {
   const fn = propPath.pop()!
+  if (typeof fn !== 'string') throw new Error('invalid query')
   const obj = doFetchReactProp(targets, propPath)
   return obj.map((o) => o[fn].apply(o, args))
 }
@@ -95,7 +119,7 @@ function doExecuteReactProp (targets: Array<Element | null>, propPath: string[],
  * New react fetch impl is light enough that the footprint can be ignored.
  * @deprecated
  */
-export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: string[]) {
+export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: QueryElement[]) {
   if (isFirefox) {
     return doFetchReactProp(nodes.map((node) => node.wrappedJSObject), propPath)
   }
@@ -108,7 +132,7 @@ export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: string
  * New react fetch impl is light enough that the footprint can be ignored.
  * @deprecated
  */
-export async function executeReactPropBulk (nodes: HTMLElement[], propPath: string[], ...args: any[]) {
+export async function executeReactPropBulk (nodes: HTMLElement[], propPath: QueryElement[], ...args: any[]) {
   if (isFirefox) {
     // @ts-expect-error
     return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, cloneInto(args, window))
@@ -117,11 +141,11 @@ export async function executeReactPropBulk (nodes: HTMLElement[], propPath: stri
   return bridgeReactStuff(nodes, propPath, args)
 }
 
-export async function fetchReactProp (node: HTMLElement, propPath: string[]) {
+export async function fetchReactProp (node: HTMLElement, propPath: QueryElement[]) {
   return fetchReactPropBulk([ node ], propPath).then((res) => res[0])
 }
 
-export async function executeReactProp (node: HTMLElement, propPath: string[], ...args: any[]) {
+export async function executeReactProp (node: HTMLElement, propPath: QueryElement[], ...args: any[]) {
   return executeReactPropBulk([ node ], propPath, ...args).then((res) => res[0])
 }
 
