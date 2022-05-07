@@ -115,7 +115,6 @@ export default class RDPConnection {
   async #send (payload: any, responseType: string = '*'): Promise<any> {
     return new Promise<any>((resolve) => {
       const data = JSON.stringify(payload)
-      require('fs').writeFileSync('test.txt', data)
       this.#connection.write(`${data.length}:${data}`)
       this.#payloads.on(responseType, resolve)
     })

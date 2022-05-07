@@ -112,7 +112,7 @@ const test = base.extend({
 
     ext.route('https://pronoundb.org/api/v1/lookup*', async (route, req) => {
       await route.fulfill({
-        body: processRequest(req.url()),
+        body: JSON.stringify(processRequest(req.url())),
         contentType: 'application/json',
       })
     })
