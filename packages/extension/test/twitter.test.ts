@@ -31,22 +31,22 @@ import { expect } from '@playwright/test'
 
 test('Profile shows pronouns', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_')
-  await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toBeVisible()
+  await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toHaveCount(1)
 })
 
 test('Tweet show pronouns (full view)', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('article >> text=TweetDeck >> xpath=../.. >> text=it/its')).toBeVisible()
+  await expect(page.locator('article >> text=TweetDeck >> xpath=../.. >> text=it/its')).toHaveCount(1)
 })
 
 test('Tweet show pronouns (inline view)', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('article:has-text("Meow!!!") >> time >> xpath=../.. >> text=it/its')).toBeVisible()
+  await expect(page.locator('article:has-text("Meow!!!") >> time >> xpath=../.. >> text=it/its')).toHaveCount(1)
 })
 
 test('Quoted tweet show pronouns', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('text=Out of Context Cats@OocCats · >> text=they/them')).toBeVisible()
+  await expect(page.locator('text=Out of Context Cats@OocCats · >> text=they/them')).toHaveCount(1)
 })
 
 test('Hovercard shows pronouns', async ({ page }) => {
@@ -61,7 +61,7 @@ test('Hovercard shows pronouns', async ({ page }) => {
     reactInstance.return.return.memoizedProps.onHoverIn()
   })
 
-  await expect(page.locator('#layers >> text=Cynthia @cyyynthia_ >> text=it/its')).toBeVisible()
+  await expect(page.locator('#layers >> text=Cynthia @cyyynthia_ >> text=it/its')).toHaveCount(1)
 })
 
 test.describe('Implementation quirks', () => {
@@ -69,7 +69,7 @@ test.describe('Implementation quirks', () => {
   // Relevant issue: https://github.com/cyyynthia/pronoundb.org/issues/55
   test('Retweets show pronouns of the poster (#55)', async ({ page }) => {
     await page.goto('https://twitter.com/cyyynthia_')
-    await page.locator('[data-testid="tweet"]').isVisible()
+    await page.locator('[data-testid="tweet"]').first().isVisible()
 
     const locator = page.locator('[data-testid="socialContext"]:has-text("Retweeted")')
     while (!await locator.count()) await page.mouse.wheel(0, 100)
@@ -77,6 +77,6 @@ test.describe('Implementation quirks', () => {
     const tweet = page.locator('[data-testid="tweet"]', { has: locator })
     const el = tweet.locator('time >> xpath=../..').first()
 
-    await expect(el.locator('text=they/them')).toBeVisible()
+    await expect(el.locator('text=they/them')).toHaveCount(1)
   })
 })

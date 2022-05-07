@@ -26,35 +26,31 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { Browser } from '@playwright/test'
-import { chromium } from '@playwright/test'
-import { LoginProcedures } from './data.js'
+const TestPronouns = {
+  twitter: {
+    // @cyyynthia_
+    1300929324154060800: 'ii',
+  },
+  github: {
+    // cyyynthia
+    9999055: 'ii',
+  },
+  facebook: {
+    // Test account associated to the PronounDB Facebook App
+    100081064205146: 'sh',
+  },
+}
 
-async function login (browser: Browser, platform: string) {
-  const procedure = LoginProcedures[platform]
-  const ignoreMissingCreds = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
-  if (ignoreMissingCreds) return
-
-  const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
-  const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
-  if (!username || !password) {
-    console.log('::warning::Authenticated tests for %s will be skipped: no available credentials set.', platform)
-    return
+export function processRequest (urlStr: string): any {
+  const url = new URL(urlStr)
+  const platform = url.searchParams.get('platform')!
+  if (urlStr.includes('lookup-bulk')) {
+    const ids = url.searchParams.get('ids')!.split(',')
+    const res = {}
+    for (const id of ids) res[id] = TestPronouns[platform]?.[id] ?? 'tt'
+    return res
   }
 
-  const page = await browser.newPage()
-  await page.goto(procedure.page)
-  await page.fill(procedure.username, username)
-  if (procedure.next) await page.click(procedure.next)
-  await page.fill(procedure.password, password)
-  await page.click(procedure.submit)
-  await page.context().storageState({ path: `.testdata/${platform}StorageState.json` })
+  const id = url.searchParams.get('id')!
+  return { pronouns: TestPronouns[platform]?.[id] ?? 'tt' }
 }
-
-async function globalSetup () {
-  const browser = await chromium.launch()
-  await Promise.all(Object.keys(LoginProcedures).map((platform) => login(browser, platform)))
-  await browser.close()
-}
-
-export default globalSetup

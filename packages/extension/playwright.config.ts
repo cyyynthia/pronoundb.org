@@ -27,7 +27,7 @@
  */
 
 import type { PlaywrightTestConfig } from '@playwright/test'
-import { LoginProcedures } from './test/data.js'
+import { LoginProcedures } from './testutils/login.js'
 
 export type TestArgs = { authenticated: boolean, credentials: Record<string, boolean> }
 
@@ -46,15 +46,18 @@ for (const platform in LoginProcedures) {
   }
 }
 
+const withoutAuthRegExp = new RegExp(`.*\\/(?!${authenticatedOnly.join('|')})[^/]*\\.test\\.ts`, 'gm')
+const withAuthRegExp = new RegExp(`.*(?:${authenticated.join('|')})\\.test\\.ts`, 'gm')
+
 const config: PlaywrightTestConfig<TestArgs> = {
   timeout: 30e3,
-  retries: 3,
-  globalSetup: require.resolve('./test/login.js'),
+  retries: 2,
+  globalSetup: require.resolve('./testutils/login.js'),
   forbidOnly: Boolean(process.env.CI),
   projects: [
     {
       name: 'Chromium without authentication',
-      testMatch: new RegExp(`.*\\/(?!${authenticatedOnly.join('|')})[^/]*\\.test\\.ts`, 'gm'),
+      testMatch: withoutAuthRegExp,
       use: {
         browserName: 'chromium',
         authenticated: false,
@@ -62,9 +65,25 @@ const config: PlaywrightTestConfig<TestArgs> = {
     },
     {
       name: 'Chromium with authentication',
-      testMatch: new RegExp(`.*(?:${authenticated.join('|')})\\.test\\.ts`, 'gm'),
+      testMatch: withAuthRegExp,
       use: {
         browserName: 'chromium',
+        authenticated: true,
+      },
+    },
+    {
+      name: 'Firefox without authentication',
+      testMatch: withoutAuthRegExp,
+      use: {
+        browserName: 'firefox',
+        authenticated: false,
+      },
+    },
+    {
+      name: 'Firefox with authentication',
+      testMatch: withAuthRegExp,
+      use: {
+        browserName: 'firefox',
         authenticated: true,
       },
     },

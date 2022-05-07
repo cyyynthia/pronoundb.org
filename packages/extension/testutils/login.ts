@@ -26,32 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export type TestPronounsData = Record<string, string>
-export type LoginProcedure = {
-  loggedInOnly?: boolean // Whether unauthenticated tests should be excluded
-  page: string // Login page URL
-  username: string // Username input locator
-  next?: string // Locator to the button to continue to the password, if required
-  password: string // Password input locator
-  submit: string // Login button locator
-}
+import type { Browser } from '@playwright/test'
+import { chromium } from '@playwright/test'
 
-export const TestPronouns: Record<string, TestPronounsData> = {
-  twitter: {
-    // @cyyynthia_
-    1300929324154060800: 'ii',
-  },
-  github: {
-    // cyyynthia
-    9999055: 'ii',
-  },
-  facebook: {
-    // Test account associated to the PronounDB Facebook App
-    100081064205146: 'sh',
-  },
-}
-
-export const LoginProcedures: Record<string, LoginProcedure> = {
+export const LoginProcedures = {
   twitter: {
     page: 'https://twitter.com/i/flow/login',
     username: 'input[autocomplete="username"]',
@@ -67,3 +45,32 @@ export const LoginProcedures: Record<string, LoginProcedure> = {
     submit: 'text=Login',
   },
 }
+
+async function login (browser: Browser, platform: string) {
+  const procedure = LoginProcedures[platform]
+  const ignoreMissingCreds = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
+  if (ignoreMissingCreds) return
+
+  const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
+  const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
+  if (!username || !password) {
+    console.log('::warning::Authenticated tests for %s will be skipped: no available credentials set.', platform)
+    return
+  }
+
+  const page = await browser.newPage()
+  await page.goto(procedure.page)
+  await page.fill(procedure.username, username)
+  if (procedure.next) await page.click(procedure.next)
+  await page.fill(procedure.password, password)
+  await page.click(procedure.submit)
+  await page.context().storageState({ path: `.testdata/${platform}StorageState.json` })
+}
+
+async function globalSetup () {
+  const browser = await chromium.launch()
+  await Promise.all(Object.keys(LoginProcedures).map((platform) => login(browser, platform)))
+  await browser.close()
+}
+
+export default globalSetup
