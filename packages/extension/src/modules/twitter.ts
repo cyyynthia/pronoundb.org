@@ -43,8 +43,11 @@ async function injectProfileHeader (header: HTMLElement) {
   const pronouns = await fetchPronouns('twitter', id)
   if (pronouns === 'unspecified') return
 
-  const prevPronouns = header.querySelector('[data-pronoundb]')
-  if (prevPronouns) prevPronouns.remove()
+  const prevPronouns = header.querySelector<HTMLElement>('[data-pronoundb]')
+  if (prevPronouns) {
+    prevPronouns.innerText = formatPronouns(pronouns)
+    return
+  }
 
   const template = header.children[header.children.length - 1]
   header.appendChild(
@@ -58,10 +61,8 @@ async function injectProfileHeader (header: HTMLElement) {
 }
 
 async function injectTweet (tweet: HTMLElement) {
-  const [ directId, retweetId ] = await Promise.all([
-    fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ]),
-    fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ]),
-  ])
+  const directId = await fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ])
+  const retweetId = await fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
 
   const pronouns = await fetchPronouns('twitter', retweetId || directId)
   if (pronouns === 'unspecified') return
@@ -76,6 +77,12 @@ async function injectTweet (tweet: HTMLElement) {
     separator = document.createDocumentFragment()
     separator.appendChild(sep.previousElementSibling!.cloneNode(true))
     separator.appendChild(sep.cloneNode(true))
+  }
+
+  const prevPronouns = sep.parentElement!.querySelector<HTMLElement>('[data-pronoundb]')
+  if (prevPronouns) {
+    prevPronouns.innerText = formatPronouns(pronouns)
+    return
   }
 
   const next = <HTMLElement> sep.nextElementSibling

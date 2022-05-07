@@ -77,6 +77,7 @@ test.describe('Implementation quirks', () => {
     const tweet = page.locator('[data-testid="tweet"]', { has: locator })
     const el = tweet.locator('time >> xpath=../..').first()
 
-    await expect(el.locator('text=they/them')).toHaveCount(1)
+    await el.scrollIntoViewIfNeeded()
+    await expect(el).toContainText('they/them')
   })
 })

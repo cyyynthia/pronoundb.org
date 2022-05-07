@@ -44,9 +44,9 @@ export default class RDPConnection {
 
   #actors: Record<string, string> = null
 
-  constructor () {
+  constructor (port: number) {
     this.#payloads = new EventEmitter()
-    this.#connection = connect(6000, '127.0.0.1')
+    this.#connection = connect(port, '127.0.0.1')
     this.#connection.on('data', (buf) => {
       let cursor = 0
       const blob = buf.toString()
@@ -77,11 +77,11 @@ export default class RDPConnection {
       addonPath: path,
     })
 
+    await wait(50)
     const installedAddons = await this.#send({ to: 'root', type: 'listAddons' })
     const addon = installedAddons.addons.find((a) => a.id === installRes.addon.id)
 
     const target = await this.#send({ to: addon.actor, type: 'getTarget' })
-
     return {
       addonId: addon.manifestURL.slice(16, 52),
       innerWindowId: target.form.innerWindowId,
@@ -104,7 +104,7 @@ export default class RDPConnection {
 
   async waitFor (event: string) {
     return new Promise((resolve) => {
-      this.#payloads.on(event, resolve)
+      this.#payloads.once(event, resolve)
     })
   }
 
@@ -116,7 +116,7 @@ export default class RDPConnection {
     return new Promise<any>((resolve) => {
       const data = JSON.stringify(payload)
       this.#connection.write(`${data.length}:${data}`)
-      this.#payloads.on(responseType, resolve)
+      this.#payloads.once(responseType, resolve)
     })
   }
 }

@@ -29,6 +29,7 @@
 import type { LaunchOptions, Page, Project } from '@playwright/test'
 import type { TestArgs } from '../playwright.config.js'
 import { test as base, chromium, firefox } from '@playwright/test'
+import { setTimeout as wait } from 'timers/promises'
 import { readFile } from 'fs/promises'
 import { join, basename } from 'path'
 import { processRequest } from '../testutils/mock.js'
@@ -45,15 +46,17 @@ const test = base.extend({
       return
     }
 
+    const port = 10_000 + Math.round(Math.random() * 10_000)
     const browser = await firefox.launch({
       headless: headless,
-      args: [ '--start-debugger-server' ],
+      args: [ `--start-debugger-server=${port}` ],
       firefoxUserPrefs: { 'devtools.debugger.prompt-connection': false },
     })
 
-    const rdp = new RDPConnection()
+    const rdp = new RDPConnection(port)
     const addon = await rdp.installAddon(PDB_EXT_PATH)
     await rdp.waitFor('frameUpdate')
+    await wait(50)
 
     const mockCodeTs = await readFile(MOCK_FILE_PATH, 'utf8')
     const mockCodeJs = mockCodeTs
@@ -110,12 +113,14 @@ const test = base.extend({
     const context = await chromium.launchPersistentContext('', launchOptions)
     while (!(ext = context.backgroundPages()[0])) await testInfo.setTimeout(10)
 
-    ext.route('https://pronoundb.org/api/v1/lookup*', async (route, req) => {
-      await route.fulfill({
-        body: JSON.stringify(processRequest(req.url())),
-        contentType: 'application/json',
-      })
-    })
+    ext.route(
+      'https://pronoundb.org/api/v1/lookup*',
+      (route, req) =>
+        route.fulfill({
+          body: JSON.stringify(processRequest(req.url())),
+          contentType: 'application/json',
+        })
+    )
 
     if (project.use.authenticated) {
       // https://github.com/microsoft/playwright/issues/7634

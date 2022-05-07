@@ -50,7 +50,7 @@ const withoutAuthRegExp = new RegExp(`.*\\/(?!${authenticatedOnly.join('|')})[^/
 const withAuthRegExp = new RegExp(`.*(?:${authenticated.join('|')})\\.test\\.ts`, 'gm')
 
 const config: PlaywrightTestConfig<TestArgs> = {
-  timeout: 30e3,
+  timeout: 20e3,
   retries: 2,
   globalSetup: require.resolve('./testutils/login.js'),
   forbidOnly: Boolean(process.env.CI),
