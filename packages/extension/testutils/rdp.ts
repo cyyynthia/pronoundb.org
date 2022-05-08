@@ -42,7 +42,7 @@ export default class RDPConnection {
 
   #payloads: EventEmitter
 
-  #actors: Record<string, string> = null
+  #actors: Record<string, string> = {}
 
   constructor (port: number) {
     this.#payloads = new EventEmitter()
@@ -69,7 +69,7 @@ export default class RDPConnection {
   }
 
   async installAddon (path: string): Promise<AddonInstallResponse> {
-    while (!this.#actors) await wait(100)
+    while (!this.#actors.addonsActor) await wait(100)
 
     const installRes = await this.#send({
       to: this.#actors.addonsActor,
@@ -79,7 +79,7 @@ export default class RDPConnection {
 
     await wait(50)
     const installedAddons = await this.#send({ to: 'root', type: 'listAddons' })
-    const addon = installedAddons.addons.find((a) => a.id === installRes.addon.id)
+    const addon = installedAddons.addons.find((a: any) => a.id === installRes.addon.id)
 
     const target = await this.#send({ to: addon.actor, type: 'getTarget' })
     return {

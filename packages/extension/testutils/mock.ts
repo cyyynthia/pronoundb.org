@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const TestPronouns = {
+const TestPronouns: Record<string, Record<string, string>> = {
   twitter: {
     // @cyyynthia_
     1300929324154060800: 'ii',
@@ -50,7 +50,7 @@ export function processRequest (urlStr: string): any {
   const platform = url.searchParams.get('platform')!
   if (urlStr.includes('lookup-bulk')) {
     const ids = url.searchParams.get('ids')!.split(',')
-    const res = {}
+    const res: Record<string, string> = {}
     for (const id of ids) res[id] = TestPronouns[platform]?.[id] ?? 'tt'
     return res
   }

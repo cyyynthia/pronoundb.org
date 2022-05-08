@@ -27,10 +27,9 @@
  */
 
 import { formatPronouns } from '@pronoundb/shared/format.js'
-import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
-import { fetchReactProp, fetchReactPropBulk } from '../utils/react'
+import { fetchPronouns } from '../utils/fetch'
+import { fetchReactProp } from '../utils/react'
 import { h, css } from '../utils/dom'
-import throttle from '../utils/throttle'
 
 export const match = /^https:\/\/(.+\.)?discord\.com\/(channels|activity|login|app|library|store)/
 
@@ -53,38 +52,37 @@ const Styles = {
   }),
 }
 
-async function handleMessages (nodes: HTMLElement[]) {
-  nodes = nodes.filter((node) => node.isConnected)
-  const ids = await fetchReactPropBulk(nodes, [ 'return', 'return', 'memoizedProps', 'message', 'author', 'id' ])
-  const pronounsMap = await fetchPronounsBulk('discord', Array.from(new Set(ids)))
+async function handleMessage (node: HTMLElement) {
+  const id = await fetchReactProp(node, [ 'return', 'return', 'memoizedProps', 'message', 'author', 'id' ])
+  if (!id) return
 
-  for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i]
-    const id = ids[i]
-    const pronouns = pronounsMap[id]
-    if (pronouns === 'unspecified') continue
+  const pronouns = await fetchPronouns('discord', id)
+  if (pronouns === 'unspecified') return
 
-    const header = node.querySelector('h2')
-    if (!header) continue
+  const header = node.querySelector('h2')
+  if (!header) return
 
-    header.appendChild(
-      h(
-        'span',
-        {
-          class: 'pronoundb-pronouns',
-          style: css({
-            color: 'var(--text-muted)',
-            fontSize: '.9rem',
-          }),
-        },
-        ` • ${formatPronouns(pronouns)}`
-      )
+  header.appendChild(
+    h(
+      'span',
+      {
+        class: 'pronoundb-pronouns',
+        style: css({
+          color: 'var(--text-muted)',
+          fontSize: '.75rem',
+          lineHeight: '1.375rem',
+          fontWeight: '500',
+        }),
+      },
+      ` • ${formatPronouns(pronouns)}`
     )
-  }
+  )
 }
 
 async function handleUserPopOut (node: HTMLElement) {
-  const id = await fetchReactProp(node, [ 'child', 'child', 'child', 'child', 'child', 'memoizedProps', 'userId' ])
+  const id = await fetchReactProp(node, [ { $find: 'userId', $in: [ 'child', 'memoizedProps' ] }, 'userId' ])
+  if (!id) return
+
   const pronouns = await fetchPronouns('discord', id)
   if (pronouns === 'unspecified') return
 
@@ -102,6 +100,8 @@ async function handleUserPopOut (node: HTMLElement) {
 
 async function handleUserModal (node: HTMLElement) {
   const id = await fetchReactProp(node, [ 'child', 'memoizedProps', 'user', 'id' ])
+  if (!id) return
+
   const pronouns = await fetchPronouns('discord', id)
   if (pronouns === 'unspecified') return
 
@@ -116,34 +116,23 @@ async function handleUserModal (node: HTMLElement) {
   container.appendChild(frag)
 }
 
-async function handleAutocompleteRows (rows: HTMLElement[]) {
-  rows = rows.filter((row) => row.isConnected)
-  const ids = await fetchReactPropBulk(rows, [ 'return', 'return', 'return', 'return', 'key' ])
-  const pronounsMap = await fetchPronounsBulk('discord', Array.from(new Set(ids)))
+async function handleAutocompleteRow (row: HTMLElement) {
+  if (row.querySelector('.pronoundb-autocomplete-pronouns')) return
 
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i]
-    if (row.querySelector('.pronoundb-autocomplete-pronouns')) continue
+  const id = await fetchReactProp(row, [ 'return', 'return', 'return', 'return', 'key' ])
+  if (!id) return
 
-    const id = ids[i]
-    if (!id) continue
+  const pronouns = await fetchPronouns('discord', id)
+  if (pronouns === 'unspecified') return
 
-    const pronouns = pronounsMap[id]
-    if (pronouns === 'unspecified') continue
+  const tag = row.querySelector('[class*="autocompleteRowContentSecondary-"]')
+  if (!tag) return
 
-    const tag = row.querySelector('[class*="autocompleteRowContentSecondary-"]')
-    if (!tag) return
-
-    const element = document.createElement('span')
-    element.className = 'pronoundb-autocomplete-pronouns'
-    element.innerText = ` • ${formatPronouns(pronouns)}`
-    tag.appendChild(element)
-  }
+  const element = document.createElement('span')
+  element.className = 'pronoundb-autocomplete-pronouns'
+  element.innerText = ` • ${formatPronouns(pronouns)}`
+  tag.appendChild(element)
 }
-
-// Bulk process stuff
-const handleMessage = throttle(handleMessages)
-const handleAutocompleteRow = throttle(handleAutocompleteRows)
 
 function handleMutation (mutations: MutationRecord[]) {
   for (const { addedNodes } of mutations) {
@@ -154,8 +143,9 @@ function handleMutation (mutations: MutationRecord[]) {
           continue
         }
 
-        if (node.className.startsWith('chatContent-')) {
-          handleMessages(Array.from(node.querySelectorAll('div[class^="message-"]')) as HTMLElement[])
+        if (node.className.startsWith('chat-')) {
+          console.log(node.querySelectorAll('li[id^=chat-messages-]'))
+          node.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
           continue
         }
 
@@ -177,7 +167,7 @@ function handleMutation (mutations: MutationRecord[]) {
 
         if (node.className.startsWith('autocomplete-')) {
           const rows = Array.from(node.querySelectorAll('[class*="autocompleteRow-"]')) as HTMLElement[]
-          handleAutocompleteRows(rows.filter((row) => row?.querySelector('[role="img"]')))
+          rows.filter((row) => row?.querySelector('[role="img"]')).forEach((row) => handleAutocompleteRow(row))
           continue
         }
 
@@ -192,7 +182,7 @@ function handleMutation (mutations: MutationRecord[]) {
 
 export function inject () {
   // Process messages already loaded
-  handleMessages(Array.from(document.querySelectorAll('[id^=chat-messages-]')) as HTMLElement[])
+  document.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
 
   // Mutation observer
   const observer = new MutationObserver(handleMutation)

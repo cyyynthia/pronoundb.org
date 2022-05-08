@@ -30,10 +30,9 @@ import { personCard, editThin, privacyPublic } from '../icons/facebook'
 
 import { WEBSITE } from '@pronoundb/shared/constants.js'
 import { formatPronouns, formatPronounsLong } from '@pronoundb/shared/format.js'
-import { fetchPronouns, fetchPronounsBulk } from '../utils/fetch'
-import { fetchReactProp, fetchReactPropBulk } from '../utils/react'
+import { fetchPronouns } from '../utils/fetch'
+import { fetchReactProp } from '../utils/react'
 import { h } from '../utils/dom'
-import throttle from '../utils/throttle'
 
 export const match = /^https:\/\/(.+\.)?facebook\.com/
 
@@ -128,25 +127,20 @@ async function handlePopOut (popout: HTMLElement) {
   )
 }
 
-async function handleArticles (articles: HTMLElement[]) {
-  const targets = articles
-    .filter((article) => article.isConnected)
-    .map((a: any) => a.ariaDescribedByElements[0])
+async function handleArticle (article: HTMLElement) {
+  const target = (article as any).ariaDescribedByElements[0]
+  if (!target) return
 
-  const ids = await fetchReactPropBulk(targets, [ 'child', 'child', 'memoizedProps', 'match', '__fragmentOwner', 'variables', 'userID' ])
-  const pronounsMap = await fetchPronounsBulk('facebook', Array.from(new Set(ids)))
+  const id = await fetchReactProp(target, [ 'child', 'child', 'memoizedProps', 'match', '__fragmentOwner', 'variables', 'userID' ])
+  if (!id) return
 
-  for (let i = 0; i < targets.length; i++) {
-    const pronouns = pronounsMap[ids[i]]
-    if (!pronounsMap || pronouns === 'unspecified') continue
+  const pronouns = await fetchPronouns('facebook', id)
+  if (pronouns === 'unspecified') return
 
-    targets[i].appendChild(
-      h('span', { style: 'font-size: .75rem; color: var(--secondary-text);', class: 'pronoundb-pronouns' }, ` · ${formatPronouns(pronouns)}`)
-    )
-  }
+  target.appendChild(
+    h('span', { style: 'font-size: .75rem; color: var(--secondary-text);', class: 'pronoundb-pronouns' }, ` · ${formatPronouns(pronouns)}`)
+  )
 }
-
-const handleArticle = throttle(handleArticles)
 
 async function handleMutation (nodes: MutationRecord[]) {
   for (const { addedNodes } of nodes) {
@@ -163,7 +157,7 @@ async function handleMutation (nodes: MutationRecord[]) {
           continue
         }
 
-        const articles = added.querySelectorAll?.('[role="article"][aria-describedby]')
+        const articles = added.querySelectorAll<HTMLElement>('[role="article"][aria-describedby]')
         if (articles && articles.length !== 0) {
           articles.forEach((article) => handleArticle(article))
           continue
@@ -200,13 +194,13 @@ export function inject () {
     }
   }
 
-  const articles = document.querySelectorAll('[role="article"][aria-describedby]')
-  handleArticles(Array.from(articles) as HTMLElement[])
+  const articles = Array.from(document.querySelectorAll('[role="article"][aria-describedby]')) as HTMLElement[]
+  articles.forEach((article) => handleArticle(article))
 }
 
 // Scrapper to get the Real ID of people authenticating to PronounDB
 export function main () {
-  if (location.pathname === '/v9.0/dialog/oauth') {
+  if (location.pathname === '/v13.0/dialog/oauth') {
     const search = new URLSearchParams(location.search)
     if (!search.get('state') || !search.get('redirect_uri') || search.get('state')!.includes(';;;')) return
 

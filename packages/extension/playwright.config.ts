@@ -31,9 +31,9 @@ import { LoginProcedures } from './testutils/login.js'
 
 export type TestArgs = { authenticated: boolean, credentials: Record<string, boolean> }
 
-const credentials = {}
-const authenticated = []
-const authenticatedOnly = []
+const credentials: Record<string, boolean> = {}
+const authenticated: string[] = []
+const authenticatedOnly: string[] = []
 for (const platform in LoginProcedures) {
   if (platform in LoginProcedures) {
     authenticated.push(platform)

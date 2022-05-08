@@ -29,7 +29,16 @@
 import type { Browser } from '@playwright/test'
 import { chromium } from '@playwright/test'
 
-export const LoginProcedures = {
+type Procedure = {
+  loggedInOnly?: boolean
+  page: string
+  username: string
+  next?: string
+  password: string
+  submit: string
+}
+
+export const LoginProcedures: Record<string, Procedure> = {
   twitter: {
     page: 'https://twitter.com/i/flow/login',
     username: 'input[autocomplete="username"]',

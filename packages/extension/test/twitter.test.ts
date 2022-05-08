@@ -65,7 +65,7 @@ test('Hovercard shows pronouns', async ({ page }) => {
 })
 
 test.describe('Implementation quirks', () => {
-  // Test is here because internally, a retweet is considered posted by the "retweeter" rather than OP.
+  // Test is here because, internally, a retweet is considered posted by the "retweeter" rather than OP.
   // Relevant issue: https://github.com/cyyynthia/pronoundb.org/issues/55
   test('Retweets show pronouns of the poster (#55)', async ({ page }) => {
     await page.goto('https://twitter.com/cyyynthia_')

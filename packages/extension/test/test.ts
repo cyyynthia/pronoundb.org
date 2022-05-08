@@ -42,7 +42,7 @@ const test = base.extend({
   // eslint-disable-next-line no-empty-pattern
   browser: async ({ browserName, headless }, use) => {
     if (browserName === 'chromium') {
-      await use(null)
+      await use(null as any)
       return
     }
 
@@ -84,11 +84,11 @@ const test = base.extend({
   context: async ({ browser, browserName }, use, testInfo) => {
     const project = testInfo.project as Project<TestArgs>
     const platform = basename(testInfo.file).split('.')[0]
-    testInfo.skip(Boolean(project.use.authenticated && !project.use.credentials?.[platform]), 'No credentials available')
+    testInfo.skip(Boolean(project.use?.authenticated && !project.use?.credentials?.[platform]), 'No credentials available')
 
     if (browserName === 'firefox') {
       const context = await browser.newContext({
-        storageState: project.use.authenticated
+        storageState: project.use?.authenticated
           ? `.testdata/${platform}StorageState.json`
           : void 0,
       })
@@ -106,7 +106,7 @@ const test = base.extend({
     }
 
     if (testInfo.project.use.headless) {
-      launchOptions.args.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
+      launchOptions.args!.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
     }
 
     let ext: Page
@@ -122,7 +122,7 @@ const test = base.extend({
         })
     )
 
-    if (project.use.authenticated) {
+    if (project.use?.authenticated) {
       // https://github.com/microsoft/playwright/issues/7634
       const blob = await readFile(`.testdata/${platform}StorageState.json`, 'utf8')
       context.addCookies(JSON.parse(blob).cookies)

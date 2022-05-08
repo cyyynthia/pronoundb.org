@@ -30,19 +30,6 @@ import type { Deferred } from './deferred'
 import browser from 'webextension-polyfill'
 import { createDeferred } from './deferred'
 
-async function doFetchBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
-  const res = await browser.runtime.sendMessage({
-    kind: 'http',
-    target: 'lookup-bulk',
-    platform: platform,
-    ids: ids,
-  })
-
-  if (res.success) return res.data ?? {}
-  console.error(`[PronounDB::fetch] Failed to fetch: ${res.error}`)
-  return {}
-}
-
 async function doFetch (platform: string, queue: Map<string, Deferred<string>>) {
   queue = new Map(queue) // clone the map
   const res = await browser.runtime.sendMessage({
@@ -97,42 +84,4 @@ export function fetchPronouns (platform: string, id: string): Promise<string> {
   }
 
   return cache[platform][id]
-}
-
-// BULK
-
-/**
- * Deprecated in favor of transparent bulking
- * @deprecated
- */
-export async function fetchPronounsBulk (platform: string, ids: string[]): Promise<Record<string, string>> {
-  if (ids.length === 1) {
-    const pronouns = await fetchPronouns(platform, ids[0])
-    return { [ids[0]]: pronouns }
-  }
-
-  if (!cache[platform]) cache[platform] = {}
-  const toFetch = []
-  const res: Record<string, string> = {}
-  const def: Record<string, Deferred<string>> = {}
-  for (const id of ids) {
-    if (cache[platform][id]) {
-      res[id] = await cache[platform][id]
-    } else {
-      def[id] = createDeferred()
-      cache[platform][id] = def[id].promise
-      toFetch.push(id)
-    }
-  }
-
-  if (toFetch.length > 0) {
-    const data = await doFetchBulk(platform, toFetch)
-    for (const id of toFetch) {
-      const pronouns = data[id] ?? 'unspecified'
-      def[id].resolve(pronouns)
-      res[id] = pronouns
-    }
-  }
-
-  return res
 }
