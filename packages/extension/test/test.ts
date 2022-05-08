@@ -111,7 +111,7 @@ const test = base.extend({
 
     let ext: Page
     const context = await chromium.launchPersistentContext('', launchOptions)
-    while (!(ext = context.backgroundPages()[0])) await testInfo.setTimeout(10)
+    while (!(ext = context.backgroundPages()[0])) await wait(10)
 
     ext.route(
       'https://pronoundb.org/api/v1/lookup*',

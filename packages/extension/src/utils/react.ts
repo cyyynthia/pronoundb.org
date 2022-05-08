@@ -96,7 +96,8 @@ function doFetchReactProp (targets: Array<Element | null>, propPath: QueryElemen
         }
 
         for (const p of prop.$in) {
-          if (p in el) queue.push(el[p])
+          // eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
+          if (p in el && el[p] != null) queue.push(el[p])
         }
       }
     }

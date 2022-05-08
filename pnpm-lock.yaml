@@ -46,6 +46,7 @@ importers:
       '@prefresh/vite': ^2.2.8
       '@pronoundb/shared': workspace:*
       '@types/webextension-polyfill': ^0.8.3
+      '@types/ws': ^8.5.3
       '@typescript-eslint/eslint-plugin': ^5.21.0
       '@typescript-eslint/parser': ^5.21.0
       archiver: ^5.3.1
@@ -60,12 +61,14 @@ importers:
       vite: ^2.9.6
       vite-plugin-magical-svg: ^1.0.2
       webextension-polyfill: ^0.9.0
+      ws: ^8.6.0
     devDependencies:
       '@playwright/test': 1.21.1
       '@preact/preset-vite': 2.2.0_preact@10.7.1+vite@2.9.6
       '@prefresh/vite': 2.2.8_preact@10.7.1+vite@2.9.6
       '@pronoundb/shared': link:../shared
       '@types/webextension-polyfill': 0.8.3
+      '@types/ws': 8.5.3
       '@typescript-eslint/eslint-plugin': 5.21.0_ade6595cb7be1524e723c025c098ae5d
       '@typescript-eslint/parser': 5.21.0_eslint@8.14.0+typescript@4.6.4
       archiver: 5.3.1
@@ -80,6 +83,7 @@ importers:
       vite: 2.9.6
       vite-plugin-magical-svg: 1.0.2_vite@2.9.6
       webextension-polyfill: 0.9.0
+      ws: 8.6.0
 
   packages/shared:
     specifiers:
@@ -1021,6 +1025,12 @@ packages:
     dependencies:
       '@types/node': 17.0.30
       '@types/webidl-conversions': 6.1.1
+
+  /@types/ws/8.5.3:
+    resolution: {integrity: sha512-6YOoWjruKj1uLf3INHH7D3qTXwFfEsg1kf3c0uDdSBJwfa/llkwIjrAGV7j7mVgGNbzTQ3HiHKKDXl6bJPD97w==}
+    dependencies:
+      '@types/node': 17.0.30
+    dev: true
 
   /@types/yargs-parser/21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
@@ -3942,6 +3952,19 @@ packages:
 
   /ws/8.4.2:
     resolution: {integrity: sha512-Kbk4Nxyq7/ZWqr/tarI9yIt/+iNNFOjBXEWgTb4ydaNHBNGgvf2QHbS9fdfsndfjFlFwEd4Al+mw83YkaD10ZA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: ^5.0.2
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: true
+
+  /ws/8.6.0:
+    resolution: {integrity: sha512-AzmM3aH3gk0aX7/rZLYvjdvZooofDu3fFOzGqcSnQ1tOcTWwhM/o+q++E8mAyVVIyUdajrkzWUGftaVSDLn1bw==}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1

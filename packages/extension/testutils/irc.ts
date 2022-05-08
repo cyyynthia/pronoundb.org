@@ -26,35 +26,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const TestPronouns = {
-  twitter: {
-    // @cyyynthia_
-    1300929324154060800: 'ii',
-  },
-  github: {
-    // cyyynthia
-    9999055: 'ii',
-  },
-  twitch: {
-    // cyyynthia_
-    103493295: 'ii',
-  },
-  facebook: {
-    // Test account associated to the PronounDB Facebook App
-    100081064205146: 'sh',
-  },
-}
+import { Server } from 'ws'
 
-export function processRequest (urlStr: string): any {
-  const url = new URL(urlStr)
-  const platform = url.searchParams.get('platform')!
-  if (urlStr.includes('lookup-bulk')) {
-    const ids = url.searchParams.get('ids')!.split(',')
-    const res = {}
-    for (const id of ids) res[id] = TestPronouns[platform]?.[id] ?? 'tt'
-    return res
-  }
+export type IrcServer = Server
 
-  const id = url.searchParams.get('id')!
-  return { pronouns: TestPronouns[platform]?.[id] ?? 'tt' }
+// Mock IRC WS server for Twitch unit tests
+export default function makeIrcServer (port: number) {
+  const server = new Server({ host: 'localhost', port: port })
+  server.on('connection', (conn) => {
+    let nick = ''
+    conn.on('message', (msg) => {
+      const payload = msg.toString()
+      if (payload.startsWith('NICK')) {
+        nick = payload.slice(5)
+        return
+      }
+
+      if (payload.startsWith('JOIN')) {
+        const channel = payload.slice(5)
+        conn.send(`:${nick}!${nick}@${nick}.tmi.twitch.tv JOIN ${channel}\n`)
+        conn.send(`:tmi.twitch.tv ROOMSTATE ${channel}\n`)
+
+        const MSG_PREFIX = '@color=#F49898;user-id=103493295 :cyyynthia_!cyyynthia_@cyyynthia_.tmi.twitch.t\n'
+        setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow.\n`), 1500)
+        setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow?\n`), 1750)
+        setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow!!\n`), 2000)
+        return
+      }
+    })
+  })
+
+  return server
 }

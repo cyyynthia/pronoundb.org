@@ -110,23 +110,13 @@ async function injectChat (element: HTMLElement) {
 }
 
 async function injectViewerCard (element: HTMLElement) {
-  let placeholder
-  for (let i = 0; i < 100; i++) {
-    placeholder = element.querySelector('.tw-placeholder')
-    if (!placeholder) break
-
-    await new Promise((resolve) => setTimeout(resolve, 10))
-  }
-
-  if (placeholder) return
-
-  const card = element.querySelector<HTMLElement>('.viewer-card')
-  if (!card) return
-
   const container = element.querySelector<HTMLElement>('.viewer-card-header__display-name')
   if (!container) return
 
-  const cardId = await fetchReactProp(card, [ 'child', 'sibling', 'child', 'memoizedProps', 'targetUser', 'id' ])
+  const query = { $find: 'targetUser', $in: [ 'child', 'sibling', 'memoizedProps', '0', '1' ] }
+  const cardId = await fetchReactProp(element, [ query, 'targetUser', 'id' ])
+  if (!cardId) return
+
   const pronouns = await fetchPronouns('twitch', cardId)
   if (pronouns === 'unspecified') return
 
@@ -155,22 +145,23 @@ async function injectViewerCard (element: HTMLElement) {
 }
 
 async function injectStreamerAbout () {
-  let streamerId
-  const player = document.querySelector<HTMLElement>('.video-player')
-  if (player) {
-    streamerId = await fetchReactProp(player, [ 'return', 'return', 'return', 'return', 'return', 'return', 'return', 'return', 'memoizedProps', 'channelID', 'user', 'id' ])
-  } else {
-    const channelInfo = document.querySelector<HTMLElement>('.channel-info-content')
-    if (!channelInfo) return
+  const channelInfo = document.querySelector<HTMLElement>('.channel-info-content')
+  if (!channelInfo) return
 
-    streamerId = await fetchReactProp(channelInfo, [ 'child', 'memoizedProps', 'channelID' ])
-  }
+  const streamerId = await fetchReactProp(channelInfo, [ { $find: 'channelID', $in: [ 'child', 'memoizedProps' ] }, 'channelID' ])
+  if (!streamerId) return
 
   const pronouns = await fetchPronouns('twitch', streamerId)
   if (pronouns === 'unspecified') return
 
   const el = document.querySelector('.about-section div + div span div')
   if (!el) return
+
+  const prevPronounsContainer = el.querySelector<HTMLElement>('.pronoundb-streamer-about div')
+  if (prevPronounsContainer) {
+    prevPronounsContainer.innerText = formatPronouns(pronouns)
+    return
+  }
 
   el.appendChild(
     h('div', {
@@ -193,14 +184,15 @@ function handleMutation (nodes: MutationRecord[]) {
     for (const added of addedNodes) {
       if (added instanceof HTMLElement) {
         if (settings.chat) {
-          const el = added.querySelector<HTMLElement>('.chat-author__display-name')
-          if (added.classList?.contains('chat-line__message') && el) {
-            injectChat(el)
+          const displayName = added.querySelector<HTMLElement>('.chat-author__display-name')
+          if (added.className.includes('chat-line__') && displayName) {
+            injectChat(displayName)
             continue
           }
         }
 
-        if (settings.popout && added.dataset.aTarget === 'viewer-card-positioner') {
+        const viewerCard = added.firstElementChild as HTMLElement
+        if (settings.popout && viewerCard?.dataset.aTarget === 'viewer-card') {
           injectViewerCard(added)
           continue
         }
@@ -216,6 +208,12 @@ function handleMutation (nodes: MutationRecord[]) {
 
 export function inject () {
   // todo: load settings
+
+  // Process all existing elements
+  document.querySelectorAll<HTMLElement>('.chat-author__display-name').forEach((el) => injectChat(el))
+  if (document.querySelector('.about-section')) injectStreamerAbout()
+
+  // Start observer
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
 }
