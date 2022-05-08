@@ -26,16 +26,43 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { IrcServer } from '../testutils/irc.js'
+import { Server } from 'ws'
 import test from './test.js'
 import { expect } from '@playwright/test'
-import makeIrcServer from '../testutils/irc.js'
 
-let server: IrcServer
+let server: Server
 const PORT = 10_000 + Math.round(Math.random() * 10_000)
 
-test.beforeAll(() => void (server = makeIrcServer(PORT)))
-test.afterAll(() => void server.close())
+test.beforeAll(() => {
+  server = new Server({ host: 'localhost', port: PORT })
+  server.on('connection', (conn) => {
+    let nick = ''
+    conn.on('message', (msg) => {
+      const payload = msg.toString()
+      if (payload.startsWith('NICK')) {
+        nick = payload.slice(5)
+        return
+      }
+
+      if (payload.startsWith('JOIN')) {
+        const channel = payload.slice(5)
+        conn.send(`:${nick}!${nick}@${nick}.tmi.twitch.tv JOIN ${channel}\n`)
+        conn.send(`:tmi.twitch.tv ROOMSTATE ${channel}\n`)
+
+        const MSG_PREFIX = '@color=#F49898;user-id=103493295 :cyyynthia_!cyyynthia_@cyyynthia_.tmi.twitch.t\n'
+        setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow.\n`), 1500)
+        setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow?\n`), 1750)
+        setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow!!\n`), 2000)
+        return
+      }
+    })
+  })
+})
+
+test.afterAll(() => {
+  server.close()
+})
+
 test.use({
   context: async ({ context }, use) => {
     await context.route(
