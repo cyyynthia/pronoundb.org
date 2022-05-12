@@ -163,6 +163,7 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
       headers: {
         accept: 'application/json',
         'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
       },
       body: encode({
         state: request.query.state,

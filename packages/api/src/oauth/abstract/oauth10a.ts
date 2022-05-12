@@ -173,8 +173,9 @@ export async function authorize (this: FastifyInstance, request: AuthorizeReques
   const { nonce, response } = await reply.context.config.httpClient.securedRequest({
     method: 'POST',
     path: reply.context.config.requestPath,
-    token: { clientId: reply.context.config.clientId, clientSecret: reply.context.config.clientSecret },
+    headers: { 'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)' },
     body: { oauth_callback: `${config.host}${redirect}` },
+    token: { clientId: reply.context.config.clientId, clientSecret: reply.context.config.clientSecret },
   })
 
   if (response.statusCode !== 200) {
@@ -221,13 +222,14 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
   const { response } = await reply.context.config.httpClient.securedRequest({
     method: 'POST',
     path: reply.context.config.tokenPath,
+    headers: { 'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)' },
+    body: { oauth_verifier: request.query.oauth_verifier },
     token: {
       clientId: reply.context.config.clientId,
       clientSecret: reply.context.config.clientSecret,
       token: request.query.oauth_token,
       tokenSecret: authorization.secret,
     },
-    body: { oauth_verifier: request.query.oauth_verifier },
   })
 
   if (response.statusCode !== 200) {

@@ -46,6 +46,7 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
     headers: {
       accept: 'application/vnd.github.v3+json',
       authorization: `token ${token}`,
+      'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
     },
   })
 

@@ -48,8 +48,12 @@ async function getSelf (token: string): Promise<ExternalAccount | string | null>
   const xliveBody = new PassThrough()
   const xstsBody = new PassThrough()
   const minecraftBody = new PassThrough()
-  const headers = { 'content-type': 'application/json', accept: 'application/json' }
   const abortCtrl = new AbortController()
+  const headers = {
+    'content-type': 'application/json',
+    accept: 'application/json',
+    'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
+  }
 
   const xliveReq = userAuthXblClient.request({
     method: 'POST',
@@ -150,6 +154,7 @@ async function getSelf (token: string): Promise<ExternalAccount | string | null>
     headers: {
       authorization: `Bearer ${minecraftToken.access_token}`,
       accept: 'application/json',
+      'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
     },
   })
 

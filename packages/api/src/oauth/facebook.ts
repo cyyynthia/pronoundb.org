@@ -43,12 +43,18 @@ function yeetToken (token: string): void {
   graphClient.request({
     method: 'DELETE',
     path: '/v13.0/me/permissions',
-    headers: { authorization: `Bearer ${token}` },
+    headers: {
+      authorization: `Bearer ${token}`,
+      'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
+    },
   })
 }
 
 async function getSelf (token: string, state: string): Promise<ExternalAccount | string | null> {
-  const headers = { authorization: `Bearer ${token}` }
+  const headers = {
+    authorization: `Bearer ${token}`,
+    'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
+  }
   const encodedId = state.split(';;;')[1]
   if (!encodedId) {
     yeetToken(token)

@@ -40,6 +40,9 @@ async function getSelf (token: string, secret: string): Promise<ExternalAccount 
   const { response } = await apiClient.securedRequest({
     method: 'GET',
     path: '/1.1/account/verify_credentials.json',
+    headers: {
+      'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
+    },
     token: {
       clientId: clientId,
       clientSecret: clientSecret,

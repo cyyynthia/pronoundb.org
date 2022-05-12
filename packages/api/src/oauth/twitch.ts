@@ -46,6 +46,7 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
     headers: {
       authorization: `Bearer ${token}`,
       'client-id': clientId,
+      'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
     },
   })
 

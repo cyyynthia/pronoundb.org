@@ -42,7 +42,10 @@ async function getSelf (token: string): Promise<ExternalAccount | null> {
   const response = await discordClient.request({
     method: 'GET',
     path: '/api/v9/users/@me',
-    headers: { authorization: `Bearer ${token}` },
+    headers: {
+      authorization: `Bearer ${token}`,
+      'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
+    },
   })
 
   if (response.statusCode !== 200) return null
