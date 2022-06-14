@@ -52,11 +52,11 @@ export default function Docs (_: Attributes) {
     <main class='container-main'>
       <div class='title-context'>About PronounDB</div>
       <h2 class='text-2xl font-bold mb-2'>API Documentation</h2>
-      <div class='mb-4 bg-blue-300 font-semibold p-4'>
+      <div class='mb-4 bg-blue-300 font-semibold p-4 dark:text-black'>
         This will be rewritten soon, with a better look and a new API that includes new features. Stay tuned!
       </div>
 
-      <h3 class='text-xl font-bold mb-2'>Types</h3>
+      <h3 class='text-xl font-bold mb-2' id='types'>Types</h3>
       <div>
         <b class='bold'>Platform:</b> <SupportedFragment/>
       </div>
@@ -74,12 +74,12 @@ export default function Docs (_: Attributes) {
         </ul>
       </div>
 
-      <div class='mb-4 bg-blue-300 font-semibold p-4'>
+      <div class='mb-4 bg-blue-300 font-semibold p-4 dark:text-black'>
         For privacy reasons, the API will respond successfully regardless of whether the account is linked to a
         PronounDB account or not.
       </div>
 
-      <h3 class='text-xl font-bold mb-2'>Lookup an account</h3>
+      <h3 class='text-xl font-bold mb-2' id='lookup'>Lookup an account</h3>
       <div class='mb-6'>
         <p>GET /api/v1/lookup</p>
         <p>Query parameters</p>
@@ -90,8 +90,8 @@ export default function Docs (_: Attributes) {
         <p>Response: A JSON object with a <b>pronouns</b> property.</p>
       </div>
 
-      <h3 class='text-xl font-bold mb-2'>Lookup accounts in bulk</h3>
-      <div class='mb-4 bg-blue-300 font-semibold p-4'>
+      <h3 class='text-xl font-bold mb-2' id='bulk'>Lookup accounts in bulk</h3>
+      <div class='mb-4 bg-blue-300 font-semibold p-4 dark:text-black'>
         It is more efficient to use a simple lookup for single-id queries, and the API may refuse to do bulk lookup
         for single-id queries in the future.
       </div>
@@ -103,6 +103,23 @@ export default function Docs (_: Attributes) {
           <li><b class='bold'>ids</b>: Comma-separated Account IDs, will be cropped to 50 max</li>
         </ul>
         <p>Response: A map of IDs with their corresponding set of pronouns.</p>
+      </div>
+
+      <h3 class='text-xl font-bold mb-2' id='shields-io'>shields.io endpoint</h3>
+      <div class='mb-2'>
+        You can use shields.io's endpoint functionality to create a badge of your pronouns using PronounDB's API.
+        The endpoint is at <code class='px-1 bg-gray-200 dark:bg-gray-700'>/shields/:pronoundbId</code>. The
+        PronounDB ID is shown under "Advanced settings" in your account screen.
+      </div>
+      <div class='mb-2'>
+        See <a href='https://shields.io/endpoint' target='_blank' rel='noreferrer'>shields.io's docs</a> for more
+        information. Below is an example badge of the website's developer pronouns.
+      </div>
+      <div class='mb-6'>
+        <pre class='mb-3 overflow-x-auto bg-gray-200 dark:bg-gray-700 p-2 text-sm'>
+          https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6
+        </pre>
+        <img src='https://img.shields.io/endpoint?color=f49898&style=flat-square&url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6' alt=''/>
       </div>
     </main>
   )
