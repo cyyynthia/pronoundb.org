@@ -32,8 +32,8 @@ declare module '@pronoundb/shared' {
   export type Platform = {
     name: string
     color: string
-    since: string
-    requiresExt?: boolean
+    hasIntegration: boolean
+    requiresExt?: string
     soon?: boolean
     info?: string
   }

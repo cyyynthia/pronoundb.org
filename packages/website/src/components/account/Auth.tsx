@@ -62,11 +62,11 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
   const [ buttonRef, onMouseEnterButton, onMouseLeaveButton ] = useTooltip(extMessage)
   const [ infoRef, onMouseEnterInfo, onMouseLeaveInfo ] = useTooltip(platform.info ?? '')
 
-  const [ disabled, setDisabled ] = useState(platform.requiresExt)
+  const [ disabled, setDisabled ] = useState(Boolean(platform.requiresExt))
 
   function check () {
     const ver = getPdbExtVer()
-    setDisabled(!ver || compareSemver(platform.since, ver) === 1)
+    setDisabled(!ver || compareSemver(platform.requiresExt!, ver) === 1)
   }
 
   useEffect(() => {
@@ -82,12 +82,12 @@ function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuth
 
   const contents = (
     <Fragment>
-      {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none' })}
+      {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
       <span class='font-semibold flex-1'>Connect with {platform.name}</span>
       {platform.info && (
         <Info
           ref={infoRef}
-          class='w-4 h-4 ml-4 flex-none'
+          class='w-4 h-4 ml-4 flex-none fill-current'
           onMouseEnter={onMouseEnterInfo}
           onMouseLeave={onMouseLeaveInfo}
         />
@@ -137,7 +137,7 @@ export default function Auth (props: OAuthProps) {
   return (
     <main class='container-main'>
       <div class='title-context'>Authentication</div>
-      <h2 class='text-2xl font-bold mb-4'>{IntentTitles[props.intent]}</h2>
+      <h2 class='text-2xl font-bold mb-3'>{IntentTitles[props.intent]}</h2>
       {props.intent === 'login' && <p class='mb-2'>Make sure to select an account you already linked on PronounDB.</p>}
       {props.intent === 'register' && <p class='mb-2'>Make sure to give the <a class='link' href={Routes.PRIVACY}>Privacy Policy</a> a look. Registering an account on PronounDB will be seen as an acceptance of it.</p>}
 

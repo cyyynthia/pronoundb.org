@@ -28,7 +28,7 @@
 
 import type { Attributes, ComponentType } from 'preact'
 import { h } from 'preact'
-import { useContext } from 'preact/hooks'
+import { useContext, useMemo } from 'preact/hooks'
 import { useTitle } from 'hoofd/preact'
 import { route } from 'preact-router'
 import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
@@ -40,21 +40,21 @@ import { Routes } from '../../constants'
 
 import Globe from 'feather-icons/dist/icons/globe.svg'
 
-type PlatformCardProps = { platformId: string }
+type PlatformCardProps = { platformId: string, thirdParty?: boolean }
 
 type SupportedProps = Attributes & { platform?: string }
 
 const Previews: Record<string, ComponentType> = { twitch: Twitch }
 
-function PlatformCard ({ platformId }: PlatformCardProps) {
+function PlatformCard ({ platformId, thirdParty }: PlatformCardProps) {
   return (
     <div class={`platform-box border-platform-${platformId}`}>
       {h(PlatformIcons[platformId], { class: 'w-8 h-8 mr-4 flex-none fill-current' })}
       <div class='flex-none flex flex-col'>
         <span class='font-semibold'>{Platforms[platformId].name}</span>
-        {platformId in Previews
+        {!thirdParty && (platformId in Previews
           ? <a class='text-deep-blue dark:text-cyan-100 link' href={Routes.SUPPORTED_PREVIEW(platformId)}>See the integration</a>
-          : <span>No preview available</span>}
+          : <span>No preview available</span>)}
       </div>
     </div>
   )
@@ -80,6 +80,19 @@ export function SupportedPreview () {
 export default function Supported ({ platform }: SupportedProps) {
   useTitle(platform ? `${Platforms[platform].name} Integration` : 'Supported')
   const { ctx } = useContext(AppContext)
+
+  const [ platformsWithIntegration, platformsWithoutIntegration ] = useMemo(() => {
+    const filtered = PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon)
+    const withInt = []
+    const withoutInt = []
+    for (const p of filtered) {
+      if (Platforms[p].hasIntegration)
+        withInt.push(p)
+        else
+        withoutInt.push(p)
+    }
+    return [ withInt, withoutInt ]
+  }, [])
 
   if (platform) {
     if (!(platform in Previews)) {
@@ -110,7 +123,17 @@ export default function Supported ({ platform }: SupportedProps) {
       </p>
 
       <div class='platforms-grid'>
-        {PlatformIds.filter((p) => import.meta.env.DEV || !Platforms[p].soon).map((p) => <PlatformCard key={p} platformId={p}/>)}
+        {platformsWithIntegration.map((p) => <PlatformCard key={p} platformId={p}/>)}
+      </div>
+
+      <h3 class='text-xl font-bold mt-8 mb-2'>Platforms without integrations</h3>
+      <p class='mb-4'>
+        While PronounDB's browser extension doesn't support these directly, these platforms are listed for third party
+        developers to make cool integrations with PronounDB.
+      </p>
+
+      <div class='platforms-grid'>
+        {platformsWithoutIntegration.map((p) => <PlatformCard key={p} platformId={p} thirdParty/>)}
       </div>
     </main>
   )

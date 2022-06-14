@@ -30,67 +30,70 @@ const Platforms = {
   codeberg: {
     name: 'Codeberg',
     color: '#2185D0',
-    since: '0.0.0',
+    hasIntegration: true,
     soon: true,
   },
   discord: {
     name: 'Discord',
     color: '#5865F2', // Degraded blurple, real blurple is 7289da.
-    since: '0.2.0',
+    hasIntegration: true,
   },
   facebook: {
     name: 'Facebook',
     color: '#4267B2',
-    since: '0.5.0',
-    requiresExt: true,
+    hasIntegration: true,
+    requiresExt: '0.5.0',
   },
   github: {
     name: 'GitHub',
     color: '#211F1F',
-    since: '0.2.0',
+    hasIntegration: true,
   },
   instagram: {
     name: 'Instagram',
     color: '#E4405F',
-    since: '0.0.0',
+    hasIntegration: true,
     soon: true,
   },
   mastodon: {
     name: 'Mastodon',
     color: '#3088D4',
-    since: '0.0.0',
+    hasIntegration: true,
     soon: true,
   },
   minecraft: {
     name: 'Minecraft',
     color: '#854F2B',
-    since: '0.0.0',
+    hasIntegration: false,
     info: 'Authentication via Xbox Live. Bedrock accounts are not supported.',
   },
   osu: {
     name: 'osu!',
     color: '#FF66AA',
-    since: '0.0.0',
+    hasIntegration: true,
     soon: true,
   },
   reddit: {
     name: 'Reddit',
     color: '#FF4500',
-    since: '0.0.0',
+    hasIntegration: true,
     soon: true,
   },
   twitch: {
     name: 'Twitch',
     color: '#9146FF',
-    since: '0.0.0',
+    hasIntegration: true,
   },
   twitter: {
     name: 'Twitter',
     color: '#1DA1F2',
-    since: '0.3.0',
+    hasIntegration: true,
   },
 }
 
 const PlatformIds = Object.keys(Platforms).sort()
 
-module.exports = { Platforms: Platforms, PlatformIds: PlatformIds }
+module.exports = {
+  Platforms: Platforms,
+  PlatformIds: PlatformIds,
+}
