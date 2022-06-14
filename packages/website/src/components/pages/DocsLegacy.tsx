@@ -108,8 +108,9 @@ export default function Docs (_: Attributes) {
       <h3 class='text-xl font-bold mb-2' id='shields-io'>shields.io endpoint</h3>
       <div class='mb-2'>
         You can use shields.io's endpoint functionality to create a badge of your pronouns using PronounDB's API.
-        The endpoint is at <code class='px-1 bg-gray-200 dark:bg-gray-700'>/shields/:pronoundbId</code>. The
-        PronounDB ID is shown under "Advanced settings" in your account screen.
+        The endpoint is at <code class='px-1 bg-gray-200 dark:bg-gray-700'>/shields/:pronoundbId</code>. By default,
+        everything will be in lowercase, but you can add the <code class='px-1 bg-gray-200 dark:bg-gray-700'>capitalize</code> query
+        parameter to change this behavior. The PronounDB ID is shown under "Advanced settings" in your account screen.
       </div>
       <div class='mb-2'>
         See <a href='https://shields.io/endpoint' target='_blank' rel='noreferrer'>shields.io's docs</a> for more

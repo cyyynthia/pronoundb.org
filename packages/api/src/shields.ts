@@ -38,13 +38,17 @@ async function generateShield (this: FastifyInstance, request: FastifyRequest, r
     return { error: 400, message: 'Invalid ID' }
   }
 
+  const capitalize = 'capitalize' in (request.query as Record<string, string>)
+  const idx = capitalize ? 1 : 0
+
   const id = new this.mongo.ObjectId(params.id)
   const user = await this.mongo.db!.collection<MongoUser>('accounts').findOne({ _id: id })
   const pronouns = user?.pronouns ?? 'unspecified'
   reply.send({
     schemaVersion: 1,
-    label: 'pronouns',
-    message: (Array.isArray(LegacyPronouns[pronouns]) ? LegacyPronouns[pronouns][0] : LegacyPronouns[pronouns]) ?? 'unspecified',
+    label: capitalize ? 'Pronouns' : 'pronouns',
+    message: (Array.isArray(LegacyPronouns[pronouns]) ? LegacyPronouns[pronouns][idx] : LegacyPronouns[pronouns])
+      ?? (capitalize ? 'Unspecified' : 'unspecified'),
   })
 }
 
