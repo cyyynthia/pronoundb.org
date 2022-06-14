@@ -62,15 +62,15 @@ function finishLicense ({ workingDirectory }) {
   let skip = false
   return {
     name: 'finish-license',
-    configResolved (cfg) {
+    configResolved: (cfg) => {
       skip = !cfg.isProduction
     },
-    generateBundle (_, bundle) {
+    generateBundle: (_, bundle) => {
       if (process.argv.includes('--ssr')) return
       const header = [
         'Copyright (c) Cynthia K. Rey, All Rights Reserved.',
         'Licensed under the BSD-3-Clause license. Contains third-party software licensed under different terms.',
-        `For third-party software licenses included in this build, please see /${finalLicensePath}`
+        `For third-party software licenses included in this build, please see /${finalLicensePath}`,
       ]
 
       for (const item of Object.values(bundle)) {
@@ -92,7 +92,7 @@ function finishLicense ({ workingDirectory }) {
     },
     closeBundle: async () => {
       if (!skip && !process.argv.includes('--ssr')) {
-        await rename(baseLicensePath, join(workingDirectory, 'dist', finalLicensePath))
+        await rename(baseLicensePath, join(workingDirectory, 'dist', finalLicensePath)).catch(() => void 0)
       }
     },
   }

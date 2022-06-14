@@ -87,10 +87,10 @@ export function usePronouns () {
       if (chrome.storage) {
         chrome.storage.onChanged.addListener(updateFormatted)
         return () => chrome.storage.onChanged.removeListener(updateFormatted)
-      } else {
-        window.addEventListener('message', updateFormatted)
-        return () => window.removeEventListener('message', updateFormatted)
       }
+
+      window.addEventListener('message', updateFormatted)
+      return () => window.removeEventListener('message', updateFormatted)
     }
   }, [ updateFormatted ])
 }

@@ -31,17 +31,13 @@ import type { Db } from 'mongodb'
 
 import type { RestExtensionStats, RestStatsData } from '@pronoundb/shared'
 import { Extensions } from '@pronoundb/shared/constants.js'
-import { createHash } from 'crypto'
 import { fetch } from 'undici'
-
-import config from './config.js'
 
 const CHROME = `https://chrome.google.com/webstore/detail/${Extensions.CHROME}?hl=en`
 const FIREFOX = `https://addons.mozilla.org/api/v5/addons/addon/${Extensions.FIREFOX}`
 const EDGE = `https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/${Extensions.EDGE}`
 
 let lastFetch: number
-let computedHash: string
 let stats: RestStatsData = {
   users: 0,
   chrome: {
@@ -107,24 +103,16 @@ async function fetchStats (db: Db) {
     firefox: firefox,
     edge: edge,
   }
-
-  computedHash = `W/"${createHash('sha256').update(config.secret).update(JSON.stringify(stats)).digest('base64')}"`
 }
 
-async function getStats (this: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
+async function getStats (this: FastifyInstance, _: FastifyRequest, reply: FastifyReply) {
   if ((Date.now() - lastFetch) > 3600e3) {
     // Initiate a re-fetch in background, but don't wait for new data
     // We can serve stale data and wait for new one to arrive
     fetchStats(this.mongo.db!)
   }
 
-  reply.header('cache-control', 'public, max-age=600')
-  if (request.headers['if-none-match'] === computedHash) {
-    reply.code(304).send()
-    return
-  }
-
-  reply.header('etag', computedHash).send(stats)
+  reply.send(stats)
 }
 
 export default async function (fastify: FastifyInstance) {

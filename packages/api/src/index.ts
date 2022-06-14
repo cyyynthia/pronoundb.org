@@ -139,7 +139,7 @@ fastify.register(stats, { prefix: '/api/v1/stats' })
 fastify.register(shields, { prefix: '/shields' })
 
 fastify.setNotFoundHandler((_: FastifyRequest, reply: FastifyReply) => void reply.code(404).send({ error: 404, message: 'Not Found' }))
-fastify.listen(config.apiPort, config.bind, (e) => {
+fastify.listen({ port: config.apiPort, host: config.bind }, (e) => {
   if (e) {
     console.error(e)
     process.exit(1)
