@@ -62,7 +62,7 @@ const test = base.extend({
     const mockCodeJs = mockCodeTs
       // Remove TS traces
       .replace(/!/g, '')
-      .replace(/: (string|any)/g, '')
+      .replace(/: (Record<.*>|string|any)/g, '')
       .replace('export function', 'function')
       // "Minify" the code
       .replace(/^((.\*| *\/\/).*)?\n/gm, '') // Comments & empty lines

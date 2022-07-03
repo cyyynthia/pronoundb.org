@@ -37,7 +37,7 @@ export const match = /^https:\/\/(.+\.)?twitter\.com/
 
 async function injectProfileHeader (header: HTMLElement) {
   const node = header.parentElement!
-  const id = await fetchReactProp(node, [ 'return', 'return', 'memoizedProps', 'user', 'id_str' ])
+  const id = await fetchReactProp(node, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'id_str' ])
   if (!id) return
 
   const pronouns = await fetchPronouns('twitter', id)
@@ -68,7 +68,9 @@ async function injectTweet (tweet: HTMLElement) {
   if (pronouns === 'unspecified') return
 
   let separator: Node
-  let sep = tweet.querySelector<HTMLElement>('time')?.parentElement?.previousElementSibling!
+  let sep = tweet.querySelector('[data-testid="User-Names"] div[dir="auto"][aria-hidden="true"]')
+  if (!sep) sep = tweet.querySelector<HTMLElement>('time')?.parentElement?.previousElementSibling!
+
   if (tweet.dataset.testid === 'tweet') {
     const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
     if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
@@ -79,26 +81,29 @@ async function injectTweet (tweet: HTMLElement) {
     separator.appendChild(sep.cloneNode(true))
   }
 
-  const prevPronouns = sep.parentElement!.querySelector<HTMLElement>('[data-pronoundb]')
-  if (prevPronouns) {
-    prevPronouns.innerText = formatPronouns(pronouns)
-    return
+  let pronounsContainer = sep.parentElement!.querySelector<HTMLElement>('[data-pronoundb]')
+  if (!pronounsContainer) {
+    const template = <HTMLElement> sep.previousElementSibling
+    if (!template) return
+
+    const after = <HTMLElement> sep.nextElementSibling?.nextElementSibling
+    pronounsContainer = <HTMLElement> template.cloneNode(true)
+    pronounsContainer.setAttribute('data-pronoundb', 'true')
+    if (after) {
+      sep.parentElement!.insertBefore(separator, after)
+      sep.parentElement!.insertBefore(pronounsContainer, after)
+      return
+    }
+
+    sep.parentElement!.appendChild(separator)
+    sep.parentElement!.appendChild(pronounsContainer)
   }
 
-  const next = <HTMLElement> sep.nextElementSibling
-  if (!next) return
-
-  const classes = next.classList
-  const after = <HTMLElement> next.nextElementSibling
-  const pronounsEl = h('span', { class: classes, 'data-pronoundb': 'true' }, formatPronouns(pronouns))
-  if (after) {
-    sep.parentElement!.insertBefore(separator, after)
-    sep.parentElement!.insertBefore(pronounsEl, after)
-    return
+  if (pronounsContainer.tagName === 'SPAN') {
+    pronounsContainer.innerText = formatPronouns(pronouns)
+  } else {
+    pronounsContainer.querySelector('span')!.innerText = formatPronouns(pronouns)
   }
-
-  sep.parentElement!.appendChild(separator)
-  sep.parentElement!.appendChild(pronounsEl)
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
