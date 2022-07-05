@@ -50,33 +50,37 @@ const Styles = {
     color: 'var(--text-normal)',
     marginBottom: '8px',
   }),
+  messageHeader: css({
+    display: 'inline-block',
+    color: 'var(--text-muted)',
+    fontSize: '.75rem',
+    lineHeight: '1.375rem',
+    fontWeight: '500',
+    height: '1.25rem',
+    cursor: 'default',
+    pointerEvents: 'none',
+    textIndent: '0',
+  }),
 }
 
 async function handleMessage (node: HTMLElement) {
+  const header = node.getElementsByTagName('h2').item(0)
+  if (!header || !header.getAttribute('aria-labelledby')?.startsWith('message-username')) return
+
   const id = await fetchReactProp(node, [ 'return', 'return', 'memoizedProps', 'message', 'author', 'id' ])
   if (!id) return
 
   const pronouns = await fetchPronouns('discord', id)
   if (pronouns === 'unspecified') return
 
-  const header = node.querySelector('h2')
-  if (!header) return
+  const element = h('span', { class: 'pronoundb-pronouns', style: Styles.messageHeader }, ` • ${formatPronouns(pronouns)}`)
+  if (node.firstElementChild?.className.includes('compact-')) {
+    const usernameSection = node.querySelector('[id^="message-username"]')
+    if (usernameSection) usernameSection.insertBefore(element, usernameSection.lastChild)
+    return
+  }
 
-  header.appendChild(
-    h(
-      'span',
-      {
-        class: 'pronoundb-pronouns',
-        style: css({
-          color: 'var(--text-muted)',
-          fontSize: '.75rem',
-          lineHeight: '1.375rem',
-          fontWeight: '500',
-        }),
-      },
-      ` • ${formatPronouns(pronouns)}`
-    )
-  )
+  header.appendChild(element)
 }
 
 async function handleUserPopOut (node: HTMLElement) {
@@ -143,8 +147,7 @@ function handleMutation (mutations: MutationRecord[]) {
           continue
         }
 
-        if (node.className.startsWith('chat-')) {
-          console.log(node.querySelectorAll('li[id^=chat-messages-]'))
+        if (node.className.startsWith('chat-') || node.className.startsWith('chatContent-')) {
           node.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
           continue
         }
@@ -171,7 +174,7 @@ function handleMutation (mutations: MutationRecord[]) {
           continue
         }
 
-        if (node.className.startsWith('autocompleteRow') && node.querySelector('[role="img"]')) {
+        if (node.className.startsWith('autocompleteRow-') && node.querySelector('[role="img"]')) {
           handleAutocompleteRow(node)
           continue
         }
@@ -187,13 +190,4 @@ export function inject () {
   // Mutation observer
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })
-
-  const style = document.createElement('style')
-  style.textContent += '[class^="headerText-"] + .pronoundb-pronouns { margin-right: .6rem; }'
-  style.textContent += '[class^="userInfoSection-"] [class^="userInfoSectionHeader-"] { grid-row: 1; }'
-  style.textContent += '[class^="userInfoSection-"] [class^="note-"]:last-child { grid-column: 1 / 3; }'
-  style.textContent += '[class^="userBio-"] { grid-row: 2; }'
-  style.textContent += '[class^="userBio-"] + [class^="userInfoSectionHeader-"] { grid-row: 3; grid-column: 1 / 3; }'
-  style.textContent += '[class^="userBio-"] ~ [class^="note-"] { grid-row: 4; grid-column: 1 / 3; }'
-  document.head.appendChild(style)
 }

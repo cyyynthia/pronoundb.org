@@ -40,7 +40,7 @@ async function doFetch (platform: string, queue: Map<string, Deferred<string>>) 
   })
 
   if (!res.success) {
-    console.error('[PronounDB::fetch] Failed to fetch: %o', res.error)
+    console.error('[PronounDB::fetch] Failed to fetch:', res.error)
     for (const v of queue.values()) v.resolve('unspecified')
     return
   }

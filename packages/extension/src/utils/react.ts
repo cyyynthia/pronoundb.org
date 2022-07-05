@@ -35,8 +35,9 @@ const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined
 const callbacks = new Map()
 let targetId = 0
 
-function bridgeReactStuff (nodes: HTMLElement[], propPath: QueryElement[], args?: any[]): Promise<any[]> {
-  const targets = nodes.map((node) => (node.dataset.pronoundbTargetId = String(++targetId)))
+function bridgeReactStuff (node: HTMLElement, propPath: QueryElement[], args?: any[]): Promise<any> {
+  const target = `${++targetId}`
+  node.dataset.pronoundbTargetId = target
   const deferred = createDeferred<any>()
   const id = Math.random().toString(36).slice(2)
   const timeout = setTimeout(() => {
@@ -54,7 +55,7 @@ function bridgeReactStuff (nodes: HTMLElement[], propPath: QueryElement[], args?
     source: 'pronoundb',
     payload: {
       action: 'bridge.query',
-      targets: targets,
+      target: target,
       props: propPath,
       args: args,
       id: id,
@@ -64,90 +65,59 @@ function bridgeReactStuff (nodes: HTMLElement[], propPath: QueryElement[], args?
   return deferred.promise
 }
 
-function doFetchReactProp (targets: Array<Element | null>, propPath: QueryElement[]) {
-  const first = targets.find(Boolean)
-  if (!first) return []
-
-  const reactKey = Object.keys(first).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
+function doFetchReactProp (target: Element, propPath: QueryElement[]) {
+  const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
   if (!reactKey) return []
 
-  let props = []
-  for (const element of targets) {
-    if (!element) {
-      props.push(null)
+  let res = (target as any)[reactKey]
+  for (const prop of propPath) {
+    if (!res) break
+    if (typeof prop === 'string') {
+      res = res[prop]
       continue
     }
 
-    let res = (element as any)[reactKey]
-    for (const prop of propPath) {
-      if (!res) break
-      if (typeof prop === 'string') {
-        res = res[prop]
-        continue
+    const queue = [ res ]
+    res = null
+    while (queue.length) {
+      const el = queue.shift()
+      if (prop.$find in el) {
+        res = el
+        break
       }
 
-      const queue = [ res ]
-      res = null
-      while (queue.length) {
-        const el = queue.shift()
-        if (prop.$find in el) {
-          res = el
-          break
-        }
-
-        for (const p of prop.$in) {
-          // eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
-          if (p in el && el[p] != null) queue.push(el[p])
-        }
+      for (const p of prop.$in) {
+        // eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
+        if (p in el && el[p] != null) queue.push(el[p])
       }
     }
-
-    props.push(res)
   }
 
-  return props
+  return res
 }
 
-function doExecuteReactProp (targets: Array<Element | null>, propPath: QueryElement[], args: any[]) {
+function doExecuteReactProp (target: Element, propPath: QueryElement[], args: any[]) {
   const fn = propPath.pop()!
   if (typeof fn !== 'string') throw new Error('invalid query')
-  const obj = doFetchReactProp(targets, propPath)
-  return obj.map((o) => o[fn].apply(o, args))
-}
-
-/**
- * Deprecated in favor of transparent bulking at request-level.
- * New react fetch impl is light enough that the footprint can be ignored.
- * @deprecated
- */
-export async function fetchReactPropBulk (nodes: HTMLElement[], propPath: QueryElement[]) {
-  if (isFirefox) {
-    return doFetchReactProp(nodes.map((node) => node.wrappedJSObject), propPath)
-  }
-
-  return bridgeReactStuff(nodes, propPath)
-}
-
-/**
- * Deprecated in favor of transparent bulking at request-level.
- * New react fetch impl is light enough that the footprint can be ignored.
- * @deprecated
- */
-export async function executeReactPropBulk (nodes: HTMLElement[], propPath: QueryElement[], ...args: any[]) {
-  if (isFirefox) {
-    // @ts-expect-error
-    return doExecuteReactProp(nodes.map((node) => node.wrappedJSObject), propPath, cloneInto(args, window))
-  }
-
-  return bridgeReactStuff(nodes, propPath, args)
+  const obj = doFetchReactProp(target, propPath)
+  return obj[fn].apply(obj, args)
 }
 
 export async function fetchReactProp (node: HTMLElement, propPath: QueryElement[]) {
-  return fetchReactPropBulk([ node ], propPath).then((res) => res[0])
+  if (isFirefox) {
+    return doFetchReactProp(node.wrappedJSObject, propPath)
+  }
+
+  return bridgeReactStuff(node, propPath)
 }
 
 export async function executeReactProp (node: HTMLElement, propPath: QueryElement[], ...args: any[]) {
-  return executeReactPropBulk([ node ], propPath, ...args).then((res) => res[0])
+  if (isFirefox) {
+    // @ts-expect-error
+    return doExecuteReactProp(node.wrappedJSObject, propPath, cloneInto(args, window))
+  }
+
+  return bridgeReactStuff(node, propPath, args)
 }
 
 // Inject main context bridge for Chromium
@@ -177,17 +147,15 @@ export function initReact () {
         if (e.source === window && e.data?.source === 'pronoundb') {
           const data = e.data.payload
           if (data.action === 'bridge.query') {
-            const elements = data.targets.map((target: string) => {
-              const node = document.querySelector(`[data-pronoundb-target-id="${target}"]`)
-              if (node) node.removeAttribute('data-pronoundb-target-id')
-              return node
-            })
-
             let res
-            if (data.args) {
-              res = doExecuteReactProp(elements, data.props, data.args)
-            } else {
-              res = doFetchReactProp(elements, data.props)
+            const element = document.querySelector(`[data-pronoundb-target-id="${data.target}"]`)
+            if (element) {
+              element.removeAttribute('data-pronoundb-target-id')
+              if (data.args) {
+                res = doExecuteReactProp(element, data.props, data.args)
+              } else {
+                res = doFetchReactProp(element, data.props)
+              }
             }
 
             window.postMessage({
