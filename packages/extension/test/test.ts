@@ -31,6 +31,7 @@ import type { TestArgs } from '../playwright.config.js'
 import { test as base, chromium, firefox } from '@playwright/test'
 import { setTimeout as wait } from 'timers/promises'
 import { readFileSync } from 'fs'
+import { readFile } from 'fs/promises'
 import { join, basename } from 'path'
 import RDPConnection from '../testutils/rdp.js'
 

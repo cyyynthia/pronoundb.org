@@ -84,11 +84,11 @@ export function initializeRuntime () {
   })
 
   // fixme: need a more stable way to get script
-  const script = (window.chrome.runtime.getManifest() as any).web_accessible_resources[0].resources[2]
-  const scriptEl = document.createElement('script')
-  scriptEl.setAttribute('type', 'module')
-  scriptEl.setAttribute('src', window.chrome.runtime.getURL(script))
-  document.head.appendChild(scriptEl)
+  const script = document.createElement('script')
+  script.setAttribute('src', window.chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
+  script.setAttribute('type', 'module')
+  document.head.appendChild(script)
+  script.remove()
 }
 
 if (!('extension' in window.chrome)) {

@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/// <reference types='@types/node' />
+
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { LoginProcedures } from './testutils/login.js'
 

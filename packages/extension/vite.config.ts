@@ -27,6 +27,7 @@
  */
 
 import type { Plugin } from 'vite'
+import type { OutputChunk } from 'rollup'
 import { join } from 'path'
 import { readFile, rmdir, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
@@ -89,6 +90,26 @@ function noInnerHtml (): Plugin {
   }
 }
 
+function insertChunkRefs (): Plugin {
+  return {
+    name: 'insert-chunk-refs',
+    generateBundle: function (_cfg, bundle) {
+      const chunks = Object.values(bundle).filter((c) => c.type === 'chunk') as OutputChunk[]
+      for (const file in bundle) {
+        if (file in bundle) {
+          const chunk = bundle[file]
+          if (chunk.type === 'chunk') {
+            chunk.code = chunk.code.replace(
+              /window\.__BUILD_CHUNK__\.([a-z]+)/g,
+              (_, chk) => JSON.stringify(chunks.find((c) => c.name === chk)?.fileName)
+            )
+          }
+        }
+      }
+    },
+  }
+}
+
 export default defineConfig({
   build: {
     assetsInlineLimit: 0,
@@ -107,6 +128,7 @@ export default defineConfig({
   plugins: [
     preact(),
     noInnerHtml(),
+    insertChunkRefs(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
       thirdParty: process.argv.includes('--ssr')

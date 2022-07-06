@@ -27,7 +27,5 @@
  */
 
 const ext = typeof window.browser !== 'undefined' ? window.browser : window.chrome
-const script = (ext.runtime.getManifest() as any).web_accessible_resources[0].resources[0]
-import(ext.runtime.getURL(script))
-
+import(ext.runtime.getURL(window.__BUILD_CHUNK__.extension))
 export {}

@@ -32,11 +32,12 @@ import type Browser from 'webextension-polyfill'
 declare global {
 
   interface Window {
-    __PRONOUNDB_EXTENSION_VERSION__: string
     wrappedJSObject: Window
 
     chrome: Browser.Browser
     browser: Browser.Browser
+
+    __BUILD_CHUNK__: Record<string, string>
   }
 
   interface Element {

@@ -56,6 +56,7 @@ importers:
       feather-icons: ^4.29.0
       postcss: ^8.4.14
       preact: ^10.8.0
+      rollup: ^2.75.7
       rollup-plugin-license: ^2.8.1
       tailwindcss: ^3.1.3
       typescript: ^4.7.3
@@ -79,7 +80,8 @@ importers:
       feather-icons: 4.29.0
       postcss: 8.4.14
       preact: 10.8.0
-      rollup-plugin-license: 2.8.1
+      rollup: 2.75.7
+      rollup-plugin-license: 2.8.1_rollup@2.75.7
       tailwindcss: 3.1.3
       typescript: 4.7.3
       vite: 2.9.12
@@ -2776,6 +2778,24 @@ packages:
       spdx-satisfies: 5.0.1
     dev: true
 
+  /rollup-plugin-license/2.8.1_rollup@2.75.7:
+    resolution: {integrity: sha512-VYd9pzaNL7NN6xQp93XiiCV2UoduXgSmTcz6rl9bHPdiifT6yH3Zw/omEr73Rq8TIyN4nqJACBbKIT/2eE66wg==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      rollup: ^1.0.0 || ^2.0.0
+    dependencies:
+      commenting: 1.1.0
+      glob: 7.2.0
+      lodash: 4.17.21
+      magic-string: 0.26.2
+      mkdirp: 1.0.4
+      moment: 2.29.3
+      package-name-regex: 2.0.6
+      rollup: 2.75.7
+      spdx-expression-validate: 2.0.0
+      spdx-satisfies: 5.0.1
+    dev: true
+
   /rollup-plugin-sri/1.3.4:
     resolution: {integrity: sha512-EkDZi6rQwTx/D8e9MisAVUw0avb24ZKixb8CypIsqJ1EySPP5ESTTm6IaBY29TBaYI/S+S85so0BNboRufyAyg==}
     dependencies:
@@ -2785,8 +2805,8 @@ packages:
       - encoding
     dev: true
 
-  /rollup/2.72.1:
-    resolution: {integrity: sha512-NTc5UGy/NWFGpSqF1lFY8z9Adri6uhyMLI6LvPAXdBKoPRFhIIiBUpt+Qg2awixqO3xvzSijjhnb4+QEZwJmxA==}
+  /rollup/2.75.7:
+    resolution: {integrity: sha512-VSE1iy0eaAYNCxEXaleThdFXqZJ42qDBatAwrfnPlENEZ8erQ+0LYX4JXOLPceWfZpV1VtZwZ3dFCuOZiSyFtQ==}
     engines: {node: '>=10.0.0'}
     hasBin: true
     optionalDependencies:
@@ -3234,7 +3254,7 @@ packages:
       esbuild: 0.14.38
       postcss: 8.4.14
       resolve: 1.22.0
-      rollup: 2.72.1
+      rollup: 2.75.7
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
