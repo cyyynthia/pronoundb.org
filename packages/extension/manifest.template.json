@@ -1,12 +1,21 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "PronounDB",
   "description": "A browser extension that lets people know how to refer to each other on various places of the Internet",
   "version": "0.9.1",
-  "permissions": [ "activeTab", "storage", "https://pronoundb.org/api/v1/*" ],
-  "browser_action": { "default_popup": "popup.html" },
-  "background": { "page": "background.html" },
-  "web_accessible_resources": [ "@chunk:extension" ],
+  "permissions": [ "activeTab", "storage" ],
+  "host_permissions": [ "https://pronoundb.org", "https://*.pronoundb.org" ],
+  "action": { "default_popup": "popup.html" },
+  "background": {
+    "service_worker": "@chunk:worker",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    { "resources": [ "@chunk:extension" ], "matches": [ "<all_urls>" ] }
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; connect-src https://pronoundb.org;"
+  },
   "content_scripts": [
     {
       "matches": [ "<all_urls>" ],

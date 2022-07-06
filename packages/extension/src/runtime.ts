@@ -26,8 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createDeferred } from './deferred'
-import { queryRuntime } from '../runtime'
+import { createDeferred } from './utils/deferred'
+import { fetchReactProp } from './utils/react'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
@@ -35,7 +35,7 @@ const isFirefox = typeof window.chrome !== 'undefined' && typeof window.browser 
 const callbacks = new Map()
 let targetId = 0
 
-export function queryReactProp (node: HTMLElement, propPath: QueryElement[]): Promise<any> {
+export function queryRuntime (node: HTMLElement, query: QueryElement[], runtime: string): Promise<any> {
   const target = `${++targetId}`
   node.dataset.pronoundbTargetId = target
   const deferred = createDeferred<any>()
@@ -55,8 +55,9 @@ export function queryReactProp (node: HTMLElement, propPath: QueryElement[]): Pr
     source: 'pronoundb',
     payload: {
       action: 'bridge.query',
+      runtime: runtime,
       target: target,
-      props: propPath,
+      query: query,
       id: id,
     },
   })
@@ -64,35 +65,56 @@ export function queryReactProp (node: HTMLElement, propPath: QueryElement[]): Pr
   return deferred.promise
 }
 
-export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): any {
-  if (!isFirefox && 'extension' in window.chrome) return queryRuntime(target, propPath, 'react')
+export function initializeRuntime () {
+  if (isFirefox) return // Nothing to init
 
-  const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
-  if (!reactKey) return []
+  // Responses from main world
+  window.addEventListener('message', (e) => {
+    if (e.source === window && e.data?.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'bridge.result') {
+        if (!callbacks.has(data.id)) {
+          console.warn('[PronounDB::bridge] Received unexpected bridge result')
+          return
+        }
 
-  let res = (target as any)[reactKey]
-  for (const prop of propPath) {
-    if (!res) break
-    if (typeof prop === 'string') {
-      res = res[prop]
-      continue
-    }
-
-    const queue = [ res ]
-    res = null
-    while (queue.length) {
-      const el = queue.shift()
-      if (prop.$find in el) {
-        res = el
-        break
-      }
-
-      for (const p of prop.$in) {
-        // eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
-        if (p in el && el[p] != null) queue.push(el[p])
+        callbacks.get(data.id).call(null, data.res)
       }
     }
-  }
+  })
 
-  return res
+  // fixme: need a more stable way to get script
+  const script = (window.chrome.runtime.getManifest() as any).web_accessible_resources[0].resources[2]
+  const scriptEl = document.createElement('script')
+  scriptEl.setAttribute('type', 'module')
+  scriptEl.setAttribute('src', window.chrome.runtime.getURL(script))
+  document.head.appendChild(scriptEl)
+}
+
+if (!('extension' in window.chrome)) {
+  window.addEventListener('message', (e) => {
+    if (e.source === window && e.data?.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'bridge.query') {
+        let res
+        const element = document.querySelector<HTMLElement>(`[data-pronoundb-target-id="${data.target}"]`)
+        if (element) {
+          element.removeAttribute('data-pronoundb-target-id')
+          switch (data.runtime) {
+            case 'react':
+              res = fetchReactProp(element, data.query)
+          }
+        }
+
+        window.postMessage({
+          source: 'pronoundb',
+          payload: {
+            action: 'bridge.result',
+            id: data.id,
+            res: res,
+          },
+        }, e.origin)
+      }
+    }
+  })
 }

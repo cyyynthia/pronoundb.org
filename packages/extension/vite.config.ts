@@ -68,11 +68,8 @@ function finalizeBuild (): Plugin {
 
       const popup = join(src, 'popup', 'index.html')
       const popupOut = join(__dirname, 'dist', 'popup.html')
-      const background = join(src, 'background.html')
-      const backgroundOut = join(__dirname, 'dist', 'background.html')
 
       await rename(popup, popupOut)
-      await rename(background, backgroundOut)
       await rmdir(join(src, 'popup'))
       await rmdir(src)
     },
@@ -99,9 +96,10 @@ export default defineConfig({
     target: 'es6',
     rollupOptions: {
       input: {
-        wrapper: join(__dirname, 'src', 'wrapper.ts'),
         extension: join(__dirname, 'src', 'index.ts'),
-        background: join(__dirname, 'src', 'background.html'),
+        worker: join(__dirname, 'src', 'worker.ts'),
+        wrapper: join(__dirname, 'src', 'wrapper.ts'),
+        runtime: join(__dirname, 'src', 'runtime.ts'),
         popup: join(__dirname, 'src', 'popup', 'index.html'),
       },
     },

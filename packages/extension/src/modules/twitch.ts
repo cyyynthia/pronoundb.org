@@ -54,7 +54,7 @@ async function injectChat (element: HTMLElement) {
     if (!username) return
     if (!(username in usersCache)) {
       // eslint-disable-next-line require-atomic-updates
-      usersCache[username] = await fetchReactProp(element, [ 'return', 'key' ]).then((s) => s.split('-')[0])
+      usersCache[username] = await fetchReactProp(element, [ 'return', 'key' ]).then((s: string) => s.split('-')[0])
     }
 
     userId = usersCache[username]

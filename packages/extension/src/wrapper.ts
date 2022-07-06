@@ -26,7 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// @ts-ignore
-const ext = typeof browser !== 'undefined' ? browser : chrome
-const script = (ext.runtime.getManifest() as any).web_accessible_resources[0]
+const ext = typeof window.browser !== 'undefined' ? window.browser : window.chrome
+const script = (ext.runtime.getManifest() as any).web_accessible_resources[0].resources[0]
 import(ext.runtime.getURL(script))
+
+export {}

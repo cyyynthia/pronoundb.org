@@ -28,7 +28,7 @@
 
 import browser from 'webextension-polyfill'
 import { WEBSITE } from '@pronoundb/shared/constants.js'
-import { initReact } from './utils/react'
+import { initializeRuntime } from './runtime'
 import { getModule } from './modules'
 
 if (!browser.tabs) {
@@ -37,7 +37,7 @@ if (!browser.tabs) {
       const key = `${currentMdl.id}.enabled`
       const { [key]: enabled } = await browser.storage.sync.get([ key ])
       if (enabled ?? true) {
-        initReact()
+        initializeRuntime()
         currentMdl.main?.()
         currentMdl.inject()
         console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
@@ -69,12 +69,5 @@ if (location.origin === WEBSITE) {
     }
   })
 
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+  document.body.dataset.pdbExtensionVersion = browser.runtime.getManifest().version
 }
