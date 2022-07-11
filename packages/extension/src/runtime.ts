@@ -31,7 +31,8 @@ import { fetchReactProp } from './utils/react'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
-const isFirefox = typeof window.chrome !== 'undefined' && typeof window.browser !== 'undefined'
+// @ts-expect-error
+const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 const callbacks = new Map()
 let targetId = 0
 
@@ -85,13 +86,13 @@ export function initializeRuntime () {
 
   // fixme: need a more stable way to get script
   const script = document.createElement('script')
-  script.setAttribute('src', window.chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
+  script.setAttribute('src', chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
   script.setAttribute('type', 'module')
   document.head.appendChild(script)
   script.remove()
 }
 
-if (!('extension' in window.chrome)) {
+if (!('extension' in chrome)) {
   window.addEventListener('message', (e) => {
     if (e.source === window && e.data?.source === 'pronoundb') {
       const data = e.data.payload

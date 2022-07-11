@@ -27,7 +27,6 @@
  */
 
 import type { ExtensionModule } from '../../modules'
-import browser from 'webextension-polyfill'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 import { WEBSITE, Endpoints } from '@pronoundb/shared/constants.js'
@@ -57,9 +56,9 @@ function Main ({ view }: { view: ViewState }) {
 export default function Popup () {
   const [ selfPronouns, setSelfPronouns ] = useState(null)
   const [ view, setView ] = useState(ViewState.MAIN)
-  const openPronounsSelector = useCallback(() => void browser.tabs.create({ url: `${WEBSITE}/me` }), [])
-  const openSettings = useCallback(() => void setView(ViewState.SETTINGS), [])
-  const closeSettings = useCallback(() => void setView(ViewState.MAIN), [])
+  const openPronounsSelector = useCallback(() => { chrome.tabs.create({ url: `${WEBSITE}/me` }) }, [])
+  const openSettings = useCallback(() => { setView(ViewState.SETTINGS) }, [])
+  const closeSettings = useCallback(() => { setView(ViewState.MAIN) }, [])
 
   useEffect(() => {
     fetch(Endpoints.LOOKUP_SELF, { credentials: 'include' })

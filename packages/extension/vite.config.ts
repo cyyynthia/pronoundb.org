@@ -113,8 +113,8 @@ function insertChunkRefs (): Plugin {
 export default defineConfig({
   build: {
     assetsInlineLimit: 0,
+    polyfillModulePreload: false,
     outDir: 'dist',
-    target: 'es6',
     rollupOptions: {
       input: {
         extension: join(__dirname, 'src', 'index.ts'),

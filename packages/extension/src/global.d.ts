@@ -26,16 +26,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import '@types/chrome'
 import '@pronoundb/shared'
-import type Browser from 'webextension-polyfill'
 
 declare global {
-
   interface Window {
     wrappedJSObject: Window
-
-    chrome: Browser.Browser
-    browser: Browser.Browser
 
     __BUILD_CHUNK__: Record<string, string>
   }

@@ -26,31 +26,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
 import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
 
-browser.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
-    browser.tabs.create({ url: `${WEBSITE}/onboarding` })
+    chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
   }
 
   if (details.reason === 'update') {
     const prev = details.previousVersion!.split('.').map(Number)
     if (prev[0] === 0 && prev[1] < 6) {
-      browser.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
+      chrome.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
     }
   }
 })
 
-browser.runtime.onMessage.addListener((request) => {
+chrome.runtime.onMessage.addListener((request, _, cb) => {
   if (request.kind === 'http') {
     const url = request.ids.length === 1
       ? Endpoints.LOOKUP(request.platform, request.ids[0])
       : Endpoints.LOOKUP_BULK(request.platform, request.ids)
 
-    return fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${browser.runtime.getManifest().version}` } })
+    fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${chrome.runtime.getManifest().version}` } })
       .then((r) => r.json())
-      .then((d) => ({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
-      .catch((e) => ({ success: false, error: e }))
+      .then((d) => cb({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
+      .catch((e) => cb({ success: false, error: e }))
+
+    return true
   }
 })

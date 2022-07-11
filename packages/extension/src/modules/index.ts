@@ -26,8 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
-
 export type ExtensionModule = {
   id: string
   match: RegExp
@@ -45,8 +43,8 @@ for (const mdl in rawModules) {
 
 export async function getModule (): Promise<ExtensionModule | null> {
   let loc = location.href
-  if (browser.tabs) {
-    const [ tab ] = await browser.tabs.query({ active: true, currentWindow: true })
+  if (chrome.tabs) {
+    const [ tab ] = await chrome.tabs.query({ active: true, currentWindow: true })
     loc = tab.url!
   }
 

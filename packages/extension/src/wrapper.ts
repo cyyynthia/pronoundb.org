@@ -26,6 +26,5 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const ext = typeof window.browser !== 'undefined' ? window.browser : window.chrome
-import(ext.runtime.getURL(window.__BUILD_CHUNK__.extension))
+import(chrome.runtime.getURL(window.__BUILD_CHUNK__.extension))
 export {}

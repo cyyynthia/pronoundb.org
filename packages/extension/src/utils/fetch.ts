@@ -27,12 +27,14 @@
  */
 
 import type { Deferred } from './deferred'
-import browser from 'webextension-polyfill'
 import { createDeferred } from './deferred'
 
 async function doFetch (platform: string, queue: Map<string, Deferred<string>>) {
   queue = new Map(queue) // clone the map
-  const res = await browser.runtime.sendMessage({
+
+  // Request is done by the background worker to avoid CSP issues.
+  // Chromium does let us do the request regardless of the page's CSP, but Firefox doesn't.
+  const res = await chrome.runtime.sendMessage({
     kind: 'http',
     target: 'lookup',
     platform: platform,
