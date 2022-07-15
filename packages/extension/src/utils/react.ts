@@ -31,7 +31,6 @@ import { queryRuntime } from '../runtime'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
-// @ts-expect-error
 const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 const callbacks = new Map()
 let targetId = 0
@@ -67,6 +66,7 @@ export function queryReactProp (node: HTMLElement, propPath: QueryElement[]): Pr
 
 export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): any {
   if (!isFirefox && 'extension' in chrome) return queryRuntime(target, propPath, 'react')
+  if (isFirefox) target = target.wrappedJSObject
 
   const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
   if (!reactKey) return []

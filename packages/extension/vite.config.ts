@@ -27,85 +27,37 @@
  */
 
 import type { Plugin } from 'vite'
-import type { OutputChunk } from 'rollup'
 import { join } from 'path'
-import { readFile, rmdir, rename } from 'fs/promises'
+import { rm, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
 import licensePlugin from 'rollup-plugin-license'
 
+import transform from './build/transform'
+import manifest from './build/manifest'
 import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
 
 function finalizeBuild (): Plugin {
-  let isDev = false
   return {
     name: 'finalize-build',
-    configResolved: (cfg) => void (isDev = Boolean(cfg.build.watch)),
-    generateBundle: async function (_, bundle) {
-      const out = Object.entries(bundle)
-      let manifest = await readFile(join(__dirname, 'manifest.template.json'), 'utf8')
-      for (const file of out) {
-        if (file[1].name === 'extension') {
-          const names = [ file[0], ...(file[1] as any).imports ].join('", "')
-          manifest = manifest.replace(`@chunk:${file[1].name}`, names)
-          continue
-        }
-
-        manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
-      }
-
-      if (isDev) {
-        manifest = manifest
-          .replace('PronounDB', 'PronounDB (dev)')
-          .replace('https://pronoundb.org', 'http://pronoundb.localhost:8080')
-      }
-
-      this.emitFile({ type: 'asset', fileName: 'manifest.json', source: manifest })
-    },
-    closeBundle: async () => {
+    closeBundle: async function () {
       // Move html files
-      const src = join(__dirname, 'dist', 'src')
+      const dist = join(__dirname, 'dist')
+      const distSrc = join(dist, 'src')
 
-      const popup = join(src, 'popup', 'index.html')
-      const popupOut = join(__dirname, 'dist', 'popup.html')
+      const popup = join(distSrc, 'popup', 'index.html')
+      const popupOut = join(dist, 'popup.html')
 
-      await rename(popup, popupOut)
-      await rmdir(join(src, 'popup'))
-      await rmdir(src)
-    },
-  }
-}
+      const background = join(distSrc, 'background.html')
+      const backgroundOut = join(dist, 'background.html')
 
-function noInnerHtml (): Plugin {
-  let isDev = false
-  return {
-    name: 'no-inner-html',
-    configResolved: (cfg) => void (isDev = Boolean(cfg.build.watch)),
-    transform: (code) => {
-      if (!isDev && code.includes('dangerouslySetInnerHTML')) {
-        return code.replace(/;[^;]+innerHTML.*?}/, '}')
+      await rename(popup, popupOut).catch(this.error)
+      if (process.env.BROWSER_TARGET === 'firefox') {
+        await rename(background, backgroundOut).catch(this.error)
       }
-    },
-  }
-}
 
-function insertChunkRefs (): Plugin {
-  return {
-    name: 'insert-chunk-refs',
-    generateBundle: function (_cfg, bundle) {
-      const chunks = Object.values(bundle).filter((c) => c.type === 'chunk') as OutputChunk[]
-      for (const file in bundle) {
-        if (file in bundle) {
-          const chunk = bundle[file]
-          if (chunk.type === 'chunk') {
-            chunk.code = chunk.code.replace(
-              /window\.__BUILD_CHUNK__\.([a-z]+)/g,
-              (_, chk) => JSON.stringify(chunks.find((c) => c.name === chk)?.fileName)
-            )
-          }
-        }
-      }
+      await rm(distSrc, { recursive: true }).catch(this.error)
     },
   }
 }
@@ -118,17 +70,16 @@ export default defineConfig({
     rollupOptions: {
       input: {
         extension: join(__dirname, 'src', 'index.ts'),
-        worker: join(__dirname, 'src', 'worker.ts'),
         wrapper: join(__dirname, 'src', 'wrapper.ts'),
         runtime: join(__dirname, 'src', 'runtime.ts'),
+        worker: join(__dirname, 'src', process.env.BROWSER_TARGET === 'firefox' ? 'background.html' : 'worker.ts'),
         popup: join(__dirname, 'src', 'popup', 'index.html'),
       },
     },
   },
   plugins: [
     preact(),
-    noInnerHtml(),
-    insertChunkRefs(),
+    transform(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
       thirdParty: process.argv.includes('--ssr')
@@ -144,5 +95,6 @@ export default defineConfig({
     }),
     finishLicense({ workingDirectory: __dirname }),
     finalizeBuild(),
+    manifest(),
   ],
 })

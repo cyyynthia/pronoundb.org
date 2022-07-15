@@ -26,23 +26,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import '@types/chrome'
-import '@pronoundb/shared'
+import type { Plugin } from 'vite'
 
-declare global {
-  // Used to test for Firefox's existence
-  const browser: undefined | typeof chrome
+export default function transform (): Plugin {
+  let isDev = false
+  return {
+    name: 'pdb-ext-transform-code',
+    configResolved: (cfg) => void (isDev = !!cfg.build.watch),
 
-  interface Window {
-    wrappedJSObject: this
-    __BUILD_CHUNK__: Record<string, string>
-  }
+    // Remove references to innerHTML
+    transform: (code) =>
+      !isDev && code.includes('dangerouslySetInnerHTML')
+        ? code.replace(/;[^;]+innerHTML.*?}/, '}')
+        : void 0,
 
-  interface Element {
-    wrappedJSObject: this
-  }
-
-  interface NodeList {
-    [Symbol.iterator](): Iterator<Node | ParentNode>
+    // Replace references to __BUILD_CHUNK__ to actual assets
+    generateBundle: (_cfg, bundle) => {
+      const chunks = Object.values(bundle).filter((c) => c.type === 'chunk')
+      for (const file in bundle) {
+        if (file in bundle) {
+          const chunk = bundle[file]
+          if (chunk.type === 'chunk') {
+            chunk.code = chunk.code.replace(
+              /window\.__BUILD_CHUNK__\.([a-z]+)/g,
+              (_, chk) => JSON.stringify(chunks.find((c) => c.name === chk)?.fileName)
+            )
+          }
+        }
+      }
+    },
   }
 }

@@ -42,9 +42,12 @@ for (const mdl in rawModules) {
 }
 
 export async function getModule (): Promise<ExtensionModule | null> {
+  // ref: https://bugzilla.mozilla.org/show_bug.cgi?id=1711570
+  const extension = typeof browser === 'undefined' ? chrome : browser
   let loc = location.href
-  if (chrome.tabs) {
-    const [ tab ] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+  if (extension.tabs) {
+    const [ tab ] = await extension.tabs.query({ active: true, currentWindow: true })
     loc = tab.url!
   }
 

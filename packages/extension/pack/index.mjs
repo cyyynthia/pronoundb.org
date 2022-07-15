@@ -73,7 +73,6 @@ sourceArchive.file(new URL('.eslintrc.json', SRC_PATH).pathname, { name: '.eslin
 // -> Only shared and extension packages are required
 for (const pkg of [ 'shared', 'extension' ]) {
   for await (const file of readdirRecursive(new URL(`packages/${pkg}/`, SRC_PATH))) {
-    console.log(`packages/${pkg}/${file.name}`)
     sourceArchive.file(file.path, { name: `packages/${pkg}/${file.name}` })
   }
 }

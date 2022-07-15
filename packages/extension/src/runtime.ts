@@ -31,7 +31,6 @@ import { fetchReactProp } from './utils/react'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
-// @ts-expect-error
 const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 const callbacks = new Map()
 let targetId = 0
