@@ -27,15 +27,15 @@
  */
 
 import type { Plugin } from 'vite'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
 type Manifest = Omit<chrome.runtime.ManifestV3, 'background'> // Firefox background page compat
   & Pick<chrome.runtime.ManifestV2 | chrome.runtime.ManifestV3, 'background'>
 
 let missingTarget = !process.env.PDB_BROWSER_TARGET
-let missingVersion = !process.env.PDB_EXT_VERSION
-
 process.env.PDB_BROWSER_TARGET = process.env.PDB_BROWSER_TARGET || 'chrome'
-process.env.PDB_EXT_VERSION = process.env.PDB_EXT_VERSION || '0.0.0'
+process.env.PDB_EXT_VERSION = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8')).version
 
 export default function manifest (): Plugin {
   let isDev = false
@@ -46,11 +46,6 @@ export default function manifest (): Plugin {
     buildStart: function () {
       if (missingTarget) {
         this.warn('Missing PDB_BROWSER_TARGET environment variable. Defaulting to Chrome.')
-      }
-
-      if (missingVersion) {
-        if (!isDev && process.env.CI) this.error('Missing PDB_EXT_VERSION environment variable. Aborting production build.')
-        this.warn('Missing PDB_EXT_VERSION environment variable. Defaulting to 0.0.0.')
       }
     },
 
