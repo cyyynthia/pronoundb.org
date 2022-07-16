@@ -34,10 +34,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 
   if (details.reason === 'update') {
-    const prev = details.previousVersion!.split('.').map(Number)
-    if (prev[0] === 0 && prev[1] < 6) {
-      chrome.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
-    }
+    // const prev = details.previousVersion!.split('.').map(Number)
+    // if (prev[0] === 0 && prev[1] < 6) {
+    //   chrome.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
+    // }
   }
 })
 
