@@ -33,7 +33,6 @@ type Manifest = Omit<chrome.runtime.ManifestV3, 'background'> // Firefox backgro
 
 export default function manifest (): Plugin {
   let isDev = false
-  let ver = '0.0.0'
 
   return {
     name: 'pdb-ext-manifest',
@@ -47,9 +46,8 @@ export default function manifest (): Plugin {
       if (!process.env.PDB_EXT_VERSION) {
         if (!isDev && process.env.CI) this.error('Missing PDB_EXT_VERSION environment variable. Aborting production build.')
         this.warn('Missing PDB_EXT_VERSION environment variable. Defaulting to 0.0.0.')
+        process.env.PDB_EXT_VERSION = '0.0.0'
       }
-
-      ver = process.env.PDB_EXT_VERSION || ver
     },
 
     generateBundle: function (_cfg, bundle) {
@@ -63,7 +61,7 @@ export default function manifest (): Plugin {
         manifest_version: 3,
         name: isDev ? 'PronounDB (dev)' : 'PronounDB',
         description: 'A browser extension that lets people know how to refer to each other on various places of the Internet', // todo: localize?
-        version: ver,
+        version: process.env.PDB_EXT_VERSION,
 
         permissions: [ 'activeTab', 'storage' ],
         // todo: localhost api indev
