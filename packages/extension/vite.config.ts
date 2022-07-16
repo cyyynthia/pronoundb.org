@@ -34,16 +34,17 @@ import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
 import licensePlugin from 'rollup-plugin-license'
 
+import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
 import transform from './build/transform'
 import manifest from './build/manifest'
-import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
+import pack from './build/pack'
 
 function finalizeBuild (): Plugin {
   let outDir = ''
   return {
     name: 'finalize-build',
     configResolved: (cfg) => void (outDir = cfg.build.outDir),
-    closeBundle: async function () {
+    writeBundle: async function () {
       // Move html files
       const dist = join(__dirname, outDir)
       const distSrc = join(dist, 'src')
@@ -107,5 +108,6 @@ export default defineConfig({
     finishLicense({ workingDirectory: __dirname }),
     finalizeBuild(),
     manifest(),
+    pack(),
   ],
 })

@@ -5,7 +5,7 @@ NodeJS and pnpm (https://pnpm.js.org) are required to bundle the extension.
 
 ### Bundling the extension
 The bundle process is as easy as installing dependencies (`pnpm i`) and then running the build script
-(`pnpm run build -r`). The bundled code will be located in `packages/extension/dist`.
+(`pnpm run -r build`). The bundled code will be located in `packages/extension/dist`.
 
 ### Testing the extension
 The easiest way to test the extension is to give a look to GitHub profiles, since it doesn't require owning an account

@@ -11,7 +11,6 @@
     "build": "pnpm run build:chrome && pnpm run build:firefox",
     "build:chrome": "PDB_BROWSER_TARGET=chrome vite build",
     "build:firefox": "PDB_BROWSER_TARGET=firefox vite build",
-    "pack": "node pack/index.mjs",
     "test": "playwright test",
     "test-headed": "playwright test --headed",
     "lint": "eslint --ext ts --ext tsx src"
@@ -21,8 +20,9 @@
     "@preact/preset-vite": "^2.2.0",
     "@prefresh/vite": "^2.2.8",
     "@pronoundb/shared": "workspace:*",
-    "@types/node": "^17.0.42",
+    "@types/archiver": "^5.3.1",
     "@types/chrome": "^0.0.193",
+    "@types/node": "^17.0.42",
     "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",

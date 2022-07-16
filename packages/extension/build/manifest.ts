@@ -45,7 +45,7 @@ export default function manifest (): Plugin {
       }
 
       if (!process.env.PDB_EXT_VERSION) {
-        if (!isDev) this.error('Missing PDB_EXT_VERSION environment variable. Aborting production build.')
+        if (!isDev && process.env.CI) this.error('Missing PDB_EXT_VERSION environment variable. Aborting production build.')
         this.warn('Missing PDB_EXT_VERSION environment variable. Defaulting to 0.0.0.')
       }
 
@@ -74,6 +74,8 @@ export default function manifest (): Plugin {
           extension_pages: 'default-src \'self\'; connect-src https://pronoundb.org;',
         },
 
+        // See https://bugzilla.mozilla.org/show_bug.cgi?id=1573659
+        // See https://bugzilla.mozilla.org/show_bug.cgi?id=1775574
         background: process.env.PDB_BROWSER_TARGET === 'firefox'
           ? { page: 'background.html' }
           : { service_worker: chunks.worker.name, type: 'module' },
@@ -82,6 +84,9 @@ export default function manifest (): Plugin {
           { js: [ chunks.wrapper.name ], matches: [ '<all_urls>' ] },
         ],
 
+        // Chrome requires resources to be WAR when using imports in content scripts
+        // Firefox doesn't, and doesn't allow MV3 extensions to load WAR in the popup page
+        // https://twitter.com/cyyynthia_/status/1546237262014324736
         web_accessible_resources: process.env.PDB_BROWSER_TARGET !== 'firefox'
           ? [ { resources: [ chunks.extension.name, ...chunks.extension.imports ], matches: [ '*://*/*' ] } ]
           : void 0,
