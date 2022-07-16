@@ -47,7 +47,7 @@ chrome.runtime.onMessage.addListener((request, _, cb) => {
       ? Endpoints.LOOKUP(request.platform, request.ids[0])
       : Endpoints.LOOKUP_BULK(request.platform, request.ids)
 
-    fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${chrome.runtime.getManifest().version}` } })
+    fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${import.meta.env.PDB_EXT_VERSION}` } })
       .then((r) => r.json())
       .then((d) => cb({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
       .catch((e) => cb({ success: false, error: e }))

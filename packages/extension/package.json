@@ -6,8 +6,11 @@
   "license": "BSD-3-Clause",
   "private": true,
   "scripts": {
-    "dev": "vite build --watch --mode dev",
-    "build": "vite build",
+    "dev:chrome": "PDB_BROWSER_TARGET=chrome vite build --watch --mode dev",
+    "dev:firefox": "PDB_BROWSER_TARGET=firefox vite build --watch --mode dev",
+    "build": "pnpm run build:chrome && pnpm run build:firefox",
+    "build:chrome": "PDB_BROWSER_TARGET=chrome vite build",
+    "build:firefox": "PDB_BROWSER_TARGET=firefox vite build",
     "pack": "node pack/index.mjs",
     "test": "playwright test",
     "test-headed": "playwright test --headed",

@@ -26,50 +26,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createDeferred } from './deferred'
 import { queryRuntime } from '../runtime'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
-const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
-const callbacks = new Map()
-let targetId = 0
-
-export function queryReactProp (node: HTMLElement, propPath: QueryElement[]): Promise<any> {
-  const target = `${++targetId}`
-  node.dataset.pronoundbTargetId = target
-  const deferred = createDeferred<any>()
-  const id = Math.random().toString(36).slice(2)
-  const timeout = setTimeout(() => {
-    deferred.resolve(null)
-    console.error('[PronounDB::bridge] Invocation timed out after 10 seconds.')
-  }, 10e3)
-
-  callbacks.set(id, (v: any) => {
-    callbacks.delete(id)
-    deferred.resolve(v)
-    clearTimeout(timeout)
-  })
-
-  window.postMessage({
-    source: 'pronoundb',
-    payload: {
-      action: 'bridge.query',
-      target: target,
-      props: propPath,
-      id: id,
-    },
-  })
-
-  return deferred.promise
-}
-
 export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): any {
-  if (!isFirefox && 'extension' in chrome) return queryRuntime(target, propPath, 'react')
-  if (isFirefox) target = target.wrappedJSObject
+  if (import.meta.env.PDB_BROWSER_TARGET === 'chrome' && 'extension' in chrome) return queryRuntime(target, propPath, 'react')
+  if (import.meta.env.PDB_BROWSER_TARGET === 'firefox') target = target.wrappedJSObject
 
   const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
-  if (!reactKey) return []
+  if (!reactKey) return null
 
   let res = (target as any)[reactKey]
   for (const prop of propPath) {

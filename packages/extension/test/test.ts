@@ -35,7 +35,8 @@ import { readFile } from 'fs/promises'
 import { join, basename } from 'path'
 import RDPConnection from '../testutils/rdp.js'
 
-const PDB_EXT_PATH = join(__dirname, '..', 'dist')
+const PDB_EXT_PATH_CR = join(__dirname, '..', 'dist', 'chrome')
+const PDB_EXT_PATH_FF = join(__dirname, '..', 'dist', 'firefox')
 const MOCK_FILE_PATH = join(__dirname, '..', 'testutils', 'mock.ts')
 
 const mockCodeTs = readFileSync(MOCK_FILE_PATH, 'utf8')
@@ -69,9 +70,9 @@ const test = base.extend({
     })
 
     const rdp = new RDPConnection(port)
-    const addon = await rdp.installAddon(PDB_EXT_PATH)
+    const addon = await rdp.installAddon(PDB_EXT_PATH_FF)
     await rdp.waitFor('frameUpdate')
-    await wait(50)
+    await wait(50) // :shrug:
 
     await rdp.evaluate(injectJsCode, addon.consoleActor, addon.innerWindowId)
 
@@ -98,8 +99,8 @@ const test = base.extend({
 
     const launchOptions: LaunchOptions = {
       args: [
-        `--disable-extensions-except=${join(__dirname, '..', 'dist')}`,
-        `--load-extension=${join(__dirname, '..', 'dist')}`,
+        `--disable-extensions-except=${PDB_EXT_PATH_CR}`,
+        `--load-extension=${PDB_EXT_PATH_CR}`,
       ],
     }
 

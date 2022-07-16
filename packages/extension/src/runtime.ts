@@ -31,7 +31,6 @@ import { fetchReactProp } from './utils/react'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
-const isFirefox = typeof chrome !== 'undefined' && typeof browser !== 'undefined'
 const callbacks = new Map()
 let targetId = 0
 
@@ -66,8 +65,6 @@ export function queryRuntime (node: HTMLElement, query: QueryElement[], runtime:
 }
 
 export function initializeRuntime () {
-  if (isFirefox) return // Nothing to init
-
   // Responses from main world
   window.addEventListener('message', (e) => {
     if (e.source === window && e.data?.source === 'pronoundb') {
@@ -83,7 +80,6 @@ export function initializeRuntime () {
     }
   })
 
-  // fixme: need a more stable way to get script
   const script = document.createElement('script')
   script.setAttribute('src', chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
   script.setAttribute('type', 'module')

@@ -33,14 +33,23 @@ type Manifest = Omit<chrome.runtime.ManifestV3, 'background'> // Firefox backgro
 
 export default function manifest (): Plugin {
   let isDev = false
+  let ver = '0.0.0'
+
   return {
     name: 'pdb-ext-manifest',
     configResolved: (cfg) => void (isDev = !!cfg.build.watch),
     buildStart: function () {
-      if (!process.env.BROWSER_TARGET) {
-        this.warn('Missing BROWSER_TARGET environment variable. Defaulting to Chrome.')
-        process.env.BROWSER_TARGET = 'chrome'
+      if (!process.env.PDB_BROWSER_TARGET) {
+        this.warn('Missing PDB_BROWSER_TARGET environment variable. Defaulting to Chrome.')
+        process.env.PDB_BROWSER_TARGET = 'chrome'
       }
+
+      if (!process.env.PDB_EXT_VERSION) {
+        if (!isDev) this.error('Missing PDB_EXT_VERSION environment variable. Aborting production build.')
+        this.warn('Missing PDB_EXT_VERSION environment variable. Defaulting to 0.0.0.')
+      }
+
+      ver = process.env.PDB_EXT_VERSION || ver
     },
 
     generateBundle: function (_cfg, bundle) {
@@ -54,7 +63,7 @@ export default function manifest (): Plugin {
         manifest_version: 3,
         name: isDev ? 'PronounDB (dev)' : 'PronounDB',
         description: 'A browser extension that lets people know how to refer to each other on various places of the Internet', // todo: localize?
-        version: '0.9.1', // fixme: dynamic
+        version: ver,
 
         permissions: [ 'activeTab', 'storage' ],
         // todo: localhost api indev
@@ -65,7 +74,7 @@ export default function manifest (): Plugin {
           extension_pages: 'default-src \'self\'; connect-src https://pronoundb.org;',
         },
 
-        background: process.env.BROWSER_TARGET === 'firefox'
+        background: process.env.PDB_BROWSER_TARGET === 'firefox'
           ? { page: 'background.html' }
           : { service_worker: chunks.worker.name, type: 'module' },
 
@@ -73,13 +82,25 @@ export default function manifest (): Plugin {
           { js: [ chunks.wrapper.name ], matches: [ '<all_urls>' ] },
         ],
 
-        web_accessible_resources: process.env.BROWSER_TARGET !== 'firefox'
+        web_accessible_resources: process.env.PDB_BROWSER_TARGET !== 'firefox'
           ? [ { resources: [ chunks.extension.name, ...chunks.extension.imports ], matches: [ '*://*/*' ] } ]
           : void 0,
 
-        browser_specific_settings: process.env.BROWSER_TARGET === 'firefox'
+        browser_specific_settings: process.env.PDB_BROWSER_TARGET === 'firefox'
           ? { gecko: { id: 'firefox-addon@pronoundb.org' } }
           : void 0,
+      }
+
+      // Manifest v2 compatibility for Firefox
+      // todo: remove once MV3 reaches GA in FF
+      if (process.env.PDB_BROWSER_TARGET === 'firefox') {
+        manifestData.manifest_version = 2
+        manifestData.browser_action = manifestData.action
+        manifestData.permissions.push(...manifestData.host_permissions)
+
+        delete manifestData.action
+        delete manifestData.content_security_policy
+        delete manifestData.host_permissions
       }
 
       this.emitFile({

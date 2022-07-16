@@ -35,7 +35,8 @@ getModule().then((currentMdl) => {
     const key = `${currentMdl.id}.enabled`
     chrome.storage.sync.get([ key ]).then(({ [key]: enabled }) => {
       if (enabled ?? true) {
-        initializeRuntime()
+        if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') initializeRuntime()
+
         currentMdl.main?.()
         currentMdl.inject()
         console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
@@ -67,5 +68,5 @@ if (location.origin === WEBSITE) {
     }
   })
 
-  document.body.dataset.pdbExtensionVersion = chrome.runtime.getManifest().version
+  document.body.dataset.pdbExtensionVersion = import.meta.env.PDB_EXT_VERSION
 }

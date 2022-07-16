@@ -39,11 +39,13 @@ import manifest from './build/manifest'
 import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
 
 function finalizeBuild (): Plugin {
+  let outDir = ''
   return {
     name: 'finalize-build',
+    configResolved: (cfg) => void (outDir = cfg.build.outDir),
     closeBundle: async function () {
       // Move html files
-      const dist = join(__dirname, 'dist')
+      const dist = join(__dirname, outDir)
       const distSrc = join(dist, 'src')
 
       const popup = join(distSrc, 'popup', 'index.html')
@@ -52,31 +54,40 @@ function finalizeBuild (): Plugin {
       const background = join(distSrc, 'background.html')
       const backgroundOut = join(dist, 'background.html')
 
-      await rename(popup, popupOut).catch(this.error)
-      if (process.env.BROWSER_TARGET === 'firefox') {
-        await rename(background, backgroundOut).catch(this.error)
+      await rename(popup, popupOut).catch(() => void 0)
+      if (process.env.PDB_BROWSER_TARGET === 'firefox') {
+        await rename(background, backgroundOut).catch(() => void 0)
       }
 
-      await rm(distSrc, { recursive: true }).catch(this.error)
+      await rm(distSrc, { recursive: true }).catch(() => void 0)
     },
   }
 }
+
+const input: Record<string, string> = {
+  extension: join(__dirname, 'src', 'index.ts'),
+  wrapper: join(__dirname, 'src', 'wrapper.ts'),
+  runtime: join(__dirname, 'src', 'runtime.ts'),
+  worker: join(__dirname, 'src', 'worker.ts'),
+  popup: join(__dirname, 'src', 'popup', 'index.html'),
+}
+
+if (process.env.PDB_BROWSER_TARGET === 'firefox') {
+  delete input.worker
+  delete input.runtime
+  input.background = join(__dirname, 'src', 'background.html')
+}
+
+const outDir = process.env.PDB_BROWSER_TARGET === 'firefox' ? 'dist/firefox' : 'dist/chrome'
 
 export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     polyfillModulePreload: false,
-    outDir: 'dist',
-    rollupOptions: {
-      input: {
-        extension: join(__dirname, 'src', 'index.ts'),
-        wrapper: join(__dirname, 'src', 'wrapper.ts'),
-        runtime: join(__dirname, 'src', 'runtime.ts'),
-        worker: join(__dirname, 'src', process.env.BROWSER_TARGET === 'firefox' ? 'background.html' : 'worker.ts'),
-        popup: join(__dirname, 'src', 'popup', 'index.html'),
-      },
-    },
+    outDir: outDir,
+    rollupOptions: { input: input },
   },
+  envPrefix: [ 'VITE', 'PDB' ],
   plugins: [
     preact(),
     transform(),
@@ -88,7 +99,7 @@ export default defineConfig({
           includePrivate: false,
           allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
           output: {
-            file: join(__dirname, baseLicensePath),
+            file: join(__dirname, outDir, baseLicensePath),
             template: renderLicense,
           },
         },
