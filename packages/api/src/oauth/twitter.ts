@@ -28,47 +28,45 @@
 
 import type { FastifyInstance } from 'fastify'
 import type { ExternalAccount } from '@pronoundb/shared'
-import oauth10a, { SecuredClient } from './abstract/oauth10a.js'
+
+import { Client } from 'undici'
+import oauth2 from './abstract/oauth2.js'
 import { httpClientOptions } from '../util.js'
 import config from '../config.js'
 
 const [ clientId, clientSecret ] = config.oauth.twitter
 
-const apiClient = new SecuredClient('https://api.twitter.com:443', httpClientOptions)
+const apiClient = new Client('https://api.twitter.com:443', httpClientOptions)
 
-async function getSelf (token: string, secret: string): Promise<ExternalAccount | null> {
-  const { response } = await apiClient.securedRequest({
+async function getSelf (token: string): Promise<ExternalAccount | null> {
+  const response = await apiClient.request({
     method: 'GET',
-    path: '/1.1/account/verify_credentials.json',
+    path: '/2/users/me',
     headers: {
+      authorization: `Bearer ${token}`,
       'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
-    },
-    token: {
-      clientId: clientId,
-      clientSecret: clientSecret,
-      tokenSecret: secret,
-      token: token,
     },
   })
 
   if (response.statusCode !== 200) return null
-  const data = await response.body.json()
+  const { data } = await response.body.json()
 
-  return { id: data.id_str, name: `${data.name} (@${data.screen_name})`, platform: 'twitter' }
+  return { id: data.id, name: `${data.name} (@${data.username})`, platform: 'twitter' }
 }
 
 export default async function (fastify: FastifyInstance) {
-  fastify.register(oauth10a, {
+  fastify.register(oauth2, {
     data: {
       platform: 'twitter',
       clientId: clientId,
       clientSecret: clientSecret,
-      authorizationEndpoint: 'https://api.twitter.com/oauth/authorize',
-      scopes: [],
+      authorizationEndpoint: 'https://twitter.com/i/oauth2/authorize',
+      scopes: [ 'users.read', 'tweet.read' ],
 
       httpClient: apiClient,
-      requestPath: '/oauth/request_token',
-      tokenPath: '/oauth/access_token',
+      tokenPath: '/2/oauth2/token',
+      pkce: true,
+
       getSelf: getSelf,
     },
   })

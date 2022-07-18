@@ -31,7 +31,7 @@ import type { FastifyInstance, FastifyRequest, FastifyReply, FastifySchema } fro
 import type { ExternalAccount } from '@pronoundb/shared'
 import type { OAuthIntent } from './shared.js'
 import type { ConfiguredReply } from '../../util.js'
-import { randomBytes } from 'crypto'
+import { randomBytes, createHash } from 'crypto'
 import { encode } from 'querystring'
 import { finishUp } from './shared.js'
 import config from '../../config.js'
@@ -59,6 +59,8 @@ export interface OAuth2Options {
 
   httpClient: Dispatcher
   tokenPath: string
+  pkce?: boolean
+
   getSelf: (token: string, state: string) => Promise<ExternalAccount | string | null>
 
   // The extension sometimes use the nonce to carry additional data
@@ -91,6 +93,7 @@ const callbackSchema: FastifySchema = {
 }
 
 const states = new Set<string>()
+const challenges = new Map<string, string>()
 
 export async function authorize (this: FastifyInstance, request: AuthorizeRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
   const intent = request.query.intent ?? 'login'
@@ -107,21 +110,32 @@ export async function authorize (this: FastifyInstance, request: AuthorizeReques
 
   const state = randomBytes(16).toString('hex')
   const fullState = `${reply.context.config.platform}-${state}`
-  setTimeout(() => states.delete(fullState), 300e3)
   states.add(fullState)
 
   const redirect = request.routerPath.replace('authorize', 'callback')
-  const q = encode({
+  const parameters: Record<string, string> = {
     state: state,
     response_type: 'code',
     scope: reply.context.config.scopes.join(' '),
     client_id: reply.context.config.clientId,
     redirect_uri: `${config.host}${redirect}`,
-  })
+  }
+
+  if (reply.context.config.pkce) {
+    const challenge = randomBytes(16).toString('hex')
+    parameters.code_challenge = createHash('sha256').update(challenge).digest('base64url')
+    parameters.code_challenge_method = 'S256'
+    challenges.set(fullState, challenge)
+  }
+
+  setTimeout(() => {
+    states.delete(fullState)
+    challenges.delete(fullState)
+  }, 300e3)
 
   reply.setCookie('state', state, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
     .setCookie('intent', intent, { path: redirect, signed: true, maxAge: 300, httpOnly: true })
-    .redirect(`${reply.context.config.authorizationEndpoint}?${q}`)
+    .redirect(`${reply.context.config.authorizationEndpoint}?${encode(parameters)}`)
 }
 
 export async function callback (this: FastifyInstance, request: CallbackRequest, reply: ConfiguredReply<FastifyReply, OAuth2Options>) {
@@ -153,27 +167,34 @@ export async function callback (this: FastifyInstance, request: CallbackRequest,
     return
   }
 
+  const parameters: Record<string, string> = {
+    state: request.query.state,
+    client_id: reply.context.config.clientId,
+    client_secret: reply.context.config.clientSecret,
+    redirect_uri: `${config.host}${request.routerPath}`,
+    scope: reply.context.config.scopes.join(' '),
+    grant_type: 'authorization_code',
+    code: request.query.code,
+  }
+
+  if (reply.context.config.pkce) {
+    parameters.code_verifier = challenges.get(fullState)!
+    challenges.delete(fullState)
+  }
+
   states.delete(fullState)
   let accessToken = null
   try {
-    const { httpClient, tokenPath } = reply.context.config
-    const response = await httpClient.request({
+    const response = await reply.context.config.httpClient.request({
       method: 'POST',
-      path: tokenPath,
+      path: reply.context.config.tokenPath,
       headers: {
         accept: 'application/json',
+        authorization: `Basic ${Buffer.from(`${reply.context.config.clientId}:${reply.context.config.clientSecret}`).toString('base64')}`,
         'content-type': 'application/x-www-form-urlencoded',
         'user-agent': 'PronounDB Authentication Agent/1.0 (+https://pronoundb.org)',
       },
-      body: encode({
-        state: request.query.state,
-        client_id: reply.context.config.clientId,
-        client_secret: reply.context.config.clientSecret,
-        redirect_uri: `${config.host}${request.routerPath}`,
-        scope: reply.context.config.scopes.join(' '),
-        grant_type: 'authorization_code',
-        code: request.query.code,
-      }),
+      body: encode(parameters),
     })
 
     if (response.statusCode !== 200) {
