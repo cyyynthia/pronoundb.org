@@ -17,7 +17,7 @@ troubles if you try to use another package manager.
 
 ### Development environment
 You can quickly spin up a development environment with [docker compose](https://docs.docker.com/compose/), which will
-everything needed for PronounDB's website & API to work. It'll have hot-reloading on both the website and the API.
+have everything needed for PronounDB's website & API to work. It'll have hot-reloading on both the website and the API.
 
 To test the extension, you can run `pnpm run dev` in the extension package to build the extension & enable automatic
 re-building when files are changed. You'll need to load the extension in your browser manually, and to refresh it
@@ -81,7 +81,7 @@ You can look at how other modules are built to get some insight in how things sh
 tests periodically using GitHub Actions. Right now, GitHub Actions aren't configured.
 
 To ensure continuous testing and detection when a website update breaks one of the modules, it's best to test the
-extension. Tests are ran using [Playwright](https://playwright.dev/) and you can take a look at how other modules
+extension. Tests are run using [Playwright](https://playwright.dev/) and you can take a look at how other modules
 are tested to get some inspiration.
 
 #### Test accounts
