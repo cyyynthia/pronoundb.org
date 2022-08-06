@@ -81,7 +81,7 @@ You can look at how other modules are built to get some insight in how things sh
 tests periodically using GitHub Actions. Right now, GitHub Actions aren't configured.
 
 To ensure continuous testing and detection when a website update breaks one of the modules, it's best to test the
-extension. Tests are ran using [Playwright](https://playwright.dev/) and you can take a look at how other modules
+extension. Tests are run using [Playwright](https://playwright.dev/) and you can take a look at how other modules
 are tested to get some inspiration.
 
 #### Test accounts
