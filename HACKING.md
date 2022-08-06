@@ -17,7 +17,7 @@ troubles if you try to use another package manager.
 
 ### Development environment
 You can quickly spin up a development environment with [docker compose](https://docs.docker.com/compose/), which will
-everything needed for PronounDB's website & API to work. It'll have hot-reloading on both the website and the API.
+have everything needed for PronounDB's website & API to work. It'll have hot-reloading on both the website and the API.
 
 To test the extension, you can run `pnpm run dev` in the extension package to build the extension & enable automatic
 re-building when files are changed. You'll need to load the extension in your browser manually, and to refresh it
