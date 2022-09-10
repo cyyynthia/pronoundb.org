@@ -26,7 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
 import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
@@ -102,7 +101,7 @@ export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
         )}
 
       <div class='py-2 px-4 flex border-t border-gray-200 dark:border-gray-700'>
-        <p>v{browser.runtime.getManifest().version}</p>
+        <p>v{import.meta.env.PDB_EXT_VERSION}</p>
         <div class='ml-auto flex gap-3'>
           <a class='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>
           <a class='hover:underline' href='https://github.com/cyyynthia/pronoundb.org' target='_blank' rel='noreferrer'>GitHub</a>

@@ -26,17 +26,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { LaunchOptions, Page, Project } from '@playwright/test'
+import type { LaunchOptions, Worker, Project } from '@playwright/test'
 import type { TestArgs } from '../playwright.config.js'
 import { test as base, chromium, firefox } from '@playwright/test'
 import { setTimeout as wait } from 'timers/promises'
+import { readFileSync } from 'fs'
 import { readFile } from 'fs/promises'
 import { join, basename } from 'path'
-import { processRequest } from '../testutils/mock.js'
 import RDPConnection from '../testutils/rdp.js'
 
-const PDB_EXT_PATH = join(__dirname, '..', 'dist')
+const PDB_EXT_PATH_CR = join(__dirname, '..', 'dist', 'chrome')
+const PDB_EXT_PATH_FF = join(__dirname, '..', 'dist', 'firefox')
 const MOCK_FILE_PATH = join(__dirname, '..', 'testutils', 'mock.ts')
+
+const mockCodeTs = readFileSync(MOCK_FILE_PATH, 'utf8')
+const mockCodeJs = mockCodeTs
+  // Remove TS traces
+  .replace(/!/g, '')
+  .replace(/: (Record<.*>|string|any)/g, '')
+  .replace('export function', 'function')
+  // "Minify" the code
+  .replace(/^((.\*| *\/\/).*)?\n/gm, '') // Comments & empty lines
+  .replace(/([{,])\n/g, '$1') // Empty lines (no ;)
+  .replace(/\n/g, ';') // Empty lines (;)
+  .replace(/ {2,}/g, '') // Multi spaces
+  .replace(/[ ,]?([=:{}(]|\?\?) ?/g, '$1') // Useless space/symbols
+
+const injectJsCode = `${mockCodeJs}\nglobalThis.fetch = (u) => Promise.resolve({ json: () => Promise.resolve(processRequest(u)) })`
 
 const test = base.extend({
   // eslint-disable-next-line no-empty-pattern
@@ -54,28 +70,11 @@ const test = base.extend({
     })
 
     const rdp = new RDPConnection(port)
-    const addon = await rdp.installAddon(PDB_EXT_PATH)
+    const addon = await rdp.installAddon(PDB_EXT_PATH_FF)
     await rdp.waitFor('frameUpdate')
-    await wait(50)
+    await wait(50) // :shrug:
 
-    const mockCodeTs = await readFile(MOCK_FILE_PATH, 'utf8')
-    const mockCodeJs = mockCodeTs
-      // Remove TS traces
-      .replace(/!/g, '')
-      .replace(/: (Record<.*>|string|any)/g, '')
-      .replace('export function', 'function')
-      // "Minify" the code
-      .replace(/^((.\*| *\/\/).*)?\n/gm, '') // Comments & empty lines
-      .replace(/([{,])\n/g, '$1') // Empty lines (no ;)
-      .replace(/\n/g, ';') // Empty lines (;)
-      .replace(/ {2,}/g, '') // Multi spaces
-      .replace(/[ ,]?([=:{}(]|\?\?) ?/g, '$1') // Useless space/symbols
-
-    await rdp.evaluate(
-      `${mockCodeJs}\nwindow.fetch = (u) => Promise.resolve({ json: () => Promise.resolve(processRequest(u)) })`,
-      addon.consoleActor,
-      addon.innerWindowId
-    )
+    await rdp.evaluate(injectJsCode, addon.consoleActor, addon.innerWindowId)
 
     rdp.close()
     await use(browser)
@@ -100,8 +99,8 @@ const test = base.extend({
 
     const launchOptions: LaunchOptions = {
       args: [
-        `--disable-extensions-except=${join(__dirname, '..', 'dist')}`,
-        `--load-extension=${join(__dirname, '..', 'dist')}`,
+        `--disable-extensions-except=${PDB_EXT_PATH_CR}`,
+        `--load-extension=${PDB_EXT_PATH_CR}`,
       ],
     }
 
@@ -109,18 +108,10 @@ const test = base.extend({
       launchOptions.args!.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
     }
 
-    let ext: Page
+    let sw: Worker
     const context = await chromium.launchPersistentContext('', launchOptions)
-    while (!(ext = context.backgroundPages()[0])) await wait(10)
-
-    ext.route(
-      'https://pronoundb.org/api/v1/lookup*',
-      (route, req) =>
-        route.fulfill({
-          body: JSON.stringify(processRequest(req.url())),
-          contentType: 'application/json',
-        })
-    )
+    while (!(sw = context.serviceWorkers()[0])) await wait(10)
+    await sw.evaluate(injectJsCode)
 
     if (project.use?.authenticated) {
       // https://github.com/microsoft/playwright/issues/7634

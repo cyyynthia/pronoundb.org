@@ -26,16 +26,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import '@types/chrome'
 import '@pronoundb/shared'
 
 declare global {
+  // Used to test for Firefox's existence
+  const browser: undefined | typeof chrome
+
   interface Window {
-    __PRONOUNDB_EXTENSION_VERSION__: string
-    wrappedJSObject: Window
+    wrappedJSObject: this
+    __BUILD_CHUNK__: Record<string, string>
   }
 
   interface Element {
-    wrappedJSObject: Element
+    wrappedJSObject: this
   }
 
   interface NodeList {

@@ -28,87 +28,70 @@
 
 import type { Plugin } from 'vite'
 import { join } from 'path'
-import { readFile, rmdir, rename } from 'fs/promises'
+import { rm, rename } from 'fs/promises'
 import { defineConfig } from 'vite'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
 import licensePlugin from 'rollup-plugin-license'
 
 import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
+import transform from './build/transform'
+import manifest from './build/manifest'
+import pack from './build/pack'
 
 function finalizeBuild (): Plugin {
-  let isDev = false
+  let outDir = ''
   return {
     name: 'finalize-build',
-    configResolved: (cfg) => void (isDev = Boolean(cfg.build.watch)),
-    generateBundle: async function (_, bundle) {
-      const out = Object.entries(bundle)
-      let manifest = await readFile(join(__dirname, 'manifest.template.json'), 'utf8')
-      for (const file of out) {
-        if (file[1].name === 'extension') {
-          const names = [ file[0], ...(file[1] as any).imports ].join('", "')
-          manifest = manifest.replace(`@chunk:${file[1].name}`, names)
-          continue
-        }
-
-        manifest = manifest.replace(`@chunk:${file[1].name}`, file[0])
-      }
-
-      if (isDev) {
-        manifest = manifest
-          .replace('PronounDB', 'PronounDB (dev)')
-          .replace('https://pronoundb.org', 'http://pronoundb.localhost:8080')
-      }
-
-      this.emitFile({ type: 'asset', fileName: 'manifest.json', source: manifest })
-    },
-    closeBundle: async () => {
+    configResolved: (cfg) => void (outDir = cfg.build.outDir),
+    writeBundle: async function () {
       // Move html files
-      const src = join(__dirname, 'dist', 'src')
+      const dist = join(__dirname, outDir)
+      const distSrc = join(dist, 'src')
 
-      const popup = join(src, 'popup', 'index.html')
-      const popupOut = join(__dirname, 'dist', 'popup.html')
-      const background = join(src, 'background.html')
-      const backgroundOut = join(__dirname, 'dist', 'background.html')
+      const popup = join(distSrc, 'popup', 'index.html')
+      const popupOut = join(dist, 'popup.html')
 
-      await rename(popup, popupOut)
-      await rename(background, backgroundOut)
-      await rmdir(join(src, 'popup'))
-      await rmdir(src)
-    },
-  }
-}
+      const background = join(distSrc, 'background.html')
+      const backgroundOut = join(dist, 'background.html')
 
-function noInnerHtml (): Plugin {
-  let isDev = false
-  return {
-    name: 'no-inner-html',
-    configResolved: (cfg) => void (isDev = Boolean(cfg.build.watch)),
-    transform: (code) => {
-      if (!isDev && code.includes('dangerouslySetInnerHTML')) {
-        return code.replace(/;[^;]+innerHTML.*?}/, '}')
+      await rename(popup, popupOut).catch(() => void 0)
+      if (process.env.PDB_BROWSER_TARGET === 'firefox') {
+        await rename(background, backgroundOut).catch(() => void 0)
       }
+
+      await rm(distSrc, { recursive: true }).catch(() => void 0)
     },
   }
 }
+
+const input: Record<string, string> = {
+  extension: join(__dirname, 'src', 'index.ts'),
+  wrapper: join(__dirname, 'src', 'wrapper.ts'),
+  runtime: join(__dirname, 'src', 'runtime.ts'),
+  worker: join(__dirname, 'src', 'worker.ts'),
+  popup: join(__dirname, 'src', 'popup', 'index.html'),
+}
+
+if (process.env.PDB_BROWSER_TARGET === 'firefox') {
+  delete input.worker
+  delete input.runtime
+  input.background = join(__dirname, 'src', 'background.html')
+}
+
+const outDir = process.env.PDB_BROWSER_TARGET === 'firefox' ? 'dist/firefox' : 'dist/chrome'
 
 export default defineConfig({
   build: {
     assetsInlineLimit: 0,
-    outDir: 'dist',
-    target: 'es6',
-    rollupOptions: {
-      input: {
-        wrapper: join(__dirname, 'src', 'wrapper.ts'),
-        extension: join(__dirname, 'src', 'index.ts'),
-        background: join(__dirname, 'src', 'background.html'),
-        popup: join(__dirname, 'src', 'popup', 'index.html'),
-      },
-    },
+    polyfillModulePreload: false,
+    outDir: outDir,
+    rollupOptions: { input: input },
   },
+  envPrefix: [ 'VITE', 'PDB' ],
   plugins: [
     preact(),
-    noInnerHtml(),
+    transform(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
       thirdParty: process.argv.includes('--ssr')
@@ -117,12 +100,14 @@ export default defineConfig({
           includePrivate: false,
           allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
           output: {
-            file: join(__dirname, baseLicensePath),
+            file: join(__dirname, outDir, baseLicensePath),
             template: renderLicense,
           },
         },
     }),
     finishLicense({ workingDirectory: __dirname }),
     finalizeBuild(),
+    manifest(),
+    pack(),
   ],
 })

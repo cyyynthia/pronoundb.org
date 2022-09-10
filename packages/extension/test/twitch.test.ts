@@ -85,7 +85,7 @@ test.use({
 })
 
 test('About section shows pronouns (main stream page)', async ({ page }) => {
-  await page.goto('https://www.twitch.tv/cyyynthia_') // TODO: click Chat
+  await page.goto('https://www.twitch.tv/cyyynthia_')
   await page.locator('.home-header-sticky >> text=Chat').click().catch()
   await expect(page.locator('[data-a-target="about-panel"]')).toContainText('it/its')
 })

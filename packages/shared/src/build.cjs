@@ -32,7 +32,7 @@ const { rename } = require('fs/promises')
 const { join } = require('path')
 
 let finalLicensePath = ''
-const baseLicensePath = join('dist', 'assets', 'third-party-licenses.txt')
+let baseLicensePath = join('assets', 'third-party-licenses.txt')
 
 function renderLicense (deps) {
   let str = 'Licenses for open-source software used in this website are reproduced below.\n=========================\n\n'
@@ -60,10 +60,14 @@ function renderLicense (deps) {
 // rollup-plugin-license doesn't do a great job w/ Vite :<
 function finishLicense ({ workingDirectory }) {
   let skip = false
+  let outDir = ''
+
   return {
     name: 'finish-license',
     configResolved: (cfg) => {
       skip = !cfg.isProduction
+      outDir = cfg.build.outDir
+      baseLicensePath = join(outDir, baseLicensePath)
     },
     generateBundle: (_, bundle) => {
       if (process.argv.includes('--ssr')) return
@@ -92,7 +96,7 @@ function finishLicense ({ workingDirectory }) {
     },
     closeBundle: async () => {
       if (!skip && !process.argv.includes('--ssr')) {
-        await rename(baseLicensePath, join(workingDirectory, 'dist', finalLicensePath)).catch(() => void 0)
+        await rename(baseLicensePath, join(workingDirectory, outDir, finalLicensePath)).catch(() => void 0)
       }
     },
   }

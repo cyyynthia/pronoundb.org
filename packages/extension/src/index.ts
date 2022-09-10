@@ -26,28 +26,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
 import { WEBSITE } from '@pronoundb/shared/constants.js'
-import { initReact } from './utils/react'
+import { initializeRuntime } from './runtime'
 import { getModule } from './modules'
 
-if (!browser.tabs) {
-  getModule().then(async (currentMdl) => {
-    if (currentMdl) {
-      const key = `${currentMdl.id}.enabled`
-      const { [key]: enabled } = await browser.storage.sync.get([ key ])
+getModule().then((currentMdl) => {
+  if (currentMdl) {
+    const key = `${currentMdl.id}.enabled`
+    chrome.storage.sync.get([ key ]).then(({ [key]: enabled }) => {
       if (enabled ?? true) {
-        initReact()
+        if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') initializeRuntime()
+
         currentMdl.main?.()
         currentMdl.inject()
         console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
       }
-    }
-  })
-}
+    })
+  }
+})
 
 if (location.origin === WEBSITE) {
-  browser.storage.sync.get([ 'pronouns.case' ]).then(({ 'pronouns.case': pronounsCase }) => {
+  chrome.storage.sync.get([ 'pronouns.case' ]).then(({ 'pronouns.case': pronounsCase }) => {
     window.postMessage({
       source: 'pronoundb',
       payload: {
@@ -57,7 +56,7 @@ if (location.origin === WEBSITE) {
     }, '*')
   })
 
-  browser.storage.onChanged.addListener((changes) => {
+  chrome.storage.onChanged.addListener((changes) => {
     if (changes['pronouns.case']) {
       window.postMessage({
         source: 'pronoundb',
@@ -69,12 +68,5 @@ if (location.origin === WEBSITE) {
     }
   })
 
-  if ('wrappedJSObject' in window) {
-    window.wrappedJSObject.__PRONOUNDB_EXTENSION_VERSION__ = browser.runtime.getManifest().version
-  } else {
-    const s = document.createElement('script')
-    s.textContent = `window.__PRONOUNDB_EXTENSION_VERSION__ = '${browser.runtime.getManifest().version}'`
-    document.head.appendChild(s)
-    s.remove()
-  }
+  document.body.dataset.pdbExtensionVersion = import.meta.env.PDB_EXT_VERSION
 }

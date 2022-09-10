@@ -27,7 +27,6 @@
  */
 
 import type { ExtensionModule } from '../../modules'
-import browser from 'webextension-polyfill'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
@@ -57,12 +56,12 @@ export function Main ({ module }: { module: ExtensionModule }) {
 
   const [ enabled, setEnabled ] = useState(true)
   const onInput = useCallback((val: any) => {
-    browser.storage.sync.set({ [enabledKey]: val })
+    chrome.storage.sync.set({ [enabledKey]: val })
     setEnabled(val)
   }, [ setEnabled ])
 
   useEffect(() => {
-    browser.storage.sync.get([ enabledKey ])
+    chrome.storage.sync.get([ enabledKey ])
       .then((s) => setEnabled(s[enabledKey] ?? true))
   }, [])
 
@@ -84,12 +83,12 @@ export function Settings () {
   const [ settings, setSettings ] = useState<Record<string, any>>({})
   const onInput = useCallback((val: any, e: Event) => {
     const key = (e.target as any).name
-    browser.storage.sync.set({ [key]: val })
+    chrome.storage.sync.set({ [key]: val })
     setSettings((s) => ({ ...s, [key]: val }))
   }, [ setSettings ])
 
   useEffect(() => {
-    browser.storage.sync.get([ 'pronouns.case', ...PlatformIds.map((p) => `${p}.enabled`) ])
+    chrome.storage.sync.get([ 'pronouns.case', ...PlatformIds.map((p) => `${p}.enabled`) ])
       .then((s) => setSettings(s))
   }, [])
 

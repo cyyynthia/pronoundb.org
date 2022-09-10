@@ -53,7 +53,7 @@ const IntentTitles = {
 }
 
 function LinkButton ({ platformId, intent }: { platformId: string, intent: OAuthIntent }) {
-  const getPdbExtVer = () => import.meta.env.SSR ? void 0 : window.__PRONOUNDB_EXTENSION_VERSION__
+  const getPdbExtVer = () => import.meta.env.SSR ? void 0 : document.body.dataset.pdbExtensionVersion || window.__PRONOUNDB_EXTENSION_VERSION__
   const platform = Platforms[platformId]
 
   const extMessage = getPdbExtVer()

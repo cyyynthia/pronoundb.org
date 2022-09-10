@@ -55,7 +55,6 @@
     "no-extend-native": "error",
     "no-extra-bind": "error",
     "no-floating-decimal": "error",
-    "no-implicit-coercion": "error",
     "no-implied-eval": "error",
     "@typescript-eslint/no-invalid-this": "error",
     "no-iterator": "error",

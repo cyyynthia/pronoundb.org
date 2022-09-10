@@ -26,19 +26,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { readdir, stat } from 'fs/promises'
-import { relative } from 'path'
+import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
 
-export async function* readdirRecursive (path, base = path.pathname) {
-  const files = await readdir(path)
-  for (const file of files) {
-    const filepath = new URL(file, path)
-    const info = await stat(filepath)
-    if (info.isDirectory()) {
-      if (file === 'node_modules' || file === 'dist' || file === 'packed') continue
-      yield* readdirRecursive(new URL(`${file}/`, path), base)
-    } else {
-      yield { name: relative(base, filepath.pathname), path: filepath.pathname }
-    }
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
   }
-}
+
+  if (details.reason === 'update') {
+    // const prev = details.previousVersion!.split('.').map(Number)
+    // if (prev[0] === 0 && prev[1] < 6) {
+    //   chrome.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
+    // }
+  }
+})
+
+chrome.runtime.onMessage.addListener((request, _, cb) => {
+  if (request.kind === 'http') {
+    const url = request.ids.length === 1
+      ? Endpoints.LOOKUP(request.platform, request.ids[0])
+      : Endpoints.LOOKUP_BULK(request.platform, request.ids)
+
+    fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${import.meta.env.PDB_EXT_VERSION}` } })
+      .then((r) => r.json())
+      .then((d) => cb({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
+      .catch((e) => cb({ success: false, error: e }))
+
+    return true
+  }
+})

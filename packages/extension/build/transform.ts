@@ -26,31 +26,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import browser from 'webextension-polyfill'
-import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
+import type { Plugin } from 'vite'
 
-browser.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    browser.tabs.create({ url: `${WEBSITE}/onboarding` })
+export default function transform (): Plugin {
+  let isDev = false
+  return {
+    name: 'pdb-ext-transform-code',
+    configResolved: (cfg) => void (isDev = !!cfg.build.watch),
+
+    // Remove references to innerHTML
+    transform: (code) =>
+      !isDev && code.includes('dangerouslySetInnerHTML')
+        ? code.replace(/;[^;]+innerHTML.*?}/, '}')
+        : void 0,
+
+    // Replace references to __BUILD_CHUNK__ to actual assets
+    generateBundle: (_cfg, bundle) => {
+      const chunks = Object.values(bundle).filter((c) => c.type === 'chunk')
+      for (const file in bundle) {
+        if (file in bundle) {
+          const chunk = bundle[file]
+          if (chunk.type === 'chunk') {
+            chunk.code = chunk.code.replace(
+              /window\.__BUILD_CHUNK__\.([a-z]+)/g,
+              (_, chk) => JSON.stringify(chunks.find((c) => c.name === chk)?.fileName)
+            )
+          }
+        }
+      }
+    },
   }
-
-  if (details.reason === 'update') {
-    const prev = details.previousVersion!.split('.').map(Number)
-    if (prev[0] === 0 && prev[1] < 6) {
-      browser.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
-    }
-  }
-})
-
-browser.runtime.onMessage.addListener((request) => {
-  if (request.kind === 'http') {
-    const url = request.ids.length === 1
-      ? Endpoints.LOOKUP(request.platform, request.ids[0])
-      : Endpoints.LOOKUP_BULK(request.platform, request.ids)
-
-    return fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${browser.runtime.getManifest().version}` } })
-      .then((r) => r.json())
-      .then((d) => ({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
-      .catch((e) => ({ success: false, error: e }))
-  }
-})
+}
