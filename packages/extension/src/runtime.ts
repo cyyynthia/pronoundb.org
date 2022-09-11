@@ -65,26 +65,37 @@ export function queryRuntime (node: HTMLElement, query: QueryElement[], runtime:
 }
 
 export function initializeRuntime () {
-  // Responses from main world
-  window.addEventListener('message', (e) => {
-    if (e.source === window && e.data?.source === 'pronoundb') {
-      const data = e.data.payload
-      if (data.action === 'bridge.result') {
-        if (!callbacks.has(data.id)) {
-          console.warn('[PronounDB::bridge] Received unexpected bridge result')
-          return
-        }
-
-        callbacks.get(data.id).call(null, data.res)
+  return new Promise<void>((resolve) => {
+    const onMessage = (e: MessageEvent<any>) => {
+      if (e.source === window && e.data?.source === 'pronoundb') {
+        window.removeEventListener('message', onMessage)
+        resolve()
       }
     }
-  })
 
-  const script = document.createElement('script')
-  script.setAttribute('src', chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
-  script.setAttribute('type', 'module')
-  document.head.appendChild(script)
-  script.remove()
+    window.addEventListener('message', onMessage)
+
+    // Responses from main world
+    window.addEventListener('message', (e) => {
+      if (e.source === window && e.data?.source === 'pronoundb') {
+        const data = e.data.payload
+        if (data.action === 'bridge.result') {
+          if (!callbacks.has(data.id)) {
+            console.warn('[PronounDB::bridge] Received unexpected bridge result')
+            return
+          }
+
+          callbacks.get(data.id).call(null, data.res)
+        }
+      }
+    })
+
+    const script = document.createElement('script')
+    script.setAttribute('src', chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
+    script.setAttribute('type', 'module')
+    document.head.appendChild(script)
+    script.remove()
+  })
 }
 
 if (!('extension' in chrome)) {
@@ -113,4 +124,6 @@ if (!('extension' in chrome)) {
       }
     }
   })
+
+  window.postMessage({ source: 'pronoundb', payload: {} })
 }

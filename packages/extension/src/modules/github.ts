@@ -30,7 +30,7 @@ import { commentDiscussion } from '../icons/octicons'
 
 import { formatPronouns } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
-import { css, h } from '../utils/dom'
+import { h } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?github\.com/
 
@@ -106,38 +106,27 @@ function injectHoverCards () {
   const observer = new MutationObserver(
     async () => {
       const startHeight = popover.getBoundingClientRect().height
-      const tracking = popover.querySelector<HTMLElement>('[data-hovercard-tracking]')?.dataset?.hovercardTracking
       const hv = popover.querySelector<HTMLElement>('[data-hydro-view]')?.dataset?.hydroView
-      if (!tracking || !hv) return
+      if (!hv) return
 
-      const { user_id: userId } = JSON.parse(tracking)
-      const { event_type: type } = JSON.parse(hv)
+      const { event_type: type, payload: { card_user_id: userId } } = JSON.parse(hv)
       if (type !== 'user-hovercard-hover') return
 
-      const block = popover.querySelector('.d-flex .overflow-hidden.ml-3')
+      const block = popover.querySelector('section:nth-child(3)')
       if (!block) return
 
       const pronouns = await fetchPronouns('github', String(userId))
       if (pronouns === 'unspecified') return
 
-      const item = block.querySelector('.mt-2')
-      if (item) item.remove()
-      block.appendChild(
+      block.parentElement?.insertBefore(
         h(
-          'div',
-          { style: css({ display: 'flex', alignItems: 'center' }) },
-          item,
-          h(
-            'div',
-            {
-              class: 'mt-2 color-fg-muted text-small',
-              style: css({ marginTop: '8px !important', marginLeft: item ? '8px' : '0' }),
-            },
-            commentDiscussion({ class: 'octicon' }),
-            '\n  ',
-            formatPronouns(pronouns)
-          )
-        )
+          'section',
+          { class: 'color-fg-muted' },
+          commentDiscussion({ class: 'octicon' }),
+          ' ',
+          formatPronouns(pronouns)
+        ),
+        block
       )
 
       if (popover.className.includes('Popover-message--bottom')) {

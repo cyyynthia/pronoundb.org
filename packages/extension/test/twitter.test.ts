@@ -80,4 +80,24 @@ test.describe('Implementation quirks', () => {
     await el.scrollIntoViewIfNeeded()
     await expect(el).toContainText('they/them')
   })
+
+  // ref: https://twitter.com/LizzyReborn/status/1552472059095048192
+  test('Pronouns update when changing profile back and forth', async ({ page }) => {
+    await page.goto('https://twitter.com/cyyynthia_')
+    await page.waitForLoadState('networkidle')
+    await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toHaveCount(1)
+
+    const cell = page.locator('[data-testid="UserCell"] a').first()
+    await cell.scrollIntoViewIfNeeded()
+    await page.mouse.wheel(0, 500)
+    await cell.click()
+    await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=they/them')).toHaveCount(1)
+
+    await page.goBack()
+    await page.mouse.wheel(0, -1000)
+    await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toHaveCount(1)
+
+    await page.goForward()
+    await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=they/them')).toHaveCount(1)
+  })
 })

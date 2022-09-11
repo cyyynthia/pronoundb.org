@@ -35,7 +35,19 @@ import { h, css } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?twitter\.com/
 
-async function injectProfileHeader (header: HTMLElement) {
+async function injectProfileHeader (username?: string) {
+  let header: HTMLElement
+  if (username) {
+    let currentUsername
+    do {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
+      currentUsername = await fetchReactProp(header.parentElement!, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'screen_name' ])
+    } while (currentUsername !== username)
+  } else {
+    header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
+  }
+
   const node = header.parentElement!
   const id = await fetchReactProp(node, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'id_str' ])
   if (!id) return
@@ -45,7 +57,7 @@ async function injectProfileHeader (header: HTMLElement) {
 
   const prevPronouns = header.querySelector<HTMLElement>('[data-pronoundb]')
   if (prevPronouns) {
-    prevPronouns.innerText = formatPronouns(pronouns)
+    prevPronouns.replaceChild(document.createTextNode(formatPronouns(pronouns)), prevPronouns.childNodes[1])
     return
   }
 
@@ -83,11 +95,8 @@ async function injectTweet (tweet: HTMLElement) {
 
   let pronounsContainer = sep.parentElement!.querySelector<HTMLElement>('[data-pronoundb]')
   if (!pronounsContainer) {
-    const template = <HTMLElement> sep.previousElementSibling
-    if (!template) return
-
     const after = <HTMLElement> sep.nextElementSibling?.nextElementSibling
-    pronounsContainer = <HTMLElement> template.cloneNode(true)
+    pronounsContainer = <HTMLElement> sep.cloneNode(true)
     pronounsContainer.setAttribute('data-pronoundb', 'true')
     if (after) {
       sep.parentElement!.insertBefore(separator, after)
@@ -158,10 +167,9 @@ function handleMutation (nodes: MutationRecord[]) {
     for (const added of addedNodes) {
       if (added instanceof HTMLElement) {
         if (added.tagName === 'META' && added.getAttribute('property') === 'al:android:url' && added.getAttribute('content')?.startsWith('twitter://user?')) {
-          const header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
-          const prevPronouns = header.querySelector('[data-pronoundb]')
+          const prevPronouns = document.querySelector('[data-testid="UserProfileHeader_Items"] [data-pronoundb]')
           if (prevPronouns) prevPronouns.remove()
-          injectProfileHeader(header)
+          injectProfileHeader(added.getAttribute('content')?.split('=')[1])
           continue
         }
 
@@ -170,9 +178,8 @@ function handleMutation (nodes: MutationRecord[]) {
           && added.getAttribute('rel') === 'canonical'
           && document.head.querySelector('meta[property="al:android:url"]')?.getAttribute('content')?.startsWith('twitter://user?')
         ) {
-          const header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
-          if (header.querySelector('[data-pronoundb]')) continue
-          injectProfileHeader(header)
+          if (document.querySelector('[data-testid="UserProfileHeader_Items"] [data-pronoundb]')) continue
+          injectProfileHeader(added.getAttribute('content')?.split('=')[1])
           continue
         }
 
@@ -201,8 +208,8 @@ function handleMutation (nodes: MutationRecord[]) {
 }
 
 export function inject () {
-  const header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')
-  if (header) injectProfileHeader(header)
+  const header = document.querySelector('[data-testid="UserProfileHeader_Items"]')
+  if (header) injectProfileHeader()
 
   const observer = new MutationObserver(handleMutation)
   observer.observe(document, { childList: true, subtree: true })

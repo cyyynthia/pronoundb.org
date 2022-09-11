@@ -35,7 +35,11 @@ export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): 
   if (import.meta.env.PDB_BROWSER_TARGET === 'firefox') target = target.wrappedJSObject
 
   const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
-  if (!reactKey) return null
+  if (!reactKey) {
+    return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
+      ? Promise.resolve(null)
+      : null
+  }
 
   let res = (target as any)[reactKey]
   for (const prop of propPath) {
@@ -61,5 +65,7 @@ export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): 
     }
   }
 
-  return res
+  return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
+    ? Promise.resolve(res)
+    : res
 }

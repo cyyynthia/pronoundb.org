@@ -85,36 +85,36 @@ test.use({
 })
 
 test('About section shows pronouns (main stream page)', async ({ page }) => {
-  await page.goto('https://www.twitch.tv/cyyynthia_')
+  await page.goto('https://www.twitch.tv/cyyynthia_', { timeout: 10e3 })
   await page.locator('.home-header-sticky >> text=Chat').click().catch()
   await expect(page.locator('[data-a-target="about-panel"]')).toContainText('it/its')
 })
 
 test('About section shows pronouns (about page)', async ({ page }) => {
-  await page.goto('https://www.twitch.tv/cyyynthia_/about')
+  await page.goto('https://www.twitch.tv/cyyynthia_/about', { timeout: 10e3 })
   await expect(page.locator('[data-a-target="about-panel"]')).toContainText('it/its')
 })
 
 test('Pronouns shows up in chat', async ({ page }) => {
-  await page.goto('https://www.twitch.tv/popout/cyyynthia_/chat')
+  await page.goto('https://www.twitch.tv/popout/cyyynthia_/chat', { timeout: 10e3 })
   await expect(page.locator('[data-a-target="chat-scroller"] >> text=it/its')).toHaveCount(3)
 })
 
 test('Viewer card shows up pronouns', async ({ page }) => {
-  await page.goto('https://www.twitch.tv/popout/cyyynthia_/chat')
+  await page.goto('https://www.twitch.tv/popout/cyyynthia_/chat', { timeout: 10e3 })
   await page.locator('text=cyyynthia_').first().click()
   await expect(page.locator('.viewer-card')).toContainText('it/its')
 })
 
 test('Viewer card shows up pronouns (popped out)', async ({ page }) => {
-  await page.goto('https://www.twitch.tv/popout/cyyynthia_/viewercard/cyyynthia_')
+  await page.goto('https://www.twitch.tv/popout/cyyynthia_/viewercard/cyyynthia_', { timeout: 10e3 })
   await expect(page.locator('.viewer-card')).toContainText('it/its')
 })
 
 test.describe('Implementation quirks', () => {
   // FFZ changes the chat internal structure. Make sure the extension adapts
   test('Pronouns shows up in chat with FFZ', async ({ page }) => {
-    await page.goto('https://www.twitch.tv/popout/cyyynthia_/chat')
+    await page.goto('https://www.twitch.tv/popout/cyyynthia_/chat', { timeout: 10e3 })
     await page.evaluate(() => {
       const script = document.createElement('script')
       script.src = `//cdn.frankerfacez.com/script/script.min.js?_=${Date.now()}`
