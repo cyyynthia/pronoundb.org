@@ -74,7 +74,7 @@ async function injectUserProfile () {
 }
 
 async function injectProfileLists () {
-  const items = Array.from(document.querySelectorAll('.user-profile-nav + div .d-table')) as HTMLElement[]
+  const items = Array.from(document.querySelectorAll('.user-profile-nav + * .d-table')) as HTMLElement[]
 
   items.forEach(async (item) => {
     const pronouns = await fetchPronouns('github', item.querySelector('img')!.src.match(/\/u\/(\d+)/)![1])

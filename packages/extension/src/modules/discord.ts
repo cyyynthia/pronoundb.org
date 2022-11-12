@@ -39,7 +39,7 @@ const Styles = {
     fontSize: '12px',
     fontWeight: '700',
     lineHeight: '16px',
-    color: 'var(--header-secondary)',
+    color: 'var(--header-primary)',
     textTransform: 'uppercase',
     marginBottom: '8px',
   }),
@@ -48,7 +48,6 @@ const Styles = {
     lineHeight: '18px',
     fontWeight: '400',
     color: 'var(--text-normal)',
-    marginBottom: '8px',
   }),
   messageHeader: css({
     display: 'inline-block',
@@ -64,7 +63,7 @@ const Styles = {
 }
 
 async function handleMessage (node: HTMLElement) {
-  const header = node.getElementsByTagName('h2').item(0)
+  const header = node.getElementsByTagName('h3').item(0)
   if (!header || !header.getAttribute('aria-labelledby')?.startsWith('message-username')) return
 
   const id = await fetchReactProp(node, [ 'return', 'return', 'memoizedProps', 'message', 'author', 'id' ])
@@ -85,15 +84,23 @@ async function handleMessage (node: HTMLElement) {
 
 async function handleUserPopOut (node: HTMLElement) {
   const id = await fetchReactProp(node, [ { $find: 'userId', $in: [ 'child', 'memoizedProps' ] }, 'userId' ])
+  console.log(id)
   if (!id) return
 
   const pronouns = await fetchPronouns('discord', id)
   if (pronouns === 'unspecified') return
 
-  const frag = document.createDocumentFragment()
-  frag.appendChild(h('div', { style: Styles.header }, 'Pronouns'))
-  frag.appendChild(h('div', { style: Styles.text }, formatPronouns(pronouns)))
-  node.querySelector('[class^="bodyInnerWrapper"]')?.appendChild(frag)
+  const pronounsSection = h(
+    'div',
+    { style: css({ padding: '12px 12px 0' })},
+    h('div', { style: Styles.header }, 'Pronouns'),
+    h('div', { style: Styles.text }, formatPronouns(pronouns))
+  )
+
+  const sinceBlock = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling?.parentElement
+  if (!sinceBlock) return
+
+  sinceBlock.parentElement?.insertBefore(pronounsSection, sinceBlock)
 
   setTimeout(() => {
     const { y, height } = node.getBoundingClientRect()
@@ -114,10 +121,14 @@ async function handleUserModal (node: HTMLElement) {
 
   const frag = document.createDocumentFragment()
   frag.appendChild(h('div', { class: 'userInfoSectionHeader-owo', style: Styles.header }, 'Pronouns'))
-  frag.appendChild(h('div', { style: Styles.text }, formatPronouns(pronouns)))
+  frag.appendChild(h('div', { style: Styles.text + css({ marginBottom: '16px' }) }, formatPronouns(pronouns)))
 
   container.classList.add('has-pronouns')
-  container.appendChild(frag)
+
+  const sinceHeader = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling
+  if (!sinceHeader) return
+
+  container.insertBefore(frag, sinceHeader)
 }
 
 async function handleAutocompleteRow (row: HTMLElement) {
@@ -152,7 +163,7 @@ function handleMutation (mutations: MutationRecord[]) {
           continue
         }
 
-        if (node.id.startsWith('popout_') && node.querySelector('div[role="dialog"][class^="userPopout-"]')) {
+        if (node.id.startsWith('popout_') && node.querySelector('div[role="dialog"] > [class^="userPopout"]')) {
           handleUserPopOut(node)
           continue
         }

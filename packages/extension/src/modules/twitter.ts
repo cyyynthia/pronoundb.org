@@ -81,22 +81,20 @@ async function injectTweet (tweet: HTMLElement) {
 
   let separator: Node
   let sep = tweet.querySelector('[data-testid="User-Names"] div[dir="auto"][aria-hidden="true"]')
-  if (!sep) sep = tweet.querySelector<HTMLElement>('time')?.parentElement?.previousElementSibling!
+  if (!sep) sep = tweet.querySelector<HTMLElement>('time')?.parentElement?.parentElement?.previousElementSibling!
 
   if (tweet.dataset.testid === 'tweet') {
     const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
     if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
     separator = sep.cloneNode(true)
   } else {
-    separator = document.createDocumentFragment()
-    separator.appendChild(sep.previousElementSibling!.cloneNode(true))
-    separator.appendChild(sep.cloneNode(true))
+    separator = sep.cloneNode(true)
   }
 
   let pronounsContainer = sep.parentElement!.querySelector<HTMLElement>('[data-pronoundb]')
   if (!pronounsContainer) {
     const after = <HTMLElement> sep.nextElementSibling?.nextElementSibling
-    pronounsContainer = <HTMLElement> sep.cloneNode(true)
+    pronounsContainer = <HTMLElement> sep.nextElementSibling!.firstChild!.cloneNode()
     pronounsContainer.setAttribute('data-pronoundb', 'true')
     if (after) {
       sep.parentElement!.insertBefore(separator, after)
@@ -108,11 +106,7 @@ async function injectTweet (tweet: HTMLElement) {
     sep.parentElement!.appendChild(pronounsContainer)
   }
 
-  if (pronounsContainer.tagName === 'SPAN') {
-    pronounsContainer.innerText = formatPronouns(pronouns)
-  } else {
-    pronounsContainer.querySelector('span')!.innerText = formatPronouns(pronouns)
-  }
+  pronounsContainer.innerText = formatPronouns(pronouns)
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
