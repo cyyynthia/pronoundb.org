@@ -26,46 +26,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { queryRuntime } from '../runtime'
+import test from './test.js'
+import { expect } from '@playwright/test'
 
-type QueryElement = string | { $find: string, $in: string[] }
+test('Profile shows pronouns', async ({ page }) => {
+  await page.goto('https://modrinth.com/user/cyyynthia')
+  await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
+})
 
-export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): any {
-  if (import.meta.env.PDB_BROWSER_TARGET === 'chrome' && 'extension' in chrome) return queryRuntime(target, propPath, 'react')
-  if (import.meta.env.PDB_BROWSER_TARGET === 'firefox') target = target.wrappedJSObject
+test('Mod page shows developers\' pronouns', async ({ page }) => {
+  await page.goto('https://modrinth.com/mod/sodium')
+  const devLocator = page.locator('.extra-info.card .team-member')
 
-  const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
-  if (!reactKey) {
-    return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
-      ? Promise.resolve(null)
-      : null
-  }
+  const devs = await devLocator.count()
+  await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
+})
 
-  let res = (target as any)[reactKey]
-  for (const prop of propPath) {
-    if (!res) break
-    if (typeof prop === 'string') {
-      res = res[prop]
-      continue
-    }
+// IDs are not exposed here, so it's not implemented. Leaving the test 'just in case'
+test.skip('Listing page shows pronouns', async ({ page }) => {
+  await page.goto('https://modrinth.com/mods')
+  await expect(page.locator('.project-card.card .info .top >> text=(they/them)')).toHaveCount(20)
+})
 
-    const queue = [ res ]
-    res = null
-    while (queue.length) {
-      const el = queue.shift()
-      if (prop.$find in el) {
-        res = el
-        break
-      }
+test.describe('Implementation quirks', () => {
+  test('Pronouns show when going to profile from another page', async ({ page }) => {
+    await page.goto('https://modrinth.com/user/cyyynthia')
+    await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
 
-      for (const p of prop.$in) {
-        // eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
-        if (p in el && el[p] != null) queue.push(el[p])
-      }
-    }
-  }
+    await page.click('.nav a[href="/mods"]')
+    await page.waitForSelector('#search-results')
+    await page.goBack()
 
-  return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
-    ? Promise.resolve(res)
-    : res
-}
+    await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
+  })
+})

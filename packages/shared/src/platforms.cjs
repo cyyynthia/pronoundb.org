@@ -67,6 +67,12 @@ const Platforms = {
     hasIntegration: false,
     info: 'Authentication via Xbox Live. Bedrock accounts are not supported.',
   },
+  modrinth: {
+    name: 'Modrinth',
+    color: '#30b27b',
+    hasIntegration: true,
+    soon: true, // Hide it from web ui.. hacky ugh
+  },
   osu: {
     name: 'osu!',
     color: '#FF66AA',

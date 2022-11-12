@@ -26,47 +26,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { WEBSITE } from '@pronoundb/shared/constants.js'
-import { initializeRuntime } from './runtime'
-import { getModule } from './modules'
+// Icons from https://feathericons.com/
 
-getModule().then((currentMdl) => {
-  if (currentMdl) {
-    const key = `${currentMdl.id}.enabled`
-    chrome.storage.sync.get([ key ]).then(async ({ [key]: enabled }) => {
-      if (enabled ?? true) {
-        if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') await initializeRuntime()
+export function messageCircle (props: Record<string, string>) {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
 
-        currentMdl.main?.()
-        currentMdl.inject()
-        console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-      }
-    })
-  }
-})
+  svg.setAttribute('viewBox', '0 0 24 24')
+  svg.setAttribute('stroke', 'currentColor')
+  svg.setAttribute('stroke-width', '2')
+  svg.setAttribute('stroke-linecap', 'round')
+  svg.setAttribute('stroke-linejoin', 'round')
+  svg.setAttribute('fill', 'none')
+  path.setAttribute('d', 'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z')
+  svg.appendChild(path)
 
-if (location.origin === WEBSITE) {
-  chrome.storage.sync.get([ 'pronouns.case' ]).then(({ 'pronouns.case': pronounsCase }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.pronouns.case',
-        pronounsCase: pronounsCase ?? 'lower',
-      },
-    }, '*')
-  })
-
-  chrome.storage.onChanged.addListener((changes) => {
-    if (changes['pronouns.case']) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.pronouns.case',
-          pronounsCase: changes['pronouns.case'].newValue,
-        },
-      }, '*')
+  for (const key in props) {
+    if (Object.prototype.hasOwnProperty.call(props, key)) {
+      svg.setAttribute(key, String(props[key]))
     }
-  })
+  }
 
-  document.body.dataset.pdbExtensionVersion = import.meta.env.PDB_EXT_VERSION
+  return svg
 }

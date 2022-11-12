@@ -45,4 +45,8 @@ declare global {
   interface NodeList {
     [Symbol.iterator](): Iterator<Node | ParentNode>
   }
+
+  interface NodeListOf<TNode extends Node> {
+    [Symbol.iterator](): Iterator<TNode>
+  }
 }

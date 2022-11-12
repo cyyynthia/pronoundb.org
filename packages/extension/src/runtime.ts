@@ -27,7 +27,7 @@
  */
 
 import { createDeferred } from './utils/deferred'
-import { fetchReactProp } from './utils/react'
+import { fetchPropUnchecked, fetchReactProp } from './utils/proxy'
 
 type QueryElement = string | { $find: string, $in: string[] }
 
@@ -108,8 +108,12 @@ if (!('extension' in chrome)) {
         if (element) {
           element.removeAttribute('data-pronoundb-target-id')
           switch (data.runtime) {
+            case 'generic':
+              res = fetchPropUnchecked(element, data.query)
+              break
             case 'react':
               res = fetchReactProp(element, data.query)
+              break
           }
         }
 

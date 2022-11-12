@@ -31,7 +31,7 @@ import { personCard, editThin, privacyPublic } from '../icons/facebook'
 import { WEBSITE } from '@pronoundb/shared/constants.js'
 import { formatPronouns, formatPronounsLong } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
-import { fetchReactProp } from '../utils/react'
+import { fetchReactProp } from '../utils/proxy'
 import { h } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?facebook\.com/

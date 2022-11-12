@@ -1,6 +1,6 @@
 {
   "name": "@pronoundb/extension",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "PronounDB browser extension",
   "repository": "git@github.com:cyyynthia/pronoundb.org.git",
   "author": "Cynthia <cynthia@cynthia.dev>",

@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export function h (tag: string, props: Record<string, any> | null, ...child: Array<Node | string | null | false>): Element {
+export function h (tag: string, props: Record<string, any> | null, ...child: Array<Node | string | null | false>): HTMLElement {
   const e = document.createElement(tag)
   if (props) {
     for (const key in props) {

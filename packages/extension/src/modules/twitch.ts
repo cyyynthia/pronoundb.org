@@ -30,7 +30,7 @@ import { whisper } from '../icons/twitch'
 
 import { formatPronouns, formatPronounsShort, formatPronounsLong } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
-import { fetchReactProp } from '../utils/react'
+import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?twitch\.tv/

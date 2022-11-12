@@ -28,7 +28,7 @@
 
 import { formatPronouns } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
-import { fetchReactProp } from '../utils/react'
+import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
 export const match = /^https:\/\/(.+\.)?discord\.com\/(channels|activity|login|app|library|store)/

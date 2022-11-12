@@ -33,6 +33,7 @@ import GitHub from 'simple-icons/icons/github.svg'
 import Instagram from 'simple-icons/icons/instagram.svg'
 import Mastodon from 'simple-icons/icons/mastodon.svg'
 import Minecraft from '../assets/minecraft.svg'
+import Modrinth from '../assets/modrinth.svg'
 import Osu from 'simple-icons/icons/osu.svg'
 import Reddit from 'simple-icons/icons/reddit.svg'
 import Twitch from 'simple-icons/icons/twitch.svg'
@@ -46,6 +47,7 @@ const Icons = {
   instagram: Instagram,
   mastodon: Mastodon,
   minecraft: Minecraft,
+  modrinth: Modrinth,
   osu: Osu,
   reddit: Reddit,
   twitch: Twitch,
