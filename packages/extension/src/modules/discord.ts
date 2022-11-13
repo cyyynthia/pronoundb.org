@@ -84,7 +84,6 @@ async function handleMessage (node: HTMLElement) {
 
 async function handleUserPopOut (node: HTMLElement) {
   const id = await fetchReactProp(node, [ { $find: 'userId', $in: [ 'child', 'memoizedProps' ] }, 'userId' ])
-  console.log(id)
   if (!id) return
 
   const pronouns = await fetchPronouns('discord', id)

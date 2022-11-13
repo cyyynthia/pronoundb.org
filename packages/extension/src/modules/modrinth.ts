@@ -47,55 +47,70 @@ async function fetchUntilData (el: HTMLElement, query: QueryElement[]) {
   return null
 }
 
-async function processProfileInfo (stats: HTMLElement) {
+async function processProfileInfo () {
   const layout = document.getElementById('main') as HTMLElement
   let githubId = await fetchVueProp(layout, [ '$children', '0', 'user', 'github_id' ])
   if (!githubId) githubId = await fetchVueProp(layout, [ '$parent', '$children', '0', 'user', 'github_id' ])
+  if (!githubId) return
 
   const pronouns = await fetchPronouns('github', githubId.toString())
   if (pronouns === 'unspecified') return
 
-  const pronounsInfo = stats.firstChild!.cloneNode() as HTMLElement
-  const icon = messageCircle({ class: 'secondary-stat__icon' })
-  const span = h('span', { class: 'secondary-stat__text' }, formatPronouns(pronouns))
+  const stat = document.querySelector<HTMLElement>('.primary-stat')
+  if (!stat) return
 
+  const pronounsInfo = stat.cloneNode() as HTMLElement
+
+  // zzzzzz thanks vue' "scoped" styles (1 scope targets 99% of the app) (there are no conflicting classes) (:
   const vData = Object.keys(pronounsInfo.dataset).find((d) => d.startsWith('v-'))!
-  icon.dataset[vData] = ''
-  span.dataset[vData] = ''
+  const dataAttr = `data-${vData}`
+
+  const icon = messageCircle({ class: 'primary-stat__icon', [dataAttr]: '' })
+  const span = h(
+    'div',
+    { class: 'primary-stat__text', [dataAttr]: '' },
+    h('span', { class: 'primary-stat__counter', [dataAttr]: '' }, formatPronouns(pronouns)),
+    ' ',
+    h('span', { class: 'primary-stat__label', [dataAttr]: '' }, 'pronouns')
+  )
+
   pronounsInfo.appendChild(icon)
   pronounsInfo.appendChild(span)
-
-  stats.prepend(pronounsInfo)
+  stat.parentElement?.insertBefore(pronounsInfo, stat)
 }
 
 async function processTeamMembers () {
   const layout = document.getElementById('main') as HTMLElement
   const members = await fetchUntilData(layout, [ '$data', 'members' ])
+  if (!members) return
 
   for (const member of members) {
     const pronouns = await fetchPronouns('github', member.user.github_id.toString())
     if (pronouns === 'unspecified') continue
 
-    const linkEl = document.querySelector(`.team-member .member-info a[href='/user/${member.name}']`)
-    if (!linkEl) continue
+    // I will not comment on this absolute... yeah. very good (:
+    for (const platform of [ '.extra-info-desktop', '.extra-info-mobile' ]) {
+      const linkEl = document.querySelector(`${platform} .team-member .member-info a[href='/user/${member.name}']`)
+      if (!linkEl) continue
 
-    const newLink = linkEl.cloneNode(true)
-    const p = newLink.firstChild as HTMLElement
-    p.style.margin = '0'
+      const newLink = linkEl.cloneNode(true)
+      const p = newLink.firstChild as HTMLElement
+      p.style.margin = '0'
 
-    linkEl.parentElement?.replaceChild(
-      h(
-        'div',
-        { style: css({ display: 'flex', alignItems: 'center', gap: '4px', margin: '0.2rem 0' }) },
-        newLink,
+      linkEl.parentElement?.replaceChild(
         h(
-          'span',
-          { style: css({ fontSize: 'var(--font-size-xs)' }) },
-          `(${formatPronouns(pronouns)})`
-        )
-      ),
-      linkEl
-    )
+          'div',
+          { style: css({ display: 'flex', alignItems: 'center', gap: '4px', margin: '0.2rem 0' }) },
+          newLink,
+          h(
+            'span',
+            { style: css({ fontSize: 'var(--font-size-xs)' }) },
+            `(${formatPronouns(pronouns)})`
+          )
+        ),
+        linkEl
+      )
+    }
   }
 }
 
@@ -111,14 +126,12 @@ async function processTeamMembers () {
 // }
 
 function processPage () {
-  if (document.querySelector('.extra-info .team-member')) {
+  if (document.querySelector('.extra-info-desktop .team-member')) {
     processTeamMembers()
   }
 
-  const profileSidebar = document.querySelector<HTMLElement>('aside.card.sidebar')
-  const stats = profileSidebar?.querySelector<HTMLElement>('.stats-block')
-  if (stats) {
-    processProfileInfo(stats)
+  if (document.querySelector('.user-header-wrapper')) {
+    processProfileInfo()
   }
 }
 
