@@ -91,7 +91,7 @@ async function handleUserPopOut (node: HTMLElement) {
 
   const pronounsSection = h(
     'div',
-    { style: css({ padding: '12px 12px 0' })},
+    { style: css({ padding: '12px 0 0' })},
     h('div', { style: Styles.header }, 'Pronouns'),
     h('div', { style: Styles.text }, formatPronouns(pronouns))
   )
