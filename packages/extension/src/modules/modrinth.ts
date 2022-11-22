@@ -36,10 +36,12 @@ import { h, css } from '../utils/dom'
 
 export const match = /^https:\/\/modrinth\.com/
 
-async function fetchUntilData (el: HTMLElement, query: QueryElement[]) {
+async function fetchUntilData (el: HTMLElement, queries: QueryElement[][]) {
   for (let i = 1; i < 20; i++) {
-    const data = await fetchVueProp(el, query)
-    if (data !== void 0) return data
+    for (const query of queries) {
+      const data = await fetchVueProp(el, query)
+      if (data !== void 0) return data
+    }
 
     await new Promise((r) => setTimeout(r, i * 25))
   }
@@ -49,8 +51,11 @@ async function fetchUntilData (el: HTMLElement, query: QueryElement[]) {
 
 async function processProfileInfo () {
   const layout = document.getElementById('main') as HTMLElement
-  let githubId = await fetchVueProp(layout, [ '$children', '0', 'user', 'github_id' ])
-  if (!githubId) githubId = await fetchVueProp(layout, [ '$parent', '$children', '0', 'user', 'github_id' ])
+  const githubId = await fetchUntilData(layout, [
+    [ 'user', 'github_id' ],
+    [ '$children', '0', 'user', 'github_id' ],
+    [ '$parent', '$children', '0', 'user', 'github_id' ]
+  ])
   if (!githubId) return
 
   const pronouns = await fetchPronouns('github', githubId.toString())
@@ -81,7 +86,11 @@ async function processProfileInfo () {
 
 async function processTeamMembers () {
   const layout = document.getElementById('main') as HTMLElement
-  const members = await fetchUntilData(layout, [ '$data', 'members' ])
+  const members = await fetchUntilData(layout, [
+    [ 'members' ],
+    [ '$children', '0', 'members' ],
+    [ '$parent', '$children', '0', 'members' ]
+  ])
   if (!members) return
 
   for (const member of members) {

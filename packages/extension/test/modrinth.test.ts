@@ -36,9 +36,11 @@ test('Profile shows pronouns', async ({ page }) => {
 
 test('Mod page shows developers\' pronouns', async ({ page }) => {
   await page.goto('https://modrinth.com/mod/sodium')
-  const devLocator = page.locator('.extra-info.card .team-member')
 
+  const devLocator = page.locator('.extra-info-desktop.card .team-member')
+  await expect(devLocator.first()).toBeVisible()
   const devs = await devLocator.count()
+
   await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
 })
 
@@ -58,5 +60,18 @@ test.describe('Implementation quirks', () => {
     await page.goBack()
 
     await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
+  })
+
+  test('Pronouns show when going to mod from another page', async ({ page }) => {
+    await page.goto('https://modrinth.com/user/jellysquid3')
+    await expect(page.locator('.card.sidebar >> text=they/them')).toHaveCount(1)
+
+    await page.click('.project-card a')
+
+    const devLocator = page.locator('.extra-info-desktop.card .team-member')
+    await expect(devLocator.first()).toBeVisible()
+    const devs = await devLocator.count()
+
+    await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
   })
 })
