@@ -34,7 +34,7 @@ import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
 import licensePlugin from 'rollup-plugin-license'
 
-import { baseLicensePath, renderLicense, finishLicense } from '@pronoundb/shared/build.js'
+import { baseLicensePath, renderLicenseWith, finishLicense } from '@pronoundb/shared/build.js'
 import transform from './build/transform'
 import manifest from './build/manifest'
 import pack from './build/pack'
@@ -101,7 +101,12 @@ export default defineConfig({
           allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
           output: {
             file: join(__dirname, outDir, baseLicensePath),
-            template: renderLicense,
+            template: renderLicenseWith([
+              {
+                target: 'js-lru (https://github.com/rsms/js-lru)',
+                license: join(__dirname, 'src', 'utils', 'lru', 'LICENSE'),
+              },
+            ]),
           },
         },
     }),

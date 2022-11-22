@@ -28,7 +28,7 @@
 
 import type { Deferred } from './deferred'
 import { createDeferred } from './deferred'
-import { LRUMap } from 'lru_map'
+import { LRUMap } from './lru/lru'
 
 async function doFetch (platform: string, queue: Map<string, Deferred<string>>) {
   queue = new Map(queue) // clone the map
@@ -82,11 +82,11 @@ async function queueFetch (platform: string, id: string): Promise<string> {
 const cache = new LRUMap<string, Promise<string>>(5000)
 export function fetchPronouns (platform: string, id: string): Promise<string> {
   const key = `${platform}::${id}`
-  let pronouns = cache.get(key)
-  if (!pronouns) {
-    pronouns = queueFetch(platform, id)
+  if (!cache.has(key)) {
+    const pronouns = queueFetch(platform, id)
     cache.set(key, pronouns)
+    return pronouns
   }
 
-  return pronouns
+  return cache.get(key)!
 }

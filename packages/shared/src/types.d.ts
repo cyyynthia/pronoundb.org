@@ -125,8 +125,14 @@ declare module '@pronoundb/shared/build.js' {
     closeBundle?: () => void
   }
 
+  type License = {
+    target: string
+    license: string
+  }
+
   export const baseLicensePath: string
 
   export function renderLicense (deps: Dependency[]): string
+  export function renderLicenseWith (licenses: License[]): (deps: Dependency[]) => string
   export function finishLicense (opts: { workingDirectory: string }): Plugin
 }

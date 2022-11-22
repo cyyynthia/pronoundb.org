@@ -34,27 +34,38 @@ const { join } = require('path')
 let finalLicensePath = ''
 let baseLicensePath = join('assets', 'third-party-licenses.txt')
 
-function renderLicense (deps) {
-  let str = 'Licenses for open-source software used in this website are reproduced below.\n=========================\n\n'
-  for (const dep of deps) {
-    const home = dep.homepage || dep.repository.url || dep.repository
-    str += `${dep.name}${home ? ` (${home})` : ''}\nThis software is licensed under the following terms:\n\n${dep.licenseText.trim()}\n\n----------\n\n`
+const TP_LICENSES = [
+  {
+    target: 'tailwindcss (https://tailwindcss.com)',
+    license: join(__dirname, '..', 'node_modules', 'tailwindcss', 'LICENSE'),
+  },
+  {
+    target: 'Quicksand Font Family (https://github.com/andrew-paglinawan/QuicksandFamily)',
+    license: join(__dirname, '..', 'fonts', 'quicksand-license.txt'),
+  },
+]
+
+function renderLicenseWith (licenses) {
+  licenses = [ ...licenses, ...TP_LICENSES ]
+  return function (deps) {
+    let str = 'Licenses for open-source software used in this website are reproduced below.\n=========================\n\n'
+    for (const dep of deps) {
+      const home = dep.homepage || dep.repository.url || dep.repository
+      str += `${dep.name}${home ? ` (${home})` : ''}\nThis software is licensed under the following terms:\n\n${dep.licenseText.trim()}\n\n----------\n\n`
+    }
+
+    for (const license of licenses) {
+      const licenseText = readFileSync(license.license, 'utf8')
+      str += `${license.target}\nThis software is licensed under the following terms:\n\n${licenseText.trim()}\n\n----------\n\n`
+    }
+
+    // Create hash
+    str += 'Meow~'
+    const hash = createHash('sha256').update(str).digest('hex').slice(0, 8)
+    finalLicensePath = join('assets', `third-party-licenses.${hash}.txt`)
+
+    return str
   }
-
-  // Tailwindcss
-  const twLicense = readFileSync(join(__dirname, '..', 'node_modules', 'tailwindcss', 'LICENSE'), 'utf8')
-  str += `tailwindcss (https://tailwindcss.com)\nThis software is licensed under the following terms:\n\n${twLicense.trim()}\n\n----------\n\n`
-
-  // Quicksand
-  const qsLicense = readFileSync(join(__dirname, '..', 'fonts', 'quicksand-license.txt'), 'utf8')
-  str += `Quicksand Font Family (https://github.com/andrew-paglinawan/QuicksandFamily)\nThis software is licensed under the following terms:\n\n${qsLicense.trim()}\n\n----------\n\n`
-
-  // Create hash
-  str += 'Meow~'
-  const hash = createHash('sha256').update(str).digest('hex').slice(0, 8)
-  finalLicensePath = join('assets', `third-party-licenses.${hash}.txt`)
-
-  return str
 }
 
 // rollup-plugin-license doesn't do a great job w/ Vite :<
@@ -104,6 +115,7 @@ function finishLicense ({ workingDirectory }) {
 
 module.exports = {
   baseLicensePath: baseLicensePath,
-  renderLicense: renderLicense,
+  renderLicenseWith: renderLicenseWith,
+  renderLicense: renderLicenseWith([]),
   finishLicense: finishLicense,
 }
