@@ -47,5 +47,8 @@
         "react"
       ]
     }
+  },
+  "dependencies": {
+    "lru_map": "^0.4.1"
   }
 }
