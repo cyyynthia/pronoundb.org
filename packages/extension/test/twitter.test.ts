@@ -36,7 +36,7 @@ test('Profile shows pronouns', async ({ page }) => {
 
 test('Tweet show pronouns (full view)', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('article >> text=TweetDeck >> xpath=../.. >> text=it/its')).toHaveCount(1)
+  await expect(page.locator('article >> text=, 2022 >> xpath=../../.. >> text=it/its')).toHaveCount(1)
 })
 
 test('Tweet show pronouns (inline view)', async ({ page }) => {
@@ -46,7 +46,7 @@ test('Tweet show pronouns (inline view)', async ({ page }) => {
 
 test('Quoted tweet show pronouns', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('text=Out of Context Cats@OocCats · >> text=they/them')).toHaveCount(1)
+  await expect(page.locator('text=Out of Context Cats@OocCats >> text=they/them')).toHaveCount(1)
 })
 
 test('Hovercard shows pronouns', async ({ page }) => {

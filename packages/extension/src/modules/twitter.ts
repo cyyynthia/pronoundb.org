@@ -40,6 +40,7 @@ async function injectProfileHeader (username?: string) {
   if (username) {
     let currentUsername
     do {
+      // Make sure the UI updated
       await new Promise((resolve) => setTimeout(resolve, 10))
       header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
       currentUsername = await fetchReactProp(header.parentElement!, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'screen_name' ])
@@ -79,39 +80,26 @@ async function injectTweet (tweet: HTMLElement) {
   const pronouns = await fetchPronouns('twitter', retweetId || directId)
   if (pronouns === 'unspecified') return
 
-  let separator: Node
-  let sep = tweet.querySelector('[data-testid="User-Names"] div[dir="auto"][aria-hidden="true"]')
-  if (!sep) sep = tweet.querySelector<HTMLElement>('time')?.parentElement?.parentElement?.previousElementSibling!
+  const dateContainer = tweet.querySelector(tweet.dataset.testid === 'tweet' ? 'a time' : 'time')?.parentElement
+  const parentContainer = dateContainer?.parentElement?.parentElement
+  if (!dateContainer || !parentContainer) return
 
-  if (tweet.dataset.testid === 'tweet') {
-    const sourceLabel = tweet.querySelector('a[href="https://help.twitter.com/using-twitter/how-to-tweet#source-labels"]')
-    if (sourceLabel) sep = sourceLabel.previousElementSibling as HTMLElement
-    separator = sep.cloneNode(true)
-  } else {
-    separator = sep.cloneNode(true)
-  }
-
-  let pronounsContainer = sep.parentElement!.querySelector<HTMLElement>('[data-pronoundb]')
-  if (!pronounsContainer) {
-    const after = <HTMLElement> sep.nextElementSibling?.nextElementSibling
-    pronounsContainer = <HTMLElement> sep.nextElementSibling!.firstChild!.cloneNode()
-    pronounsContainer.setAttribute('data-pronoundb', 'true')
-    if (after) {
-      sep.parentElement!.insertBefore(separator, after)
-      sep.parentElement!.insertBefore(pronounsContainer, after)
-      return
-    }
-
-    sep.parentElement!.appendChild(separator)
-    sep.parentElement!.appendChild(pronounsContainer)
-  }
-
-  pronounsContainer.innerText = formatPronouns(pronouns)
+  const containerClass = dateContainer.className
+  parentContainer.querySelector('.pronoundb-container')?.remove()
+  parentContainer.appendChild(
+    h(
+      'div',
+      { class: `${containerClass} pronoundb-container` },
+      h('span', { class: 'pronoundb-void' }, '​'),
+      h('span', { class: 'pronoundb-separator' }, '·'),
+      h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns))
+    )
+  )
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
   const userInfo = popout.querySelector('a + div')?.parentElement
-  const template = userInfo?.querySelector<HTMLElement>('a [dir=ltr]')
+  const template = userInfo?.querySelector<HTMLElement>('a[tabindex="-1"] [dir=ltr]')
   if (!template || !userInfo) return
 
   const id = await fetchReactProp(popout, [ 'memoizedProps', 'children', '2', 'props', 'children', 'props', 'userId' ])
@@ -183,7 +171,7 @@ function handleMutation (nodes: MutationRecord[]) {
           if (prevPronouns) prevPronouns.remove()
           injectTweet(tweet)
 
-          const quoteTweet = tweet.querySelector<HTMLElement>('div[dir="auto"] + div[tabindex="0"]')
+          const quoteTweet = tweet.querySelector<HTMLElement>('[aria-labelledby][id] > [id] [tabindex="0"]')
           if (quoteTweet && quoteTweet.querySelector('time')) {
             injectTweet(quoteTweet)
           }
