@@ -52,6 +52,33 @@ export const LegacyPronouns = {
   avoid: 'Avoid pronouns, use my name',
 }
 
+let p = 'pronouns'
+export const LegacyPronounsWithSuffix = {
+  unspecified: null,
+  // -- Contributors: please keep the list sorted alphabetically.
+  hh: [ LegacyPronouns.hh, p ],
+  hi: [ LegacyPronouns.hi, p ],
+  hs: [ LegacyPronouns.hs, p ],
+  ht: [ LegacyPronouns.ht, p ],
+  ih: [ LegacyPronouns.ih, p ],
+  ii: [ LegacyPronouns.ii, p ],
+  is: [ LegacyPronouns.is, p ],
+  it: [ LegacyPronouns.it, p ],
+  shh: [ LegacyPronouns.shh, p ],
+  sh: [ LegacyPronouns.sh, p ],
+  si: [ LegacyPronouns.si, p ],
+  st: [ LegacyPronouns.st, p ],
+  th: [ LegacyPronouns.th, p ],
+  ti: [ LegacyPronouns.ti, p ],
+  ts: [ LegacyPronouns.ts, p ],
+  tt: [ LegacyPronouns.tt, p ],
+  // --
+  any: [ 'Any', p ],
+  other: [ 'Other', p ],
+  ask: [ 'Ask me', 'my pronouns' ],
+  avoid: [ 'Avoid', 'pronouns, use my name' ],
+}
+
 export const LegacyPronounsShort = {
   ...LegacyPronouns,
   any: [ 'any', 'Any' ],

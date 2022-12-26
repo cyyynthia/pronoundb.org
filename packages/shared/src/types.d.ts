@@ -109,6 +109,7 @@ declare module '@pronoundb/shared/format.js' {
   export function formatPronouns (id: string): string
   export function formatPronounsShort (id: string): string
   export function formatPronounsLong (id: string): string
+  export function formatPronounsSuffixed (id: string): [ string, string ]
   export function usePronouns (): void
 }
 

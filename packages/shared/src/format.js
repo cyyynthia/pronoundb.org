@@ -27,7 +27,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'preact/hooks'
-import { LegacyPronouns, LegacyPronounsShort } from './pronouns.js'
+import { LegacyPronouns, LegacyPronounsShort, LegacyPronounsWithSuffix } from './pronouns.js'
 
 let pronounsCase = 'lower'
 if (typeof chrome !== 'undefined') {
@@ -57,6 +57,17 @@ export function formatPronounsShort (id) {
   const pronouns = LegacyPronounsShort[id]
   const idx = pronounsCase === 'lower' ? 0 : 1
   return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+}
+
+export function formatPronounsSuffixed (id) {
+  const pronouns = LegacyPronounsWithSuffix[id]
+  if (!pronouns) return null
+
+  const idx = pronounsCase === 'lower' ? 0 : 1
+  return [
+    Array.isArray(pronouns[0]) ? pronouns[0][idx] : pronouns[0],
+    pronouns[1]
+  ]
 }
 
 export function formatPronounsLong (id) {

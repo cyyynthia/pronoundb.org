@@ -29,7 +29,7 @@
 import type { QueryElement } from '../utils/proxy'
 import { messageCircle } from '../icons/feather'
 
-import { formatPronouns } from '@pronoundb/shared/format.js'
+import { formatPronouns, formatPronounsSuffixed } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchVueProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
@@ -54,7 +54,7 @@ async function processProfileInfo () {
   const githubId = await fetchUntilData(layout, [
     [ 'user', 'github_id' ],
     [ '$children', '0', 'user', 'github_id' ],
-    [ '$parent', '$children', '0', 'user', 'github_id' ]
+    [ '$parent', '$children', '0', 'user', 'github_id' ],
   ])
   if (!githubId) return
 
@@ -71,12 +71,13 @@ async function processProfileInfo () {
   const dataAttr = `data-${vData}`
 
   const icon = messageCircle({ class: 'primary-stat__icon', [dataAttr]: '' })
+  const [ a, b ] = formatPronounsSuffixed(pronouns)
   const span = h(
     'div',
     { class: 'primary-stat__text', [dataAttr]: '' },
-    h('span', { class: 'primary-stat__counter', [dataAttr]: '' }, formatPronouns(pronouns)),
+    h('span', { class: 'primary-stat__counter', [dataAttr]: '' }, a),
     ' ',
-    h('span', { class: 'primary-stat__label', [dataAttr]: '' }, 'pronouns')
+    h('span', { class: 'primary-stat__label', [dataAttr]: '' }, b)
   )
 
   pronounsInfo.appendChild(icon)
@@ -89,7 +90,7 @@ async function processTeamMembers () {
   const members = await fetchUntilData(layout, [
     [ 'members' ],
     [ '$children', '0', 'members' ],
-    [ '$parent', '$children', '0', 'members' ]
+    [ '$parent', '$children', '0', 'members' ],
   ])
   if (!members) return
 
