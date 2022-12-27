@@ -65,6 +65,7 @@ export default function manifest (): Plugin {
         permissions: [ 'activeTab', 'storage' ],
         // todo: localhost api indev
         host_permissions: [ 'https://*.pronoundb.org/*' ],
+        // optional_host_permissions: [ '*://*/*' ],
         action: { default_popup: 'popup.html' },
         content_security_policy: {
           // todo: localhost api indev
@@ -78,7 +79,17 @@ export default function manifest (): Plugin {
           : { service_worker: chunks.worker.name, type: 'module' },
 
         content_scripts: [
-          { js: [ chunks.wrapper.name ], matches: [ '<all_urls>' ] },
+          {
+            js: [ chunks.wrapper.name ],
+            matches: [
+              'https://*.discord.com/*',
+              'https://*.facebook.com/*',
+              'https://*.github.com/*',
+              'https://*.modrinth.com/*',
+              'https://*.twitch.com/*',
+              'https://*.twitter.com/*',
+            ],
+          },
         ],
 
         // Chrome requires resources to be WAR when using imports in content scripts
@@ -99,10 +110,12 @@ export default function manifest (): Plugin {
         manifestData.manifest_version = 2
         manifestData.browser_action = manifestData.action
         manifestData.permissions.push(...manifestData.host_permissions)
+        // manifestData.optional_permissions = manifestData.optional_host_permissions
 
         delete manifestData.action
-        delete manifestData.content_security_policy
         delete manifestData.host_permissions
+        delete manifestData.optional_host_permissions
+        delete manifestData.content_security_policy
       }
 
       this.emitFile({
