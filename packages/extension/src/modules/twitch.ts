@@ -33,6 +33,7 @@ import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
+export { default as Icon } from 'simple-icons/icons/twitch.svg'
 export const match = /^https:\/\/(.+\.)?twitch\.tv/
 
 const settings = {

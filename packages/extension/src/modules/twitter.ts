@@ -33,6 +33,7 @@ import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
+export { default as Icon } from 'simple-icons/icons/twitter.svg'
 export const match = /^https:\/\/(.+\.)?twitter\.com/
 
 async function injectProfileHeader (username?: string) {

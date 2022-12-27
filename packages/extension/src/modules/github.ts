@@ -32,6 +32,7 @@ import { formatPronouns } from '@pronoundb/shared/format.js'
 import { fetchPronouns } from '../utils/fetch'
 import { h } from '../utils/dom'
 
+export { default as Icon } from 'simple-icons/icons/github.svg'
 export const match = /^https:\/\/(.+\.)?github\.com/
 
 async function injectUserProfile () {

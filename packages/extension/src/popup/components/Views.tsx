@@ -30,13 +30,12 @@ import type { ExtensionModule } from '../../modules'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
-import PlatformIcons from '@pronoundb/shared/icons.js'
 
 import Checkbox from './form/Checkbox'
 import Select from './form/Select'
 import modules from '../../modules'
 
-export enum ViewState {
+export const enum ViewState {
   MAIN,
   PRONOUNS,
   SETTINGS
@@ -68,7 +67,7 @@ export function Main ({ module }: { module: ExtensionModule }) {
   return (
     <main class={`flex-grow border-t-8 border-platform-${module.id} px-4 py-2 -m-px`}>
       <div class='flex gap-2 items-center mb-3'>
-        {h(PlatformIcons[module.id], { class: 'w-6 h-6 fill-current' })}
+        {h(module.Icon, { class: 'w-6 h-6 fill-current' })}
         <h2 class='text-xl font-semibold tracking-wide'>{platform.name}</h2>
       </div>
 
@@ -115,7 +114,7 @@ export function Settings () {
           key={mdl.id}
           label={
             <span class='flex gap-2 items-center'>
-              {h(PlatformIcons[mdl.id], { class: 'w-4 h-4 fill-current' })} {Platforms[mdl.id].name}
+              {h(mdl.Icon, { class: 'w-4 h-4 fill-current' })} {Platforms[mdl.id].name}
             </span>
           }
         />

@@ -34,6 +34,7 @@ import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h } from '../utils/dom'
 
+export { default as Icon } from 'simple-icons/icons/facebook.svg'
 export const match = /^https:\/\/(.+\.)?facebook\.com/
 
 async function handleProfileTilesFeed (node: HTMLElement) {

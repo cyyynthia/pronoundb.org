@@ -34,6 +34,7 @@ import { fetchPronouns } from '../utils/fetch'
 import { fetchVueProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
+export { default as Icon } from '@pronoundb/shared/assets/modrinth.svg'
 export const match = /^https:\/\/modrinth\.com/
 
 async function fetchUntilData (el: HTMLElement, queries: QueryElement[][]) {

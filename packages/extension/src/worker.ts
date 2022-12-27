@@ -28,6 +28,7 @@
 
 import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
 
+// ONBOARDING & CHANGE LOGS
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
@@ -41,6 +42,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 })
 
+// HTTP HANDLER
 chrome.runtime.onMessage.addListener((request, _, cb) => {
   if (request.kind === 'http') {
     const url = request.ids.length === 1

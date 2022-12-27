@@ -26,7 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { ComponentType } from 'preact'
+
 export type ExtensionModule = {
+  Icon: ComponentType<any>
   id: string
   match: RegExp
   inject: () => void
@@ -41,17 +44,20 @@ for (const mdl in rawModules) {
   }
 }
 
-export async function getModule (): Promise<ExtensionModule | null> {
+export async function getModule (loc?: string): Promise<ExtensionModule | null> {
   // ref: https://bugzilla.mozilla.org/show_bug.cgi?id=1711570
   const extension = typeof browser === 'undefined' ? chrome : browser
-  let loc = location.href
 
-  if (extension.tabs) {
-    const [ tab ] = await extension.tabs.query({ active: true, currentWindow: true })
-    loc = tab.url!
+  if (!loc) {
+    loc = location.href
+    if (extension.tabs) {
+      const [ tab ] = await extension.tabs.query({ active: true, currentWindow: true })
+      // eslint-disable-next-line require-atomic-updates
+      loc = tab.url!
+    }
   }
 
-  return modules.find((mdl) => mdl.match.test(loc)) || null
+  return modules.find((mdl) => mdl.match.test(loc!)) || null
 }
 
 export default modules

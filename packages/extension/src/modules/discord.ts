@@ -31,6 +31,7 @@ import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
+export { default as Icon } from 'simple-icons/icons/discord.svg'
 export const match = /^https:\/\/(.+\.)?discord\.com\/(channels|activity|login|app|library|store)/
 
 const Styles = {
@@ -91,7 +92,7 @@ async function handleUserPopOut (node: HTMLElement) {
 
   const pronounsSection = h(
     'div',
-    { style: css({ padding: '12px 0 0' })},
+    { style: css({ padding: '12px 0 0' }) },
     h('div', { style: Styles.header }, 'Pronouns'),
     h('div', { style: Styles.text }, formatPronouns(pronouns))
   )
