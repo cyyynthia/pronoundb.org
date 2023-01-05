@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 Cynthia K. Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
