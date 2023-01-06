@@ -26,23 +26,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const colors = require('tailwindcss/colors')
+import { defineConfig } from 'astro/config'
+import tailwind from '@astrojs/tailwind'
+import node from '@astrojs/node'
 
-module.exports = {
-  darkMode: 'media',
-  content: [ './**/*.html', './src/**/*.tsx' ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    extend: {
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-      },
+export default defineConfig({
+  output: 'server',
+  integrations: [ tailwind() ],
+  adapter: node({ mode: 'standalone' }),
+  vite: {
+    build: {
+      // I don't like inlined assets
+      assetsInlineLimit: 0,
     },
   },
-  plugins: [],
-}
+})

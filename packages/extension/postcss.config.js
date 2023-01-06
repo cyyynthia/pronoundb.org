@@ -26,4 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module.exports = require('@pronoundb/shared/postcss.config.cjs')
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+  },
+}

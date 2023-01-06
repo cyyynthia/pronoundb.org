@@ -26,13 +26,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { formatPronouns } from '@pronoundb/shared/format.js'
+import { formatPronouns } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
-export { default as Icon } from 'simple-icons/icons/discord.svg'
+export const name = 'Discord'
+export const color = '#5865F2'
 export const match = /^https:\/\/(.+\.)?discord\.com\/(channels|activity|login|app|library|store)/
+export { default as Icon } from 'simple-icons/icons/discord.svg'
 
 const Styles = {
   header: css({

@@ -29,7 +29,7 @@
 import type { ExtensionModule } from '../../modules'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
-import { WEBSITE, Endpoints } from '@pronoundb/shared/constants.js'
+import { WEBSITE, Endpoints } from '../../constants.js'
 import { Header, Footer } from './Layout'
 import { ViewState } from './Views'
 import * as Views from './Views'

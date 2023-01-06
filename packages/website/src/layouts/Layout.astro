@@ -1,3 +1,4 @@
+---
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -26,23 +27,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const colors = require('tailwindcss/colors')
-
-module.exports = {
-  darkMode: 'media',
-  content: [ './**/*.html', './src/**/*.tsx' ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    extend: {
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-      },
-    },
-  },
-  plugins: [],
+export interface Props {
+	title?: string;
+	description?: string;
 }
+
+const DEFAULT_DESCRIPTION = 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly.'
+
+const { title, description } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang='en' class='font-sans w-full h-full'>
+  <head>
+    <meta charset='utf8'/>
+    <meta name='viewport' content='width=device-width'/>
+    <meta name='theme-color' content='#f49898'/>
+
+		<meta name='og:site_name' content='PronounDB'/>
+		<meta name='og:title' content={title || 'PronounDB'}/>
+		<title>{title ? `${title} • PronounDB` : 'PronounDB'}</title>
+		<meta name='og:description' content={description || DEFAULT_DESCRIPTION}/>
+		<meta name='description' content={description || DEFAULT_DESCRIPTION}/>
+  </head>
+  <body class='w-full h-full text-black bg-white dark:bg-gray-800 dark:text-white'>
+		<slot/>
+  </body>
+</html>
+
+<style is:global>
+	@font-face {
+		font-family: 'Quicksand';
+		font-style: normal;
+		font-display: swap;
+		src: url(../assets/fonts/quicksand-regular.woff2) format('woff2');
+	}
+
+	@font-face {
+		font-family: 'Quicksand';
+		font-style: normal;
+		font-weight: 600;
+		font-display: swap;
+		src: url(../assets/fonts/quicksand-semibold.woff2) format('woff2');
+	}
+
+	@font-face {
+		font-family: 'Quicksand';
+		font-style: normal;
+		font-weight: 700;
+		font-display: swap;
+		src: url(../assets/fonts/quicksand-bold.woff2) format('woff2');
+	}
+</style>

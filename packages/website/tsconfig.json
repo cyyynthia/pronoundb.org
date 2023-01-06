@@ -1,11 +1,6 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "astro/tsconfigs/strictest",
   "compilerOptions": {
-    "types": [ "vite/client" ],
-    "outDir": "./dist",
-    "jsx": "preserve",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
-  },
-  "include": [ "./src/**/*", "vite.config.ts" ]
+    "types": [ "astro/client" ]
+  }
 }

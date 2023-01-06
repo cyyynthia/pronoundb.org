@@ -34,7 +34,7 @@ import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
 import licensePlugin from 'rollup-plugin-license'
 
-import { baseLicensePath, renderLicenseWith, finishLicense } from '@pronoundb/shared/build.js'
+import { baseLicensePath, renderLicense, finishLicense } from './build/license'
 import transform from './build/transform'
 import manifest from './build/manifest'
 import pack from './build/pack'
@@ -84,9 +84,11 @@ const outDir = process.env.PDB_BROWSER_TARGET === 'firefox' ? 'dist/firefox' : '
 export default defineConfig({
   build: {
     assetsInlineLimit: 0,
-    polyfillModulePreload: false,
     outDir: outDir,
     rollupOptions: { input: input },
+    modulePreload: {
+      polyfill: false,
+    },
   },
   envPrefix: [ 'VITE', 'PDB' ],
   plugins: [
@@ -94,23 +96,16 @@ export default defineConfig({
     transform(),
     magicalSvg({ target: 'preact' }),
     licensePlugin({
-      thirdParty: process.argv.includes('--ssr')
-        ? void 0
-        : {
-          includePrivate: false,
-          allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
-          output: {
-            file: join(__dirname, outDir, baseLicensePath),
-            template: renderLicenseWith([
-              {
-                target: 'js-lru (https://github.com/rsms/js-lru)',
-                license: join(__dirname, 'src', 'utils', 'lru', 'LICENSE'),
-              },
-            ]),
-          },
+      thirdParty: {
+        includePrivate: false,
+        allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
+        output: {
+          file: join(__dirname, outDir, baseLicensePath),
+          template: renderLicense,
         },
+      },
     }),
-    finishLicense({ workingDirectory: __dirname }),
+    finishLicense(),
     finalizeBuild(),
     manifest(),
     pack(),

@@ -27,7 +27,6 @@
  */
 
 import '@types/chrome'
-import '@pronoundb/shared'
 
 declare global {
   // Used to test for Firefox's existence
@@ -40,13 +39,5 @@ declare global {
 
   interface Element {
     wrappedJSObject: this
-  }
-
-  interface NodeList {
-    [Symbol.iterator](): Iterator<Node | ParentNode>
-  }
-
-  interface NodeListOf<TNode extends Node> {
-    [Symbol.iterator](): Iterator<TNode>
   }
 }

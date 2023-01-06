@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
+import { Endpoints, WEBSITE } from './constants.js'
 
 // ONBOARDING & CHANGE LOGS
 chrome.runtime.onInstalled.addListener((details) => {

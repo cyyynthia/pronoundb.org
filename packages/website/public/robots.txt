@@ -1,6 +1,0 @@
-User-agent: *
-Disallow: /api
-Disallow: /api/
-
-User-agent: nsa
-Disallow: /

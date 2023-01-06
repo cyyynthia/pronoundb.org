@@ -85,7 +85,7 @@ export default function pack (): Plugin {
         srcArchive.file(join(rootDir, '.eslintrc.json'), { name: '.eslintrc.json' })
 
         // Add necessary packages
-        for (const pkg of [ 'shared', 'extension' ]) {
+        for (const pkg of [ 'extension' ]) {
           for await (const file of readdirRecursive(join(rootDir, 'packages', pkg))) {
             srcArchive.file(file.path, { name: `packages/${pkg}/${file.name}` })
           }

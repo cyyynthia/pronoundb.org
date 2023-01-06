@@ -26,23 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const colors = require('tailwindcss/colors')
+export const WEBSITE = import.meta.env && import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
 
-module.exports = {
-  darkMode: 'media',
-  content: [ './**/*.html', './src/**/*.tsx' ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    extend: {
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-      },
-    },
-  },
-  plugins: [],
+export const Endpoints = {
+  LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
+  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
+  LOOKUP_SELF: `${WEBSITE}/api/v1/lookup/me`,
 }

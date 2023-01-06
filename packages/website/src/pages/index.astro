@@ -1,3 +1,4 @@
+---
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -26,23 +27,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const colors = require('tailwindcss/colors')
+import Layout from '../layouts/Layout.astro';
+---
 
-module.exports = {
-  darkMode: 'media',
-  content: [ './**/*.html', './src/**/*.tsx' ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    extend: {
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-      },
-    },
-  },
-  plugins: [],
-}
+<Layout title="Welcome to Astro.">
+	<h1>PronounDB, Astro edition</h1>
+</Layout>

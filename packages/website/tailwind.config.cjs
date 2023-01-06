@@ -30,10 +30,24 @@ const colors = require('tailwindcss/colors')
 
 module.exports = {
   darkMode: 'media',
-  content: [ './**/*.html', './src/**/*.tsx' ],
+  content: [
+    './src/pages/**/*.astro',
+    './src/components/**/*.astro',
+    './src/layouts/*.astro',
+  ],
   theme: {
     fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+    container: {
+      screens: {
+        'sm': '640px',
+        'md': '768px',
+        'lg': '1024px',
+        'xl': '1280px',
+        '2xl': '1360px',
+      },
+    },
     extend: {
+      screens: { xs: '420px' },
       colors: {
         pink: {
           DEFAULT: '#f49898',
@@ -41,6 +55,10 @@ module.exports = {
         },
         cyan: colors.cyan,
         gray: colors.neutral,
+        emerald: colors.emerald,
+        'deep-blue': '#130e85',
+        'red-orange': '#ff9483',
+        platform: {},
       },
     },
   },

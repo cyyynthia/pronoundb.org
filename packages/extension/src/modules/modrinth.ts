@@ -29,13 +29,15 @@
 import type { QueryElement } from '../utils/proxy'
 import { messageCircle } from '../icons/feather'
 
-import { formatPronouns, formatPronounsSuffixed } from '@pronoundb/shared/format.js'
+import { formatPronouns, formatPronounsSuffixed } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchVueProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
-export { default as Icon } from '@pronoundb/shared/assets/modrinth.svg'
+export const name = 'Modrinth'
+export const color = '#30B27B'
 export const match = /^https:\/\/modrinth\.com/
+export { default as Icon } from '../../assets/modrinth.svg'
 
 async function fetchUntilData (el: HTMLElement, queries: QueryElement[][]) {
   for (let i = 1; i < 20; i++) {

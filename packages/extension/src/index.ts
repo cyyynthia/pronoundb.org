@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { WEBSITE } from '@pronoundb/shared/constants.js'
+import { WEBSITE } from './constants.js'
 import { initializeRuntime } from './runtime'
 import { getModule } from './modules'
 

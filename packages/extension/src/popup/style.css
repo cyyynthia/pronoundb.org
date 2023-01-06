@@ -26,12 +26,34 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@import '@pronoundb/shared/styles.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-display: swap;
+    src: url(../../assets/fonts/quicksand-regular.woff2) format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url(../../assets/fonts/quicksand-semibold.woff2) format('woff2');
+  }
+
+  @font-face {
+    font-family: 'Quicksand';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(../../assets/fonts/quicksand-bold.woff2) format('woff2');
+  }
+
   html, body {
     @apply font-sans text-black bg-white h-full;
     width: 360px;
@@ -47,6 +69,10 @@
 }
 
 @layer components {
+  .link {
+    @apply text-blue-800 hover:underline dark:text-cyan-200;
+  }
+
   .checkbox {
     @apply relative m-1 cursor-pointer;
   }
