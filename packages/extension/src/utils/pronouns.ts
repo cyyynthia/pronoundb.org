@@ -82,6 +82,7 @@ export const LegacyPronounsWithSuffix: Record<string, [ string | string[], strin
 }
 
 export const LegacyPronounsShort: Record<string, string | string[]> = {
+  ...LegacyPronouns,
   any: [ 'any', 'Any' ],
   other: [ 'other', 'Other' ],
   ask: [ 'ask', 'Ask' ],

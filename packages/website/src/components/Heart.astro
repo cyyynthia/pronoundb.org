@@ -27,8 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Layout from '../layouts/Layout.astro';
+const HEARTS = [ '❤️', '🧡', '💛', '💚', '💙', '💜', '💗', '💖', '💝' ]
+const heart = HEARTS[Math.random() * HEARTS.length | 0]
 ---
-<Layout>
-	<h1>PronounDB, Astro edition</h1>
-</Layout>
+{heart}

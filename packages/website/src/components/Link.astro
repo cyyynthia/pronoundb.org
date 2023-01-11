@@ -27,61 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Header from '../components/Header.astro'
-import Footer from '../components/Footer.astro'
-
 export interface Props {
-	title?: string;
-	description?: string;
+  href: string
 }
 
-const DEFAULT_DESCRIPTION = 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly.'
-
-const { title, description } = Astro.props;
+const { href } = Astro.props
 ---
-<!DOCTYPE html>
-<html lang='en' class='font-sans w-full h-full'>
-  <head>
-    <meta charset='utf8'/>
-    <meta name='viewport' content='width=device-width'/>
-    <meta name='theme-color' content='#f49898'/>
-
-		<meta name='og:site_name' content='PronounDB'/>
-		<meta name='og:title' content={title || 'PronounDB'}/>
-		<title>{title ? `${title} • PronounDB` : 'PronounDB'}</title>
-		<meta name='og:description' content={description || DEFAULT_DESCRIPTION}/>
-		<meta name='description' content={description || DEFAULT_DESCRIPTION}/>
-  </head>
-  <body class='flex flex-col w-full h-full text-black bg-white dark:bg-gray-800 dark:text-white'>
-		<Header/>
-		<main class='container flex-1 mx-auto p-4'>
-			<slot/>
-		</main>
-		<Footer/>
-  </body>
-</html>
-
-<style is:global>
-	@font-face {
-		font-family: 'Quicksand';
-		font-style: normal;
-		font-display: swap;
-		src: url(../assets/fonts/quicksand-regular.woff2) format('woff2');
-	}
-
-	@font-face {
-		font-family: 'Quicksand';
-		font-style: normal;
-		font-weight: 600;
-		font-display: swap;
-		src: url(../assets/fonts/quicksand-semibold.woff2) format('woff2');
-	}
-
-	@font-face {
-		font-family: 'Quicksand';
-		font-style: normal;
-		font-weight: 700;
-		font-display: swap;
-		src: url(../assets/fonts/quicksand-bold.woff2) format('woff2');
-	}
-</style>
+{href.startsWith('/')
+  ? <a href={href} class='text-blue-800 hover:underline dark:text-cyan-200'><slot/></a>
+  : <a href={href} target='_blank' rel='noreferrer' class='text-blue-800 hover:underline dark:text-cyan-200'><slot/></a>}
