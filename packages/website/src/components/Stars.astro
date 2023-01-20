@@ -27,22 +27,36 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Link from './Link.astro'
-import Heart from './Heart.astro'
-import pawSvg from '../assets/paw.svg?raw'
+import starSvg from '../assets/star.svg?raw'
+
+export type Store = 'chrome' | 'firefox' | 'edge'
+
+export interface Props {
+  stars: number
+}
+
+const trimmedSvg = starSvg.replace(/<!--(.|\n)+-->/, '')
+const { stars } = Astro.props
 ---
-<footer class='container flex flex-none flex-wrap items-center justify-between gap-x-6 gap-y-2 mx-auto p-3 border-t border-gray-200 dark:border-gray-700'>
-  <div class='flex flex-none items-center gap-2 text-gray-600 dark:text-gray-400'>
-    <div class='w-5 h-5'>
-      <Fragment set:html={pawSvg}/>
-    </div>
-    <span>Copyright &copy; {new Date().getFullYear()} Cynthia Rey</span>
-  </div>
-  <div class='flex flex-wrap gap-x-4 gap-y-2'>
-    <Link href='/docs'>API Docs</Link>
-    <Link href='/legal'>Legal</Link>
-    <Link href='/privacy'>Privacy</Link>
-    <Link href='https://github.com/cyyynthia/pronoundb.org'>GitHub</Link>
-    <Link href='https://ko-fi.com/cyyynthia'>Donate <Heart/></Link>
-  </div>
-</footer>
+<div class='flex gap-0.5 items-center'>
+  <div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 1, mid: stars === 0.5 } ]} set:html={trimmedSvg}/>
+  <div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 2, mid: stars === 1.5 } ]} set:html={trimmedSvg}/>
+  <div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 3, mid: stars === 2.5 } ]} set:html={trimmedSvg}/>
+  <div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 4, mid: stars === 3.5 } ]} set:html={trimmedSvg}/>
+  <div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 5, mid: stars === 4.5 } ]} set:html={trimmedSvg}/>
+</div>
+
+<style>
+  .flex :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  .flex .mid :global(svg .mid) {
+    fill: currentColor;
+  }
+
+  .flex .full :global(svg .full) {
+    fill: currentColor;
+  }
+</style>

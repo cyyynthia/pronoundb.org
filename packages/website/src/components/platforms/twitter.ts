@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,22 +26,5 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Link from './Link.astro'
-import Heart from './Heart.astro'
-import pawSvg from '../assets/paw.svg?raw'
----
-<footer class='container flex flex-none flex-wrap items-center justify-between gap-x-6 gap-y-2 mx-auto p-3 border-t border-gray-200 dark:border-gray-700'>
-  <div class='flex flex-none items-center gap-2 text-gray-600 dark:text-gray-400'>
-    <div class='w-5 h-5'>
-      <Fragment set:html={pawSvg}/>
-    </div>
-    <span>Copyright &copy; {new Date().getFullYear()} Cynthia Rey</span>
-  </div>
-  <div class='flex flex-wrap gap-x-4 gap-y-2'>
-    <Link href='/docs'>API Docs</Link>
-    <Link href='/legal'>Legal</Link>
-    <Link href='/privacy'>Privacy</Link>
-    <Link href='https://github.com/cyyynthia/pronoundb.org'>GitHub</Link>
-    <Link href='https://ko-fi.com/cyyynthia'>Donate <Heart/></Link>
-  </div>
-</footer>
+export { default as icon } from 'simple-icons/icons/twitter.svg?raw'
+export const color = '#1DA1F2'

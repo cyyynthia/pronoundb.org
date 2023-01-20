@@ -27,8 +27,86 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import * as twitter from '../components/platforms/twitter'
+import * as twitch from '../components/platforms/twitch'
+import * as github from '../components/platforms/github'
+
 import Layout from '../layouts/Layout.astro';
+import Link from '../components/Link.astro';
+import StoreButton from '../components/StoreButton.astro';
+import PlatformGrid from '../components/PlatformGrid.astro';
+import Platform from '../components/Platform.astro';
+
+import globeSvg from 'feather-icons/dist/icons/globe.svg?raw'
 ---
 <Layout>
-	<h1>PronounDB, Astro edition</h1>
+	<div class='my-12 text-center'>
+		<h1 class='text-3xl font-semibold mb-6'>
+			Get people's pronouns right, all the time, without struggling
+		</h1>
+		<div class='flex flex-col gap-y-1 text-xl'>
+			<p>Keeping track of everyone's pronouns can be complicated, and unfortunate mistakes can happen.</p>
+			<p>PronounDB makes it for you to share your pronouns, so people can use the right ones without even asking.</p>
+			<p>It also helps you knowing the pronouns of the people you discuss with.</p>
+			<p>There's 11472 people sharing their pronouns! Join them now!</p>
+		</div>
+	</div>
+	<div class='flex flex-col md:flex-row gap-6 mb-6'>
+		<StoreButton
+			store='chrome'
+			version='0.0.0'
+			users={1337}
+			stars={5}
+			url='https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf'
+		/>
+		<StoreButton
+			store='firefox'
+			version='0.0.0'
+			users={1337}
+			stars={5}
+			url='https://addons.mozilla.org/firefox/addon/pronoundb'
+		/>
+		<StoreButton
+			store='edge'
+			version='0.0.0'
+			users={1337}
+			stars={5}
+			url='https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn'
+		/>
+	</div>
+
+	<hr class='border-gray-200 dark:border-gray-700'/>
+
+	<section>
+		<h2 class='text-2xl font-bold mt-8 mb-4'>Elegant integrations, as if pronouns were always there</h2>
+		<p class='text-lg mb-4'>
+			PronounDB is carefully designed so pronouns integrate smoothly within websites, matching their design language
+			and injecting in sensible places. You'll find pronouns right where you expect them to be.
+		</p>
+		<p class='text-lg mb-4'>
+			See which platforms PronounDB supports and how it looks on your favorite one:
+		</p>
+		<PlatformGrid>
+			<Platform color={twitch.color}>
+				<Fragment>Twitch</Fragment>
+				<Fragment slot='icon' set:html={twitch.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+			<Platform color={twitter.color}>
+				<Fragment>Twitter</Fragment>
+				<Fragment slot='icon' set:html={twitter.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+			<Platform color={github.color}>
+				<Fragment>GitHub</Fragment>
+				<Fragment slot='icon' set:html={github.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+			<Platform>
+				<Fragment>...and more!</Fragment>
+				<Fragment slot='icon' set:html={globeSvg}/>
+				<Link slot='sub' href='/supported'>See all supported platforms</Link>
+			</Platform>
+		</PlatformGrid>
+	</section>
 </Layout>
