@@ -26,19 +26,16 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-import { data } from '../assets/cat-facts.json'
-
-import Layout from '../layouts/Layout.astro';
-import PageHeader from '../components/PageHeader.astro';
-import Link from '../components/Link.astro';
-
-const fact = data[Math.random() * data.length | 0]
 ---
-<Layout title='404 Not Found'>
-  <PageHeader>Seems like you're lost</PageHeader>
-  <div class='my-2'>
-    There's nothing here... But there, have a fact about cats: {fact}
+{Astro.slots.has('namespace') && (
+  <div class='uppercase text-sm font-bold text-pink-dark dark:text-pink'>
+    <slot name='namespace'/>
   </div>
-	<Link href='/'>Go home</Link>
-</Layout>
+)}
+<h1 class='text-2xl font-bold mb-2'><slot/></h1>
+
+<style>
+  div {
+    letter-spacing: .25em;
+  }
+</style>

@@ -27,18 +27,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { data } from '../assets/cat-facts.json'
-
 import Layout from '../layouts/Layout.astro';
 import PageHeader from '../components/PageHeader.astro';
-import Link from '../components/Link.astro';
-
-const fact = data[Math.random() * data.length | 0]
 ---
-<Layout title='404 Not Found'>
-  <PageHeader>Seems like you're lost</PageHeader>
-  <div class='my-2'>
-    There's nothing here... But there, have a fact about cats: {fact}
-  </div>
-	<Link href='/'>Go home</Link>
+<Layout title='Legal Notice'>
+  <PageHeader>
+    <Fragment slot='namespace'>Legal</Fragment>
+    <Fragment>Legal Notice</Fragment>
+  </PageHeader>
+
+  <p class='mb-3'>
+    Complying with the article 6 of French law No. 2004-575 of June 21, 2004 for Confidence in the Digital Economy
+    (Loi n°2004-575 du 21 juin 2004 pour la Confiance dans l'Économie Numérique), the hosting provider for the website
+    pronoundb.org is:
+  </p>
+  <p>
+    OVH SAS <br/>
+    RCS Lille Métropole 424 761 419 <br/>
+    2 Rue Kellermann <br/>
+    59100 Roubaix <br/>
+    France
+  </p>
 </Layout>
