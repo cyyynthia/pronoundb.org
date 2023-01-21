@@ -6,11 +6,9 @@ platforms, fix bugs, or dig into the source code in general.
 PronounDB is entirely written in TypeScript, with a small limited amount of JavaScript for shared components (to
 avoid annoying compilation overhead when the benefits are small enough).
 
-The repository is a monorepo which contains 4 different packages (+ various configuration files):
+The repository is a monorepo which contains 2 packages (+ various configuration files):
   - `packages/extension`: Browser extension
-  - `packages/website`: Frontend source code
-  - `packages/api`: REST API source code
-  - `packages/shared`: Shared internal library, for data/config/... shared between different modules
+  - `packages/website`: Website source code
 
 This repo uses [pnpm](https://pnpm.io/) for dependency management and general management. You will most likely run into
 troubles if you try to use another package manager.
@@ -23,12 +21,10 @@ To test the extension, you can run `pnpm run dev` in the extension package to bu
 re-building when files are changed. You'll need to load the extension in your browser manually, and to refresh it
 manually every time in the browser.
 
-**Note**: You can only test (easily) in Chromium-based browsers at the time.
-
 ### Building for production
-The website, API and extension can all be built using `pnpm run build`.
+The website and extension can all be built using `pnpm run build`.
 
-The extension can additionally be packed for submission on extension stores using `pnpm run pack`, which will produce:
+The extension will additionally be packed for submission on extension stores, and the following files will be produced:
   - An archive for Chromium-based browsers
   - An archive for Firefox-based browsers
   - An archive of the source code with notes for reviewers (used to submit to the Mozilla Add-Ons team)
@@ -43,32 +39,34 @@ to build the extension with `pnpm run build` before running the tests**.
 See the [test accounts](#test-accounts) section for more details about how to E2E test an app with a test account.
 
 ## Building a new integration
-### Addition to the shared library
-The first step is to add the platform to the list of supported platforms, by adding:
-  - An entry in `packages/shared/src/platforms.cjs`
-  - Associate an icon in `packages/shared/src/icons.js`
+### Add info about the integration
+The first step is to create a file in `packages/website/src/components/platform` with the name, color and icon of the
+integration. This will make it show up as supported on the website.
 
 ### Setup the OAuth flow
 This step is very simple and requires very little amount of work, thanks to OAuth being a well-implemented standard.
 You simply need to:
-  - Add the key-pair entry in `config.example.json`
-  - Create a new file for your platform in `packages/api/src/oauth` (You can copy an existing one, like the `discord.ts` file)
-  - Modify the oauth endpoints, scopes, and the config appropriately
-  - Implement the `getSelf` function, which should return an object of type `ExternalAccount` (or `null` if an error occurred)
-  - Register your module in `packages/api/src/oauth/index.ts`
+  - Add the client id/secret pair placeholder in `packages/website/.env.example`
+  - Create a new file for your platform in `packages/website/src/server/oauth/platforms`.
+    - Here is an example of an [OAuth 2.0 config](https://github.com/cyyynthia/pronoundb.org/blob/b2e47cb/packages/website/src/server/oauth/platforms/discord.ts)
+    - Here is an example of an [OAuth 1.0a config](https://github.com/cyyynthia/pronoundb.org/blob/b2e47cb/packages/website/src/server/oauth/platforms/twitter.ts)
 
-And voilà! The OAuth flow should be working like a charm.
-
-**Note**: If you need to follow an older OAuth 1.0a authentication standard, take a look at how `twitter.ts` handles it.
+And voilà! The OAuth flow should be working like a charm. It'll be automatically picked up by the API and the login,
+register and link pages.
 
 ### Build the extension integration
 This is by far the most time-consuming part of making a new integration. To get started, you need to create a new file
-in `packages/extension/src/modules`, which needs to export 2 things:
+in `packages/extension/src/modules`, which needs to export a few things.
 
- - `match`: a RegExp which will be tested against pages paths to know when a module should run.
- - `inject`: the entry point of your module.
+- `name`: Platform name.
+- `color`: Platform color.
+- `match`: RegExp which will be tested against pages paths to know when a module should run.
+- `Icon`: Platform icon as a component. Can use the `export { default as Icon } from 'simple-icons/...'` pattern.
+- `inject`: Entry point of your module. Will be called on all pages where your module's `match` did match.
 
 You can look at how other modules are built to get some insight in how things should be done, and how they're done.
+
+You'll also need to add the necessary permissions in `packages/extension/build/manifest.ts`.
 
 #### Utility methods
 *TODO*: Document React prop fetcher, DOM helpers (`h`, `css`)
@@ -85,4 +83,4 @@ extension. Tests are run using [Playwright](https://playwright.dev/) and you can
 are tested to get some inspiration.
 
 #### Test accounts
-*TBD* [#59](https://github.com/cyyynthia/pronoundb.org/issues/59)
+*TBD*

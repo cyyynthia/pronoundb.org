@@ -22,8 +22,7 @@ https://pronoundb.org/supported.
  - [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn)
 
 ## Structure
- - The backend is built using [fastify](https://fastify.io)
- - The frontend and the extension are built using [preact](https://preactjs.com), [tailwindcss](https://tailwindcss.com), and [vite](https://vitejs.dev)
+ - The website (backend & frontend) is built with [astro](https://astro.build) and [tailwindcss](https://tailwindcss.com)
  - Data is stored using [mongodb](https://mongodb.com)
  - May contains stains of coffee and a few cookie crumbs :whistle:
 
