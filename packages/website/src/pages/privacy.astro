@@ -27,8 +27,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import Layout from '../layouts/Layout.astro';
-import PageHeader from '../components/PageHeader.astro';
+import { migrateAuth } from '../server/auth'
+migrateAuth(Astro)
+
+import Layout from '../layouts/Layout.astro'
+import PageHeader from '../components/PageHeader.astro'
 ---
 <Layout title='Privacy Policy'>
   <PageHeader>

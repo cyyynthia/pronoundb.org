@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,26 +26,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { authenticate } from '../server/auth.js'
-import Link from './Link.astro'
+import type { APIContext } from 'astro'
 
-const authenticated = !!authenticate(Astro)
----
-<header class='container flex flex-none flex-wrap items-center justify-between gap-x-6 gap-y-2 mx-auto p-4 border-b border-gray-200 dark:border-gray-700'>
-  <a href='/' class='text-3xl font-bold'>PronounDB</a>
-  <div class='flex flex-none items-center gap-x-4'>
-    {authenticated
-      ? (
-        <Fragment>
-          <Link href='/me'>My account</Link>
-          <Link href='/logout'>Logout</Link>
-        </Fragment>
-      )
-      : (
-        <Fragment>
-          <Link href='/login'>Login</Link>
-          <Link href='/register'>Create account</Link>
-        </Fragment>
-      )}
-  </div>
-</header>
+import { authenticate } from '../../../server/auth.js'
+import { type OAuth1Params, authorize as authorize1 } from '../../../server/oauth/core/oauth10a.js'
+import { type OAuth2Params, authorize as authorize2 } from '../../../server/oauth/core/oauth2.js'
+
+type Params = OAuth1Params | OAuth2Params
+const INTENTS = [ 'register', 'login', 'link' ]
+const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
+
+export function get (ctx: APIContext) {
+  const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
+  if (!platform) return new Response('400: Invalid provider', { status: 400 })
+
+  const token = ctx.cookies.get('token').value
+  const intent = ctx.url.searchParams.get('intent') ?? 'login'
+  const user = token ? authenticate(ctx) : null
+
+  if (!INTENTS.includes(intent)) {
+    return new Response('400: Invalid intent', { status: 400 })
+  }
+
+  if ((intent === 'register' || intent === 'login') && user) {
+    return ctx.redirect('/me')
+  }
+
+  if (intent === 'link' && !user) {
+    return ctx.redirect('/')
+  }
+
+  switch (platform.oauthVersion) {
+    case 1:
+      return authorize1(ctx, platform) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
+    case 2:
+      return authorize2(ctx, platform)
+  }
+}

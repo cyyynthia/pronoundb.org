@@ -26,5 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export { default as icon } from 'simple-icons/icons/github.svg?raw'
+export const name = 'GitHub'
 export const color = '#211F1F'
+export { default as icon } from 'simple-icons/icons/github.svg?raw'

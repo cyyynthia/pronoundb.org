@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,26 +26,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { authenticate } from '../server/auth.js'
-import Link from './Link.astro'
+import { MongoClient } from 'mongodb'
 
-const authenticated = !!authenticate(Astro)
----
-<header class='container flex flex-none flex-wrap items-center justify-between gap-x-6 gap-y-2 mx-auto p-4 border-b border-gray-200 dark:border-gray-700'>
-  <a href='/' class='text-3xl font-bold'>PronounDB</a>
-  <div class='flex flex-none items-center gap-x-4'>
-    {authenticated
-      ? (
-        <Fragment>
-          <Link href='/me'>My account</Link>
-          <Link href='/logout'>Logout</Link>
-        </Fragment>
-      )
-      : (
-        <Fragment>
-          <Link href='/login'>Login</Link>
-          <Link href='/register'>Create account</Link>
-        </Fragment>
-      )}
-  </div>
-</header>
+const client = new MongoClient(import.meta.env.MONGO_DSN, { appName: 'pronoundb-backend' })
+await client.connect()
+
+export default client.db()

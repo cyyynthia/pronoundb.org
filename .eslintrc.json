@@ -38,7 +38,6 @@
     "require-atomic-updates": "error",
 
     // Best practices
-    "class-methods-use-this": "error",
     "default-case-last": "error",
     "default-param-last": "error",
     "dot-location": [ "error", "property" ],
@@ -83,7 +82,6 @@
     // Vars
     "@typescript-eslint/no-shadow": "error",
     "no-undefined": "error",
-    "@typescript-eslint/no-use-before-define": "error",
 
     // Stylistic
     "array-bracket-newline": [ "error", "consistent" ],

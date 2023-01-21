@@ -27,17 +27,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { migrateAuth } from '../server/auth'
+migrateAuth(Astro)
+
 import * as twitter from '../components/platforms/twitter'
 import * as twitch from '../components/platforms/twitch'
 import * as github from '../components/platforms/github'
 
-import Layout from '../layouts/Layout.astro';
-import Link from '../components/Link.astro';
-import StoreButton from '../components/StoreButton.astro';
-import PlatformGrid from '../components/PlatformGrid.astro';
-import Platform from '../components/Platform.astro';
+import getStats from '../server/stats.js'
+
+import Layout from '../layouts/Layout.astro'
+import Link from '../components/Link.astro'
+import StoreButton from '../components/StoreButton.astro'
+import PlatformGrid from '../components/PlatformGrid.astro'
+import Platform from '../components/Platform.astro'
 
 import globeSvg from 'feather-icons/dist/icons/globe.svg?raw'
+
+const stats = getStats()
 ---
 <Layout>
 	<div class='my-12 text-center'>
@@ -48,29 +55,29 @@ import globeSvg from 'feather-icons/dist/icons/globe.svg?raw'
 			<p>Keeping track of everyone's pronouns can be complicated, and unfortunate mistakes can happen.</p>
 			<p>PronounDB makes it for you to share your pronouns, so people can use the right ones without even asking.</p>
 			<p>It also helps you knowing the pronouns of the people you discuss with.</p>
-			<p>There's 11472 people sharing their pronouns! Join them now!</p>
+			<p>There's {stats.users} people sharing their pronouns! Join them now!</p>
 		</div>
 	</div>
 	<div class='flex flex-col md:flex-row gap-6 mb-6'>
 		<StoreButton
 			store='chrome'
-			version='0.0.0'
-			users={1337}
-			stars={5}
+			version={stats.chrome.version}
+			users={stats.chrome.users}
+			stars={stats.chrome.rating}
 			url='https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf'
 		/>
 		<StoreButton
 			store='firefox'
-			version='0.0.0'
-			users={1337}
-			stars={5}
+			version={stats.firefox.version}
+			users={stats.firefox.users}
+			stars={stats.firefox.rating}
 			url='https://addons.mozilla.org/firefox/addon/pronoundb'
 		/>
 		<StoreButton
 			store='edge'
-			version='0.0.0'
-			users={1337}
-			stars={5}
+			version={stats.edge.version}
+			users={stats.edge.users}
+			stars={stats.edge.rating}
 			url='https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn'
 		/>
 	</div>

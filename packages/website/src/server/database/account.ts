@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,26 +26,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { authenticate } from '../server/auth.js'
-import Link from './Link.astro'
+import type { ObjectId } from 'mongodb'
+import database from './database.js'
 
-const authenticated = !!authenticate(Astro)
----
-<header class='container flex flex-none flex-wrap items-center justify-between gap-x-6 gap-y-2 mx-auto p-4 border-b border-gray-200 dark:border-gray-700'>
-  <a href='/' class='text-3xl font-bold'>PronounDB</a>
-  <div class='flex flex-none items-center gap-x-4'>
-    {authenticated
-      ? (
-        <Fragment>
-          <Link href='/me'>My account</Link>
-          <Link href='/logout'>Logout</Link>
-        </Fragment>
-      )
-      : (
-        <Fragment>
-          <Link href='/login'>Login</Link>
-          <Link href='/register'>Create account</Link>
-        </Fragment>
-      )}
-  </div>
-</header>
+const collection = database.collection<Account>('accounts')
+
+export type Account = {
+  pronouns: string
+  accounts: ExternalAccount[]
+}
+
+export type ExternalAccount = {
+  id: string
+  name: string
+  platform: string
+}
+
+export async function createAccount (from: ExternalAccount) {
+  const existingAccount = await findByExternalAccount(from)
+  if (existingAccount) return null
+
+  const result = await collection.insertOne({ accounts: [ from ], pronouns: 'unspecified' })
+  return result.insertedId
+}
+
+export async function findById (id: ObjectId) {
+  return collection.findOne({ _id: id })
+}
+
+export async function findByExternalAccount (external: ExternalAccount) {
+  // Find and also update account's display name in one go
+  // This isn't efficient as it requires a write lock every time but I frankly do not care
+  // Future Cynthia, if you're mad know you were already mad at this back when you wrote it you dumbcat
+  // -- Cynthia
+  const result = await collection.findOneAndUpdate(
+    { 'accounts.id': external.id, 'accounts.platform': external.platform },
+    { $set: { 'accounts.$[account].name': external.name } },
+    { arrayFilters: [ { 'account.platform': external.platform, 'account.id': external.id } ] }
+  )
+
+  return result.value
+}
+
+export async function addLinkedAccount (userId: ObjectId, account: ExternalAccount) {
+  await collection.updateOne({ _id: userId }, { $push: { accounts: account } })
+}

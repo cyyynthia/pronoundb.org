@@ -5,10 +5,17 @@
   "author": "Cynthia <cynthia@cynthia.dev>",
   "license": "BSD-3-Clause",
   "private": true,
+  "engines": {
+    "node": ">= 18"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
+  },
+  "dependencies": {
+    "fast-jwt": "^2.1.0",
+    "mongodb": "^4.13.0"
   },
   "devDependencies": {
     "@astrojs/node": "^4.0.0",
@@ -16,7 +23,7 @@
     "@types/node": "^18.11.18",
     "@typescript-eslint/eslint-plugin": "^5.48.0",
     "@typescript-eslint/parser": "^5.48.0",
-    "astro": "^1.9.1",
+    "astro": "^1.9.2",
     "eslint": "^8.31.0",
     "feather-icons": "^4.29.0",
     "simple-icons": "^8.2.0",

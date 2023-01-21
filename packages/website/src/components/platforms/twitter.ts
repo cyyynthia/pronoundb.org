@@ -26,5 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export { default as icon } from 'simple-icons/icons/twitter.svg?raw'
+export const name = 'Twitter'
 export const color = '#1DA1F2'
+export { default as icon } from 'simple-icons/icons/twitter.svg?raw'
