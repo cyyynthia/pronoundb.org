@@ -26,16 +26,34 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
----
-{Astro.slots.has('namespace') && (
-  <div class='uppercase text-sm font-bold text-pink-dark dark:text-pink'>
-    <slot name='namespace'/>
-  </div>
-)}
-<h1 class='text-2xl font-bold mb-3'><slot/></h1>
 
-<style>
-  div {
-    letter-spacing: .25em;
-  }
-</style>
+import PlatformGrid from './PlatformGrid.astro'
+import Platform from './Platform.astro'
+
+export interface Props {
+  intent: 'login' | 'register' | 'link'
+}
+
+type Platform = { name: string, color: string, icon: string }
+
+const platforms = import.meta.glob<Platform>('./platforms/*.ts', { eager: true })
+const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true, import: '__null' })
+const providers = Object.keys(providersGlob).map((k) => k.slice(26, -3))
+
+const { intent } = Astro.props
+---
+<PlatformGrid>
+{providers.map((provider) => {
+  const platform = platforms[`./platforms/${provider}.ts`]
+  if (!platform) return null
+
+  return (
+    <a href={`/oauth/${provider}/authorize?intent=${intent}`}>
+      <Platform color={platform.color}>
+        <Fragment>Connect with {platform.name}</Fragment>
+        <Fragment slot='icon' set:html={platform.icon}/>
+      </Platform>
+    </a>
+  )
+})}
+</PlatformGrid>

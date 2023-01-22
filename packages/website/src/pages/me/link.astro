@@ -26,16 +26,21 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
----
-{Astro.slots.has('namespace') && (
-  <div class='uppercase text-sm font-bold text-pink-dark dark:text-pink'>
-    <slot name='namespace'/>
-  </div>
-)}
-<h1 class='text-2xl font-bold mb-3'><slot/></h1>
 
-<style>
-  div {
-    letter-spacing: .25em;
-  }
-</style>
+import { authenticate } from '../../server/auth.js'
+
+import Layout from '../../layouts/Layout.astro'
+import PageHeader from '../../components/PageHeader.astro'
+import OAuthProviderList from '../../components/OAuthProviderList.astro'
+
+const user = await authenticate(Astro)
+if (!user) return Astro.redirect('/')
+---
+<Layout title='Link a new account'>
+  <PageHeader>
+    <Fragment slot='namespace'>Authentication</Fragment>
+    <Fragment>Link a new account</Fragment>
+  </PageHeader>
+
+  <OAuthProviderList intent='link'/>
+</Layout>

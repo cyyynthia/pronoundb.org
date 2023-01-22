@@ -26,16 +26,23 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
----
-{Astro.slots.has('namespace') && (
-  <div class='uppercase text-sm font-bold text-pink-dark dark:text-pink'>
-    <slot name='namespace'/>
-  </div>
-)}
-<h1 class='text-2xl font-bold mb-3'><slot/></h1>
 
-<style>
-  div {
-    letter-spacing: .25em;
-  }
-</style>
+import Layout from '../layouts/Layout.astro'
+import PageHeader from '../components/PageHeader.astro'
+import Link from '../components/Link.astro'
+import OAuthProviderList from '../components/OAuthProviderList.astro'
+
+if (Astro.cookies.has('token')) return Astro.redirect('/me')
+---
+<Layout title='Register an account'>
+  <PageHeader>
+    <Fragment slot='namespace'>Authentication</Fragment>
+    <Fragment>Register an account</Fragment>
+  </PageHeader>
+
+  <p class='mb-2'>
+    Make sure to give the <Link href='/privacy'>Privacy Policy</Link> a look.
+    Registering an account on PronounDB will be seen as an acceptance of it.
+  </p>
+  <OAuthProviderList intent='register'/>
+</Layout>
