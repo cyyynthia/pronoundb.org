@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,27 +26,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export interface Props {
-  color?: string
+import type { APIContext } from 'astro'
+import { validateCsrf } from '../server/auth.js'
+
+export async function post (ctx: APIContext) {
+  const body = await ctx.request.formData().catch(() => null)
+  const csrfToken = body?.get('csrfToken')
+  if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
+    // todo: error message
+    return ctx.redirect('/')
+  }
+
+  ctx.cookies.delete('token')
+  return ctx.redirect('/')
 }
 
-const { color } = Astro.props
----
-<div class='platform flex items-center px-4 pt-3 pb-2 bg-gray-200 dark:bg-gray-700 border-b-8' style={`--color:${color ?? '#a3a3a3'}`}>
-  {Astro.slots.has('icon') && (
-    <div class='icon w-8 h-8 mr-4 flex-none fill-current'>
-      <slot name='icon'/>
-    </div>
-  )}
-  <div class='flex flex-col flex-none'>
-    <span class='font-semibold'><slot/></span>
-    <slot name='sub'/>
-  </div>
-  <slot name='extra'/>
-</div>
-
-<style>
-  .platform {
-    border-color: var(--color);
-  }
-</style>
+export function all () {
+  return new Response('405: Method not allowed', { status: 405 })
+}

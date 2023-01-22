@@ -82,6 +82,9 @@ export function createCsrf ({ cookies }: APIContext): string {
   const token = cookies.get('token').value
   if (!token) throw new Error('Cannot generate CSRF tokens for unauthenticated requests.')
 
+  const stored = csrfStore.get(token)
+  if (stored) return stored.toString('base64url')
+
   const csrf = randomBytes(64)
   csrfStore.set(token, csrf)
   setTimeout(() => csrfStore.delete(token), 300e3)

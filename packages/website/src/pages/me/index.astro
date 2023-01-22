@@ -36,6 +36,7 @@ import LegacyPronounsSelector from '../../components/LegacyPronounsSelector.astr
 import Platform from '../../components/Platform.astro'
 
 import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
+import xSvg from 'feather-icons/dist/icons/x.svg?raw'
 
 type Platform = { name: string, color: string, icon: string }
 const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', { eager: true })
@@ -69,14 +70,26 @@ const csrf = createCsrf(Astro)
   <h2 class='text-xl font-bold mb-2'>Linked accounts</h2>
   <p class='mb-2'>You can add or remove accounts at any time.</p>
   <div class='grid gap-3 lg:grid-cols-2 mb-8'>
-    {user.accounts.map(({ platform: p, name }) => {
-      const platform = platforms[`../../components/platforms/${p}.ts`]
+    {user.accounts.map((account) => {
+      const platform = platforms[`../../components/platforms/${account.platform}.ts`]
       if (!platform) return null
 
       return (
         <Platform color={platform.color}>
-          <Fragment>{name}</Fragment>
+          <Fragment>{account.name}</Fragment>
           <Fragment slot='icon' set:html={platform.icon}/>
+          <form
+            slot='extra'
+            method='post'
+            action='/me/unlink-account'
+            onsubmit={`return confirm("Are you sure you want to unlink this ${platform.name} account? You will be able to link it back later.")`}
+            class='ml-auto w-5 h-5'
+          >
+            <input type='hidden' name='csrfToken' value={csrf}/>
+            <input type='hidden' name='platform' value={account.platform}/>
+            <input type='hidden' name='id' value={account.id}/>
+            <button class='cursor-pointer w-full h-hull' title='Unlink account' set:html={xSvg}/>
+          </form>
         </Platform>
       )
     })}
@@ -99,7 +112,7 @@ const csrf = createCsrf(Astro)
     I'd be very sad to see you go though... :'(
   </p>
   <p class='mb-4'>Be careful, the action is immediate and irreversible!</p>
-  <form method='post' action='/me/delete' onsubmit="return confirm('Are you sure? This action is irreversible!')">
+  <form method='post' action='/me/delete' onsubmit='return confirm("Are you sure? This action is irreversible!")'>
     <input type='hidden' name='csrfToken' value={csrf}/>
     <button class='text-red-600 border-red-600 font-semibold py-1 px-3 border rounded dark:text-red-orange dark:border-red-orange'>
       Delete my account

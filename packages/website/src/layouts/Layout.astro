@@ -31,13 +31,13 @@ import Header from '../components/Header.astro'
 import Footer from '../components/Footer.astro'
 
 export interface Props {
-	title?: string;
-	description?: string;
+	title?: string
+	description?: string
 }
 
 const DEFAULT_DESCRIPTION = 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly.'
 
-const { title, description } = Astro.props;
+const { title, description } = Astro.props
 ---
 <!DOCTYPE html>
 <html lang='en' class='font-sans w-full h-full'>
@@ -83,5 +83,10 @@ const { title, description } = Astro.props;
 		font-weight: 700;
 		font-display: swap;
 		src: url(../assets/fonts/quicksand-bold.woff2) format('woff2');
+	}
+
+	svg {
+		width: 100%;
+		height: 100%;
 	}
 </style>
