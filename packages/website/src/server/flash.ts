@@ -43,6 +43,14 @@ export const FlashMessages = <const> {
   E_ACCOUNT_EXISTS: 'This account already exists in our database. Did you mean to login?',
   E_ACCOUNT_NOT_FOUND: 'This account does not exist in our database. Did you mean to register?',
   E_ACCOUNT_TAKEN: 'This account has already been linked to another PronounDB account.',
+
+  E_XLIVE_AUTHENTICATION: 'Could not authenticate with Xbox Live servers.',
+  E_XLIVE_NO_ACCOUNT: 'There are no Xbox Live account associated to your Microsoft account.',
+  E_XLIVE_UNAVAILABLE: 'Xbox Live is unavailable in your country.',
+  E_XLIVE_CHILD: 'Your Xbox Live account cannot be processed unless it is added to a Family by an adult.',
+  E_XLIVE_AUTHORIZATION: 'Could not request authorization from Xbox Live servers.',
+  E_MC_AUTH: 'Could not authenticate with Minecraft authentication servers.',
+  E_MC_NO_LICENSE: 'You do not have a Minecraft account associated with this Xbox Live account.',
 }
 
 export function handleFlash ({ cookies }: AstroGlobal) {

@@ -28,11 +28,11 @@
 
 import type { APIContext } from 'astro'
 import type { ExternalAccount } from '../../database/account.js'
-import type { FlashMessage } from '../../flash.js'
 import type { ParsedUrlQueryInput } from 'querystring'
 
 import { randomUUID, createHmac } from 'crypto'
 import { encode, decode } from 'querystring'
+import { type FlashMessage, setFlash } from '../../flash.js'
 
 export type OAuth1Params = {
   oauthVersion: 1
@@ -124,9 +124,9 @@ export async function authenticatedFetch (url: string | URL, init: Authenticated
 
 const pending = new Map<string, Authorization>()
 
-export async function authorize ({ url, params, cookies, redirect }: APIContext, oauth: OAuth1Params) {
-  const intent = url.searchParams.get('intent') ?? 'login'
-  const callbackUrl = new URL('callback', url).href
+export async function authorize (ctx: APIContext, oauth: OAuth1Params) {
+  const intent = ctx.url.searchParams.get('intent') ?? 'login'
+  const callbackUrl = new URL('callback', ctx.url).href
 
   const { nonce, response } = await authenticatedFetch(oauth.requestUrl, {
     method: 'POST',
@@ -136,21 +136,23 @@ export async function authorize ({ url, params, cookies, redirect }: APIContext,
   })
 
   if (!response.ok) {
-    return 'E_OAUTH_10A_EXCHANGE'
+    setFlash(ctx, 'E_OAUTH_10A_EXCHANGE')
+    return null
   }
 
   const requestToken = decode(await response.text()) as unknown as ProviderResponse
   if (!requestToken.oauth_callback_confirmed) {
-    return 'E_OAUTH_10A_EXCHANGE'
+    setFlash(ctx, 'E_OAUTH_10A_EXCHANGE')
+    return null
   }
 
-  const fullToken = `${params.platform}-${requestToken.oauth_token}-${intent}`
+  const fullToken = `${ctx.params.platform}-${requestToken.oauth_token}-${intent}`
   pending.set(fullToken, { nonce: nonce, secret: requestToken.oauth_token_secret })
   setTimeout(() => pending.delete(fullToken), 300e3)
 
-  cookies.set('nonce', nonce, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  cookies.set('intent', intent, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  return redirect(`${oauth.authorizationUrl}?oauth_token=${requestToken.oauth_token}`)
+  ctx.cookies.set('nonce', nonce, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+  ctx.cookies.set('intent', intent, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+  return ctx.redirect(`${oauth.authorizationUrl}?oauth_token=${requestToken.oauth_token}`)
 }
 
 export async function callback ({ url, params, cookies }: APIContext, oauth: OAuth1Params) {
