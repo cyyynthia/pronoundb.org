@@ -135,14 +135,12 @@ export async function authorize ({ url, params, cookies, redirect }: APIContext,
   })
 
   if (!response.ok) {
-    console.log(await response.text())
     // todo: error message
     return null
   }
 
   const requestToken = decode(await response.text()) as unknown as ProviderResponse
   if (!requestToken.oauth_callback_confirmed) {
-    console.log(requestToken)
     // todo: error message
     return null
   }

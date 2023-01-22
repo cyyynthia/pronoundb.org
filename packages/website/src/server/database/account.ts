@@ -68,6 +68,18 @@ export async function findByExternalAccount (external: ExternalAccount) {
   return result.value
 }
 
+export async function updatePronouns (userId: ObjectId, pronouns: string) {
+  await collection.updateOne({ _id: userId }, { $set: { pronouns: pronouns } })
+}
+
 export async function addLinkedAccount (userId: ObjectId, account: ExternalAccount) {
   await collection.updateOne({ _id: userId }, { $push: { accounts: account } })
+}
+
+export async function removeLinkedAccount (userId: ObjectId, platform: string, externalId: string) {
+  await collection.updateOne({ _id: userId }, { $pull: { accounts: { platform: platform, id: externalId } } })
+}
+
+export async function deleteAccount (id: ObjectId) {
+  await collection.deleteOne({ _id: id })
 }

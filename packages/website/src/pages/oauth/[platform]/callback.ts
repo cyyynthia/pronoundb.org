@@ -28,7 +28,6 @@
 
 import type { APIContext } from 'astro'
 
-import { ObjectId } from 'mongodb'
 import { generateToken, authenticate } from '../../../server/auth.js'
 import { type ExternalAccount, createAccount, findByExternalAccount, addLinkedAccount } from '../../../server/database/account.js'
 import { type OAuth1Params, callback as callback1 } from '../../../server/oauth/core/oauth10a.js'
@@ -44,7 +43,7 @@ export async function get (ctx: APIContext) {
 
   const token = ctx.cookies.get('token').value
   const intent = ctx.cookies.get('intent').value ?? 'login'
-  const user = token ? authenticate(ctx) : null
+  const user = token ? await authenticate(ctx) : null
 
   if ((intent === 'register' || intent === 'login') && user) {
     return ctx.redirect('/me')
@@ -75,13 +74,13 @@ export async function get (ctx: APIContext) {
 
   if (intent === 'link') {
     const existingAccount = await findByExternalAccount(external)
-    if (existingAccount && existingAccount._id.toString() !== user!.id) {
+    if (existingAccount && existingAccount._id.equals(user!._id)) {
       // todo: error message
       return ctx.redirect('/me')
     }
 
     if (!existingAccount) {
-      await addLinkedAccount(new ObjectId(user!.id), external)
+      await addLinkedAccount(user!._id, external)
     }
 
     return ctx.redirect('/me')

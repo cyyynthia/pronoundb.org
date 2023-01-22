@@ -26,40 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { APIContext } from 'astro'
-
-import { authenticate } from '../../../server/auth.js'
-import { type OAuth1Params, authorize as authorize1 } from '../../../server/oauth/core/oauth10a.js'
-import { type OAuth2Params, authorize as authorize2 } from '../../../server/oauth/core/oauth2.js'
-
-type Params = OAuth1Params | OAuth2Params
-const INTENTS = [ 'register', 'login', 'link' ]
-const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
-
-export async function get (ctx: APIContext) {
-  const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
-  if (!platform) return new Response('400: Invalid provider', { status: 400 })
-
-  const token = ctx.cookies.get('token').value
-  const intent = ctx.url.searchParams.get('intent') ?? 'login'
-  const user = token ? await authenticate(ctx) : null
-
-  if (!INTENTS.includes(intent)) {
-    return new Response('400: Invalid intent', { status: 400 })
-  }
-
-  if ((intent === 'register' || intent === 'login') && user) {
-    return ctx.redirect('/me')
-  }
-
-  if (intent === 'link' && !user) {
-    return ctx.redirect('/')
-  }
-
-  switch (platform.oauthVersion) {
-    case 1:
-      return authorize1(ctx, platform) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
-    case 2:
-      return authorize2(ctx, platform)
-  }
-}
+export const name = 'Discord'
+export const color = '#5865F2' // Degraded blurple, real blurple is 7289da.
+export { default as icon } from 'simple-icons/icons/discord.svg?raw'

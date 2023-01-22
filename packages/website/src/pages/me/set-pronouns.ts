@@ -27,39 +27,27 @@
  */
 
 import type { APIContext } from 'astro'
+import { authenticate } from '../../server/auth.js'
+import { updatePronouns } from '../../server/database/account.js'
 
-import { authenticate } from '../../../server/auth.js'
-import { type OAuth1Params, authorize as authorize1 } from '../../../server/oauth/core/oauth10a.js'
-import { type OAuth2Params, authorize as authorize2 } from '../../../server/oauth/core/oauth2.js'
+const LEGACY_PRONOUNS = [
+  'hh', 'hi', 'hs', 'ht', 'ih', 'ii', 'is', 'it', 'shh', 'sh', 'si',
+  'st', 'th', 'ti', 'ts', 'tt', 'any', 'other', 'ask', 'avoid',
+]
 
-type Params = OAuth1Params | OAuth2Params
-const INTENTS = [ 'register', 'login', 'link' ]
-const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
+export async function put (ctx: APIContext) {
+  const user = await authenticate(ctx)
+  if (!user) return new Response('401: Unauthorized', { status: 401 })
 
-export async function get (ctx: APIContext) {
-  const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
-  if (!platform) return new Response('400: Invalid provider', { status: 400 })
-
-  const token = ctx.cookies.get('token').value
-  const intent = ctx.url.searchParams.get('intent') ?? 'login'
-  const user = token ? await authenticate(ctx) : null
-
-  if (!INTENTS.includes(intent)) {
-    return new Response('400: Invalid intent', { status: 400 })
+  const pronouns = await ctx.request.text()
+  if (!LEGACY_PRONOUNS.includes(pronouns)) {
+    return new Response('400: Bad request', { status: 400 })
   }
 
-  if ((intent === 'register' || intent === 'login') && user) {
-    return ctx.redirect('/me')
-  }
+  updatePronouns(user._id, pronouns)
+  return new Response(null, { status: 204 })
+}
 
-  if (intent === 'link' && !user) {
-    return ctx.redirect('/')
-  }
-
-  switch (platform.oauthVersion) {
-    case 1:
-      return authorize1(ctx, platform) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
-    case 2:
-      return authorize2(ctx, platform)
-  }
+export function all () {
+  return new Response('405: Method not allowed', { status: 405 })
 }
