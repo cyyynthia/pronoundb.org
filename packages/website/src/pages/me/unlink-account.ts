@@ -28,6 +28,7 @@
 
 import type { APIContext } from 'astro'
 import { authenticate, validateCsrf } from '../../server/auth.js'
+import { setFlash } from '../../server/flash.js'
 import { removeLinkedAccount } from '../../server/database/account.js'
 
 export async function post (ctx: APIContext) {
@@ -41,7 +42,7 @@ export async function post (ctx: APIContext) {
 
 
   if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
-    // todo: error message
+    setFlash(ctx, 'E_CSRF')
     return ctx.redirect('/me')
   }
 

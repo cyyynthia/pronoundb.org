@@ -28,12 +28,13 @@
 
 import type { APIContext } from 'astro'
 import { validateCsrf } from '../server/auth.js'
+import { setFlash } from '../server/flash.js'
 
 export async function post (ctx: APIContext) {
   const body = await ctx.request.formData().catch(() => null)
   const csrfToken = body?.get('csrfToken')
   if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
-    // todo: error message
+    setFlash(ctx, 'E_CSRF')
     return ctx.redirect('/')
   }
 

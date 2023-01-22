@@ -27,6 +27,7 @@
  */
 
 import type { ExternalAccount } from '../../database/account.js'
+import type { FlashMessage } from '../../flash.js'
 import { authenticatedFetch } from '../core/oauth10a.js'
 
 export const oauthVersion = 1
@@ -38,7 +39,7 @@ export const authorizationUrl = 'https://api.twitter.com/oauth/authorize'
 export const tokenUrl = 'https://api.twitter.com/oauth/access_token'
 export const scopes = []
 
-export async function getSelf (token: string, secret: string): Promise<ExternalAccount | null> {
+export async function getSelf (token: string, secret: string): Promise<ExternalAccount | FlashMessage | null> {
   const { response } = await authenticatedFetch('https://api.twitter.com/1.1/account/verify_credentials.json', {
     headers: {
       'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',

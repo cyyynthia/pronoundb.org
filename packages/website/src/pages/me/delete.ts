@@ -28,6 +28,7 @@
 
 import type { APIContext } from 'astro'
 import { authenticate, validateCsrf } from '../../server/auth.js'
+import { setFlash } from '../../server/flash.js'
 import { deleteAccount } from '../../server/database/account.js'
 
 export async function post (ctx: APIContext) {
@@ -38,13 +39,13 @@ export async function post (ctx: APIContext) {
   const csrfToken = body?.get('csrfToken')
 
   if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
-    // todo: error message
+    setFlash(ctx, 'E_CSRF')
     return ctx.redirect('/me')
   }
 
   deleteAccount(user._id)
   ctx.cookies.delete('token')
-  // todo: success message
+  setFlash(ctx, 'S_ACC_DELETED')
   return ctx.redirect('/')
 }
 

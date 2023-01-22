@@ -27,6 +27,7 @@
  */
 
 import type { ExternalAccount } from '../../database/account.js'
+import type { FlashMessage } from '../../flash.js'
 
 export const oauthVersion = 2
 export const clientId = import.meta.env.OAUTH_DISCORD_CLIENT
@@ -36,7 +37,7 @@ export const authorizationUrl = 'https://discord.com/oauth2/authorize'
 export const tokenUrl = 'https://discord.com/api/v10/oauth2/token'
 export const scopes = [ 'identify' ]
 
-export async function getSelf (token: string): Promise<ExternalAccount | null> {
+export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
   const res = await fetch('https://discord.com/api/v10/users/@me', {
     headers: {
       authorization: `Bearer ${token}`,

@@ -28,6 +28,7 @@
 
 import type { APIContext } from 'astro'
 import type { ExternalAccount } from '../../database/account.js'
+import type { FlashMessage } from '../../flash.js'
 import type { ParsedUrlQueryInput } from 'querystring'
 
 import { randomUUID, createHmac } from 'crypto'
@@ -43,7 +44,7 @@ export type OAuth1Params = {
   tokenUrl: string
   scopes: string[]
 
-  getSelf: (token: string, tokenSecret: string) => Promise<ExternalAccount | null>
+  getSelf: (token: string, tokenSecret: string) => Promise<ExternalAccount | FlashMessage | null>
 }
 
 type OAuthToken = {
@@ -135,14 +136,12 @@ export async function authorize ({ url, params, cookies, redirect }: APIContext,
   })
 
   if (!response.ok) {
-    // todo: error message
-    return null
+    return 'E_OAUTH_10A_EXCHANGE'
   }
 
   const requestToken = decode(await response.text()) as unknown as ProviderResponse
   if (!requestToken.oauth_callback_confirmed) {
-    // todo: error message
-    return null
+    return 'E_OAUTH_10A_EXCHANGE'
   }
 
   const fullToken = `${params.platform}-${requestToken.oauth_token}-${intent}`
@@ -184,14 +183,12 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
   })
 
   if (!response.ok) {
-    // todo: error message
     return null
   }
 
   const tokens = decode(await response.text()) as unknown as ProviderResponse
   const user = await oauth.getSelf(tokens.oauth_token, tokens.oauth_token_secret)
   if (!user) {
-    // todo: error message
     return null
   }
 

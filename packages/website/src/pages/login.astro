@@ -27,13 +27,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { handleFlash } from '../server/flash.js'
+
 import Layout from '../layouts/Layout.astro'
 import PageHeader from '../components/PageHeader.astro'
 import OAuthProviderList from '../components/OAuthProviderList.astro'
 
 if (Astro.cookies.has('token')) return Astro.redirect('/me')
+const flash = handleFlash(Astro)
 ---
-<Layout title='Login to your account'>
+<Layout flash={flash} title='Login to your account'>
   <PageHeader>
     <Fragment slot='namespace'>Authentication</Fragment>
     <Fragment>Login to your account</Fragment>

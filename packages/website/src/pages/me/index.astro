@@ -27,7 +27,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { migrateAuth } from '../../server/auth.js'
+migrateAuth(Astro)
+
 import { authenticate, createCsrf } from '../../server/auth.js'
+import { handleFlash } from '../../server/flash.js'
 
 import Layout from '../../layouts/Layout.astro'
 import PageHeader from '../../components/PageHeader.astro'
@@ -44,9 +48,10 @@ const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', 
 const user = await authenticate(Astro)
 if (!user) return Astro.redirect('/login')
 
+const flash = handleFlash(Astro)
 const csrf = createCsrf(Astro)
 ---
-<Layout title='My Account'>
+<Layout flash={flash} title='My Account'>
   <noscript>
     <p class='mb-4 px-4 py-2 font-semibold text-red-600 border border-red-600 rounded'>
       JavaScript is disabled in your browser. You may experience issues and changes may not be applied! Make sure to

@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey, All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,31 +26,35 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../server/auth.js'
-migrateAuth(Astro)
+import type { AstroGlobal, APIContext } from 'astro'
 
-import { handleFlash } from '../server/flash.js'
+export type FlashMessage = keyof typeof FlashMessages
 
-import Layout from '../layouts/Layout.astro'
-import PageHeader from '../components/PageHeader.astro'
-const flash = handleFlash(Astro)
----
-<Layout flash={flash} title='Legal Notice'>
-  <PageHeader>
-    <Fragment slot='namespace'>Legal</Fragment>
-    <Fragment>Legal Notice</Fragment>
-  </PageHeader>
+export const FlashMessages = <const> {
+  // Success
+  S_REGISTERED: 'Welcome!! Thank you for creating your PronounDB account. Start by setting your pronouns, and then consider linking your other accounts. Have a great stay!',
+  S_ACC_DELETED: 'Your account has been successfully deleted. Sorry to see you go!',
 
-  <p class='mb-3'>
-    Complying with the article 6 of French law No. 2004-575 of June 21, 2004 for Confidence in the Digital Economy
-    (Loi n°2004-575 du 21 juin 2004 pour la Confiance dans l'Économie Numérique), the hosting provider for the website
-    pronoundb.org is:
-  </p>
-  <p>
-    OVH SAS <br/>
-    RCS Lille Métropole 424 761 419 <br/>
-    2 Rue Kellermann <br/>
-    59100 Roubaix <br/>
-    France
-  </p>
-</Layout>
+  // Error
+  E_CSRF: 'Verification of the authenticity of the submission failed. Please try again.',
+  E_OAUTH_GENERIC: 'An unknown error occurred while authenticating with the third party service.',
+  E_OAUTH_FETCH: 'Could not fetch information about your external account.',
+  E_OAUTH_10A_EXCHANGE: 'Could not initialize the authentication request with the third party.',
+  E_ACCOUNT_EXISTS: 'This account already exists in our database. Did you mean to login?',
+  E_ACCOUNT_NOT_FOUND: 'This account does not exist in our database. Did you mean to register?',
+  E_ACCOUNT_TAKEN: 'This account has already been linked to another PronounDB account.',
+}
+
+export function handleFlash ({ cookies }: AstroGlobal) {
+  const flashId = cookies.get('flash').value
+  if (flashId) {
+    cookies.delete('flash')
+    return FlashMessages[flashId as FlashMessage]
+  }
+
+  return void 0
+}
+
+export function setFlash ({ cookies }: APIContext, flashId: FlashMessage) {
+  cookies.set('flash', flashId, { path: '/', maxAge: 30, httpOnly: true, secure: import.meta.env.PROD })
+}

@@ -28,6 +28,7 @@
 
 import type { APIContext } from 'astro'
 import type { ExternalAccount } from '../../database/account.js'
+import type { FlashMessage } from '../../flash.js'
 
 import { randomUUID } from 'crypto'
 import { encode } from 'querystring'
@@ -41,7 +42,7 @@ export type OAuth2Params = {
   tokenUrl: string
   scopes: string[]
 
-  getSelf: (token: string) => Promise<ExternalAccount | null>
+  getSelf: (token: string) => Promise<ExternalAccount | FlashMessage | null>
 }
 
 const states = new Set<string>()
@@ -106,21 +107,13 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
   })
 
   if (!res.ok) {
-    // todo: error message
     return null
   }
 
   const { access_token: accessToken } = await res.json()
   if (!accessToken) {
-    // todo: error message
     return null
   }
 
-  const user = await oauth.getSelf(accessToken)
-  if (!user) {
-    // todo: error message
-    return null
-  }
-
-  return user
+  return oauth.getSelf(accessToken)
 }

@@ -27,13 +27,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../server/auth'
+import { migrateAuth } from '../server/auth.js'
 migrateAuth(Astro)
 
-import * as twitter from '../components/platforms/twitter'
-import * as twitch from '../components/platforms/twitch'
-import * as github from '../components/platforms/github'
+import * as twitter from '../components/platforms/twitter.js'
+import * as twitch from '../components/platforms/twitch.js'
+import * as github from '../components/platforms/github.js'
 
+import { handleFlash } from '../server/flash.js'
 import getStats from '../server/stats.js'
 
 import Layout from '../layouts/Layout.astro'
@@ -45,8 +46,9 @@ import Platform from '../components/Platform.astro'
 import globeSvg from 'feather-icons/dist/icons/globe.svg?raw'
 
 const stats = getStats()
+const flash = handleFlash(Astro)
 ---
-<Layout>
+<Layout flash={flash}>
 	<div class='my-12 text-center'>
 		<h1 class='text-3xl font-semibold mb-6'>
 			Get people's pronouns right, all the time, without struggling

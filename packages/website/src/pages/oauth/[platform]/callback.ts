@@ -29,6 +29,7 @@
 import type { APIContext } from 'astro'
 
 import { generateToken, authenticate } from '../../../server/auth.js'
+import { type FlashMessage, setFlash } from '../../../server/flash.js'
 import { type ExternalAccount, createAccount, findByExternalAccount, addLinkedAccount } from '../../../server/database/account.js'
 import { type OAuth1Params, callback as callback1 } from '../../../server/oauth/core/oauth10a.js'
 import { type OAuth2Params, callback as callback2 } from '../../../server/oauth/core/oauth2.js'
@@ -57,7 +58,7 @@ export async function get (ctx: APIContext) {
     return new Response('400: Invalid intent', { status: 400 })
   }
 
-  let external: ExternalAccount | null
+  let external: ExternalAccount | FlashMessage | null
   switch (platform.oauthVersion) {
     case 1:
       external = await callback1(ctx, platform)
@@ -67,15 +68,15 @@ export async function get (ctx: APIContext) {
       break
   }
 
-  if (!external) {
-    // todo: error message
+  if (!external || typeof external === 'string') {
+    setFlash(ctx, external || 'E_OAUTH_FETCH')
     return ctx.redirect(intent === 'link' ? '/me' : '/')
   }
 
   if (intent === 'link') {
     const existingAccount = await findByExternalAccount(external)
     if (existingAccount && existingAccount._id.equals(user!._id)) {
-      // todo: error message
+      setFlash(ctx, 'E_ACCOUNT_TAKEN')
       return ctx.redirect('/me')
     }
 
@@ -91,11 +92,12 @@ export async function get (ctx: APIContext) {
     : await findByExternalAccount(external).then((acc) => acc?._id)
 
   if (!account) {
-    // todo: error message
+    setFlash(ctx, intent === 'register' ? 'E_ACCOUNT_EXISTS' : 'E_ACCOUNT_NOT_FOUND')
     return ctx.redirect('/')
   }
 
   const authToken = generateToken({ id: account.toString() })
   ctx.cookies.set('token', authToken, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
+  if (intent === 'register') setFlash(ctx, 'S_REGISTERED')
   return ctx.redirect('/me')
 }
