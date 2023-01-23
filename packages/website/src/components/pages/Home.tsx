@@ -92,10 +92,10 @@ export default function Home (_: Attributes) {
           Keeping track of everyone's pronouns can be complicated, and unfortunate mistakes can happen.
         </p>
         <p class='text-center text-xl mt-1'>
-          PronounDB makes it for you to share your pronouns, so people can use the right ones without even asking.
+          PronounDB makes it easy for you to share your pronouns, so people can use the right ones without even asking.
         </p>
         <p class='text-center text-xl mt-1'>
-          It also helps you knowing the pronouns of the people you discuss with.
+          It also helps you know the pronouns of the people you discuss with.
         </p>
         <p class='text-center text-xl mt-1'>
           There's {stats.users} people sharing their pronouns! Join them now!
