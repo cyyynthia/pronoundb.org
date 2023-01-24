@@ -42,6 +42,12 @@ export type ExternalAccount = {
   platform: string
 }
 
+export type PronounsOfUser = {
+  pronouns: string
+  platform: string
+  id: string
+}
+
 export async function createAccount (from: ExternalAccount) {
   const existingAccount = await findByExternalAccount(from)
   if (existingAccount) return null
@@ -66,6 +72,26 @@ export async function findByExternalAccount (external: ExternalAccount) {
   )
 
   return result.value
+}
+
+export function findPronounsOf (platform: string, externalIds: string[]) {
+  return collection.aggregate<PronounsOfUser>([
+    { $unwind: '$accounts' },
+    {
+      '$match': {
+        'accounts.platform': platform,
+        'accounts.id': { '$in': externalIds },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        pronouns: 1,
+        platform: '$accounts.platform',
+        id: '$accounts.id',
+      },
+    },
+  ])
 }
 
 export async function updatePronouns (userId: ObjectId, pronouns: string) {

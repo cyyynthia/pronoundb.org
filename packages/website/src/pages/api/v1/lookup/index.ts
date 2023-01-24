@@ -26,41 +26,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const colors = require('tailwindcss/colors')
+import type { APIContext } from 'astro'
+import { findPronounsOf } from '../../../../server/database/account.js'
 
-module.exports = {
-  darkMode: 'media',
-  content: [
-    './src/pages/**/*.astro',
-    './src/components/**/*.astro',
-    './src/layouts/*.astro',
-  ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    container: {
-      screens: {
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1360px',
-      },
+export async function get (ctx: APIContext) {
+  const platform = ctx.url.searchParams.get('platform')
+  const id = ctx.url.searchParams.get('id')
+
+  if (!platform || !id) {
+    return new Response(
+      JSON.stringify({
+        errorCode: 400,
+        error: 'Bad request',
+        message: '`platform` and `id` query parameters are required.',
+      }),
+      { status: 400 }
+    )
+  }
+
+  const cursor = findPronounsOf(platform, [ id ])
+  const user = await cursor.next()
+  await cursor.close()
+
+  const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
+  return new Response(body, {
+    headers: {
+      vary: 'origin',
+      'access-control-allow-methods': 'GET',
+      'access-control-allow-origin': '*',
+      'access-control-allow-headers': 'x-pronoundb-source',
+      'access-control-max-age': '600',
     },
-    extend: {
-      screens: { xs: '420px' },
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-        emerald: colors.emerald,
-        'deep-blue': '#130e85',
-        'red-orange': '#ff6046',
-        platform: {},
-      },
+  })
+}
+
+export function options () {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      vary: 'origin',
+      'access-control-allow-methods': 'GET',
+      'access-control-allow-origin': '*',
+      'access-control-allow-headers': 'x-pronoundb-source',
+      'access-control-max-age': '600',
     },
-  },
-  plugins: [],
+  })
+}
+
+export function all () {
+  return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }
