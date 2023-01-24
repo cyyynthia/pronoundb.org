@@ -31,3 +31,5 @@ import minecraft from '../../assets/minecraft.svg?raw'
 export const name = 'Minecraft'
 export const color = '#854F2B'
 export const icon = minecraft.replace(/<!--(.|\n)*-->/, '')
+
+export const thirdPartyOnly = true

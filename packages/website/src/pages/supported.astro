@@ -1,0 +1,90 @@
+---
+/*
+ * Copyright (c) Cynthia Rey, All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import { migrateAuth } from '../server/auth.js'
+migrateAuth(Astro)
+
+import { handleFlash } from '../server/flash.js'
+
+import Layout from '../layouts/Layout.astro'
+import PageHeader from '../components/PageHeader.astro'
+import PlatformGrid from '../components/PlatformGrid.astro'
+import Platform from '../components/Platform.astro'
+import Link from '../components/Link.astro'
+
+type PlatformInfo = {
+  name: string
+  color: string
+  icon: string
+  via?: string
+  supported?: boolean
+  thirdPartyOnly?: boolean
+}
+
+const platforms = Object.values(
+  import.meta.glob<PlatformInfo>('../components/platforms/*.ts', { eager: true })
+)
+
+const platformsWithIntegration = platforms.filter((p) => p.supported !== false && !p.thirdPartyOnly)
+const platformsWithoutIntegration = platforms.filter((p) => p.supported !== false && p.thirdPartyOnly)
+
+const flash = handleFlash(Astro)
+---
+<Layout flash={flash} title='Supported platforms'>
+  <PageHeader>
+    <Fragment slot='namespace'>About PronounDB</Fragment>
+    <Fragment>Supported platforms</Fragment>
+  </PageHeader>
+  <div class='mb-4'>
+    PronounDB aims to support as many platforms as possible, so pronouns can easily be shared and changed everywhere by just a few clicks. Here's the full list of platforms supported by PronounDB:
+  </div>
+  <PlatformGrid>
+    {platformsWithIntegration.map((platform) => (
+      <Platform color={platform.color}>
+        <Fragment>{platform.name}{platform.via && <span class='font-normal'> (via {platform.via})</span>}</Fragment>
+        <Fragment slot='icon' set:html={platform.icon}/>
+        <span slot='sub'>No preview available</span>
+      </Platform>
+    ))}
+  </PlatformGrid>
+
+  <h2 class='text-xl font-bold mt-8 mb-2'>Platforms without integrations</h2>
+  <p class='mb-4'>
+    While PronounDB's browser extension doesn't support these directly, these platforms are listed for third party
+    developers to make cool integrations with PronounDB via the <Link href='/docs'>API</Link>.
+  </p>
+  <PlatformGrid>
+    {platformsWithoutIntegration.map((platform) => (
+      <Platform color={platform.color}>
+        <Fragment>{platform.name}{platform.via && <span class='font-normal'> (via {platform.via})</span>}</Fragment>
+        <Fragment slot='icon' set:html={platform.icon}/>
+      </Platform>
+    ))}
+  </PlatformGrid>
+</Layout>

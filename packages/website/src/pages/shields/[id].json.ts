@@ -58,7 +58,7 @@ export const LegacyPronouns: Record<string, string | string[]> = {
 
 function formatPronouns (pronounsId: string, capitalize: boolean) {
   const pronouns = LegacyPronouns[pronounsId]
-  return Array.isArray(pronouns) ? pronouns[capitalize ? 0 : 1] : pronouns
+  return Array.isArray(pronouns) ? pronouns[capitalize ? 1 : 0] : pronouns
 }
 
 export async function get ({ url, params }: APIContext) {

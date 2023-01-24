@@ -29,3 +29,6 @@
 export const name = 'Facebook'
 export const color = '#4267B2'
 export { default as icon } from 'simple-icons/icons/facebook.svg?raw'
+
+// https://github.com/cyyynthia/pronoundb.org/issues/81
+export const supported = false
