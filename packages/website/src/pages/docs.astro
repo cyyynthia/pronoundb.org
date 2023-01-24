@@ -34,17 +34,14 @@ import { handleFlash } from '../server/flash.js'
 
 import Layout from '../layouts/Layout.astro'
 import PageHeader from '../components/PageHeader.astro'
-import PlatformGrid from '../components/PlatformGrid.astro'
-import Platform from '../components/Platform.astro'
 import Link from '../components/Link.astro'
-import { platform } from 'os'
 
 const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true, import: '__null' })
 const providers = Object.keys(providersGlob).map((k) => k.slice(26, -3))
 
 const flash = handleFlash(Astro)
 ---
-<Layout flash={flash} title='Supported platforms'>
+<Layout flash={flash} title='API Documentation'>
   <PageHeader>
     <Fragment slot='namespace'>About PronounDB</Fragment>
     <Fragment>API Documentation</Fragment>
@@ -119,6 +116,7 @@ const flash = handleFlash(Astro)
     {providers.map((p) => <li><code>{p}</code></li>)}
   </ul>
 </Layout>
+
 <style>
   code {
     @apply px-1 bg-gray-200 dark:bg-gray-700

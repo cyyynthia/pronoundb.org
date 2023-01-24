@@ -1,0 +1,84 @@
+---
+/*
+ * Copyright (c) Cynthia Rey, All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import { migrateAuth } from '../server/auth.js'
+migrateAuth(Astro)
+
+import { handleFlash } from '../server/flash.js'
+
+import Layout from '../layouts/Layout.astro'
+import PageHeader from '../components/PageHeader.astro'
+import Link from '../components/Link.astro'
+
+const flash = handleFlash(Astro)
+---
+<Layout flash={flash} title='Pronouns 101'>
+  <PageHeader>
+    <Fragment slot='namespace'>About PronounDB</Fragment>
+    <Fragment>Pronouns 101</Fragment>
+  </PageHeader>
+  <p class='mb-4'>
+    Unsure what all this pronouns stuff means? Here's a small guide that hopefully will help getting you started.
+  </p>
+
+  <h2 class='text-xl font-bold mb-2'>What are pronouns?</h2>
+  <p class='mb-6'>
+    Pronouns are part of our everyday language, and constitutes a whole part of someone's identity. Just like you call
+    people by their name, when it's time to substitute their name for a pronoun, you should use this person's pronouns.
+    Everyone has pronouns, aligned or not with their gender, and using the correct ones is important.
+  </p>
+
+  <h2 class='text-xl font-bold mb-2'>What does "x/y" means?</h2>
+  <p class='mb-1'>
+    For single pronouns like he/him or she/her, these are quite straightforward. However, some people may have multiple
+    preferred pronouns, in which case PronounDB will use a compact form of <i>compound pronouns</i>.
+  </p>
+  <p class='mb-4'>
+    Here's an example: if one person goes by the pronouns of she/her or it/its, PronounDB will show this as she/it.
+  </p>
+  <h3 class='text-md font-bold mb-2'>What's the difference between "x/y" and "y/x"?</h3>
+  <p class='mb-1'>
+    Generally, it is an order of preference. Someone going by "she/it" is fine having either set applied on them, but
+    prefers in this case "she". If it was "it/she", it'd be the opposite.
+  </p>
+  <p class='mb-4'>
+    Beware, <b>this is not a generality</b>. Some would want to be called <i>a bit of both</i>, some simply don't care
+    and don't prefer one over the other and just like both sets equally. Make sure to ask if you're unsure!
+  </p>
+
+  <h2 class='text-xl font-bold mb-2'>Further reading</h2>
+  <p class='mb-1'>
+    <Link href='https://en.pronouns.page/pronouns'>Pronouns.page's popular pronouns list page</Link> is a great
+    resource and includes information about how to use pronouns.
+  </p>
+  <p class='italic'>
+    Tip: PronounDB's compound pronouns are expressed as x&amp;y on pronouns.page. e.g.: PronounDB's she/it would be
+    she&amp;it on pronouns.page.
+  </p>
+</Layout>

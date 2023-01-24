@@ -61,6 +61,18 @@ export function generateToken (payload: JwtPayload): string {
   return signer(payload)
 }
 
+export function hasValidToken ({ cookies }: APIContext) {
+  let token = cookies.get('token').value
+  if (!token) return false
+
+  try {
+    verifierStrict(token)
+    return true
+  } catch {
+    return false
+  }
+}
+
 export async function authenticate ({ cookies }: APIContext, lax?: boolean) {
   let token = cookies.get('token').value
   if (!token) return null
