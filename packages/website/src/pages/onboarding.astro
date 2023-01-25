@@ -27,16 +27,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../server/auth.js'
+import { migrateAuth } from '@server/auth.js'
 migrateAuth(Astro)
 
-import { hasValidToken } from '../server/auth.js'
-import { handleFlash } from '../server/flash.js'
+import { hasValidToken } from '@server/auth.js'
+import { handleFlash } from '@server/flash.js'
 
-import Layout from '../layouts/Layout.astro'
-import PageHeader from '../components/PageHeader.astro'
-import Link from '../components/Link.astro'
-import Heart from '../components/Heart.astro'
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import Link from '@components/Link.astro'
+import Heart from '@components/Heart.astro'
 
 const authenticated = hasValidToken(Astro)
 

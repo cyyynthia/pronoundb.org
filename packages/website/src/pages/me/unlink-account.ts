@@ -27,9 +27,9 @@
  */
 
 import type { APIContext } from 'astro'
-import { authenticate, validateCsrf } from '../../server/auth.js'
-import { setFlash } from '../../server/flash.js'
-import { removeLinkedAccount } from '../../server/database/account.js'
+import { authenticate, validateCsrf } from '@server/auth.js'
+import { setFlash } from '@server/flash.js'
+import { removeLinkedAccount } from '@server/database/account.js'
 
 export async function post (ctx: APIContext) {
   const user = await authenticate(ctx)

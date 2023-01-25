@@ -27,8 +27,8 @@
  */
 
 import type { APIContext } from 'astro'
-import { authenticate } from '../../server/auth.js'
-import { updatePronouns } from '../../server/database/account.js'
+import { authenticate } from '@server/auth.js'
+import { updatePronouns } from '@server/database/account.js'
 
 const LEGACY_PRONOUNS = [
   'hh', 'hi', 'hs', 'ht', 'ih', 'ii', 'is', 'it', 'shh', 'sh', 'si',

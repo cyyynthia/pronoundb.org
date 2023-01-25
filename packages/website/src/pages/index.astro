@@ -27,21 +27,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../server/auth.js'
+import { migrateAuth } from '@server/auth.js'
 migrateAuth(Astro)
 
-import * as twitter from '../components/platforms/twitter.js'
-import * as twitch from '../components/platforms/twitch.js'
-import * as github from '../components/platforms/github.js'
+import * as twitter from '@components/platforms/twitter.js'
+import * as twitch from '@components/platforms/twitch.js'
+import * as github from '@components/platforms/github.js'
 
-import { handleFlash } from '../server/flash.js'
-import getStats from '../server/stats.js'
+import { handleFlash } from '@server/flash.js'
+import getStats from '@server/stats.js'
 
-import Layout from '../layouts/Layout.astro'
-import Link from '../components/Link.astro'
-import StoreButton from '../components/StoreButton.astro'
-import PlatformGrid from '../components/PlatformGrid.astro'
-import Platform from '../components/Platform.astro'
+import Layout from '@layouts/Layout.astro'
+import Link from '@components/Link.astro'
+import StoreButton from '@components/StoreButton.astro'
+import PlatformGrid from '@components/PlatformGrid.astro'
+import Platform from '@components/Platform.astro'
 
 import globeSvg from 'feather-icons/dist/icons/globe.svg?raw'
 
