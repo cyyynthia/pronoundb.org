@@ -26,53 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { APIContext } from 'astro'
-import { findPronounsOf } from '../../../../server/database/account.js'
-
-export async function get (ctx: APIContext) {
-  const platform = ctx.url.searchParams.get('platform')
-  const id = ctx.url.searchParams.get('id')
-
-  if (!platform || !id) {
-    return new Response(
-      JSON.stringify({
-        errorCode: 400,
-        error: 'Bad request',
-        message: '`platform` and `id` query parameters are required.',
-      }),
-      { status: 400 }
-    )
-  }
-
-  const cursor = findPronounsOf(platform, [ id ])
-  const user = await cursor.next()
-  await cursor.close()
-
-  const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
-  return new Response(body, {
-    headers: {
-      vary: 'origin',
-      'access-control-allow-methods': 'GET',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'x-pronoundb-source',
-      'access-control-max-age': '600',
-    },
-  })
-}
-
-export function options () {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      vary: 'origin',
-      'access-control-allow-methods': 'GET',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'x-pronoundb-source',
-      'access-control-max-age': '600',
-    },
-  })
-}
-
-export function all () {
-  return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
+// See comment in astro.config.ts
+export default async function () {
+  // Nothing
 }

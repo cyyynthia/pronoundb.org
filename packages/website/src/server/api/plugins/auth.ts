@@ -26,41 +26,57 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { defineConfig } from 'astro/config'
-import tailwind from '@astrojs/tailwind'
-import fastify from '@matthewp/astro-fastify'
+import type { FastifyInstance } from 'fastify'
+import type { Account } from '../../database/account.js'
+import { getRealToken, authenticateToken } from '../../auth.js'
 
-// If vars don't exist in the build's env, secrets are inlined.
-// Since I don't want any of the env to be inlined in production, I load everything them with dotenv.
-import dotenv from 'dotenv'
-dotenv.config()
+export default async function authPlugin (fastify: FastifyInstance) {
+  fastify.decorateRequest('user', null)
 
-export default defineConfig({
-  site: 'https://pronoundb.org',
-  output: 'server',
-  integrations: [ tailwind() ],
-  // Fastify adapter does NOT work in dev, and causes hard dev server crash.
-  // It is unable to resolve imports I do in `api.ts`... Oh well. I'll file a bug report eventually.
-  adapter: process.env.NODE_ENV !== 'development'
-    ? fastify({
-      entry: new URL('./src/server/api.ts', import.meta.url),
-      logger: { level: 'warn' },
-    })
-    : void 0 as any,
-  vite: {
-    resolve: {
-      alias: {
-        // The Fastify adapter does include @fastify/static, except I don't want it.
-        // So I short-circuit it with this noop "plugin"...
-        '@fastify/static': new URL('./src/server/noop.ts', import.meta.url).pathname,
-      },
-    },
-    build: {
-      // I don't like inlined assets
-      assetsInlineLimit: 0,
-      rollupOptions: {
-        external: [ 'fastify' ],
-      },
-    },
-  },
-})
+  fastify.addHook('preHandler', async (request, reply) => {
+    request.user = null
+    if (request.cookies.token) {
+      let token = request.cookies.token
+      const migration = !token.startsWith('ey')
+      if (migration) {
+        // Legacy Tokenize migration
+        const newToken = getRealToken(token)
+        if (!newToken) {
+          reply.clearCookie('token')
+          return
+        }
+
+        token = newToken
+      }
+
+      request.user = await authenticateToken(token)
+      if (!request.user) {
+        reply.clearCookie('token')
+      }
+
+      if (migration) {
+        // Legacy Tokenize migration pt. 2
+        reply.setCookie('token', token, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
+      }
+    }
+  })
+}
+
+// Mark as root-level plugin
+// @ts-ignore -- TS isn't happy about that one
+authPlugin[Symbol.for('skip-override')] = true
+// @ts-ignore -- TS isn't happy about that one
+authPlugin[Symbol.for('fastify.display-name')] = '@pronoundb/auth'
+// @ts-ignore -- TS isn't happy about that one
+authPlugin[Symbol.for('plugin-meta')] = {
+  fastify: '4.x',
+  name: '@pronoundb/auth',
+  decorators: { request: [ 'cookies' ] },
+  dependencies: [ '@fastify/cookie' ],
+}
+
+declare module 'fastify' {
+  export interface FastifyRequest {
+    user: Account | null
+  }
+}

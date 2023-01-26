@@ -77,13 +77,17 @@ export async function authenticate ({ cookies }: APIContext, lax?: boolean) {
   let token = cookies.get('token').value
   if (!token) return null
 
+  const user = await authenticateToken(token, lax)
+  if (!user) cookies.delete('token')
+  return user
+}
+
+export async function authenticateToken (token: string, lax?: boolean) {
   const verifier = lax ? verifierLax : verifierStrict
 
   try {
     const { id } = verifier(token)
-    const user = await findById(new ObjectId(id))
-    if (!user) cookies.delete('token')
-    return user
+    return findById(new ObjectId(id))
   } catch {
     return null
   }
@@ -117,23 +121,32 @@ export function validateCsrf ({ cookies }: APIContext, csrf: string) {
 
 // Legacy tokenize migration
 export function migrateAuth ({ cookies }: APIContext) {
-  let token = cookies.get('token').value
+  const token = cookies.get('token').value
   if (!token || token.startsWith('ey')) return
 
-  if (!import.meta.env.LEGACY_SECRET_KEY) return
+  const newToken = getRealToken(token)
+  if (!newToken) {
+    cookies.delete('token')
+  } else {
+    cookies.set('token', newToken, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
+  }
+}
+
+export function getRealToken (token: string) {
+  if (!token || token.startsWith('ey')) return token
+  if (!import.meta.env.LEGACY_SECRET_KEY) return null
 
   const [ id, gen, sig ] = token.split('.')
-  if (!id || !gen || !sig) return
+  if (!id || !gen || !sig) return null
 
   const expectedSig = createHmac('sha256', import.meta.env.LEGACY_SECRET_KEY)
     .update(`TTF.1.${id}.${gen}`)
     .digest('base64')
     .replace(/=/g, '')
 
-  if (!safeEqual(sig, expectedSig)) return
-
-  token = generateToken({ id: Buffer.from(id, 'base64').toString() })
-  cookies.set('token', token, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
+  return safeEqual(sig, expectedSig)
+    ? generateToken({ id: Buffer.from(id, 'base64').toString() })
+    : null
 }
 
 function safeEqual (str1: string, str2: string) {
