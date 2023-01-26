@@ -40,7 +40,7 @@ export async function get (ctx: APIContext) {
         error: 'Bad request',
         message: '`platform` and `id` query parameters are required.',
       }),
-      { status: 400 }
+      { status: 400, headers: { 'content-type': 'application/json' } }
     )
   }
 
@@ -56,6 +56,7 @@ export async function get (ctx: APIContext) {
       'access-control-allow-origin': '*',
       'access-control-allow-headers': 'x-pronoundb-source',
       'access-control-max-age': '600',
+      'content-type': 'application/json',
     },
   })
 }

@@ -54,7 +54,12 @@ function getCorsHeaders (request: APIContext['request']) {
 export async function get (ctx: APIContext) {
   const user = await authenticate(ctx, true)
   const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
-  return new Response(body, { headers: getCorsHeaders(ctx.request) })
+  return new Response(body, {
+    headers: {
+      ...getCorsHeaders(ctx.request),
+      'content-type': 'application/json',
+    },
+  })
 }
 
 export function options ({ request }: APIContext) {
