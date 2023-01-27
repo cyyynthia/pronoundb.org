@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -88,7 +88,7 @@ export function finishLicense (): Plugin {
     },
     generateBundle: (_, bundle) => {
       const header = [
-        'Copyright (c) Cynthia Rey, All Rights Reserved.',
+        'Copyright (c) Cynthia Rey et al., All Rights Reserved.',
         'Licensed under the BSD-3-Clause license. Contains third-party software licensed under different terms.',
         `For third-party software licenses included in this build, please see /${finalLicensePath}`,
       ]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,12 @@ function getCorsHeaders (request: APIContext['request']) {
 export async function get (ctx: APIContext) {
   const user = await authenticate(ctx, true)
   const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
-  return new Response(body, { headers: getCorsHeaders(ctx.request) })
+  return new Response(body, {
+    headers: {
+      ...getCorsHeaders(ctx.request),
+      'content-type': 'application/json',
+    },
+  })
 }
 
 export function options ({ request }: APIContext) {

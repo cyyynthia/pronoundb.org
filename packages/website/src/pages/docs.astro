@@ -1,6 +1,6 @@
 ---
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ import Layout from '@layouts/Layout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import Link from '@components/Link.astro'
 
-const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true, import: '__null' })
+const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true })
 const providers = Object.keys(providersGlob).map((k) => k.slice(26, -3))
 
 const flash = handleFlash(Astro)
