@@ -27,6 +27,7 @@
  */
 
 import type { APIContext } from 'astro'
+import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
 
 export async function get (ctx: APIContext) {
@@ -47,6 +48,11 @@ export async function get (ctx: APIContext) {
   const cursor = findPronounsOf(platform, [ id ])
   const user = await cursor.next()
   await cursor.close()
+
+  // Collect metrics
+  LookupRequestsCounter.inc({ platform: platform, method: 'single' })
+  LookupIdsCounter.inc({ platform: platform })
+  if (user) LookupHitCounter.inc({ platform: platform })
 
   const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
   return new Response(body, {

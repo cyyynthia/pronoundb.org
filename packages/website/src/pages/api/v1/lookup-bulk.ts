@@ -27,6 +27,7 @@
  */
 
 import type { APIContext } from 'astro'
+import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram } from '@server/metrics.js'
 import { type PronounsOfUser, findPronounsOf } from '@server/database/account.js'
 
 export async function get (ctx: APIContext) {
@@ -45,7 +46,8 @@ export async function get (ctx: APIContext) {
   }
 
   const ids = new Set(idsStr.split(',').filter((a) => a))
-  if (ids.size < 1 || ids.size > 50) {
+  const idsCount = ids.size
+  if (idsCount < 1 || idsCount > 50) {
     return new Response(
       JSON.stringify({
         errorCode: 400,
@@ -65,8 +67,18 @@ export async function get (ctx: APIContext) {
   }
 
   await cursor.close()
+  const idsHitCount = idsCount - ids.size
   for (const id of ids) {
     res[id] = 'unspecified'
+  }
+
+  // Collect metrics
+  const method = idsCount === 1 ? 'single' : 'bulk'
+  LookupRequestsCounter.inc({ platform: platform, method: method })
+  LookupIdsCounter.inc({ platform: platform }, idsCount)
+  LookupHitCounter.inc({ platform: platform }, idsHitCount)
+  if (method === 'bulk') {
+    LookupBulkSizeHistogram.observe({ platform: platform }, idsCount)
   }
 
   const body = JSON.stringify(res)
