@@ -14,8 +14,8 @@ This repo uses [pnpm](https://pnpm.io/) for dependency management and general ma
 troubles if you try to use another package manager.
 
 ### Development environment
-You can quickly spin up a development environment with [docker compose](https://docs.docker.com/compose/), which will
-have everything needed for PronounDB's website & API to work. It'll have hot-reloading on both the website and the API.
+You can start services needed for PronounDB with with [docker compose](https://docs.docker.com/compose/). Once services
+are up, you can run the dev server with `pnpm run dev` in the websites package.
 
 To test the extension, you can run `pnpm run dev` in the extension package to build the extension & enable automatic
 re-building when files are changed. You'll need to load the extension in your browser manually, and to refresh it

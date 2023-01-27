@@ -8,5 +8,5 @@ node_modules
 *.nogit.*
 
 .env
-config.json
-conf/nginx.custom.conf
+.env.*
+!.env.example

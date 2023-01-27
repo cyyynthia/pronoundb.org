@@ -19,4 +19,4 @@ community.
    Extremism is dangerous and only lead to conflicts, and nobody likes conflicts. Exaggerating someone's view on a
    subject to misleadingly claim they are being offensive, oppressive, or otherwise harmful falls under this rule.
 
-You may report unappropriated behavior by shooting me an email at cynthia@cynthia.dev.
+You may report unappropriated behavior by shooting me an email at cynthia@maid.gg.
