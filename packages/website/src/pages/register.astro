@@ -27,15 +27,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../server/auth.js'
+import { migrateAuth } from '@server/auth.js'
 migrateAuth(Astro)
 
-import { handleFlash } from '../server/flash.js'
+import { handleFlash } from '@server/flash.js'
 
-import Layout from '../layouts/Layout.astro'
-import PageHeader from '../components/PageHeader.astro'
-import Link from '../components/Link.astro'
-import OAuthProviderList from '../components/OAuthProviderList.astro'
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import Link from '@components/Link.astro'
+import OAuthProviderList from '@components/OAuthProviderList.astro'
 
 if (Astro.cookies.has('token')) return Astro.redirect('/me')
 const flash = handleFlash(Astro)

@@ -28,11 +28,11 @@
 
 import type { APIContext } from 'astro'
 
-import { generateToken, authenticate } from '../../../server/auth.js'
-import { type FlashMessage, setFlash } from '../../../server/flash.js'
-import { type ExternalAccount, createAccount, findByExternalAccount, addLinkedAccount } from '../../../server/database/account.js'
-import { type OAuth1Params, callback as callback1 } from '../../../server/oauth/core/oauth10a.js'
-import { type OAuth2Params, callback as callback2 } from '../../../server/oauth/core/oauth2.js'
+import { generateToken, authenticate } from '@server/auth.js'
+import { type FlashMessage, setFlash } from '@server/flash.js'
+import { type ExternalAccount, createAccount, findByExternalAccount, addLinkedAccount } from '@server/database/account.js'
+import { type OAuth1Params, callback as callback1 } from '@server/oauth/core/oauth10a.js'
+import { type OAuth2Params, callback as callback2 } from '@server/oauth/core/oauth2.js'
 
 type Params = OAuth1Params | OAuth2Params
 const INTENTS = [ 'register', 'login', 'link' ]

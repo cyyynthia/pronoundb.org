@@ -27,7 +27,7 @@
  */
 
 import type { APIContext } from 'astro'
-import { findPronounsOf } from '../../../../server/database/account.js'
+import { findPronounsOf } from '@server/database/account.js'
 
 export async function get (ctx: APIContext) {
   const platform = ctx.url.searchParams.get('platform')

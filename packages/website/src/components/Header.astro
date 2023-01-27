@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { hasValidToken, createCsrf } from '../server/auth.js'
+import { hasValidToken, createCsrf } from '@server/auth.js'
 import Link from './Link.astro'
 
 const authenticated = hasValidToken(Astro)

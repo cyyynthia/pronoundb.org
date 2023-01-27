@@ -37,7 +37,7 @@ import { h, css } from '../utils/dom'
 export const name = 'Modrinth'
 export const color = '#30B27B'
 export const match = /^https:\/\/modrinth\.com/
-export { default as Icon } from '../../assets/modrinth.svg'
+export { default as Icon } from '@assets/modrinth.svg'
 
 async function fetchUntilData (el: HTMLElement, queries: QueryElement[][]) {
   for (let i = 1; i < 20; i++) {

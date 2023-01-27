@@ -27,7 +27,7 @@
  */
 
 import type { APIContext } from 'astro'
-import { authenticate } from '../../../../server/auth.js'
+import { authenticate } from '@server/auth.js'
 
 function getCorsHeaders (request: APIContext['request']) {
   const origin = request.headers.get('origin')

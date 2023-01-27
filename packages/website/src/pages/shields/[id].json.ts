@@ -28,7 +28,7 @@
 
 import type { APIContext } from 'astro'
 import { ObjectId } from 'mongodb'
-import { findById } from '../../server/database/account.js'
+import { findById } from '@server/database/account.js'
 
 export const LegacyPronouns: Record<string, string | string[]> = {
   // -- Contributors: please keep the list sorted alphabetically.

@@ -28,9 +28,9 @@
 
 import type { APIContext } from 'astro'
 
-import { authenticate } from '../../../server/auth.js'
-import { type OAuth1Params, authorize as authorize1 } from '../../../server/oauth/core/oauth10a.js'
-import { type OAuth2Params, authorize as authorize2 } from '../../../server/oauth/core/oauth2.js'
+import { authenticate } from '@server/auth.js'
+import { type OAuth1Params, authorize as authorize1 } from '@server/oauth/core/oauth10a.js'
+import { type OAuth2Params, authorize as authorize2 } from '@server/oauth/core/oauth2.js'
 
 type Params = OAuth1Params | OAuth2Params
 const INTENTS = [ 'register', 'login', 'link' ]

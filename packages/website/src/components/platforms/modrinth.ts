@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import modrinth from '../../assets/modrinth.svg?raw'
+import modrinth from '@assets/modrinth.svg?raw'
 
 export const name = 'Modrinth'
 export const color = '#30B27B'

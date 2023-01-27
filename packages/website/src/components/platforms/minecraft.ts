@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import minecraft from '../../assets/minecraft.svg?raw'
+import minecraft from '@assets/minecraft.svg?raw'
 
 export const name = 'Minecraft'
 export const color = '#854F2B'

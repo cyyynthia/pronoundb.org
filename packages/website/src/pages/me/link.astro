@@ -27,15 +27,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../../server/auth.js'
+import { migrateAuth } from '@server/auth.js'
 migrateAuth(Astro)
 
-import { authenticate } from '../../server/auth.js'
-import { handleFlash } from '../../server/flash.js'
+import { authenticate } from '@server/auth.js'
+import { handleFlash } from '@server/flash.js'
 
-import Layout from '../../layouts/Layout.astro'
-import PageHeader from '../../components/PageHeader.astro'
-import OAuthProviderList from '../../components/OAuthProviderList.astro'
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import OAuthProviderList from '@components/OAuthProviderList.astro'
 
 const user = await authenticate(Astro)
 if (!user) return Astro.redirect('/')

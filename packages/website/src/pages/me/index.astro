@@ -27,17 +27,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '../../server/auth.js'
+import { migrateAuth } from '@server/auth.js'
 migrateAuth(Astro)
 
-import { authenticate, createCsrf } from '../../server/auth.js'
-import { handleFlash } from '../../server/flash.js'
+import { authenticate, createCsrf } from '@server/auth.js'
+import { handleFlash } from '@server/flash.js'
 
-import Layout from '../../layouts/Layout.astro'
-import PageHeader from '../../components/PageHeader.astro'
-import Link from '../../components/Link.astro'
-import LegacyPronounsSelector from '../../components/LegacyPronounsSelector.astro'
-import Platform from '../../components/Platform.astro'
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import Link from '@components/Link.astro'
+import LegacyPronounsSelector from '@components/LegacyPronounsSelector.astro'
+import Platform from '@components/Platform.astro'
 
 import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
 import xSvg from 'feather-icons/dist/icons/x.svg?raw'
