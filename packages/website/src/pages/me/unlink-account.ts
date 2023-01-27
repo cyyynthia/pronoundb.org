@@ -27,9 +27,10 @@
  */
 
 import type { APIContext } from 'astro'
+import { LinkedAccountsRemovalCount } from '@server/metrics.js'
 import { authenticate, validateCsrf } from '@server/auth.js'
-import { setFlash } from '@server/flash.js'
 import { removeLinkedAccount } from '@server/database/account.js'
+import { setFlash } from '@server/flash.js'
 
 export async function post (ctx: APIContext) {
   const user = await authenticate(ctx)
@@ -50,6 +51,7 @@ export async function post (ctx: APIContext) {
     return new Response('400: Bad request', { status: 400 })
   }
 
+  LinkedAccountsRemovalCount.inc({ platform: platform })
   removeLinkedAccount(user._id, platform, id)
   return ctx.redirect('/me')
 }

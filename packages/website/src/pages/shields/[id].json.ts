@@ -55,7 +55,6 @@ export const LegacyPronouns: Record<string, string | string[]> = {
   avoid: 'Avoid pronouns, use my name',
 }
 
-
 function formatPronouns (pronounsId: string, capitalize: boolean) {
   const pronouns = LegacyPronouns[pronounsId]
   return Array.isArray(pronouns) ? pronouns[capitalize ? 1 : 0] : pronouns

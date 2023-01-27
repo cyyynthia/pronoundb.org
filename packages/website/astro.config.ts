@@ -26,11 +26,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Astro only uses process.env for variables visible during build time
+// As I do not want anything from .env to be inlined in server bundle, I load everything with dotenv
+import 'dotenv/config'
+
 import { defineConfig } from 'astro/config'
 import tailwind from '@astrojs/tailwind'
 import node from '@astrojs/node'
 
 export default defineConfig({
+  site: 'https://pronoundb.org/',
   output: 'server',
   integrations: [ tailwind() ],
   adapter: node({ mode: 'standalone' }),

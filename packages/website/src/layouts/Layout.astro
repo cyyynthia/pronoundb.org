@@ -41,7 +41,11 @@ export interface Props {
 
 const DEFAULT_DESCRIPTION = 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly.'
 
-const { title, description, flash } = Astro.props
+const { title: t, description: d, flash } = Astro.props
+const description = d || DEFAULT_DESCRIPTION
+const title = t ? `${t} • PronounDB` : 'PronounDB'
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
+
 const [ flashIcon, flashColor ] = flash?.startsWith('S_')
 	? [ checkSvg, 'text-green-700 border-green-700 dark:text-green-400 dark:border-green-400' ]
 	: [ alertSvg, 'text-red-600 border-red-600 dark:text-red-orange dark:border-red-orange' ]
@@ -50,14 +54,23 @@ const [ flashIcon, flashColor ] = flash?.startsWith('S_')
 <html lang='en' class='font-sans w-full h-full'>
   <head>
     <meta charset='utf8'/>
-    <meta name='viewport' content='width=device-width'/>
     <meta name='theme-color' content='#f49898'/>
+    <meta name='viewport' content='width=device-width, initial-scale=1'/>
 
-		<meta name='og:site_name' content='PronounDB'/>
-		<meta name='og:title' content={title || 'PronounDB'}/>
-		<title>{title ? `${title} • PronounDB` : 'PronounDB'}</title>
-		<meta name='og:description' content={description || DEFAULT_DESCRIPTION}/>
-		<meta name='description' content={description || DEFAULT_DESCRIPTION}/>
+    <title>{title}</title>
+    <meta name='description' content={description}/>
+    <link rel='canonical' href={canonicalUrl}/>
+
+    <meta property='og:site_name' content='PronounDB'/>
+    <meta property='og:type' property='og:type' content='website'>
+    <meta property='og:url' content={canonicalUrl}/>
+    <meta property='og:title' content={title}/>
+    <meta property='og:description' content={description}/>
+
+    <meta name='twitter:card' content='summary'/>
+    <meta name='twitter:creator' content='@cyyynthia_'/>
+    <meta name='twitter:title' content={title}/>
+    <meta name='twitter:description' content={description}/>
   </head>
   <body class='flex flex-col w-full h-full text-black bg-white dark:bg-gray-800 dark:text-white'>
 		<Header/>

@@ -30,6 +30,7 @@ import type { APIContext } from 'astro'
 import { ObjectId } from 'mongodb'
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto'
 import { createSigner, createVerifier } from 'fast-jwt'
+import { LegacyTokenizeMigrationCounter } from './metrics.js'
 import { findById } from './database/account.js'
 
 export type JwtPayload = { id: string }
@@ -81,10 +82,9 @@ export async function authenticate ({ cookies }: APIContext, lax?: boolean) {
 
   try {
     const { id } = verifier(token)
-    const user = await findById(new ObjectId(id))
-    if (!user) cookies.delete('token')
-    return user
+    return findById(new ObjectId(id))
   } catch {
+    // Not deleting the token if invalid is intentional. This allows the extension to still show up pronouns.
     return null
   }
 }
@@ -117,10 +117,10 @@ export function validateCsrf ({ cookies }: APIContext, csrf: string) {
 
 // Legacy tokenize migration
 export function migrateAuth ({ cookies }: APIContext) {
+  if (!import.meta.env.LEGACY_SECRET_KEY) return
+
   let token = cookies.get('token').value
   if (!token || token.startsWith('ey')) return
-
-  if (!import.meta.env.LEGACY_SECRET_KEY) return
 
   const [ id, gen, sig ] = token.split('.')
   if (!id || !gen || !sig) return
@@ -132,6 +132,7 @@ export function migrateAuth ({ cookies }: APIContext) {
 
   if (!safeEqual(sig, expectedSig)) return
 
+  LegacyTokenizeMigrationCounter.inc()
   token = generateToken({ id: Buffer.from(id, 'base64').toString() })
   cookies.set('token', token, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
 }

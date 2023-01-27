@@ -36,7 +36,7 @@ export const FlashMessages = <const> {
   S_ACC_DELETED: 'Your account has been successfully deleted. Sorry to see you go!',
 
   // Error
-  E_CSRF: 'Verification of the authenticity of the submission failed. Please try again.',
+  E_CSRF: 'Verification of the authenticity of the submission failed (CSRF check). Please try again.',
   E_OAUTH_GENERIC: 'An unknown error occurred while authenticating with the third party service.',
   E_OAUTH_FETCH: 'Could not fetch information about your external account.',
   E_OAUTH_10A_EXCHANGE: 'Could not initialize the authentication request with the third party.',

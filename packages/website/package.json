@@ -25,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
     "astro": "^2.0.2",
+    "dotenv": "^16.0.3",
     "eslint": "^8.32.0",
     "feather-icons": "^4.29.0",
     "simple-icons": "^8.3.0",

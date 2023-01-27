@@ -29,7 +29,9 @@
 import type { ObjectId } from 'mongodb'
 import database from './database.js'
 
-const collection = database.collection<Account>('accounts')
+export const collection = database.collection<Account>('accounts')
+await collection.createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
+await collection.createIndex({ 'accounts.platform': 1 })
 
 export type Account = {
   pronouns: string
@@ -44,8 +46,7 @@ export type ExternalAccount = {
 
 export type PronounsOfUser = {
   pronouns: string
-  platform: string
-  id: string
+  account: ExternalAccount
 }
 
 export async function createAccount (from: ExternalAccount) {
@@ -75,20 +76,34 @@ export async function findByExternalAccount (external: ExternalAccount) {
 }
 
 export function findPronounsOf (platform: string, externalIds: string[]) {
+  // perf: first filtering ($match) needs to be done before doing anything to ensure we hit the index.
+  // once initial filtering is done, we can do whatever as the dataset is small enough.
+  // it was behaving with 10k+ docs, it should be ridiculously fast for <=50 docs...
   return collection.aggregate<PronounsOfUser>([
-    { $unwind: '$accounts' },
     {
-      '$match': {
+      $match: {
         'accounts.platform': platform,
-        'accounts.id': { '$in': externalIds },
+        'accounts.id': { $in: externalIds },
       },
     },
     {
       $project: {
         _id: 0,
         pronouns: 1,
-        platform: '$accounts.platform',
-        id: '$accounts.id',
+        account: {
+          $first: {
+            $filter: {
+              input: '$accounts',
+              as: 'account',
+              cond: {
+                $and: [
+                  { $eq: [ '$$account.platform', platform ] },
+                  { $in: [ '$$account.id', externalIds ] },
+                ],
+              },
+            },
+          },
+        },
       },
     },
   ])

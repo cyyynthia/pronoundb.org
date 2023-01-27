@@ -27,9 +27,10 @@
  */
 
 import type { APIContext } from 'astro'
+import { DeletedAccountCount } from '@server/metrics.js'
 import { authenticate, validateCsrf } from '@server/auth.js'
-import { setFlash } from '@server/flash.js'
 import { deleteAccount } from '@server/database/account.js'
+import { setFlash } from '@server/flash.js'
 
 export async function post (ctx: APIContext) {
   const user = await authenticate(ctx)
@@ -43,6 +44,7 @@ export async function post (ctx: APIContext) {
     return ctx.redirect('/me')
   }
 
+  DeletedAccountCount.inc()
   deleteAccount(user._id)
   ctx.cookies.delete('token')
   setFlash(ctx, 'S_ACC_DELETED')

@@ -28,6 +28,7 @@
 
 import type { APIContext } from 'astro'
 
+import { CreatedAccountCount, LinkedAccountsAddCount } from '@server/metrics.js'
 import { generateToken, authenticate } from '@server/auth.js'
 import { type FlashMessage, setFlash } from '@server/flash.js'
 import { type ExternalAccount, createAccount, findByExternalAccount, addLinkedAccount } from '@server/database/account.js'
@@ -81,6 +82,7 @@ export async function get (ctx: APIContext) {
     }
 
     if (!existingAccount) {
+      LinkedAccountsAddCount.inc({ platform: external.platform })
       await addLinkedAccount(user!._id, external)
     }
 
@@ -94,6 +96,11 @@ export async function get (ctx: APIContext) {
   if (!account) {
     setFlash(ctx, intent === 'register' ? 'E_ACCOUNT_EXISTS' : 'E_ACCOUNT_NOT_FOUND')
     return ctx.redirect('/')
+  }
+
+  if (intent === 'register') {
+    CreatedAccountCount.inc({ platform: external.platform })
+    LinkedAccountsAddCount.inc({ platform: external.platform })
   }
 
   const authToken = generateToken({ id: account.toString() })

@@ -26,14 +26,68 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { register, collectDefaultMetrics, Counter, Histogram } from 'prom-client'
+import { register, collectDefaultMetrics, Counter, Histogram, Gauge } from 'prom-client'
+import { collection } from './database/account.js'
+
+const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true })
+const providers = Object.keys(providersGlob).map((k) => k.slice(26, -3))
 
 collectDefaultMetrics({
   prefix: 'pronoundb_',
 })
 
 /// ACCOUNT METRICS
-// todo
+new Gauge({
+  name: 'pronoundb_accounts_total',
+  help: 'accounts count',
+  labelNames: [],
+  collect: async function () {
+    const count = await collection.countDocuments()
+    this.set({}, count)
+  },
+})
+
+new Gauge({
+  name: 'pronoundb_linked_accounts_total',
+  help: 'accounts linked per platform count',
+  labelNames: [ 'platform' ],
+  collect: async function () {
+    // - But Cynthia!!!! You're doing this every 30 seconds!!!!
+    // - lol yea whatever hehe
+    // - ................
+    // - *noms cookie*
+    await Promise.all(
+      providers.map(
+        (p) => collection.countDocuments({ 'accounts.platform': p })
+          .then((count) => this.set({ platform: p }, count))
+      )
+    )
+  },
+})
+
+export const CreatedAccountCount = new Counter({
+  name: 'pronoundb_account_create_count',
+  help: 'amount of accounts created',
+  labelNames: [ 'platform' ],
+})
+
+export const DeletedAccountCount = new Counter({
+  name: 'pronoundb_account_deletion_count',
+  help: 'amount of accounts deleted',
+  labelNames: [],
+})
+
+export const LinkedAccountsAddCount = new Counter({
+  name: 'pronoundb_linked_accounts_add_count',
+  help: 'amount of accounts linked per platform',
+  labelNames: [ 'platform' ],
+})
+
+export const LinkedAccountsRemovalCount = new Counter({
+  name: 'pronoundb_linked_accounts_remove_count',
+  help: 'amount of accounts unlinked per platform',
+  labelNames: [ 'platform' ],
+})
 
 /// LOOKUP METRICS
 export const LookupRequestsCounter = new Counter({
@@ -61,7 +115,13 @@ export const LookupHitCounter = new Counter({
 })
 
 /// INTERNAL HEALTH METRICS
-// todo
+// some more metrics might be welcome
+// for now I just log this one so I can know roughly when I can ditch Tokenize migration code
+export const LegacyTokenizeMigrationCounter = new Counter({
+  name: 'pronoundb_tokenize_migration_total',
+  help: 'tokens migrated from legacy tokenize to jwt',
+  labelNames: [],
+})
 
 /// HELPERS
 export function metrics () {

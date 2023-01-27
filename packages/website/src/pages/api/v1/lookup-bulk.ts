@@ -62,8 +62,8 @@ export async function get (ctx: APIContext) {
   const res = Object.create(null)
   let user: PronounsOfUser | null
   while ((user = await cursor.next())) {
-    res[user.id] = user.pronouns
-    ids.delete(user.id)
+    res[user.account.id] = user.pronouns
+    ids.delete(user.account.id)
   }
 
   await cursor.close()
