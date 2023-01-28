@@ -35,7 +35,9 @@ import tailwind from '@astrojs/tailwind'
 import node from '@astrojs/node'
 
 export default defineConfig({
-  site: 'https://pronoundb.org/',
+  site: process.env.NODE_ENV === 'development'
+    ? 'http://localhost:3000/'
+    : 'https://pronoundb.org/',
   output: 'server',
   integrations: [ tailwind() ],
   adapter: node({ mode: 'standalone' }),

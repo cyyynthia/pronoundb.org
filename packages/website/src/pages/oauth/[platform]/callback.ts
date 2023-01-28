@@ -70,7 +70,7 @@ export async function get (ctx: APIContext) {
   }
 
   if (!external || typeof external === 'string') {
-    setFlash(ctx, external || 'E_OAUTH_FETCH')
+    setFlash(ctx, external || 'E_OAUTH_GENERIC')
     return ctx.redirect(intent === 'link' ? '/me' : '/')
   }
 

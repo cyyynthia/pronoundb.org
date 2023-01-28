@@ -47,9 +47,10 @@ export type OAuth2Params = {
 
 const states = new Set<string>()
 
-export async function authorize ({ url, params, cookies, redirect }: APIContext, oauth: OAuth2Params) {
+export async function authorize ({ url, params, cookies, redirect, site }: APIContext, oauth: OAuth2Params) {
   const intent = url.searchParams.get('intent') ?? 'login'
-  const callbackUrl = new URL('callback', url).href
+  const callbackPath = new URL('callback', url).pathname
+  const callbackUrl = new URL(callbackPath, site).href
 
   const state = randomUUID()
   const fullState = `${params.platform}-${state}-${intent}`
@@ -69,7 +70,7 @@ export async function authorize ({ url, params, cookies, redirect }: APIContext,
   return redirect(`${oauth.authorizationUrl}?${q}`)
 }
 
-export async function callback ({ url, params, cookies }: APIContext, oauth: OAuth2Params) {
+export async function callback ({ url, params, cookies, site }: APIContext, oauth: OAuth2Params) {
   const stateCookie = cookies.get('state').value
   const intentCookie = cookies.get('intent').value
   const state = url.searchParams.get('state')
@@ -85,9 +86,7 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
     return null
   }
 
-  const rawUrl = new URL(url)
-  rawUrl.search = ''
-
+  const cleanRedirectUrl = new URL(url.pathname, site)
   const res = await fetch(oauth.tokenUrl, {
     method: 'POST',
     headers: {
@@ -99,7 +98,7 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
       state: state,
       client_id: oauth.clientId,
       client_secret: oauth.clientSecret,
-      redirect_uri: rawUrl.href,
+      redirect_uri: cleanRedirectUrl.href,
       scope: oauth.scopes.join(' '),
       grant_type: 'authorization_code',
       code: code,
@@ -115,5 +114,10 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
     return null
   }
 
-  return oauth.getSelf(accessToken)
+  const user = await oauth.getSelf(accessToken)
+  if (!user) {
+    return 'E_OAUTH_FETCH'
+  }
+
+  return user
 }

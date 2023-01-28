@@ -126,7 +126,8 @@ const pending = new Map<string, Authorization>()
 
 export async function authorize (ctx: APIContext, oauth: OAuth1Params) {
   const intent = ctx.url.searchParams.get('intent') ?? 'login'
-  const callbackUrl = new URL('callback', ctx.url).href
+  const callbackPath = new URL('callback', ctx.url).pathname
+  const callbackUrl = new URL(callbackPath, ctx.site).href
 
   const { nonce, response } = await authenticatedFetch(oauth.requestUrl, {
     method: 'POST',
@@ -191,7 +192,7 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
   const tokens = decode(await response.text()) as unknown as ProviderResponse
   const user = await oauth.getSelf(tokens.oauth_token, tokens.oauth_token_secret)
   if (!user) {
-    return null
+    return 'E_OAUTH_FETCH'
   }
 
   return user
