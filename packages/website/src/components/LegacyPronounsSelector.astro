@@ -1,0 +1,59 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+export interface Props {
+  id?: string
+  selected: string
+}
+
+const { id, selected } = Astro.props
+---
+<select class='w-full px-2 py-1 mb-8 bg-gray-200 dark:bg-gray-700' id={id}>
+  <option value='unspecified' selected={selected === 'unspecified'}>Unspecified</option>
+  <option value='hh' selected={selected === 'hh'}>he/him</option>
+  <option value='hi' selected={selected === 'hi'}>he/it</option>
+  <option value='hs' selected={selected === 'hs'}>he/she</option>
+  <option value='ht' selected={selected === 'ht'}>he/they</option>
+  <option value='ih' selected={selected === 'ih'}>it/him</option>
+  <option value='ii' selected={selected === 'ii'}>it/its</option>
+  <option value='is' selected={selected === 'is'}>it/she</option>
+  <option value='it' selected={selected === 'it'}>it/they</option>
+  <option value='shh' selected={selected === 'shh'}>she/he</option>
+  <option value='sh' selected={selected === 'sh'}>she/her</option>
+  <option value='si' selected={selected === 'si'}>she/it</option>
+  <option value='st' selected={selected === 'st'}>she/they</option>
+  <option value='th' selected={selected === 'th'}>they/he</option>
+  <option value='ti' selected={selected === 'ti'}>they/it</option>
+  <option value='ts' selected={selected === 'ts'}>they/she</option>
+  <option value='tt' selected={selected === 'tt'}>they/them</option>
+  <option value='any' selected={selected === 'any'}>Any pronouns</option>
+  <option value='other' selected={selected === 'other'}>Other pronouns</option>
+  <option value='ask' selected={selected === 'ask'}>Ask me my pronouns</option>
+  <option value='avoid' selected={selected === 'avoid'}>Avoid pronouns, use my name</option>
+</select>

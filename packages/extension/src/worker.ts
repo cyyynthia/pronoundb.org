@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { Endpoints, WEBSITE } from '@pronoundb/shared/constants.js'
+import { Endpoints, WEBSITE } from './constants.js'
 
 // ONBOARDING & CHANGE LOGS
 chrome.runtime.onInstalled.addListener((details) => {

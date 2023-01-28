@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { WEBSITE } from '@pronoundb/shared/constants.js'
 import { initializeRuntime } from './runtime'
 import { getModule } from './modules'
 
@@ -35,7 +34,9 @@ getModule().then((currentMdl) => {
     const key = `${currentMdl.id}.enabled`
     chrome.storage.sync.get([ key ]).then(async ({ [key]: enabled }) => {
       if (enabled ?? true) {
-        if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') await initializeRuntime()
+        if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') {
+          await initializeRuntime()
+        }
 
         currentMdl.main?.()
         currentMdl.inject()
@@ -44,29 +45,3 @@ getModule().then((currentMdl) => {
     })
   }
 })
-
-if (location.origin === WEBSITE) {
-  chrome.storage.sync.get([ 'pronouns.case' ]).then(({ 'pronouns.case': pronounsCase }) => {
-    window.postMessage({
-      source: 'pronoundb',
-      payload: {
-        action: 'settings.pronouns.case',
-        pronounsCase: pronounsCase ?? 'lower',
-      },
-    }, '*')
-  })
-
-  chrome.storage.onChanged.addListener((changes) => {
-    if (changes['pronouns.case']) {
-      window.postMessage({
-        source: 'pronoundb',
-        payload: {
-          action: 'settings.pronouns.case',
-          pronounsCase: changes['pronouns.case'].newValue,
-        },
-      }, '*')
-    }
-  })
-
-  document.body.dataset.pdbExtensionVersion = import.meta.env.PDB_EXT_VERSION
-}

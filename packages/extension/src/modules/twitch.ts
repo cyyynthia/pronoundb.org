@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,13 +28,15 @@
 
 import { whisper } from '../icons/twitch'
 
-import { formatPronouns, formatPronounsShort, formatPronounsLong } from '@pronoundb/shared/format.js'
+import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
-export { default as Icon } from 'simple-icons/icons/twitch.svg'
+export const name = 'Twitch'
+export const color = '#9146FF'
 export const match = /^https:\/\/(.+\.)?twitch\.tv/
+export { default as Icon } from 'simple-icons/icons/twitch.svg'
 
 const settings = {
   chat: true,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,12 +28,14 @@
 
 import { commentDiscussion } from '../icons/octicons'
 
-import { formatPronouns } from '@pronoundb/shared/format.js'
+import { formatPronouns } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { h } from '../utils/dom'
 
-export { default as Icon } from 'simple-icons/icons/github.svg'
+export const name = 'GitHub'
+export const color = '#211F1F'
 export const match = /^https:\/\/(.+\.)?github\.com/
+export { default as Icon } from 'simple-icons/icons/github.svg'
 
 async function injectUserProfile () {
   const userId = document.querySelector<HTMLElement>('[data-scope-id]')!.dataset.scopeId

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,14 +28,16 @@
 
 import { personCard, editThin, privacyPublic } from '../icons/facebook'
 
-import { WEBSITE } from '@pronoundb/shared/constants.js'
-import { formatPronouns, formatPronounsLong } from '@pronoundb/shared/format.js'
+import { WEBSITE } from '../constants'
+import { formatPronouns, formatPronounsLong } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h } from '../utils/dom'
 
-export { default as Icon } from 'simple-icons/icons/facebook.svg'
+export const name = 'Facebook'
+export const color = '#4267B2'
 export const match = /^https:\/\/(.+\.)?facebook\.com/
+export { default as Icon } from 'simple-icons/icons/facebook.svg'
 
 async function handleProfileTilesFeed (node: HTMLElement) {
   const id = await fetchReactProp(node, [ 'child', 'child', 'memoizedProps', 'profileTileSection', '__fragmentOwner', 'variables', 'userID' ])

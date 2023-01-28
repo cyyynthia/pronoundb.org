@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,6 @@
 import type { ExtensionModule } from '../../modules'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
-import { Platforms, PlatformIds } from '@pronoundb/shared/platforms.js'
 
 import Checkbox from './form/Checkbox'
 import Select from './form/Select'
@@ -50,7 +49,6 @@ export function Unsupported () {
 }
 
 export function Main ({ module }: { module: ExtensionModule }) {
-  const platform = Platforms[module.id]
   const enabledKey = `${module.id}.enabled`
 
   const [ enabled, setEnabled ] = useState(true)
@@ -65,10 +63,10 @@ export function Main ({ module }: { module: ExtensionModule }) {
   }, [])
 
   return (
-    <main class={`flex-grow border-t-8 border-platform-${module.id} px-4 py-2 -m-px`}>
+    <main class='flex-grow border-t-8 px-4 py-2 -m-px' style={{ borderColor: module.color }}>
       <div class='flex gap-2 items-center mb-3'>
         {h(module.Icon, { class: 'w-6 h-6 fill-current' })}
-        <h2 class='text-xl font-semibold tracking-wide'>{platform.name}</h2>
+        <h2 class='text-xl font-semibold tracking-wide'>{module.name}</h2>
       </div>
 
       <Checkbox onInput={onInput} name='enabled' value={enabled} label='Enable module'/>
@@ -87,7 +85,7 @@ export function Settings () {
   }, [ setSettings ])
 
   useEffect(() => {
-    chrome.storage.sync.get([ 'pronouns.case', ...PlatformIds.map((p) => `${p}.enabled`) ])
+    chrome.storage.sync.get([ 'pronouns.case', ...modules.map((mdl) => `${mdl.id}.enabled`) ])
       .then((s) => setSettings(s))
   }, [])
 
@@ -114,7 +112,7 @@ export function Settings () {
           key={mdl.id}
           label={
             <span class='flex gap-2 items-center'>
-              {h(mdl.Icon, { class: 'w-4 h-4 fill-current' })} {Platforms[mdl.id].name}
+              {h(mdl.Icon, { class: 'w-4 h-4 fill-current' })} {mdl.name}
             </span>
           }
         />

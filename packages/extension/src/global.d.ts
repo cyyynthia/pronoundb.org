@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,6 @@
  */
 
 import '@types/chrome'
-import '@pronoundb/shared'
 
 declare global {
   // Used to test for Firefox's existence
@@ -40,13 +39,5 @@ declare global {
 
   interface Element {
     wrappedJSObject: this
-  }
-
-  interface NodeList {
-    [Symbol.iterator](): Iterator<Node | ParentNode>
-  }
-
-  interface NodeListOf<TNode extends Node> {
-    [Symbol.iterator](): Iterator<TNode>
   }
 }

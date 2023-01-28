@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,9 @@
 
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
-import { usePronouns, formatPronouns } from '@pronoundb/shared/format.js'
 
 import { ViewState } from './Views'
+import { formatPronouns } from '../../utils/pronouns'
 
 import Settings from 'feather-icons/dist/icons/settings.svg'
 import ArrowLeft from 'feather-icons/dist/icons/arrow-left.svg'
@@ -76,8 +76,7 @@ export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) 
 }
 
 export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
-  usePronouns()
-  const cute = useMemo(() => Math.floor(Math.random() * CUTE_COMMENTS.length), [])
+  const cute = useMemo(() => Math.random() * CUTE_COMMENTS.length | 0, [])
 
   return (
     <footer class='text-gray-600 dark:text-gray-200 text-sm'>

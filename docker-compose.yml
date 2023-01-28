@@ -1,41 +1,10 @@
 services:
-  # Services
-  webserver:
-    image: nginx:alpine
-    ports:
-      - 8080:80
-    volumes:
-      - ./conf/nginx.dev.conf:/etc/nginx/conf.d/default.conf
   mongo:
     image: mongo:5-focal
     ports:
       - 27017:27017
     volumes:
       - db-data:/data/db
-
-  # App
-  api:
-    environment:
-      NODE_ENV: development
-    build: .
-    working_dir: /opt/pronoundb.org/packages/api
-    command: pnpm run dev
-    volumes:
-      - ./packages:/opt/pronoundb.org/packages
-      - ./node_modules:/opt/pronoundb.org/node_modules
-      - ./config.example.json:/opt/pronoundb.org/config.example.json
-      - ./tsconfig.json:/opt/pronoundb.org/tsconfig.json
-      - ./config.json:/opt/pronoundb.org/config.json
-  website:
-    build: .
-    command: pnpm run dev -- --host
-    working_dir: /opt/pronoundb.org/packages/website
-    volumes:
-      - ./packages:/opt/pronoundb.org/packages
-      - ./node_modules:/opt/pronoundb.org/node_modules
-      - ./config.example.json:/opt/pronoundb.org/config.example.json
-      - ./pnpm-workspace.yaml:/opt/pronoundb.org/pnpm-workspace.yaml
-      - ./tsconfig.json:/opt/pronoundb.org/tsconfig.json
 
 volumes:
   db-data:

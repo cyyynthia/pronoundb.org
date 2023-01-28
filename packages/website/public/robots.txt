@@ -1,6 +1,13 @@
 User-agent: *
 Disallow: /api
 Disallow: /api/
+Disallow: /oauth
+Disallow: /oauth/
+Disallow: /shields
+Disallow: /shields/
+Disallow: /me
+Disallow: /me/
+Disallow: /onboarding
 
 User-agent: nsa
 Disallow: /

@@ -1,0 +1,26 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Contact: mailto:cynthia@maid.gg
+Expires: 2024-01-01T00:00:00.000Z
+Encryption: https://cynthia.dev/pgp.txt
+Preferred-Languages: en, fr
+Canonical: https://pronoundb.org/.well-known/security.txt
+Canonical: https://www.pronoundb.org/.well-known/security.txt
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCAAuFiEE/d9d2TTcWBRsiz6Ly1YfdNzq4jsFAmO5k+gQHGN5bnRoaWFA
+bWFpZC5nZwAKCRDLVh903OriO4M+D/9r4CsSe4Vl8EYZ44CHFoAVgfZgchCYn11R
+6S1n5g0LPQ747XsNBVqEQIPKVE0/MnyunJ2h/sI/0Ktl5f/K6fnO6Cle7uuT0pjI
+bNBJRhmUe0aeIOrT41X4ErjiXbeX5gu1u+eeFknxwEDAJcFmGb49EP3qbH8/wqPk
+KQrrLqNQXl3uOfSO+1avtvO3gKzBmvDGuT9hbr8kHHkqo40KAiw4/hIfyhMtgyxs
+y9b+LDdYiv9ALw6Ki+tUItdqQkL7NPbL0ixGbxe5Age4IQ6FCRQVk6+EF0CSaaJV
+S9JMHdS7sB4aGFLkUSomLGuRC4i82pOOYICmK++9jjS956SmLr49e3sEjDm7fUf4
+WpBDGheS9w4euiSVKF9SDt8Z2QlkWYl/pCqnlH/ajwnhYq977+jXcp2v8s/qO5+H
+dKZfAtPu5l/OApsS5Zp34rpm8veY+9CbMgjtQ0ml/Pijk/H0M6hGZqf1Mm6bx8SC
+wLIUFUOdQOrJCyHHGqp2QkdGxIjqtdYPVyecGjtnmOfmaHFvy2Q/Llje7zH9QkKK
+TSu4K7CNSNRNuWqaCOmLympURru7m5cCXKole2laJRSvfbZ+Kidpv1TO9PB2I7Lc
+HzuP4M/ZsnFrnkE/ZKyr3vyPTd4uxBgnvZL0jExkne5sN2AYpRwBfQ2bYBYFZKBF
+UQQ0CMa3tw==
+=+jVA
+-----END PGP SIGNATURE-----

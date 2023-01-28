@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,4 +26,23 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module.exports = require('@pronoundb/shared/tailwind.config.cjs')
+const colors = require('tailwindcss/colors')
+
+module.exports = {
+  darkMode: 'media',
+  content: [ './**/*.html', './src/**/*.tsx' ],
+  theme: {
+    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+    extend: {
+      colors: {
+        pink: {
+          DEFAULT: '#f49898',
+          dark: '#bb6570',
+        },
+        cyan: colors.cyan,
+        gray: colors.neutral,
+      },
+    },
+  },
+  plugins: [],
+}

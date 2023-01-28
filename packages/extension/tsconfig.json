@@ -2,7 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "types": [ "vite/client" ],
-    "outDir": "./dist",
+    "lib": [ "esnext", "dom", "dom.iterable" ],
+
     "jsx": "preserve",
     "jsxFactory": "h",
     "jsxFragmentFactory": "Fragment"

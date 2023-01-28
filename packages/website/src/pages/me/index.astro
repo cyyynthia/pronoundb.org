@@ -1,0 +1,131 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import { migrateAuth } from '@server/auth.js'
+migrateAuth(Astro)
+
+import { authenticate, createCsrf } from '@server/auth.js'
+import { handleFlash } from '@server/flash.js'
+
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import Link from '@components/Link.astro'
+import LegacyPronounsSelector from '@components/LegacyPronounsSelector.astro'
+import Platform from '@components/Platform.astro'
+
+import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
+import xSvg from 'feather-icons/dist/icons/x.svg?raw'
+
+type Platform = { name: string, color: string, icon: string }
+const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', { eager: true })
+
+const user = await authenticate(Astro)
+if (!user) return Astro.redirect('/login')
+
+const flash = handleFlash(Astro)
+const csrf = createCsrf(Astro)
+---
+<Layout flash={flash} title='My Account'>
+  <noscript>
+    <p class='mb-4 px-4 py-2 font-semibold text-red-600 border border-red-600 rounded'>
+      JavaScript is disabled in your browser. You may experience issues and changes may not be applied! Make sure to
+      enable it in your browser settings.
+    </p>
+  </noscript>
+
+  <PageHeader>My Account</PageHeader>
+  <p class='mb-1'>
+    Welcome back! Want to change your pronouns, or link a new account? You're at the right place!
+  </p>
+  <p class='mb-4'>
+    All of the changes are saved automatically, and should take no more than a minute to apply on our end. In some
+    cases, users may have pronouns in cache and will need a page reload to see the change (e.g.: on a Twitch chat)
+  </p>
+
+  <h2 class='text-xl font-bold mb-2'>Pronouns</h2>
+  <p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically.</p>
+  <LegacyPronounsSelector id='pronouns-selector' selected={user.pronouns}/>
+
+  <h2 class='text-xl font-bold mb-2'>Linked accounts</h2>
+  <p class='mb-2'>You can add or remove accounts at any time.</p>
+  <div class='grid gap-3 lg:grid-cols-2 mb-8'>
+    {user.accounts.map((account) => {
+      const platform = platforms[`../../components/platforms/${account.platform}.ts`]
+      if (!platform) return null
+
+      return (
+        <Platform color={platform.color}>
+          <Fragment>{account.name}</Fragment>
+          <Fragment slot='icon' set:html={platform.icon}/>
+          <form
+            slot='extra'
+            method='post'
+            action='/me/unlink-account'
+            onsubmit={`return confirm("Are you sure you want to unlink this ${platform.name} account? You will be able to link it back later.")`}
+            class='ml-auto w-5 h-5'
+          >
+            <input type='hidden' name='csrfToken' value={csrf}/>
+            <input type='hidden' name='platform' value={account.platform}/>
+            <input type='hidden' name='id' value={account.id}/>
+            <button class='cursor-pointer w-full h-hull' title='Unlink account' set:html={xSvg}/>
+          </form>
+        </Platform>
+      )
+    })}
+
+    <a href='/me/link'>
+      <Platform>
+        <Fragment>Add a new account</Fragment>
+        <Fragment slot='icon' set:html={userPlusSvg}/>
+      </Platform>
+    </a>
+  </div>
+
+  <h2 class='text-xl font-bold mb-2'>Advanced settings</h2>
+  <p class='mb-1'>PronounDB ID: <code class='bg-gray-200 px-1 rounded dark:bg-gray-700'>{user._id.toString()}</code></p>
+  <p class='mb-4'>This ID may be useful for some of the <Link href='/docs'>API endpoints</Link>.</p>
+
+  <h3 class='text-lg font-semibold mb-2'>Delete my account</h3>
+  <p class='mb-1'>
+    Want to delete your account? You can delete your account at any time by pressing the button below.
+    I'd be very sad to see you go though... :'(
+  </p>
+  <p class='mb-4'>Be careful, the action is immediate and irreversible!</p>
+  <form method='post' action='/me/delete' onsubmit='return confirm("Are you sure? This action is irreversible!")'>
+    <input type='hidden' name='csrfToken' value={csrf}/>
+    <button class='text-red-600 border-red-600 font-semibold py-1 px-3 border rounded dark:text-red-orange dark:border-red-orange'>
+      Delete my account
+    </button>
+  </form>
+</Layout>
+
+<script>
+  const selector = document.getElementById('pronouns-selector') as HTMLSelectElement
+  selector.addEventListener('change', () => fetch('/me/set-pronouns', { method: 'PUT', body: selector.value }))
+</script>

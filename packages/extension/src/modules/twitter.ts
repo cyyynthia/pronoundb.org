@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,13 +28,15 @@
 
 import { topics } from '../icons/twitter'
 
-import { formatPronouns } from '@pronoundb/shared/format.js'
+import { formatPronouns } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
 
-export { default as Icon } from 'simple-icons/icons/twitter.svg'
+export const name = 'Twitter'
+export const color = '#1DA1F2'
 export const match = /^https:\/\/(.+\.)?twitter\.com/
+export { default as Icon } from 'simple-icons/icons/twitter.svg'
 
 async function injectProfileHeader (username?: string) {
   let header: HTMLElement

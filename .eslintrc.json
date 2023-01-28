@@ -35,10 +35,8 @@
     "no-sparse-arrays": "error",
     "no-unreachable-loop": "error",
     "no-useless-backreference": "error",
-    "require-atomic-updates": "error",
 
     // Best practices
-    "class-methods-use-this": "error",
     "default-case-last": "error",
     "default-param-last": "error",
     "dot-location": [ "error", "property" ],
@@ -62,7 +60,6 @@
     "no-lone-blocks": "error",
     "no-loop-func": "error",
     "no-multi-spaces": "error",
-    "no-new": "error",
     "no-new-wrappers": "error",
     "no-octal": "error",
     "no-octal-escape": "error",
@@ -83,7 +80,6 @@
     // Vars
     "@typescript-eslint/no-shadow": "error",
     "no-undefined": "error",
-    "@typescript-eslint/no-use-before-define": "error",
 
     // Stylistic
     "array-bracket-newline": [ "error", "consistent" ],

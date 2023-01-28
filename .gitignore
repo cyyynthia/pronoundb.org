@@ -1,9 +1,12 @@
 .vscode
 .idea
 
-node_modules
 dist
+node_modules
+
 *.nogit/
 *.nogit.*
-config.json
-conf/nginx.custom.conf
+
+.env
+.env.*
+!.env.example

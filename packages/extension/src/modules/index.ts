@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Cynthia Rey, All rights reserved.
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,18 +29,20 @@
 import type { ComponentType } from 'preact'
 
 export type ExtensionModule = {
-  Icon: ComponentType<any>
   id: string
+  name: string
+  color: string
   match: RegExp
+  Icon: ComponentType<any>
   inject: () => void
   main?: () => void
 }
 
 const modules: ExtensionModule[] = []
-const rawModules = import.meta.globEager('./*.ts')
+const rawModules = import.meta.glob<ExtensionModule>('./*.ts', { eager: true })
 for (const mdl in rawModules) {
   if (mdl in rawModules) {
-    modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) } as ExtensionModule)
+    modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) })
   }
 }
 

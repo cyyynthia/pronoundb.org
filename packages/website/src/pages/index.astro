@@ -1,0 +1,125 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import { migrateAuth } from '@server/auth.js'
+migrateAuth(Astro)
+
+import * as twitter from '@components/platforms/twitter.js'
+import * as twitch from '@components/platforms/twitch.js'
+import * as github from '@components/platforms/github.js'
+
+import { handleFlash } from '@server/flash.js'
+import getStats from '@server/stats.js'
+
+import Layout from '@layouts/Layout.astro'
+import Link from '@components/Link.astro'
+import StoreButton from '@components/StoreButton.astro'
+import PlatformGrid from '@components/PlatformGrid.astro'
+import Platform from '@components/Platform.astro'
+
+import globeSvg from 'feather-icons/dist/icons/globe.svg?raw'
+
+const stats = getStats()
+const flash = handleFlash(Astro)
+---
+<Layout flash={flash}>
+	<div class='my-12 text-center'>
+		<h1 class='text-3xl font-semibold mb-6'>
+			Get people's pronouns right, all the time, without struggling
+		</h1>
+		<div class='flex flex-col gap-y-1 text-xl'>
+			<p>Keeping track of everyone's pronouns can be complicated, and unfortunate mistakes can happen.</p>
+			<p>PronounDB makes it easy for you to share your pronouns, so people can use the right ones without even asking.</p>
+			<p>It also helps you know the pronouns of the people you discuss with.</p>
+			<p>There's {stats.users} people sharing their pronouns! Join them now!</p>
+		</div>
+	</div>
+	<div class='flex flex-col md:flex-row gap-6 mb-6'>
+		<StoreButton
+			store='chrome'
+			version={stats.chrome.version}
+			users={stats.chrome.users}
+			stars={stats.chrome.rating}
+			url='https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf'
+		/>
+		<StoreButton
+			store='firefox'
+			version={stats.firefox.version}
+			users={stats.firefox.users}
+			stars={stats.firefox.rating}
+			url='https://addons.mozilla.org/firefox/addon/pronoundb'
+		/>
+		<StoreButton
+			store='edge'
+			version={stats.edge.version}
+			users={stats.edge.users}
+			stars={stats.edge.rating}
+			url='https://microsoftedge.microsoft.com/addons/detail/jbgjogfdlgjohdacngknlohahhaiaodn'
+		/>
+	</div>
+
+  <p class='mb-6'>
+    Feeling unsure about what pronouns are about? Make sure to give the <Link href='/pronouns-101'>Pronouns 101</Link>
+    guide a look!
+  </p>
+	<hr class='border-gray-200 dark:border-gray-700'/>
+
+	<section>
+		<h2 class='text-2xl font-bold mt-8 mb-4'>Elegant integrations, as if pronouns were always there</h2>
+		<p class='text-lg mb-4'>
+			PronounDB is carefully designed so pronouns integrate smoothly within websites, matching their design language
+			and injecting in sensible places. You'll find pronouns right where you expect them to be.
+		</p>
+		<p class='text-lg mb-4'>
+			See which platforms PronounDB supports and how it looks on your favorite one:
+		</p>
+		<PlatformGrid>
+			<Platform color={twitch.color}>
+				<Fragment>Twitch</Fragment>
+				<Fragment slot='icon' set:html={twitch.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+			<Platform color={twitter.color}>
+				<Fragment>Twitter</Fragment>
+				<Fragment slot='icon' set:html={twitter.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+			<Platform color={github.color}>
+				<Fragment>GitHub</Fragment>
+				<Fragment slot='icon' set:html={github.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+			<Platform>
+				<Fragment>...and more!</Fragment>
+				<Fragment slot='icon' set:html={globeSvg}/>
+				<Link slot='sub' href='/supported'>See all supported platforms</Link>
+			</Platform>
+		</PlatformGrid>
+	</section>
+</Layout>
