@@ -42,6 +42,7 @@ export type OAuth2Params = {
   tokenUrl: string
   scopes: string[]
 
+  callback?: (oauth: OAuth2Params, code: string, redirect_uri: string) => Promise<Response>
   getSelf: (token: string) => Promise<ExternalAccount | FlashMessage | null>
 }
 
@@ -87,23 +88,30 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
   }
 
   const cleanRedirectUrl = new URL(url.pathname, site)
-  const res = await fetch(oauth.tokenUrl, {
-    method: 'POST',
-    headers: {
-      accept: 'application/json',
-      'content-type': 'application/x-www-form-urlencoded',
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-    },
-    body: encode({
-      state: state,
-      client_id: oauth.clientId,
-      client_secret: oauth.clientSecret,
-      redirect_uri: cleanRedirectUrl.href,
-      scope: oauth.scopes.join(' '),
-      grant_type: 'authorization_code',
-      code: code,
-    }),
-  })
+
+  let res: Response | undefined
+
+  if (oauth.callback) res = await oauth.callback(oauth, code, cleanRedirectUrl.href)
+
+  else {
+    res = await fetch(oauth.tokenUrl, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'content-type': 'application/x-www-form-urlencoded',
+        'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+      },
+      body: encode({
+        state: state,
+        client_id: oauth.clientId,
+        client_secret: oauth.clientSecret,
+        redirect_uri: cleanRedirectUrl.href,
+        scope: oauth.scopes.join(' '),
+        grant_type: 'authorization_code',
+        code: code,
+      }),
+    })
+  }
 
   if (!res.ok) {
     return null
