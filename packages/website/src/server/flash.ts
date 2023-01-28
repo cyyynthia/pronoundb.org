@@ -55,9 +55,10 @@ export const FlashMessages = <const> {
 
 export function handleFlash ({ cookies }: AstroGlobal) {
   const flashId = cookies.get('flash').value
-  if (flashId) {
+  if (flashId && flashId) {
     cookies.delete('flash')
-    return FlashMessages[flashId as FlashMessage]
+    const msg = FlashMessages[flashId as FlashMessage]
+    return msg ? { id: flashId, message: msg } : void 0
   }
 
   return void 0

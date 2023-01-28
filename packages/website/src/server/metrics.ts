@@ -32,6 +32,11 @@ import { collection } from './database/account.js'
 const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true })
 const providers = Object.keys(providersGlob).map((k) => k.slice(26, -3))
 
+if (import.meta.env.DEV) {
+  // Ensure hot-reload doesn't brick metrics
+  register.clear()
+}
+
 collectDefaultMetrics({
   prefix: 'pronoundb_',
 })

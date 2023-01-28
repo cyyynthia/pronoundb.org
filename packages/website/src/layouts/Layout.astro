@@ -36,7 +36,7 @@ import checkSvg from 'feather-icons/dist/icons/check-circle.svg?raw'
 export interface Props {
 	title?: string
 	description?: string
-	flash: string | undefined
+	flash: { id: string, message: string } | undefined
 }
 
 const DEFAULT_DESCRIPTION = 'PronounDB is a browser extension that helps people know each other\'s pronouns easily and instantly.'
@@ -46,7 +46,7 @@ const description = d || DEFAULT_DESCRIPTION
 const title = t ? `${t} • PronounDB` : 'PronounDB'
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site)
 
-const [ flashIcon, flashColor ] = flash?.startsWith('S_')
+const [ flashIcon, flashColor ] = flash?.id.startsWith('S_')
 	? [ checkSvg, 'text-green-700 border-green-700 dark:text-green-400 dark:border-green-400' ]
 	: [ alertSvg, 'text-red-600 border-red-600 dark:text-red-orange dark:border-red-orange' ]
 ---
@@ -78,7 +78,7 @@ const [ flashIcon, flashColor ] = flash?.startsWith('S_')
 			{flash && (
 				<div class={`flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded ${flashColor}`}>
 					<div class='w-6 h-6' set:html={flashIcon}/>
-					<p>{flash}</p>
+					<p>{flash.message}</p>
 				</div>
 			)}
 			<slot/>

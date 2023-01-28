@@ -93,6 +93,7 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
       accept: 'application/json',
       'content-type': 'application/x-www-form-urlencoded',
       'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+      authorization: `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`,
     },
     body: encode({
       state: state,

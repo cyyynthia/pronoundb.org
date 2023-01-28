@@ -76,7 +76,7 @@ export async function get (ctx: APIContext) {
 
   if (intent === 'link') {
     const existingAccount = await findByExternalAccount(external)
-    if (existingAccount && existingAccount._id.equals(user!._id)) {
+    if (existingAccount && !existingAccount._id.equals(user!._id)) {
       setFlash(ctx, 'E_ACCOUNT_TAKEN')
       return ctx.redirect('/me')
     }
