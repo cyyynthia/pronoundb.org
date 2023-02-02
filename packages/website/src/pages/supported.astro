@@ -47,7 +47,7 @@ type PlatformInfo = {
   thirdPartyOnly?: boolean
 }
 
-const platforms = Object.values(
+const platforms: PlatformInfo[] = Object.values(
   import.meta.glob<PlatformInfo>('../components/platforms/*.ts', { eager: true })
 )
 

@@ -99,7 +99,7 @@ export function createCsrf ({ cookies }: APIContext): string {
 
   const csrf = randomBytes(64)
   csrfStore.set(token, csrf)
-  setTimeout(() => csrfStore.delete(token), 300e3)
+  setTimeout(() => csrfStore.delete(token), 1800e3)
   return csrf.toString('base64url')
 }
 

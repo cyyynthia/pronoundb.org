@@ -29,6 +29,7 @@
 import type { APIContext } from 'astro'
 import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
+import { providers } from '@server/oauth/providers.js'
 
 export async function get (ctx: APIContext) {
   const platform = ctx.url.searchParams.get('platform')
@@ -40,6 +41,17 @@ export async function get (ctx: APIContext) {
         errorCode: 400,
         error: 'Bad request',
         message: '`platform` and `id` query parameters are required.',
+      }),
+      { status: 400, headers: { 'content-type': 'application/json' } }
+    )
+  }
+
+  if (!providers.includes(platform)) {
+    return new Response(
+      JSON.stringify({
+        errorCode: 400,
+        error: 'Bad request',
+        message: '`platform` is not a valid platform.',
       }),
       { status: 400, headers: { 'content-type': 'application/json' } }
     )

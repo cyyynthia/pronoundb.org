@@ -15,21 +15,21 @@
   },
   "dependencies": {
     "fast-jwt": "^2.1.0",
-    "mongodb": "^4.13.0",
+    "mongodb": "^5.0.0",
     "prom-client": "^14.1.1"
   },
   "devDependencies": {
-    "@astrojs/node": "^5.0.1",
-    "@astrojs/tailwind": "^3.0.0",
+    "@astrojs/node": "^5.0.2",
+    "@astrojs/tailwind": "^3.0.1",
     "@types/node": "^18.11.18",
-    "@typescript-eslint/eslint-plugin": "^5.49.0",
-    "@typescript-eslint/parser": "^5.49.0",
-    "astro": "^2.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.50.0",
+    "@typescript-eslint/parser": "^5.50.0",
+    "astro": "^2.0.5",
     "dotenv": "^16.0.3",
-    "eslint": "^8.32.0",
+    "eslint": "^8.33.0",
     "feather-icons": "^4.29.0",
-    "simple-icons": "^8.3.0",
+    "simple-icons": "^8.4.0",
     "tailwindcss": "^3.2.4",
-    "typescript": "^4.9.4"
+    "typescript": "^4.9.5"
   }
 }

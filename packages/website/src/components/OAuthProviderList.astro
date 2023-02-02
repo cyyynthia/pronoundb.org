@@ -27,18 +27,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { providers } from '@server/oauth/providers.js'
+
 import PlatformGrid from './PlatformGrid.astro'
 import Platform from './Platform.astro'
+
 
 export interface Props {
   intent: 'login' | 'register' | 'link'
 }
 
 type Platform = { name: string, color: string, icon: string }
-
 const platforms = import.meta.glob<Platform>('./platforms/*.ts', { eager: true })
-const providersGlob = import.meta.glob('../server/oauth/platforms/*.ts', { eager: true })
-const providers = Object.keys(providersGlob).map((k) => k.slice(26, -3))
 
 const { intent } = Astro.props
 ---

@@ -28,7 +28,8 @@
 
 import type { APIContext } from 'astro'
 import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram } from '@server/metrics.js'
-import { type PronounsOfUser, findPronounsOf } from '@server/database/account.js'
+import { findPronounsOf } from '@server/database/account.js'
+import { providers } from '@server/oauth/providers.js'
 
 export async function get (ctx: APIContext) {
   const platform = ctx.url.searchParams.get('platform')
@@ -40,6 +41,17 @@ export async function get (ctx: APIContext) {
         errorCode: 400,
         error: 'Bad request',
         message: '`platform` and `ids` query parameters are required.',
+      }),
+      { status: 400, headers: { 'content-type': 'application/json' } }
+    )
+  }
+
+  if (!providers.includes(platform)) {
+    return new Response(
+      JSON.stringify({
+        errorCode: 400,
+        error: 'Bad request',
+        message: '`platform` is not a valid platform.',
       }),
       { status: 400, headers: { 'content-type': 'application/json' } }
     )
@@ -60,13 +72,11 @@ export async function get (ctx: APIContext) {
 
   const cursor = findPronounsOf(platform, Array.from(ids))
   const res = Object.create(null)
-  let user: PronounsOfUser | null
-  while ((user = await cursor.next())) {
+  for await (const user of cursor) {
     res[user.account.id] = user.pronouns
     ids.delete(user.account.id)
   }
 
-  await cursor.close()
   const idsHitCount = idsCount - ids.size
   for (const id of ids) {
     res[id] = 'unspecified'

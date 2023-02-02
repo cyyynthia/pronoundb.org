@@ -1,4 +1,3 @@
----
 /*
  * Copyright (c) Cynthia Rey et al., All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
@@ -27,29 +26,5 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { migrateAuth } from '@server/auth.js'
-migrateAuth(Astro)
-
-import { handleFlash } from '@server/flash.js'
-import { authenticate } from '@server/auth.js'
-
-import Layout from '@layouts/Layout.astro'
-import PageHeader from '@components/PageHeader.astro'
-import Link from '@components/Link.astro'
-import OAuthProviderList from '@components/OAuthProviderList.astro'
-
-if (await authenticate(Astro)) return Astro.redirect('/me')
-const flash = handleFlash(Astro)
----
-<Layout flash={flash} title='Register an account'>
-  <PageHeader>
-    <Fragment slot='namespace'>Authentication</Fragment>
-    <Fragment>Register an account</Fragment>
-  </PageHeader>
-
-  <p class='mb-2'>
-    Make sure to give the <Link href='/privacy'>Privacy Policy</Link> a look.
-    Registering an account on PronounDB will be seen as an acceptance of it.
-  </p>
-  <OAuthProviderList intent='register'/>
-</Layout>
+const providersGlob = import.meta.glob('./platforms/*.ts', { eager: true })
+export const providers = Object.keys(providersGlob).map((k) => k.slice(12, -3))

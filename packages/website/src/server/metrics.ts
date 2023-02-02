@@ -28,9 +28,7 @@
 
 import { register, collectDefaultMetrics, Counter, Histogram, Gauge } from 'prom-client'
 import { collection } from './database/account.js'
-
-const providersGlob = import.meta.glob('./oauth/platforms/*.ts', { eager: true })
-const providers = Object.keys(providersGlob).map((k) => k.slice(18, -3))
+import { providers } from './oauth/providers.js'
 
 if (import.meta.env.DEV) {
   // Ensure hot-reload doesn't brick metrics
