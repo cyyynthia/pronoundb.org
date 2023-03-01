@@ -50,7 +50,7 @@ const states = new Set<string>()
 export async function authorize ({ url, params, cookies, redirect, site }: APIContext, oauth: OAuth2Params) {
   const intent = url.searchParams.get('intent') ?? 'login'
   const callbackPath = new URL('callback', url).pathname
-  const callbackUrl = new URL(callbackPath, site).href
+  const callbackUrl = new URL(callbackPath, site)
 
   const state = randomUUID()
   const fullState = `${params.platform}-${state}-${intent}`
@@ -62,11 +62,11 @@ export async function authorize ({ url, params, cookies, redirect, site }: APICo
     response_type: 'code',
     scope: oauth.scopes.join(' '),
     client_id: oauth.clientId,
-    redirect_uri: callbackUrl,
+    redirect_uri: callbackUrl.href,
   })
 
-  cookies.set('state', state, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  cookies.set('intent', intent, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+  cookies.set('state', state, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+  cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
   return redirect(`${oauth.authorizationUrl}?${q}`)
 }
 

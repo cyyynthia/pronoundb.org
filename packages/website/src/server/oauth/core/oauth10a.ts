@@ -127,13 +127,13 @@ const pending = new Map<string, Authorization>()
 export async function authorize (ctx: APIContext, oauth: OAuth1Params) {
   const intent = ctx.url.searchParams.get('intent') ?? 'login'
   const callbackPath = new URL('callback', ctx.url).pathname
-  const callbackUrl = new URL(callbackPath, ctx.site).href
+  const callbackUrl = new URL(callbackPath, ctx.site)
 
   const { nonce, response } = await authenticatedFetch(oauth.requestUrl, {
     method: 'POST',
     token: { clientId: oauth.clientId, clientSecret: oauth.clientSecret },
     headers: { 'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)' },
-    body: { oauth_callback: callbackUrl },
+    body: { oauth_callback: callbackUrl.href },
   })
 
   if (!response.ok) {
@@ -151,8 +151,8 @@ export async function authorize (ctx: APIContext, oauth: OAuth1Params) {
   pending.set(fullToken, { nonce: nonce, secret: requestToken.oauth_token_secret })
   setTimeout(() => pending.delete(fullToken), 300e3)
 
-  ctx.cookies.set('nonce', nonce, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  ctx.cookies.set('intent', intent, { path: callbackUrl, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+  ctx.cookies.set('nonce', nonce, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+  ctx.cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
   return ctx.redirect(`${oauth.authorizationUrl}?oauth_token=${requestToken.oauth_token}`)
 }
 
