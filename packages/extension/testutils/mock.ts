@@ -39,10 +39,6 @@ const TestPronouns: Record<string, Record<string, string>> = {
     // cyyynthia_
     103493295: 'ii',
   },
-  facebook: {
-    // Test account associated to the PronounDB Facebook App
-    100081064205146: 'sh',
-  },
 }
 
 export function processRequest (urlStr: string): any {

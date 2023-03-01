@@ -83,7 +83,6 @@ export default function manifest (): Plugin {
             js: [ chunks.wrapper.name ],
             matches: [
               'https://*.discord.com/*',
-              'https://*.facebook.com/*',
               'https://*.github.com/*',
               'https://*.modrinth.com/*',
               'https://*.twitch.tv/*',

@@ -32,7 +32,6 @@ import { providers } from '@server/oauth/providers.js'
 import PlatformGrid from './PlatformGrid.astro'
 import Platform from './Platform.astro'
 
-
 export interface Props {
   intent: 'login' | 'register' | 'link'
 }
@@ -43,17 +42,17 @@ const platforms = import.meta.glob<Platform>('./platforms/*.ts', { eager: true }
 const { intent } = Astro.props
 ---
 <PlatformGrid>
-{providers.map((provider) => {
-  const platform = platforms[`./platforms/${provider}.ts`]
-  if (!platform) return null
+  {providers.map((provider) => {
+    const platform = platforms[`./platforms/${provider}.ts`]
+    if (!platform) return null
 
-  return (
-    <a href={`/oauth/${provider}/authorize?intent=${intent}`}>
-      <Platform color={platform.color}>
-        <Fragment>Connect with {platform.name}</Fragment>
-        <Fragment slot='icon' set:html={platform.icon}/>
-      </Platform>
-    </a>
-  )
-})}
+    return (
+      <a href={`/oauth/${provider}/authorize?intent=${intent}`}>
+        <Platform color={platform.color}>
+          <Fragment>Connect with {platform.name}</Fragment>
+          <Fragment slot='icon' set:html={platform.icon}/>
+        </Platform>
+      </a>
+    )
+  })}
 </PlatformGrid>
