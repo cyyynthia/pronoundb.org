@@ -82,8 +82,12 @@ export function findPronounsOf (platform: string, externalIds: string[]) {
   return collection.aggregate<PronounsOfUser>([
     {
       $match: {
-        'accounts.platform': platform,
-        'accounts.id': { $in: externalIds },
+        accounts: {
+          $elemMatch: {
+            platform: platform,
+            id: { $in: externalIds },
+          },
+        },
       },
     },
     {
