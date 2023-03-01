@@ -36,7 +36,7 @@ test('Profile shows pronouns', async ({ page }) => {
 
 test('Tweet show pronouns (full view)', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('article >> text=, 2022 >> xpath=../../.. >> text=it/its')).toHaveCount(1)
+  await expect(page.locator('article').nth(0).locator('text=, 2022 >> xpath=../.. >> text=it/its')).toHaveCount(1)
 })
 
 test('Tweet show pronouns (inline view)', async ({ page }) => {
@@ -87,10 +87,12 @@ test.describe('Implementation quirks', () => {
     await page.waitForLoadState('networkidle')
     await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toHaveCount(1)
 
-    const cell = page.locator('[data-testid="UserCell"] a').first()
-    await cell.scrollIntoViewIfNeeded()
-    await page.mouse.wheel(0, 500)
-    await cell.click()
+    const locator = page.locator('article:has([data-testid="socialContext"]:has-text("Retweeted"))')
+    while (!await locator.count()) await page.mouse.wheel(0, 100)
+
+    const user = locator.locator('[data-testid^="UserAvatar-Container"] a').first()
+    await user.click()
+
     await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=they/them')).toHaveCount(1)
 
     await page.goBack()

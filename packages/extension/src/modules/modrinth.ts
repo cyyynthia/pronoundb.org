@@ -97,33 +97,38 @@ async function processTeamMembers () {
   ])
   if (!members) return
 
-  for (const member of members) {
-    const pronouns = await fetchPronouns('github', member.user.github_id.toString())
+  // Weird Firefox behavior telling me I don't have access to the object if I use .map
+  const promises = []
+  for (let i = 0; i < members.length; i++) {
+    promises.push(fetchPronouns('github', members[i].user.github_id.toString()))
+  }
+
+  const membersPronouns = await Promise.all(promises)
+  for (let i = 0; i < members.length; i++) {
+    const member = members[i]
+    const pronouns = membersPronouns[i]
     if (pronouns === 'unspecified') continue
 
-    // I will not comment on this absolute... yeah. very good (:
-    for (const platform of [ '.extra-info-desktop', '.extra-info-mobile' ]) {
-      const linkEl = document.querySelector(`${platform} .team-member .member-info a[href='/user/${member.name}']`)
-      if (!linkEl) continue
+    const linkEl = document.querySelector(`.normal-page__info .team-member .member-info a[href='/user/${member.name}']`)
+    if (!linkEl) continue
 
-      const newLink = linkEl.cloneNode(true)
-      const p = newLink.firstChild as HTMLElement
-      p.style.margin = '0'
+    const newLink = linkEl.cloneNode(true)
+    const p = newLink.firstChild as HTMLElement
+    p.style.margin = '0'
 
-      linkEl.parentElement?.replaceChild(
+    linkEl.parentElement?.replaceChild(
+      h(
+        'div',
+        { style: css({ display: 'flex', alignItems: 'center', gap: '4px', margin: '0.2rem 0' }) },
+        newLink,
         h(
-          'div',
-          { style: css({ display: 'flex', alignItems: 'center', gap: '4px', margin: '0.2rem 0' }) },
-          newLink,
-          h(
-            'span',
-            { style: css({ fontSize: 'var(--font-size-xs)' }) },
-            `(${formatPronouns(pronouns)})`
-          )
-        ),
-        linkEl
-      )
-    }
+          'span',
+          { style: css({ fontSize: 'var(--font-size-xs)' }) },
+          `(${formatPronouns(pronouns)})`
+        )
+      ),
+      linkEl
+    )
   }
 }
 
@@ -139,7 +144,7 @@ async function processTeamMembers () {
 // }
 
 function processPage () {
-  if (document.querySelector('.extra-info-desktop .team-member')) {
+  if (document.querySelector('.normal-page__info .team-member')) {
     processTeamMembers()
   }
 

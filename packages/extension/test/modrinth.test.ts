@@ -37,7 +37,7 @@ test('Profile shows pronouns', async ({ page }) => {
 test('Mod page shows developers\' pronouns', async ({ page }) => {
   await page.goto('https://modrinth.com/mod/sodium')
 
-  const devLocator = page.locator('.extra-info-desktop.card .team-member')
+  const devLocator = page.locator('.normal-page__info .team-member')
   await expect(devLocator.first()).toBeVisible()
   const devs = await devLocator.count()
 
@@ -68,7 +68,7 @@ test.describe('Implementation quirks', () => {
 
     await page.click('.project-card a')
 
-    const devLocator = page.locator('.extra-info-desktop.card .team-member')
+    const devLocator = page.locator('.normal-page__info .team-member')
     await expect(devLocator.first()).toBeVisible()
     const devs = await devLocator.count()
 

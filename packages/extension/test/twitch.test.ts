@@ -49,7 +49,7 @@ test.beforeAll(() => {
         conn.send(`:${nick}!${nick}@${nick}.tmi.twitch.tv JOIN ${channel}\n`)
         conn.send(`:tmi.twitch.tv ROOMSTATE ${channel}\n`)
 
-        const MSG_PREFIX = '@color=#F49898;user-id=103493295 :cyyynthia_!cyyynthia_@cyyynthia_.tmi.twitch.t\n'
+        const MSG_PREFIX = '@color=#F49898;user-id=103493295 :cyyynthia_!cyyynthia_@cyyynthia_.tmi.twitch.tv\n'
         setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow.\n`), 1500)
         setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow?\n`), 1750)
         setTimeout(() => conn.send(`${MSG_PREFIX} PRIVMSG ${channel} :Meow!!\n`), 2000)
@@ -86,7 +86,7 @@ test.use({
 
 test('About section shows pronouns (main stream page)', async ({ page }) => {
   await page.goto('https://www.twitch.tv/cyyynthia_', { timeout: 10e3 })
-  await page.locator('.home-header-sticky >> text=Chat').click().catch()
+  await page.locator('[data-a-target="channel-home-tab-Chat"]').click().catch()
   await expect(page.locator('[data-a-target="about-panel"]')).toContainText('it/its')
 })
 

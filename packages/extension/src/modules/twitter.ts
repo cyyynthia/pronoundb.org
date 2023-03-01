@@ -77,14 +77,14 @@ async function injectProfileHeader (username?: string) {
 }
 
 async function injectTweet (tweet: HTMLElement) {
-  const directId = await fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ])
-  const retweetId = await fetchReactProp(tweet.parentElement!, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
+  const directId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ])
+  const retweetId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
 
   const pronouns = await fetchPronouns('twitter', retweetId || directId)
   if (pronouns === 'unspecified') return
 
   const dateContainer = tweet.querySelector(tweet.dataset.testid === 'tweet' ? 'a time' : 'time')?.parentElement
-  const parentContainer = dateContainer?.parentElement?.parentElement
+  const parentContainer = dateContainer?.parentElement
   if (!dateContainer || !parentContainer) return
 
   const containerClass = dateContainer.className
