@@ -77,13 +77,13 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
   const code = url.searchParams.get('code')
 
   if (!stateCookie || !intentCookie || !state || !code) {
-    return null
+    return 'E_CSRF'
   }
 
   const fullState = `${params.platform}-${state}-${intentCookie}`
   const expectedState = `${params.platform}-${stateCookie}-${intentCookie}`
   if (fullState !== expectedState || !states.delete(fullState)) {
-    return null
+    return 'E_CSRF'
   }
 
   const cleanRedirectUrl = new URL(url.pathname, site)

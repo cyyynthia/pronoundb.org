@@ -163,13 +163,13 @@ export async function callback ({ url, params, cookies }: APIContext, oauth: OAu
   const verifier = url.searchParams.get('oauth_verifier')
 
   if (!nonceCookie || !intentCookie || !token || !verifier) {
-    return null
+    return 'E_CSRF'
   }
 
   const fullToken = `${params.platform}-${token}-${intentCookie}`
   const authorization = pending.get(fullToken)
   if (!authorization || nonceCookie !== authorization.nonce) {
-    return null
+    return 'E_CSRF'
   }
 
   pending.delete(fullToken)
