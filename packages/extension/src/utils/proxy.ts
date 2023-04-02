@@ -41,7 +41,7 @@ export function fetchPropUnchecked (target: HTMLElement, propPath: QueryElement[
 
     const queue = [ res ]
     res = null
-    while (queue.length) {
+    for (let i = 0; i < 1_000 && queue.length; i++) {
       const el = queue.shift()
       if (prop.$find in el) {
         res = el

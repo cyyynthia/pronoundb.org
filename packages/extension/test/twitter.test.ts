@@ -41,7 +41,7 @@ test('Tweet show pronouns (full view)', async ({ page }) => {
 
 test('Tweet show pronouns (inline view)', async ({ page }) => {
   await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
-  await expect(page.locator('article:has-text("Meow!!!") >> [data-testid="User-Names"] >> text=it/its')).toHaveCount(1)
+  await expect(page.locator('article:has-text("Meow!!!") >> [data-testid="User-Name"] >> text=it/its')).toHaveCount(1)
 })
 
 test('Quoted tweet show pronouns', async ({ page }) => {
@@ -75,7 +75,7 @@ test.describe('Implementation quirks', () => {
     while (!await locator.count()) await page.mouse.wheel(0, 100)
 
     const tweet = page.locator('[data-testid="tweet"]', { has: locator })
-    const el = tweet.locator('[data-testid="User-Names"]').first()
+    const el = tweet.locator('[data-testid="User-Name"]').first()
 
     await el.scrollIntoViewIfNeeded()
     await expect(el).toContainText('they/them')

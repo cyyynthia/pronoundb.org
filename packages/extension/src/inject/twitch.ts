@@ -26,20 +26,40 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import '@types/chrome'
+import { fetchReactProp } from '../utils/proxy'
 
-declare global {
-  // Used to test for Firefox's existence
-  const browser: undefined | typeof chrome
+export default function () {
+  const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')
 
-  const cloneInto: (object: any, ctx: any, opts?: any) => void
+  window.addEventListener('message', async (e) => {
+    if (e.source === window && e.data?.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'ttv.inject-chat') {
+        const chat = document.querySelector<HTMLElement>('.chat-list--default')
+        if (!chat) return
 
-  interface Window {
-    wrappedJSObject: this
-    __BUILD_CHUNK__: Record<string, string>
-  }
+        const handler = await fetchReactProp(chat, [ { $find: 'messageHandlerAPI', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messageHandlerAPI' ])
+        if (handler[kOriginalHandler]) return
 
-  interface Element {
-    wrappedJSObject: this
-  }
+        const ogDesc = Reflect.getOwnPropertyDescriptor(handler, 'handleMessage')!
+        Reflect.defineProperty(handler, kOriginalHandler, ogDesc)
+
+        const patchedHandleMessage = (m: any) => {
+          if (m.user) m.id = `${m.user.userID}::${m.id}`
+          handler[kOriginalHandler](m)
+        }
+
+        Reflect.defineProperty(handler, 'handleMessage', {
+          value: import.meta.env.PDB_BROWSER_TARGET !== 'chrome'
+            ? cloneInto(patchedHandleMessage, window, { cloneFunctions: true })
+            : patchedHandleMessage,
+        })
+
+        const messages = await fetchReactProp(chat, [ { $find: 'messagesHash', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messagesHash' ])
+        for (const m of messages) {
+          if (m.user) m.id = `${m.user.userID}::${m.id}`
+        }
+      }
+    }
+  })
 }

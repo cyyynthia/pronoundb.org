@@ -73,11 +73,13 @@ async function injectChat (element: HTMLElement) {
     const username = element.dataset.aUser
     if (!username) return
     if (!(username in usersCache)) {
-      // eslint-disable-next-line require-atomic-updates
-      usersCache[username] = await fetchReactProp(element, [ 'return', 'key' ]).then((s: string) => s.split('-')[0])
-    }
+      userId = await fetchReactProp(element, [ 'return', 'key' ]).then((s: string) => s.split('-')[0])
+      if (!userId) return
 
-    userId = usersCache[username]
+      usersCache[username] = userId
+    } else {
+      userId = usersCache[username]
+    }
   }
 
   const pronouns = await fetchPronouns('twitch', userId)
@@ -116,6 +118,43 @@ async function injectChat (element: HTMLElement) {
   if (!document.querySelector('.chat-paused-footer')) {
     const scroller = document.querySelector('[data-a-target="chat-scroller"] .simplebar-scroll-content')
     scroller?.scrollTo(0, scroller.scrollHeight)
+  }
+}
+
+async function inject7tvChat (message: HTMLElement) {
+  const messageId = message.getAttribute('msg-id')
+  if (!messageId || !messageId.includes('::')) return
+
+  const userId = messageId.split('::')[0]
+  const pronouns = await fetchPronouns('twitch', userId)
+  if (pronouns === 'unspecified') return
+
+  const user = message.querySelector<HTMLElement>('.seventv-chat-user')
+  if (!user) return
+
+  if (settings.chatStyle === 'badge') {
+    user.insertBefore(
+      h(
+        'div',
+        {
+          class: 'pronoundb-chat-badge',
+          style: css({ display: 'inline', position: 'relative', bottom: '-1px', marginRight: '4px' }),
+        },
+        createBadge(pronouns)
+      ),
+      user.firstChild!
+    )
+  } else {
+    user.appendChild(
+      h(
+        'span',
+        {
+          class: 'pronoundb-chat-inline',
+          style: css({ opacity: '0.7' }),
+        },
+        ` (${formatPronounsShort(pronouns)})`
+      )
+    )
   }
 }
 
@@ -216,12 +255,23 @@ function handleMutation (nodes: MutationRecord[]) {
             injectChat(displayName)
             continue
           }
+
+          if (added.className === 'seventv-message') {
+            const userMessage = added.querySelector<HTMLElement>('.seventv-user-message')
+            if (userMessage) inject7tvChat(userMessage)
+            continue
+          }
+
+          if (added.classList.contains('seventv-chat-scroller')) {
+            window.postMessage({ source: 'pronoundb', payload: { action: 'ttv.inject-chat' } })
+            continue
+          }
         }
 
-        if (added.className.includes('tw-dialog-layer') && added.querySelector('.whispers-list-item')) {
-          console.log('whispers list', added)
-          continue
-        }
+        // if (added.className.includes('tw-dialog-layer') && added.querySelector('.whispers-list-item')) {
+        //   console.log('whispers list', added)
+        //   continue
+        // }
 
         if (added.dataset.aTarget === 'thread-header__click-area') {
           injectWhisperHeader(added)
@@ -262,11 +312,13 @@ export function inject () {
   // todo: load settings
 
   const navbar = document.querySelector<HTMLElement>('[data-a-target="top-nav-container"]')!
-  fetchReactProp(navbar, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user' ])
-    .then((data: any) => {
-      document.body.dataset.currentUserId = data.id
-      document.body.dataset.currentUserDn = data.displayName
-    })
+  if (navbar) {
+    fetchReactProp(navbar, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user' ])
+      .then((data: any) => {
+        document.body.dataset.currentUserId = data.id
+        document.body.dataset.currentUserDn = data.displayName
+      })
+  }
 
   // Process all existing elements
   document.querySelectorAll<HTMLElement>('.chat-author__display-name').forEach((el) => injectChat(el))
