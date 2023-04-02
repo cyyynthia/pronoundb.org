@@ -45,6 +45,23 @@ const settings = {
   chatStyle: 'badge',
 }
 
+function createBadge (pronouns: string) {
+  return h(
+    'span',
+    {
+      style: css({
+        display: 'inline-block',
+        borderRadius: 'var(--border-radius-medium)',
+        backgroundColor: 'var(--color-background-button-secondary-default)',
+        color: 'var(--color-text-button-secondary)',
+        lineHeight: '1.8rem',
+        padding: '0 2px',
+      }),
+    },
+    formatPronounsShort(pronouns)
+  )
+}
+
 const usersCache = Object.create(null)
 async function injectChat (element: HTMLElement) {
   const isFFZ = !element.dataset.aUser
@@ -74,22 +91,12 @@ async function injectChat (element: HTMLElement) {
 
     badgesContainer.insertBefore(
       h(
-        'span',
+        'div',
         {
           class: 'pronoundb-chat-badge',
-          style: css({
-            display: 'inline-block',
-            borderRadius: 'var(--border-radius-medium)',
-            backgroundColor: 'var(--color-background-button-secondary-default)',
-            color: 'var(--color-text-button-secondary)',
-            lineHeight: '1.8rem',
-            position: 'relative',
-            bottom: '-1px',
-            marginRight: '4px',
-            padding: '0 2px',
-          }),
+          style: css({ display: 'inline', position: 'relative', bottom: '-1px', marginRight: '4px' }),
         },
-        formatPronounsShort(pronouns)
+        createBadge(pronouns)
       ),
       badgesContainer.firstChild!
     )
@@ -110,6 +117,23 @@ async function injectChat (element: HTMLElement) {
     const scroller = document.querySelector('[data-a-target="chat-scroller"] .simplebar-scroll-content')
     scroller?.scrollTo(0, scroller.scrollHeight)
   }
+}
+
+async function injectWhisperHeader (header: HTMLElement) {
+  const container = header.parentElement?.parentElement?.parentElement
+  if (!container) return
+
+  if (!container.dataset.interlocutorId) {
+    container.dataset.interlocutorId = await fetchReactProp(header, [ { $find: 'interlocutor', $in: [ 'return', 'memoizedProps' ] }, 'interlocutor', 'id' ])
+  }
+
+  let pronouns = await fetchPronouns('twitch', container.dataset.interlocutorId!)
+  if (pronouns === 'unspecified') return
+
+  const username = header.querySelector('span')
+  username!.parentElement!.appendChild(
+    h('div', { class: 'pronoundb-whisper-header', style: css({ marginLeft: '4px' }) }, createBadge(pronouns))
+  )
 }
 
 async function injectViewerCard (element: HTMLElement) {
@@ -194,6 +218,31 @@ function handleMutation (nodes: MutationRecord[]) {
           }
         }
 
+        if (added.className.includes('tw-dialog-layer') && added.querySelector('.whispers-list-item')) {
+          console.log('whispers list', added)
+          continue
+        }
+
+        if (added.dataset.aTarget === 'thread-header__click-area') {
+          injectWhisperHeader(added)
+          continue
+        }
+
+        /* Unnecessary imho, here for reference
+        if (added.dataset.aTarget === 'whisper-message') {
+          console.log('whispers message', added)
+          continue
+        }
+
+        if (added.className === 'simplebar-scroll-content' && added.querySelector('[data-a-target="whisper-message"]')) {
+          const msgs = added.querySelectorAll('[data-a-target="whisper-message"]')
+          for (let i = 0; i < msgs.length; i++) {
+            console.log('whispers message', msgs[i])
+          }
+          continue
+        }
+        */
+
         const viewerCard = added.firstElementChild as HTMLElement
         if (settings.popout && viewerCard?.dataset.aTarget === 'viewer-card') {
           injectViewerCard(added)
@@ -211,6 +260,13 @@ function handleMutation (nodes: MutationRecord[]) {
 
 export function inject () {
   // todo: load settings
+
+  const navbar = document.querySelector<HTMLElement>('[data-a-target="top-nav-container"]')!
+  fetchReactProp(navbar, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user' ])
+    .then((data: any) => {
+      document.body.dataset.currentUserId = data.id
+      document.body.dataset.currentUserDn = data.displayName
+    })
 
   // Process all existing elements
   document.querySelectorAll<HTMLElement>('.chat-author__display-name').forEach((el) => injectChat(el))
