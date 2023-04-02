@@ -36,7 +36,7 @@ export const LegacyPronouns: Record<string, string | string[]> = {
   hi: [ 'he/it', 'He/It' ],
   hs: [ 'he/she', 'He/She' ],
   ht: [ 'he/they', 'He/They' ],
-  ih: [ 'it/him', 'It/Him' ],
+  ih: [ 'it/he', 'It/He' ],
   ii: [ 'it/its', 'It/Its' ],
   is: [ 'it/she', 'It/She' ],
   it: [ 'it/they', 'It/They' ],
