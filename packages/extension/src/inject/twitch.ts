@@ -30,6 +30,7 @@ import { fetchReactProp } from '../utils/proxy'
 
 export default function () {
   const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')
+  const kCustomHandler = Symbol('pdb.ttv.custom-handler')
 
   window.addEventListener('message', async (e) => {
     if (e.source === window && e.data?.source === 'pronoundb') {
@@ -39,16 +40,26 @@ export default function () {
         if (!chat) return
 
         const handler = await fetchReactProp(chat, [ { $find: 'messageHandlerAPI', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messageHandlerAPI' ])
-        if (handler[kOriginalHandler]) return
+        if (handler.handleMessage[kCustomHandler]) return
 
         const ogDesc = Reflect.getOwnPropertyDescriptor(handler, 'handleMessage')!
         Reflect.defineProperty(handler, kOriginalHandler, ogDesc)
 
         const patchedHandleMessage = (m: any) => {
-          if (m.user) m.id = `${m.user.userID}::${m.id}`
+          window.postMessage({
+            source: 'pronoundb',
+            payload: {
+              action: 'ttv.chat.msg',
+              id: m.id,
+              user: m.user.userID,
+            },
+          }, e.origin)
+
           handler[kOriginalHandler](m)
         }
 
+        // @ts-expect-error
+        patchedHandleMessage[kCustomHandler] = true
         Reflect.defineProperty(handler, 'handleMessage', {
           value: import.meta.env.PDB_BROWSER_TARGET !== 'chrome'
             ? cloneInto(patchedHandleMessage, window, { cloneFunctions: true })

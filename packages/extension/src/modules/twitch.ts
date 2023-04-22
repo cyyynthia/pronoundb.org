@@ -121,11 +121,15 @@ async function injectChat (element: HTMLElement) {
   }
 }
 
+const msgUserMap = Object.create(null)
 async function inject7tvChat (message: HTMLElement) {
   const messageId = message.getAttribute('msg-id')
-  if (!messageId || !messageId.includes('::')) return
+  if (!messageId) return
 
-  const userId = messageId.split('::')[0]
+  const userId = msgUserMap[messageId]
+  if (!userId) return
+
+  delete msgUserMap[messageId]
   const pronouns = await fetchPronouns('twitch', userId)
   if (pronouns === 'unspecified') return
 
@@ -245,6 +249,18 @@ async function injectStreamerAbout () {
   el.appendChild(h('div', {}, formatPronouns(pronouns)))
 }
 
+function bind7tvCompat () {
+  window.postMessage({ source: 'pronoundb', payload: { action: 'ttv.inject-chat' } })
+  window.addEventListener('message', (e) => {
+    if (e.source === window && e.data?.source === 'pronoundb') {
+      const data = e.data.payload
+      if (data.action === 'ttv.chat.msg') {
+        msgUserMap[data.id] = data.user
+      }
+    }
+  })
+}
+
 function handleMutation (nodes: MutationRecord[]) {
   for (const { addedNodes } of nodes) {
     for (const added of addedNodes) {
@@ -263,7 +279,7 @@ function handleMutation (nodes: MutationRecord[]) {
           }
 
           if (added.classList.contains('seventv-chat-scroller')) {
-            window.postMessage({ source: 'pronoundb', payload: { action: 'ttv.inject-chat' } })
+            bind7tvCompat()
             continue
           }
         }
