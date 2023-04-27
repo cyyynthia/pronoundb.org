@@ -28,32 +28,26 @@
 
 import type { ExternalAccount } from '../../database/account.js'
 import type { FlashMessage } from '../../flash.js'
-import { authenticatedFetch } from '../core/oauth10a.js'
 
-export const oauthVersion = 1
+export const oauthVersion = 2
+export const oauthUsePkce = true
 export const clientId = import.meta.env.OAUTH_TWITTER_CLIENT
 export const clientSecret = import.meta.env.OAUTH_TWITTER_SECRET
 
-export const requestUrl = 'https://api.twitter.com/oauth/request_token'
-export const authorizationUrl = 'https://api.twitter.com/oauth/authorize'
-export const tokenUrl = 'https://api.twitter.com/oauth/access_token'
-export const scopes = []
+export const authorizationUrl = 'https://twitter.com/i/oauth2/authorize'
+export const tokenUrl = 'https://api.twitter.com/2/oauth2/token'
+export const scopes = [ 'users.read', 'tweet.read' ]
 
-export async function getSelf (token: string, secret: string): Promise<ExternalAccount | FlashMessage | null> {
-  const { response } = await authenticatedFetch('https://api.twitter.com/1.1/account/verify_credentials.json', {
+export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
+  const res = await fetch('https://api.twitter.com/2/users/me', {
     headers: {
+      authorization: `Bearer ${token}`,
       'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-    },
-    token: {
-      clientId: clientId,
-      clientSecret: clientSecret,
-      tokenSecret: secret,
-      token: token,
     },
   })
 
-  if (!response.ok) return null
-  const data = await response.json()
+  if (!res.ok) return null
+  const { data } = await res.json()
 
-  return { id: data.id_str, name: `${data.name} (@${data.screen_name})`, platform: 'twitter' }
+  return { id: data.id, name: `${data.name} (@${data.username})`, platform: 'twitter' }
 }

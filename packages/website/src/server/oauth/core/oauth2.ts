@@ -30,11 +30,12 @@ import type { APIContext } from 'astro'
 import type { ExternalAccount } from '../../database/account.js'
 import type { FlashMessage } from '../../flash.js'
 
-import { randomUUID } from 'crypto'
+import { randomUUID, createHash } from 'crypto'
 import { encode } from 'querystring'
 
 export type OAuth2Params = {
   oauthVersion: 2
+  oauthUsePkce?: boolean
   clientId: string
   clientSecret: string
 
@@ -46,6 +47,7 @@ export type OAuth2Params = {
 }
 
 const states = new Set<string>()
+const challenges = new Map<string, string>()
 
 export async function authorize ({ url, params, cookies, redirect, site }: APIContext, oauth: OAuth2Params) {
   const intent = url.searchParams.get('intent') ?? 'login'
@@ -54,20 +56,31 @@ export async function authorize ({ url, params, cookies, redirect, site }: APICo
 
   const state = randomUUID()
   const fullState = `${params.platform}-${state}-${intent}`
-  setTimeout(() => states.delete(fullState), 300e3)
   states.add(fullState)
 
-  const q = encode({
+  const parameters: Record<string, string> = {
     state: state,
     response_type: 'code',
     scope: oauth.scopes.join(' '),
     client_id: oauth.clientId,
     redirect_uri: callbackUrl.href,
-  })
+  }
+
+  if (oauth.oauthUsePkce) {
+    const challenge = randomUUID()
+    parameters.code_challenge = createHash('sha256').update(challenge).digest('base64url')
+    parameters.code_challenge_method = 'S256'
+    challenges.set(fullState, challenge)
+  }
+
+  setTimeout(() => {
+    states.delete(fullState)
+    challenges.delete(fullState)
+  }, 300e3)
 
   cookies.set('state', state, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
   cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  return redirect(`${oauth.authorizationUrl}?${q}`)
+  return redirect(`${oauth.authorizationUrl}?${encode(parameters)}`)
 }
 
 export async function callback ({ url, params, cookies, site }: APIContext, oauth: OAuth2Params) {
@@ -87,6 +100,21 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
   }
 
   const cleanRedirectUrl = new URL(url.pathname, site)
+  const parameters: Record<string, string> = {
+    state: state,
+    client_id: oauth.clientId,
+    client_secret: oauth.clientSecret,
+    redirect_uri: cleanRedirectUrl.href,
+    scope: oauth.scopes.join(' '),
+    grant_type: 'authorization_code',
+    code: code,
+  }
+
+  if (oauth.oauthUsePkce) {
+    parameters.code_verifier = challenges.get(fullState)!
+    challenges.delete(fullState)
+  }
+
   const res = await fetch(oauth.tokenUrl, {
     method: 'POST',
     headers: {
@@ -95,15 +123,7 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
       'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
       authorization: `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`,
     },
-    body: encode({
-      state: state,
-      client_id: oauth.clientId,
-      client_secret: oauth.clientSecret,
-      redirect_uri: cleanRedirectUrl.href,
-      scope: oauth.scopes.join(' '),
-      grant_type: 'authorization_code',
-      code: code,
-    }),
+    body: encode(parameters),
   })
 
   if (!res.ok) {
