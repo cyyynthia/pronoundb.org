@@ -46,14 +46,16 @@ export default function () {
         Reflect.defineProperty(handler, kOriginalHandler, ogDesc)
 
         const patchedHandleMessage = (m: any) => {
-          window.postMessage({
-            source: 'pronoundb',
-            payload: {
-              action: 'ttv.chat.msg',
-              id: m.id,
-              user: m.user.userID,
-            },
-          }, e.origin)
+          if (m?.id && m.user?.userID) {
+            window.postMessage({
+              source: 'pronoundb',
+              payload: {
+                action: 'ttv.chat.msg',
+                id: m.id,
+                user: m.user.userID,
+              },
+            }, e.origin)
+          }
 
           handler[kOriginalHandler](m)
         }

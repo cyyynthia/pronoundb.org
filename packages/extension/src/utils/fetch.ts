@@ -65,7 +65,7 @@ async function queueFetch (platform: string, id: string): Promise<string> {
       doFetch(platform, state[platform].queue)
       state[platform].timer = null
       state[platform].queue.clear()
-    }, 10)
+    }, 25)
   }
 
   state[platform].queue.set(id, deferred)
@@ -79,7 +79,7 @@ async function queueFetch (platform: string, id: string): Promise<string> {
   return deferred.promise
 }
 
-const cache = new LRUMap<string, Promise<string>>(5000)
+const cache = new LRUMap<string, Promise<string>>(10000)
 export function fetchPronouns (platform: string, id: string): Promise<string> {
   const key = `${platform}::${id}`
   if (!cache.has(key)) {
