@@ -70,7 +70,16 @@ export default function () {
 
         const messages = await fetchReactProp(chat, [ { $find: 'messagesHash', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messagesHash' ])
         for (const m of messages) {
-          if (m.user) m.id = `${m.user.userID}::${m.id}`
+          if (m?.id && m.user?.userID) {
+            window.postMessage({
+              source: 'pronoundb',
+              payload: {
+                action: 'ttv.chat.msg',
+                id: m.id,
+                user: m.user.userID,
+              },
+            }, e.origin)
+          }
         }
       }
     }

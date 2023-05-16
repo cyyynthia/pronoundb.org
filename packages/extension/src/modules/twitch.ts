@@ -32,6 +32,7 @@ import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../util
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
+import { LRUMap } from '../utils/lru/lru'
 
 export const name = 'Twitch'
 export const color = '#9146FF'
@@ -68,7 +69,8 @@ async function injectChat (element: HTMLElement) {
 
   let userId
   if (isFFZ) {
-    userId = element.parentElement?.parentElement?.dataset.userId
+    let grandparent = element.parentElement?.parentElement
+    userId = grandparent?.dataset.userId || grandparent?.parentElement?.dataset.userId
   } else {
     const username = element.dataset.aUser
     if (!username) return
@@ -121,15 +123,20 @@ async function injectChat (element: HTMLElement) {
   }
 }
 
-const msgUserMap = Object.create(null)
+const msgUserMap = new LRUMap<string, string>(500)
 async function inject7tvChat (message: HTMLElement) {
   const messageId = message.getAttribute('msg-id')
   if (!messageId) return
 
-  const userId = msgUserMap[messageId]
-  if (!userId) return
+  let userId = msgUserMap.get(messageId)
+  for (let i = 0; i < 10 && !userId; i++) {
+    // Sometimes the IDs are a bit slow to arrive...
+    // We wait for them for up to 100 ms.
+    await new Promise((r) => setTimeout(r, 10))
+    userId = msgUserMap.get(messageId)
+  }
 
-  delete msgUserMap[messageId]
+  if (!userId) return
   const pronouns = await fetchPronouns('twitch', userId)
   if (pronouns === 'unspecified') return
 
@@ -255,7 +262,7 @@ function bind7tvCompat () {
     if (e.source === window && e.data?.source === 'pronoundb') {
       const data = e.data.payload
       if (data.action === 'ttv.chat.msg') {
-        msgUserMap[data.id] = data.user
+        msgUserMap.set(data.id, data.user)
       }
     }
   })
@@ -267,14 +274,27 @@ function handleMutation (nodes: MutationRecord[]) {
       if (added instanceof HTMLElement) {
         if (settings.chat) {
           const displayName = added.querySelector<HTMLElement>('.chat-author__display-name')
-          if (added.className.includes('chat-line__') && displayName) {
+          // Chat message
+          if ((added.className.includes('chat-line__') || added.classList.contains('user-notice-line')) && displayName) {
             injectChat(displayName)
             continue
           }
 
+          // Thread view
+          if (added.children?.item(1)?.classList.contains('chat-replies-list__container')) {
+            added.querySelectorAll<HTMLElement>('.chat-author__display-name').forEach((el) => injectChat(el))
+            continue
+          }
+
+          // 7TV compat, cuz why respect Twitch semantics :D
           if (added.className === 'seventv-message') {
             const userMessage = added.querySelector<HTMLElement>('.seventv-user-message')
             if (userMessage) inject7tvChat(userMessage)
+            continue
+          }
+
+          if (added.classList.contains('seventv-user-message')) {
+            inject7tvChat(added)
             continue
           }
 
