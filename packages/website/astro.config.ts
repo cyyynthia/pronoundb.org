@@ -35,16 +35,16 @@ import tailwind from '@astrojs/tailwind'
 import node from '@astrojs/node'
 
 export default defineConfig({
-  site: process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000/'
-    : 'https://pronoundb.org/',
-  output: 'server',
-  integrations: [ tailwind() ],
-  adapter: node({ mode: 'standalone' }),
-  vite: {
-    build: {
-      // I don't like inlined assets
-      assetsInlineLimit: 0,
-    },
-  },
+	site: process.env.NODE_ENV === 'development'
+		? 'http://localhost:3000/'
+		: 'https://pronoundb.org/',
+	output: 'server',
+	integrations: [ tailwind() ],
+	adapter: node({ mode: 'standalone' }),
+	vite: {
+		build: {
+			// I don't like inlined assets
+			assetsInlineLimit: 0,
+		},
+	},
 })

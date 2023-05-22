@@ -29,37 +29,37 @@
 import type { ComponentType } from 'preact'
 
 export type ExtensionModule = {
-  id: string
-  name: string
-  color: string
-  match: RegExp
-  Icon: ComponentType<any>
-  inject: () => void
-  main?: () => void
+	id: string
+	name: string
+	color: string
+	match: RegExp
+	Icon: ComponentType<any>
+	inject: () => void
+	main?: () => void
 }
 
 const modules: ExtensionModule[] = []
 const rawModules = import.meta.glob<ExtensionModule>('./*.ts', { eager: true })
 for (const mdl in rawModules) {
-  if (mdl in rawModules) {
-    modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) })
-  }
+	if (mdl in rawModules) {
+		modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) })
+	}
 }
 
 export async function getModule (loc?: string): Promise<ExtensionModule | null> {
-  // ref: https://bugzilla.mozilla.org/show_bug.cgi?id=1711570
-  const extension = typeof browser === 'undefined' ? chrome : browser
+	// ref: https://bugzilla.mozilla.org/show_bug.cgi?id=1711570
+	const extension = typeof browser === 'undefined' ? chrome : browser
 
-  if (!loc) {
-    loc = location.href
-    if (extension.tabs) {
-      const [ tab ] = await extension.tabs.query({ active: true, currentWindow: true })
-      // eslint-disable-next-line require-atomic-updates
-      loc = tab.url!
-    }
-  }
+	if (!loc) {
+		loc = location.href
+		if (extension.tabs) {
+			const [ tab ] = await extension.tabs.query({ active: true, currentWindow: true })
+			// eslint-disable-next-line require-atomic-updates
+			loc = tab.url!
+		}
+	}
 
-  return modules.find((mdl) => mdl.match.test(loc!)) || null
+	return modules.find((mdl) => mdl.match.test(loc!)) || null
 }
 
 export default modules

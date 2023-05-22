@@ -43,10 +43,10 @@ if (!user) return Astro.redirect('/')
 const flash = handleFlash(Astro)
 ---
 <Layout flash={flash} title='Link a new account'>
-  <PageHeader>
-    <Fragment slot='namespace'>Authentication</Fragment>
-    <Fragment>Link a new account</Fragment>
-  </PageHeader>
+	<PageHeader>
+		<Fragment slot='namespace'>Authentication</Fragment>
+		<Fragment>Link a new account</Fragment>
+	</PageHeader>
 
-  <OAuthProviderList intent='link'/>
+	<OAuthProviderList intent='link'/>
 </Layout>

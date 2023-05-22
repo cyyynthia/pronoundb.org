@@ -41,87 +41,87 @@ const MOCK_FILE_PATH = join(__dirname, '..', 'testutils', 'mock.ts')
 
 const mockCodeTs = readFileSync(MOCK_FILE_PATH, 'utf8')
 const mockCodeJs = mockCodeTs
-  // Remove TS traces
-  .replace(/!/g, '')
-  .replace(/: (Record<.*>|string|any)/g, '')
-  .replace('export function', 'function')
-  // "Minify" the code
-  .replace(/^((.\*| *\/\/).*)?\n/gm, '') // Comments & empty lines
-  .replace(/([{,])\n/g, '$1') // Empty lines (no ;)
-  .replace(/\n/g, ';') // Empty lines (;)
-  .replace(/ {2,}/g, '') // Multi spaces
-  .replace(/[ ,]?([=:{}(]|\?\?) ?/g, '$1') // Useless space/symbols
+	// Remove TS traces
+	.replace(/!/g, '')
+	.replace(/: (Record<.*>|string|any)/g, '')
+	.replace('export function', 'function')
+	// "Minify" the code
+	.replace(/^((.\*| *\/\/).*)?\n/gm, '') // Comments & empty lines
+	.replace(/([{,])\n/g, '$1') // Empty lines (no ;)
+	.replace(/\n/g, ';') // Empty lines (;)
+	.replace(/ {2,}/g, '') // Multi spaces
+	.replace(/[ ,]?([=:{}(]|\?\?) ?/g, '$1') // Useless space/symbols
 
 const injectJsCode = `${mockCodeJs}\nglobalThis.fetch = (u) => Promise.resolve({ json: () => Promise.resolve(processRequest(u)) })`
 
 const test = base.extend({
-  // eslint-disable-next-line no-empty-pattern
-  browser: async ({ browserName, headless }, use) => {
-    if (browserName === 'chromium') {
-      await use(null as any)
-      return
-    }
+	// eslint-disable-next-line no-empty-pattern
+	browser: async ({ browserName, headless }, use) => {
+		if (browserName === 'chromium') {
+			await use(null as any)
+			return
+		}
 
-    const port = 10_000 + Math.round(Math.random() * 10_000)
-    const browser = await firefox.launch({
-      headless: headless,
-      args: [ `--start-debugger-server=${port}` ],
-      firefoxUserPrefs: { 'devtools.debugger.prompt-connection': false },
-    })
+		const port = 10_000 + Math.round(Math.random() * 10_000)
+		const browser = await firefox.launch({
+			headless: headless,
+			args: [ `--start-debugger-server=${port}` ],
+			firefoxUserPrefs: { 'devtools.debugger.prompt-connection': false },
+		})
 
-    const rdp = new RDPConnection(port)
-    const addon = await rdp.installAddon(PDB_EXT_PATH_FF)
-    await rdp.waitFor('frameUpdate')
-    await wait(50) // :shrug:
+		const rdp = new RDPConnection(port)
+		const addon = await rdp.installAddon(PDB_EXT_PATH_FF)
+		await rdp.waitFor('frameUpdate')
+		await wait(50) // :shrug:
 
-    await rdp.evaluate(injectJsCode, addon.consoleActor, addon.innerWindowId)
+		await rdp.evaluate(injectJsCode, addon.consoleActor, addon.innerWindowId)
 
-    rdp.close()
-    await use(browser)
-    await browser.close()
-  },
-  context: async ({ browser, browserName }, use, testInfo) => {
-    const project = testInfo.project as Project<TestArgs>
-    const platform = basename(testInfo.file).split('.')[0]
-    testInfo.skip(Boolean(project.use?.authenticated && !project.use?.credentials?.[platform]), 'No credentials available')
+		rdp.close()
+		await use(browser)
+		await browser.close()
+	},
+	context: async ({ browser, browserName }, use, testInfo) => {
+		const project = testInfo.project as Project<TestArgs>
+		const platform = basename(testInfo.file).split('.')[0]
+		testInfo.skip(Boolean(project.use?.authenticated && !project.use?.credentials?.[platform]), 'No credentials available')
 
-    if (browserName === 'firefox') {
-      const context = await browser.newContext({
-        storageState: project.use?.authenticated
-          ? `.testdata/${platform}StorageState.json`
-          : void 0,
-      })
+		if (browserName === 'firefox') {
+			const context = await browser.newContext({
+				storageState: project.use?.authenticated
+					? `.testdata/${platform}StorageState.json`
+					: void 0,
+			})
 
-      await use(context)
-      await context.close()
-      return
-    }
+			await use(context)
+			await context.close()
+			return
+		}
 
-    const launchOptions: LaunchOptions = {
-      args: [
-        `--disable-extensions-except=${PDB_EXT_PATH_CR}`,
-        `--load-extension=${PDB_EXT_PATH_CR}`,
-      ],
-    }
+		const launchOptions: LaunchOptions = {
+			args: [
+				`--disable-extensions-except=${PDB_EXT_PATH_CR}`,
+				`--load-extension=${PDB_EXT_PATH_CR}`,
+			],
+		}
 
-    if (testInfo.project.use.headless) {
-      launchOptions.args!.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
-    }
+		if (testInfo.project.use.headless) {
+			launchOptions.args!.push('--headless=chrome') // https://bugs.chromium.org/p/chromium/issues/detail?id=706008#c36
+		}
 
-    let sw: Worker
-    const context = await chromium.launchPersistentContext('', launchOptions)
-    while (!(sw = context.serviceWorkers()[0])) await wait(10)
-    await sw.evaluate(injectJsCode)
+		let sw: Worker
+		const context = await chromium.launchPersistentContext('', launchOptions)
+		while (!(sw = context.serviceWorkers()[0])) await wait(10)
+		await sw.evaluate(injectJsCode)
 
-    if (project.use?.authenticated) {
-      // https://github.com/microsoft/playwright/issues/7634
-      const blob = await readFile(`.testdata/${platform}StorageState.json`, 'utf8')
-      context.addCookies(JSON.parse(blob).cookies)
-    }
+		if (project.use?.authenticated) {
+			// https://github.com/microsoft/playwright/issues/7634
+			const blob = await readFile(`.testdata/${platform}StorageState.json`, 'utf8')
+			context.addCookies(JSON.parse(blob).cookies)
+		}
 
-    await use(context)
-    await context.close()
-  },
+		await use(context)
+		await context.close()
+	},
 })
 
 export default test

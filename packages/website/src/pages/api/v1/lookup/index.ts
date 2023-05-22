@@ -32,66 +32,66 @@ import { findPronounsOf } from '@server/database/account.js'
 import { providers } from '@server/oauth/providers.js'
 
 export async function get (ctx: APIContext) {
-  const platform = ctx.url.searchParams.get('platform')
-  const id = ctx.url.searchParams.get('id')
+	const platform = ctx.url.searchParams.get('platform')
+	const id = ctx.url.searchParams.get('id')
 
-  if (!platform || !id) {
-    return new Response(
-      JSON.stringify({
-        errorCode: 400,
-        error: 'Bad request',
-        message: '`platform` and `id` query parameters are required.',
-      }),
-      { status: 400, headers: { 'content-type': 'application/json' } }
-    )
-  }
+	if (!platform || !id) {
+		return new Response(
+			JSON.stringify({
+				errorCode: 400,
+				error: 'Bad request',
+				message: '`platform` and `id` query parameters are required.',
+			}),
+			{ status: 400, headers: { 'content-type': 'application/json' } }
+		)
+	}
 
-  if (!providers.includes(platform)) {
-    return new Response(
-      JSON.stringify({
-        errorCode: 400,
-        error: 'Bad request',
-        message: '`platform` is not a valid platform.',
-      }),
-      { status: 400, headers: { 'content-type': 'application/json' } }
-    )
-  }
+	if (!providers.includes(platform)) {
+		return new Response(
+			JSON.stringify({
+				errorCode: 400,
+				error: 'Bad request',
+				message: '`platform` is not a valid platform.',
+			}),
+			{ status: 400, headers: { 'content-type': 'application/json' } }
+		)
+	}
 
-  const cursor = findPronounsOf(platform, [ id ])
-  const user = await cursor.next()
-  await cursor.close()
+	const cursor = findPronounsOf(platform, [ id ])
+	const user = await cursor.next()
+	await cursor.close()
 
-  // Collect metrics
-  LookupRequestsCounter.inc({ platform: platform, method: 'single' })
-  LookupIdsCounter.inc({ platform: platform })
-  if (user) LookupHitCounter.inc({ platform: platform })
+	// Collect metrics
+	LookupRequestsCounter.inc({ platform: platform, method: 'single' })
+	LookupIdsCounter.inc({ platform: platform })
+	if (user) LookupHitCounter.inc({ platform: platform })
 
-  const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
-  return new Response(body, {
-    headers: {
-      vary: 'origin',
-      'access-control-allow-methods': 'GET',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'x-pronoundb-source',
-      'access-control-max-age': '600',
-      'content-type': 'application/json',
-    },
-  })
+	const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
+	return new Response(body, {
+		headers: {
+			vary: 'origin',
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': '*',
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-max-age': '600',
+			'content-type': 'application/json',
+		},
+	})
 }
 
 export function options () {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      vary: 'origin',
-      'access-control-allow-methods': 'GET',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'x-pronoundb-source',
-      'access-control-max-age': '600',
-    },
-  })
+	return new Response(null, {
+		status: 204,
+		headers: {
+			vary: 'origin',
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': '*',
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-max-age': '600',
+		},
+	})
 }
 
 export function all () {
-  return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
+	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }

@@ -27,30 +27,30 @@
  */
 
 const TestPronouns: Record<string, Record<string, string>> = {
-  twitter: {
-    // @cyyynthia_
-    1300929324154060800: 'ii',
-  },
-  github: {
-    // cyyynthia
-    9999055: 'ii',
-  },
-  twitch: {
-    // cyyynthia_
-    103493295: 'ii',
-  },
+	twitter: {
+		// @cyyynthia_
+		1300929324154060800: 'ii',
+	},
+	github: {
+		// cyyynthia
+		9999055: 'ii',
+	},
+	twitch: {
+		// cyyynthia_
+		103493295: 'ii',
+	},
 }
 
 export function processRequest (urlStr: string): any {
-  const url = new URL(urlStr)
-  const platform = url.searchParams.get('platform')!
-  if (urlStr.includes('lookup-bulk')) {
-    const ids = url.searchParams.get('ids')!.split(',')
-    const res: Record<string, string> = {}
-    for (const id of ids) res[id] = TestPronouns[platform]?.[id] ?? 'tt'
-    return res
-  }
+	const url = new URL(urlStr)
+	const platform = url.searchParams.get('platform')!
+	if (urlStr.includes('lookup-bulk')) {
+		const ids = url.searchParams.get('ids')!.split(',')
+		const res: Record<string, string> = {}
+		for (const id of ids) res[id] = TestPronouns[platform]?.[id] ?? 'tt'
+		return res
+	}
 
-  const id = url.searchParams.get('id')!
-  return { pronouns: TestPronouns[platform]?.[id] ?? 'tt' }
+	const id = url.searchParams.get('id')!
+	return { pronouns: TestPronouns[platform]?.[id] ?? 'tt' }
 }

@@ -34,97 +34,97 @@ await collection.createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 await collection.createIndex({ 'accounts.platform': 1 })
 
 export type Account = {
-  pronouns: string
-  accounts: ExternalAccount[]
+	pronouns: string
+	accounts: ExternalAccount[]
 }
 
 export type ExternalAccount = {
-  id: string
-  name: string
-  platform: string
+	id: string
+	name: string
+	platform: string
 }
 
 export type PronounsOfUser = {
-  pronouns: string
-  account: ExternalAccount
+	pronouns: string
+	account: ExternalAccount
 }
 
 export async function createAccount (from: ExternalAccount) {
-  const existingAccount = await findByExternalAccount(from)
-  if (existingAccount) return null
+	const existingAccount = await findByExternalAccount(from)
+	if (existingAccount) return null
 
-  const result = await collection.insertOne({ accounts: [ from ], pronouns: 'unspecified' })
-  return result.insertedId
+	const result = await collection.insertOne({ accounts: [ from ], pronouns: 'unspecified' })
+	return result.insertedId
 }
 
 export async function findById (id: ObjectId) {
-  return collection.findOne({ _id: id })
+	return collection.findOne({ _id: id })
 }
 
 export async function findByExternalAccount (external: ExternalAccount) {
-  // Find and also update account's display name in one go
-  // This isn't efficient as it requires a write lock every time but I frankly do not care
-  // Future Cynthia, if you're mad know you were already mad at this back when you wrote it you dumbcat
-  // -- Cynthia
-  const result = await collection.findOneAndUpdate(
-    { 'accounts.id': external.id, 'accounts.platform': external.platform },
-    { $set: { 'accounts.$[account].name': external.name } },
-    { arrayFilters: [ { 'account.platform': external.platform, 'account.id': external.id } ] }
-  )
+	// Find and also update account's display name in one go
+	// This isn't efficient as it requires a write lock every time but I frankly do not care
+	// Future Cynthia, if you're mad know you were already mad at this back when you wrote it you dumbcat
+	// -- Cynthia
+	const result = await collection.findOneAndUpdate(
+		{ 'accounts.id': external.id, 'accounts.platform': external.platform },
+		{ $set: { 'accounts.$[account].name': external.name } },
+		{ arrayFilters: [ { 'account.platform': external.platform, 'account.id': external.id } ] }
+	)
 
-  return result.value
+	return result.value
 }
 
 export function findPronounsOf (platform: string, externalIds: string[]) {
-  // perf: first filtering ($match) needs to be done before doing anything to ensure we hit the index.
-  // once initial filtering is done, we can do whatever as the dataset is small enough.
-  // it was behaving with 10k+ docs, it should be ridiculously fast for <=50 docs...
-  return collection.aggregate<PronounsOfUser>([
-    {
-      $match: {
-        accounts: {
-          $elemMatch: {
-            platform: platform,
-            id: { $in: externalIds },
-          },
-        },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        pronouns: 1,
-        account: {
-          $first: {
-            $filter: {
-              input: '$accounts',
-              as: 'account',
-              cond: {
-                $and: [
-                  { $eq: [ '$$account.platform', platform ] },
-                  { $in: [ '$$account.id', externalIds ] },
-                ],
-              },
-            },
-          },
-        },
-      },
-    },
-  ])
+	// perf: first filtering ($match) needs to be done before doing anything to ensure we hit the index.
+	// once initial filtering is done, we can do whatever as the dataset is small enough.
+	// it was behaving with 10k+ docs, it should be ridiculously fast for <=50 docs...
+	return collection.aggregate<PronounsOfUser>([
+		{
+			$match: {
+				accounts: {
+					$elemMatch: {
+						platform: platform,
+						id: { $in: externalIds },
+					},
+				},
+			},
+		},
+		{
+			$project: {
+				_id: 0,
+				pronouns: 1,
+				account: {
+					$first: {
+						$filter: {
+							input: '$accounts',
+							as: 'account',
+							cond: {
+								$and: [
+									{ $eq: [ '$$account.platform', platform ] },
+									{ $in: [ '$$account.id', externalIds ] },
+								],
+							},
+						},
+					},
+				},
+			},
+		},
+	])
 }
 
 export async function updatePronouns (userId: ObjectId, pronouns: string) {
-  await collection.updateOne({ _id: userId }, { $set: { pronouns: pronouns } })
+	await collection.updateOne({ _id: userId }, { $set: { pronouns: pronouns } })
 }
 
 export async function addLinkedAccount (userId: ObjectId, account: ExternalAccount) {
-  await collection.updateOne({ _id: userId }, { $push: { accounts: account } })
+	await collection.updateOne({ _id: userId }, { $push: { accounts: account } })
 }
 
 export async function removeLinkedAccount (userId: ObjectId, platform: string, externalId: string) {
-  await collection.updateOne({ _id: userId }, { $pull: { accounts: { platform: platform, id: externalId } } })
+	await collection.updateOne({ _id: userId }, { $pull: { accounts: { platform: platform, id: externalId } } })
 }
 
 export async function deleteAccount (id: ObjectId) {
-  await collection.deleteOne({ _id: id })
+	await collection.deleteOne({ _id: id })
 }

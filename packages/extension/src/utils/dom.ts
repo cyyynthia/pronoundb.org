@@ -27,34 +27,34 @@
  */
 
 export function h (tag: string, props: Record<string, any> | null, ...child: Array<Node | string | null | false>): HTMLElement {
-  const e = document.createElement(tag)
-  if (props) {
-    for (const key in props) {
-      if (key in props) {
-        if (key.startsWith('on')) {
-          const event = key.slice(2).toLowerCase()
-          e.addEventListener(event, props[key])
-        } else {
-          e.setAttribute(key, String(props[key]))
-        }
-      }
-    }
-  }
+	const e = document.createElement(tag)
+	if (props) {
+		for (const key in props) {
+			if (key in props) {
+				if (key.startsWith('on')) {
+					const event = key.slice(2).toLowerCase()
+					e.addEventListener(event, props[key])
+				} else {
+					e.setAttribute(key, String(props[key]))
+				}
+			}
+		}
+	}
 
-  for (const c of child) {
-    if (!c) continue
-    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
-  }
+	for (const c of child) {
+		if (!c) continue
+		e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
+	}
 
-  return e
+	return e
 }
 
 export function css (style: Record<string, string>): string {
-  let res = ''
-  for (const prop in style) {
-    if (Object.prototype.hasOwnProperty.call(style, prop)) {
-      res += `${prop.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`)}:${style[prop]};`
-    }
-  }
-  return res
+	let res = ''
+	for (const prop in style) {
+		if (Object.prototype.hasOwnProperty.call(style, prop)) {
+			res += `${prop.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`)}:${style[prop]};`
+		}
+	}
+	return res
 }

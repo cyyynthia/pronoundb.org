@@ -31,102 +31,102 @@ import { collection } from './database/account.js'
 import { providers } from './oauth/providers.js'
 
 if (import.meta.env.DEV) {
-  // Ensure hot-reload doesn't brick metrics
-  register.clear()
+	// Ensure hot-reload doesn't brick metrics
+	register.clear()
 }
 
 collectDefaultMetrics({
-  prefix: 'pronoundb_',
+	prefix: 'pronoundb_',
 })
 
 /// ACCOUNT METRICS
 new Gauge({
-  name: 'pronoundb_accounts_total',
-  help: 'accounts count',
-  labelNames: [],
-  collect: async function () {
-    const count = await collection.countDocuments()
-    this.set({}, count)
-  },
+	name: 'pronoundb_accounts_total',
+	help: 'accounts count',
+	labelNames: [],
+	collect: async function () {
+		const count = await collection.countDocuments()
+		this.set({}, count)
+	},
 })
 
 new Gauge({
-  name: 'pronoundb_linked_accounts_total',
-  help: 'accounts linked per platform count',
-  labelNames: [ 'platform' ],
-  collect: async function () {
-    // - But Cynthia!!!! You're doing this every 30 seconds!!!!
-    // - lol yea whatever hehe
-    // - ................
-    // - *noms cookie*
-    await Promise.all(
-      providers.map(
-        (p) => collection.countDocuments({ 'accounts.platform': p })
-          .then((count) => this.set({ platform: p }, count))
-      )
-    )
-  },
+	name: 'pronoundb_linked_accounts_total',
+	help: 'accounts linked per platform count',
+	labelNames: [ 'platform' ],
+	collect: async function () {
+		// - But Cynthia!!!! You're doing this every 30 seconds!!!!
+		// - lol yea whatever hehe
+		// - ................
+		// - *noms cookie*
+		await Promise.all(
+			providers.map(
+				(p) => collection.countDocuments({ 'accounts.platform': p })
+					.then((count) => this.set({ platform: p }, count))
+			)
+		)
+	},
 })
 
 export const CreatedAccountCount = new Counter({
-  name: 'pronoundb_account_create_count',
-  help: 'amount of accounts created',
-  labelNames: [ 'platform' ],
+	name: 'pronoundb_account_create_count',
+	help: 'amount of accounts created',
+	labelNames: [ 'platform' ],
 })
 
 export const DeletedAccountCount = new Counter({
-  name: 'pronoundb_account_deletion_count',
-  help: 'amount of accounts deleted',
-  labelNames: [],
+	name: 'pronoundb_account_deletion_count',
+	help: 'amount of accounts deleted',
+	labelNames: [],
 })
 
 export const LinkedAccountsAddCount = new Counter({
-  name: 'pronoundb_linked_accounts_add_count',
-  help: 'amount of accounts linked per platform',
-  labelNames: [ 'platform' ],
+	name: 'pronoundb_linked_accounts_add_count',
+	help: 'amount of accounts linked per platform',
+	labelNames: [ 'platform' ],
 })
 
 export const LinkedAccountsRemovalCount = new Counter({
-  name: 'pronoundb_linked_accounts_remove_count',
-  help: 'amount of accounts unlinked per platform',
-  labelNames: [ 'platform' ],
+	name: 'pronoundb_linked_accounts_remove_count',
+	help: 'amount of accounts unlinked per platform',
+	labelNames: [ 'platform' ],
 })
 
 /// LOOKUP METRICS
 export const LookupRequestsCounter = new Counter({
-  name: 'pronoundb_lookup_requests_total',
-  help: 'lookup requests count',
-  labelNames: [ 'platform', 'method' ],
+	name: 'pronoundb_lookup_requests_total',
+	help: 'lookup requests count',
+	labelNames: [ 'platform', 'method' ],
 })
 
 export const LookupIdsCounter = new Counter({
-  name: 'pronoundb_lookup_ids_total',
-  help: 'lookup requests count',
-  labelNames: [ 'platform' ],
+	name: 'pronoundb_lookup_ids_total',
+	help: 'lookup requests count',
+	labelNames: [ 'platform' ],
 })
 
 export const LookupBulkSizeHistogram = new Histogram({
-  name: 'pronoundb_lookup_bulk_ids_count',
-  help: 'amount of ids looked up per bulk request',
-  labelNames: [ 'platform' ],
+	name: 'pronoundb_lookup_bulk_ids_count',
+	help: 'amount of ids looked up per bulk request',
+	labelNames: [ 'platform' ],
 })
 
 export const LookupHitCounter = new Counter({
-  name: 'pronoundb_lookup_hit_total',
-  help: 'successful lookup requests count',
-  labelNames: [ 'platform' ],
+	name: 'pronoundb_lookup_hit_total',
+	help: 'successful lookup requests count',
+	labelNames: [ 'platform' ],
 })
 
 /// INTERNAL HEALTH METRICS
 // some more metrics might be welcome
 // for now I just log this one so I can know roughly when I can ditch Tokenize migration code
 export const LegacyTokenizeMigrationCounter = new Counter({
-  name: 'pronoundb_tokenize_migration_total',
-  help: 'tokens migrated from legacy tokenize to jwt',
-  labelNames: [],
+	name: 'pronoundb_tokenize_migration_total',
+	help: 'tokens migrated from legacy tokenize to jwt',
+	labelNames: [],
 })
 
 /// HELPERS
 export function metrics () {
-  return register.metrics()
+	return register.metrics()
 }

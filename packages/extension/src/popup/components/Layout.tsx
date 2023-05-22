@@ -36,77 +36,77 @@ import Settings from 'feather-icons/dist/icons/settings.svg'
 import ArrowLeft from 'feather-icons/dist/icons/arrow-left.svg'
 
 type HeaderProps = {
-  view: ViewState
-  onOpenSettings: () => void
-  onCloseSettings: () => void
+	view: ViewState
+	onOpenSettings: () => void
+	onCloseSettings: () => void
 }
 
 type FooterProps = { selfPronouns: string | null, onOpenPronounsSelector: () => void }
 
 const CUTE_COMMENTS = [
-  'So cute!',
-  'Pretty!',
-  'Fits you well!',
-  'That\'s adorable!',
+	'So cute!',
+	'Pretty!',
+	'Fits you well!',
+	'That\'s adorable!',
 ]
 
 const specialNotes = {
-  unspecified: 'You didn\'t specify your pronouns yet.',
-  other: 'You\'re going by other pronouns than the ones available on PronounDB.',
-  ask: 'You want people to ask for your pronouns.',
-  avoid: 'You want people to avoid using pronouns on you.',
+	unspecified: 'You didn\'t specify your pronouns yet.',
+	other: 'You\'re going by other pronouns than the ones available on PronounDB.',
+	ask: 'You want people to ask for your pronouns.',
+	avoid: 'You want people to avoid using pronouns on you.',
 }
 
 export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) {
-  return (
-    <header class='px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex'>
-      {view === ViewState.SETTINGS && (
-        <button class='mr-4' onClick={onCloseSettings}>
-          <ArrowLeft class='w-5'/>
-        </button>
-      )}
-      <h1 class='text-2xl font-bold'>{view === ViewState.SETTINGS ? 'Settings' : 'PronounDB'}</h1>
-      {view !== ViewState.SETTINGS && (
-        <button class='ml-auto' onClick={onOpenSettings}>
-          <Settings class='w-5'/>
-        </button>
-      )}
-    </header>
-  )
+	return (
+		<header class='px-4 py-2 border-b border-gray-200 dark:border-gray-700 flex'>
+			{view === ViewState.SETTINGS && (
+				<button class='mr-4' onClick={onCloseSettings}>
+					<ArrowLeft class='w-5'/>
+				</button>
+			)}
+			<h1 class='text-2xl font-bold'>{view === ViewState.SETTINGS ? 'Settings' : 'PronounDB'}</h1>
+			{view !== ViewState.SETTINGS && (
+				<button class='ml-auto' onClick={onOpenSettings}>
+					<Settings class='w-5'/>
+				</button>
+			)}
+		</header>
+	)
 }
 
 export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
-  const cute = useMemo(() => Math.random() * CUTE_COMMENTS.length | 0, [])
+	const cute = useMemo(() => Math.random() * CUTE_COMMENTS.length | 0, [])
 
-  return (
-    <footer class='text-gray-600 dark:text-gray-200 text-sm'>
-      {selfPronouns
-        ? (
-          <div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
-            {selfPronouns in specialNotes
-              ? <p>{specialNotes[selfPronouns as keyof typeof specialNotes]}</p>
-              : <p>You're going by {formatPronouns(selfPronouns)}. {CUTE_COMMENTS[cute]}</p>}
-            <button class='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
-          </div>
-        )
-        : (
-          <div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
-            <p>You're not logged in on pronoundb.org</p>
-            <div class='flex gap-3'>
-              <a class='link' href='https://pronoundb.org/login' target='_blank' rel='noreferrer'>Login</a>
-              <a class='link' href='https://pronoundb.org/register' target='_blank' rel='noreferrer'>Register</a>
-            </div>
-          </div>
-        )}
+	return (
+		<footer class='text-gray-600 dark:text-gray-200 text-sm'>
+			{selfPronouns
+				? (
+					<div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
+						{selfPronouns in specialNotes
+							? <p>{specialNotes[selfPronouns as keyof typeof specialNotes]}</p>
+							: <p>You're going by {formatPronouns(selfPronouns)}. {CUTE_COMMENTS[cute]}</p>}
+						<button class='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
+					</div>
+				)
+				: (
+					<div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
+						<p>You're not logged in on pronoundb.org</p>
+						<div class='flex gap-3'>
+							<a class='link' href='https://pronoundb.org/login' target='_blank' rel='noreferrer'>Login</a>
+							<a class='link' href='https://pronoundb.org/register' target='_blank' rel='noreferrer'>Register</a>
+						</div>
+					</div>
+				)}
 
-      <div class='py-2 px-4 flex border-t border-gray-200 dark:border-gray-700'>
-        <p>v{import.meta.env.PDB_EXT_VERSION}</p>
-        <div class='ml-auto flex gap-3'>
-          <a class='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>
-          <a class='hover:underline' href='https://github.com/cyyynthia/pronoundb.org' target='_blank' rel='noreferrer'>GitHub</a>
-          <a class='hover:underline' href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer'>Donate</a>
-        </div>
-      </div>
-    </footer>
-  )
+			<div class='py-2 px-4 flex border-t border-gray-200 dark:border-gray-700'>
+				<p>v{import.meta.env.PDB_EXT_VERSION}</p>
+				<div class='ml-auto flex gap-3'>
+					<a class='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>
+					<a class='hover:underline' href='https://github.com/cyyynthia/pronoundb.org' target='_blank' rel='noreferrer'>GitHub</a>
+					<a class='hover:underline' href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer'>Donate</a>
+				</div>
+			</div>
+		</footer>
+	)
 }

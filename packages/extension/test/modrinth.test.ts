@@ -30,48 +30,48 @@ import test from './test.js'
 import { expect } from '@playwright/test'
 
 test('Profile shows pronouns', async ({ page }) => {
-  await page.goto('https://modrinth.com/user/cyyynthia')
-  await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
+	await page.goto('https://modrinth.com/user/cyyynthia')
+	await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
 })
 
 test('Mod page shows developers\' pronouns', async ({ page }) => {
-  await page.goto('https://modrinth.com/mod/sodium')
+	await page.goto('https://modrinth.com/mod/sodium')
 
-  const devLocator = page.locator('.normal-page__info .team-member')
-  await expect(devLocator.first()).toBeVisible()
-  const devs = await devLocator.count()
+	const devLocator = page.locator('.normal-page__info .team-member')
+	await expect(devLocator.first()).toBeVisible()
+	const devs = await devLocator.count()
 
-  await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
+	await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
 })
 
 // IDs are not exposed here, so it's not implemented. Leaving the test 'just in case'
 test.skip('Listing page shows pronouns', async ({ page }) => {
-  await page.goto('https://modrinth.com/mods')
-  await expect(page.locator('.project-card.card .info .top >> text=(they/them)')).toHaveCount(20)
+	await page.goto('https://modrinth.com/mods')
+	await expect(page.locator('.project-card.card .info .top >> text=(they/them)')).toHaveCount(20)
 })
 
 test.describe('Implementation quirks', () => {
-  test('Pronouns show when going to profile from another page', async ({ page }) => {
-    await page.goto('https://modrinth.com/user/cyyynthia')
-    await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
+	test('Pronouns show when going to profile from another page', async ({ page }) => {
+		await page.goto('https://modrinth.com/user/cyyynthia')
+		await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
 
-    await page.click('.nav a[href="/mods"]')
-    await page.waitForSelector('#search-results')
-    await page.goBack()
+		await page.click('.nav a[href="/mods"]')
+		await page.waitForSelector('#search-results')
+		await page.goBack()
 
-    await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
-  })
+		await expect(page.locator('.card.sidebar >> text=it/its')).toHaveCount(1)
+	})
 
-  test('Pronouns show when going to mod from another page', async ({ page }) => {
-    await page.goto('https://modrinth.com/user/jellysquid3')
-    await expect(page.locator('.card.sidebar >> text=they/them')).toHaveCount(1)
+	test('Pronouns show when going to mod from another page', async ({ page }) => {
+		await page.goto('https://modrinth.com/user/jellysquid3')
+		await expect(page.locator('.card.sidebar >> text=they/them')).toHaveCount(1)
 
-    await page.click('.project-card a')
+		await page.click('.project-card a')
 
-    const devLocator = page.locator('.normal-page__info .team-member')
-    await expect(devLocator.first()).toBeVisible()
-    const devs = await devLocator.count()
+		const devLocator = page.locator('.normal-page__info .team-member')
+		await expect(devLocator.first()).toBeVisible()
+		const devs = await devLocator.count()
 
-    await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
-  })
+		await expect(devLocator.locator('text=they/them')).toHaveCount(devs)
+	})
 })

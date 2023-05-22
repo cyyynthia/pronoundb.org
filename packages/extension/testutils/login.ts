@@ -30,56 +30,56 @@ import type { Browser } from '@playwright/test'
 import { chromium } from '@playwright/test'
 
 type Procedure = {
-  loggedInOnly?: boolean
-  page: string
-  username: string
-  next?: string
-  password: string
-  submit: string
+	loggedInOnly?: boolean
+	page: string
+	username: string
+	next?: string
+	password: string
+	submit: string
 }
 
 export const LoginProcedures: Record<string, Procedure> = {
-  twitter: {
-    page: 'https://twitter.com/i/flow/login',
-    username: 'input[autocomplete="username"]',
-    next: 'text=Next',
-    password: 'input[name="password"]',
-    submit: 'text=Log in',
-  },
-  discord: {
-    loggedInOnly: true,
-    page: 'https://discord.com/login',
-    username: 'input[name="email"]',
-    password: 'input[name="password"]',
-    submit: 'text=Login',
-  },
+	twitter: {
+		page: 'https://twitter.com/i/flow/login',
+		username: 'input[autocomplete="username"]',
+		next: 'text=Next',
+		password: 'input[name="password"]',
+		submit: 'text=Log in',
+	},
+	discord: {
+		loggedInOnly: true,
+		page: 'https://discord.com/login',
+		username: 'input[name="email"]',
+		password: 'input[name="password"]',
+		submit: 'text=Login',
+	},
 }
 
 async function login (browser: Browser, platform: string) {
-  const procedure = LoginProcedures[platform]
-  const ignoreMissingCreds = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
-  if (ignoreMissingCreds) return
+	const procedure = LoginProcedures[platform]
+	const ignoreMissingCreds = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
+	if (ignoreMissingCreds) return
 
-  const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
-  const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
-  if (!username || !password) {
-    console.log('::warning::Authenticated tests for %s will be skipped: no available credentials set.', platform)
-    return
-  }
+	const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
+	const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
+	if (!username || !password) {
+		console.log('::warning::Authenticated tests for %s will be skipped: no available credentials set.', platform)
+		return
+	}
 
-  const page = await browser.newPage()
-  await page.goto(procedure.page)
-  await page.fill(procedure.username, username)
-  if (procedure.next) await page.click(procedure.next)
-  await page.fill(procedure.password, password)
-  await page.click(procedure.submit)
-  await page.context().storageState({ path: `.testdata/${platform}StorageState.json` })
+	const page = await browser.newPage()
+	await page.goto(procedure.page)
+	await page.fill(procedure.username, username)
+	if (procedure.next) await page.click(procedure.next)
+	await page.fill(procedure.password, password)
+	await page.click(procedure.submit)
+	await page.context().storageState({ path: `.testdata/${platform}StorageState.json` })
 }
 
 async function globalSetup () {
-  const browser = await chromium.launch()
-  await Promise.all(Object.keys(LoginProcedures).map((platform) => login(browser, platform)))
-  await browser.close()
+	const browser = await chromium.launch()
+	await Promise.all(Object.keys(LoginProcedures).map((platform) => login(browser, platform)))
+	await browser.close()
 }
 
 export default globalSetup

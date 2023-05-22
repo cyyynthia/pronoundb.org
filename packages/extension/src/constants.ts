@@ -29,7 +29,7 @@
 export const WEBSITE = import.meta.env && import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
 
 export const Endpoints = {
-  LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-  LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
-  LOOKUP_SELF: `${WEBSITE}/api/v1/lookup/me`,
+	LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
+	LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
+	LOOKUP_SELF: `${WEBSITE}/api/v1/lookup/me`,
 }

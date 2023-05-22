@@ -36,105 +36,105 @@ const callbacks = new Map()
 let targetId = 0
 
 export function queryRuntime (node: HTMLElement, query: QueryElement[], runtime: string): Promise<any> {
-  const target = `${++targetId}`
-  node.dataset.pronoundbTargetId = target
-  const deferred = createDeferred<any>()
-  const id = Math.random().toString(36).slice(2)
-  const timeout = setTimeout(() => {
-    deferred.resolve(null)
-    console.error('[PronounDB::bridge] Invocation timed out after 10 seconds.')
-  }, 10e3)
+	const target = `${++targetId}`
+	node.dataset.pronoundbTargetId = target
+	const deferred = createDeferred<any>()
+	const id = Math.random().toString(36).slice(2)
+	const timeout = setTimeout(() => {
+		deferred.resolve(null)
+		console.error('[PronounDB::bridge] Invocation timed out after 10 seconds.')
+	}, 10e3)
 
-  callbacks.set(id, (v: any) => {
-    callbacks.delete(id)
-    deferred.resolve(v)
-    clearTimeout(timeout)
-  })
+	callbacks.set(id, (v: any) => {
+		callbacks.delete(id)
+		deferred.resolve(v)
+		clearTimeout(timeout)
+	})
 
-  window.postMessage({
-    source: 'pronoundb',
-    payload: {
-      action: 'bridge.query',
-      runtime: runtime,
-      target: target,
-      query: query,
-      id: id,
-    },
-  })
+	window.postMessage({
+		source: 'pronoundb',
+		payload: {
+			action: 'bridge.query',
+			runtime: runtime,
+			target: target,
+			query: query,
+			id: id,
+		},
+	})
 
-  return deferred.promise
+	return deferred.promise
 }
 
 export function initializeRuntime () {
-  return new Promise<void>((resolve) => {
-    const onMessage = (e: MessageEvent<any>) => {
-      if (e.source === window && e.data?.source === 'pronoundb') {
-        window.removeEventListener('message', onMessage)
-        resolve()
-      }
-    }
+	return new Promise<void>((resolve) => {
+		const onMessage = (e: MessageEvent<any>) => {
+			if (e.source === window && e.data?.source === 'pronoundb') {
+				window.removeEventListener('message', onMessage)
+				resolve()
+			}
+		}
 
-    window.addEventListener('message', onMessage)
+		window.addEventListener('message', onMessage)
 
-    // Responses from main world
-    window.addEventListener('message', (e) => {
-      if (e.source === window && e.data?.source === 'pronoundb') {
-        const data = e.data.payload
-        if (data.action === 'bridge.result') {
-          if (!callbacks.has(data.id)) {
-            console.warn('[PronounDB::bridge] Received unexpected bridge result')
-            return
-          }
+		// Responses from main world
+		window.addEventListener('message', (e) => {
+			if (e.source === window && e.data?.source === 'pronoundb') {
+				const data = e.data.payload
+				if (data.action === 'bridge.result') {
+					if (!callbacks.has(data.id)) {
+						console.warn('[PronounDB::bridge] Received unexpected bridge result')
+						return
+					}
 
-          callbacks.get(data.id).call(null, data.res)
-        }
-      }
-    })
+					callbacks.get(data.id).call(null, data.res)
+				}
+			}
+		})
 
-    const script = document.createElement('script')
-    script.setAttribute('src', chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
-    script.setAttribute('type', 'module')
-    document.head.appendChild(script)
-    script.remove()
-  })
+		const script = document.createElement('script')
+		script.setAttribute('src', chrome.runtime.getURL(window.__BUILD_CHUNK__.runtime))
+		script.setAttribute('type', 'module')
+		document.head.appendChild(script)
+		script.remove()
+	})
 }
 
 if (import.meta.env.PDB_BROWSER_TARGET !== 'chrome') {
-  for (const { default: mdl } of Object.values(injectModules)) mdl()
+	for (const { default: mdl } of Object.values(injectModules)) mdl()
 }
 
 if (import.meta.env.PDB_BROWSER_TARGET === 'chrome' && !('extension' in chrome)) {
-  for (const { default: mdl } of Object.values(injectModules)) mdl()
+	for (const { default: mdl } of Object.values(injectModules)) mdl()
 
-  window.addEventListener('message', (e) => {
-    if (e.source === window && e.data?.source === 'pronoundb') {
-      const data = e.data.payload
-      if (data.action === 'bridge.query') {
-        let res
-        const element = document.querySelector<HTMLElement>(`[data-pronoundb-target-id="${data.target}"]`)
-        if (element) {
-          element.removeAttribute('data-pronoundb-target-id')
-          switch (data.runtime) {
-            case 'generic':
-              res = fetchPropUnchecked(element, data.query)
-              break
-            case 'react':
-              res = fetchReactProp(element, data.query)
-              break
-          }
-        }
+	window.addEventListener('message', (e) => {
+		if (e.source === window && e.data?.source === 'pronoundb') {
+			const data = e.data.payload
+			if (data.action === 'bridge.query') {
+				let res
+				const element = document.querySelector<HTMLElement>(`[data-pronoundb-target-id="${data.target}"]`)
+				if (element) {
+					element.removeAttribute('data-pronoundb-target-id')
+					switch (data.runtime) {
+						case 'generic':
+							res = fetchPropUnchecked(element, data.query)
+							break
+						case 'react':
+							res = fetchReactProp(element, data.query)
+							break
+					}
+				}
 
-        window.postMessage({
-          source: 'pronoundb',
-          payload: {
-            action: 'bridge.result',
-            id: data.id,
-            res: res,
-          },
-        }, e.origin)
-      }
-    }
-  })
+				window.postMessage({
+					source: 'pronoundb',
+					payload: {
+						action: 'bridge.result',
+						id: data.id,
+						res: res,
+					},
+				}, e.origin)
+			}
+		}
+	})
 
-  window.postMessage({ source: 'pronoundb', payload: {} })
+	window.postMessage({ source: 'pronoundb', payload: {} })
 }

@@ -29,38 +29,38 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  darkMode: 'media',
-  content: [
-    './src/pages/**/*.astro',
-    './src/components/**/*.astro',
-    './src/layouts/*.astro',
-  ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    container: {
-      screens: {
-        'sm': '640px',
-        'md': '768px',
-        'lg': '1024px',
-        'xl': '1280px',
-        '2xl': '1360px',
-      },
-    },
-    extend: {
-      screens: { xs: '420px' },
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-        emerald: colors.emerald,
-        'deep-blue': '#130e85',
-        'red-orange': '#ff6046',
-        platform: {},
-      },
-    },
-  },
-  plugins: [],
+	darkMode: 'media',
+	content: [
+		'./src/pages/**/*.astro',
+		'./src/components/**/*.astro',
+		'./src/layouts/*.astro',
+	],
+	theme: {
+		fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+		container: {
+			screens: {
+				'sm': '640px',
+				'md': '768px',
+				'lg': '1024px',
+				'xl': '1280px',
+				'2xl': '1360px',
+			},
+		},
+		extend: {
+			screens: { xs: '420px' },
+			colors: {
+				pink: {
+					DEFAULT: '#f49898',
+					dark: '#bb6570',
+				},
+				cyan: colors.cyan,
+				gray: colors.neutral,
+				emerald: colors.emerald,
+				'deep-blue': '#130e85',
+				'red-orange': '#ff6046',
+				platform: {},
+			},
+		},
+	},
+	plugins: [],
 }

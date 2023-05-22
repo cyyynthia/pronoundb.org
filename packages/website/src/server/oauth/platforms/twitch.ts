@@ -38,16 +38,16 @@ export const tokenUrl = 'https://id.twitch.tv/oauth2/token'
 export const scopes = []
 
 export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
-  const res = await fetch('https://api.twitch.tv/helix/users', {
-    headers: {
-      authorization: `Bearer ${token}`,
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-      'client-id': clientId,
-    },
-  })
+	const res = await fetch('https://api.twitch.tv/helix/users', {
+		headers: {
+			authorization: `Bearer ${token}`,
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+			'client-id': clientId,
+		},
+	})
 
-  if (!res.ok) return null
-  const data = await res.json()
+	if (!res.ok) return null
+	const data = await res.json()
 
-  return { id: data.data[0].id, name: data.data[0].display_name, platform: 'twitch' }
+	return { id: data.data[0].id, name: data.data[0].display_name, platform: 'twitch' }
 }

@@ -31,62 +31,62 @@ import { createDeferred } from './deferred'
 import { LRUMap } from './lru/lru'
 
 async function doFetch (platform: string, queue: Map<string, Deferred<string>>) {
-  queue = new Map(queue) // clone the map
+	queue = new Map(queue) // clone the map
 
-  // Request is done by the background worker to avoid CSP issues.
-  // Chromium does let us do the request regardless of the page's CSP, but Firefox doesn't.
-  const res = await chrome.runtime.sendMessage({
-    kind: 'http',
-    target: 'lookup',
-    platform: platform,
-    ids: Array.from(queue.keys()),
-  })
+	// Request is done by the background worker to avoid CSP issues.
+	// Chromium does let us do the request regardless of the page's CSP, but Firefox doesn't.
+	const res = await chrome.runtime.sendMessage({
+		kind: 'http',
+		target: 'lookup',
+		platform: platform,
+		ids: Array.from(queue.keys()),
+	})
 
-  if (!res.success) {
-    console.error('[PronounDB::fetch] Failed to fetch:', res.error)
-    for (const v of queue.values()) v.resolve('unspecified')
-    return
-  }
+	if (!res.success) {
+		console.error('[PronounDB::fetch] Failed to fetch:', res.error)
+		for (const v of queue.values()) v.resolve('unspecified')
+		return
+	}
 
-  for (const k in res.data) {
-    if (k in res.data) {
-      queue.get(k)?.resolve(res.data[k])
-    }
-  }
+	for (const k in res.data) {
+		if (k in res.data) {
+			queue.get(k)?.resolve(res.data[k])
+		}
+	}
 }
 
 type State = { timer: NodeJS.Timer | null, queue: Map<string, Deferred<string>> }
 const state: Record<string, State> = {}
 async function queueFetch (platform: string, id: string): Promise<string> {
-  if (!state[platform]) state[platform] = { timer: null, queue: new Map() }
-  const deferred = createDeferred<string>()
-  if (!state[platform].timer) {
-    state[platform].timer = setTimeout(() => {
-      doFetch(platform, state[platform].queue)
-      state[platform].timer = null
-      state[platform].queue.clear()
-    }, 25)
-  }
+	if (!state[platform]) state[platform] = { timer: null, queue: new Map() }
+	const deferred = createDeferred<string>()
+	if (!state[platform].timer) {
+		state[platform].timer = setTimeout(() => {
+			doFetch(platform, state[platform].queue)
+			state[platform].timer = null
+			state[platform].queue.clear()
+		}, 25)
+	}
 
-  state[platform].queue.set(id, deferred)
-  if (state[platform].queue.size === 50) {
-    clearTimeout(state[platform].timer!)
-    doFetch(platform, state[platform].queue)
-    state[platform].timer = null
-    state[platform].queue.clear()
-  }
+	state[platform].queue.set(id, deferred)
+	if (state[platform].queue.size === 50) {
+		clearTimeout(state[platform].timer!)
+		doFetch(platform, state[platform].queue)
+		state[platform].timer = null
+		state[platform].queue.clear()
+	}
 
-  return deferred.promise
+	return deferred.promise
 }
 
 const cache = new LRUMap<string, Promise<string>>(10000)
 export function fetchPronouns (platform: string, id: string): Promise<string> {
-  const key = `${platform}::${id}`
-  if (!cache.has(key)) {
-    const pronouns = queueFetch(platform, id)
-    cache.set(key, pronouns)
-    return pronouns
-  }
+	const key = `${platform}::${id}`
+	if (!cache.has(key)) {
+		const pronouns = queueFetch(platform, id)
+		cache.set(key, pronouns)
+		return pronouns
+	}
 
-  return cache.get(key)!
+	return cache.get(key)!
 }

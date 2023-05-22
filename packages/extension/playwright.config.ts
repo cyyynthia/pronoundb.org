@@ -37,65 +37,65 @@ const credentials: Record<string, boolean> = {}
 const authenticated: string[] = []
 const authenticatedOnly: string[] = []
 for (const platform in LoginProcedures) {
-  if (platform in LoginProcedures) {
-    authenticated.push(platform)
-    if (LoginProcedures[platform].loggedInOnly) authenticatedOnly.push(platform)
+	if (platform in LoginProcedures) {
+		authenticated.push(platform)
+		if (LoginProcedures[platform].loggedInOnly) authenticatedOnly.push(platform)
 
-    const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
-    const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
-    const ignore = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
-    credentials[platform] = Boolean(ignore) || Boolean(username && password)
-  }
+		const username = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_USERNAME`]
+		const password = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_PASSWORD`]
+		const ignore = process.env[`TEST_ACCOUNT_${platform.toUpperCase()}_IGNORE_MISSING_CREDENTIALS`]
+		credentials[platform] = Boolean(ignore) || Boolean(username && password)
+	}
 }
 
 const withoutAuthRegExp = new RegExp(`.*\\/(?!${authenticatedOnly.join('|')})[^/]*\\.test\\.ts`, 'gm')
 const withAuthRegExp = new RegExp(`.*(?:${authenticated.join('|')})\\.test\\.ts`, 'gm')
 
 const config: PlaywrightTestConfig<TestArgs> = {
-  timeout: 20e3,
-  retries: 2,
-  globalSetup: require.resolve('./testutils/login.js'),
-  forbidOnly: Boolean(process.env.CI),
-  projects: [
-    {
-      name: 'Chromium without authentication',
-      testMatch: withoutAuthRegExp,
-      use: {
-        browserName: 'chromium',
-        authenticated: false,
-      },
-    },
-    {
-      name: 'Chromium with authentication',
-      testMatch: withAuthRegExp,
-      use: {
-        browserName: 'chromium',
-        authenticated: true,
-      },
-    },
-    {
-      name: 'Firefox without authentication',
-      testMatch: withoutAuthRegExp,
-      use: {
-        browserName: 'firefox',
-        authenticated: false,
-      },
-    },
-    {
-      name: 'Firefox with authentication',
-      testMatch: withAuthRegExp,
-      use: {
-        browserName: 'firefox',
-        authenticated: true,
-      },
-    },
-  ],
-  use: {
-    headless: !process.argv.includes('--headed'),
-    launchOptions: { devtools: true },
-    actionTimeout: 5e3,
-    credentials: credentials,
-  },
+	timeout: 20e3,
+	retries: 2,
+	globalSetup: require.resolve('./testutils/login.js'),
+	forbidOnly: Boolean(process.env.CI),
+	projects: [
+		{
+			name: 'Chromium without authentication',
+			testMatch: withoutAuthRegExp,
+			use: {
+				browserName: 'chromium',
+				authenticated: false,
+			},
+		},
+		{
+			name: 'Chromium with authentication',
+			testMatch: withAuthRegExp,
+			use: {
+				browserName: 'chromium',
+				authenticated: true,
+			},
+		},
+		{
+			name: 'Firefox without authentication',
+			testMatch: withoutAuthRegExp,
+			use: {
+				browserName: 'firefox',
+				authenticated: false,
+			},
+		},
+		{
+			name: 'Firefox with authentication',
+			testMatch: withAuthRegExp,
+			use: {
+				browserName: 'firefox',
+				authenticated: true,
+			},
+		},
+	],
+	use: {
+		headless: !process.argv.includes('--headed'),
+		launchOptions: { devtools: true },
+		actionTimeout: 5e3,
+		credentials: credentials,
+	},
 }
 
 export default config

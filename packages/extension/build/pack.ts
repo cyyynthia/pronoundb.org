@@ -35,64 +35,64 @@ import archiver from 'archiver'
 type File = { name: string, path: string }
 
 async function* readdirRecursive (path: string, base = path): AsyncGenerator<File> {
-  const files = await readdir(path)
-  for (const file of files) {
-    const filepath = join(path, file)
-    const info = await stat(filepath)
-    if (info.isDirectory()) {
-      if (file === 'node_modules' || file === 'dist' || file === 'packed') continue
-      yield* readdirRecursive(join(path, file), base)
-    } else {
-      yield { name: relative(base, filepath), path: filepath }
-    }
-  }
+	const files = await readdir(path)
+	for (const file of files) {
+		const filepath = join(path, file)
+		const info = await stat(filepath)
+		if (info.isDirectory()) {
+			if (file === 'node_modules' || file === 'dist' || file === 'packed') continue
+			yield* readdirRecursive(join(path, file), base)
+		} else {
+			yield { name: relative(base, filepath), path: filepath }
+		}
+	}
 }
 
 export default function pack (): Plugin {
-  let skip = false
-  let outDir = ''
+	let skip = false
+	let outDir = ''
 
-  return {
-    name: 'pdb-ext-pack',
-    configResolved: (cfg) => {
-      skip = !cfg.isProduction
-      outDir = cfg.build.outDir
-    },
-    closeBundle: async () => {
-      if (skip) return
+	return {
+		name: 'pdb-ext-pack',
+		configResolved: (cfg) => {
+			skip = !cfg.isProduction
+			outDir = cfg.build.outDir
+		},
+		closeBundle: async () => {
+			if (skip) return
 
-      const distDir = join(__dirname, '..', outDir)
-      if (!existsSync(distDir)) return
+			const distDir = join(__dirname, '..', outDir)
+			if (!existsSync(distDir)) return
 
-      const archive = archiver('zip', { zlib: { level: 9 } })
-      archive.pipe(createWriteStream(`${distDir}.zip`))
+			const archive = archiver('zip', { zlib: { level: 9 } })
+			archive.pipe(createWriteStream(`${distDir}.zip`))
 
-      for await (const file of readdirRecursive(distDir)) archive.file(file.path, { name: file.name })
-      await archive.finalize()
+			for await (const file of readdirRecursive(distDir)) archive.file(file.path, { name: file.name })
+			await archive.finalize()
 
-      if (process.env.PDB_BROWSER_TARGET === 'firefox') {
-        // Prepare a source file archive, required by MAO review policies
-        const srcArchive = archiver('zip', { zlib: { level: 9 } })
-        srcArchive.pipe(createWriteStream(join(distDir, '..', 'source.zip')))
+			if (process.env.PDB_BROWSER_TARGET === 'firefox') {
+				// Prepare a source file archive, required by MAO review policies
+				const srcArchive = archiver('zip', { zlib: { level: 9 } })
+				srcArchive.pipe(createWriteStream(join(distDir, '..', 'source.zip')))
 
-        // Add individual base source files
-        const baseDir = join(__dirname, '..')
-        const rootDir = join(baseDir, '..', '..')
-        srcArchive.file(join(baseDir, 'Mozilla-Addons-Note.md'), { name: 'README.md' })
-        srcArchive.file(join(rootDir, 'pnpm-lock.yaml'), { name: 'pnpm-lock.yaml' })
-        srcArchive.file(join(rootDir, 'pnpm-workspace.yaml'), { name: 'pnpm-workspace.yaml' })
-        srcArchive.file(join(rootDir, 'tsconfig.json'), { name: 'tsconfig.json' })
-        srcArchive.file(join(rootDir, '.eslintrc.json'), { name: '.eslintrc.json' })
+				// Add individual base source files
+				const baseDir = join(__dirname, '..')
+				const rootDir = join(baseDir, '..', '..')
+				srcArchive.file(join(baseDir, 'Mozilla-Addons-Note.md'), { name: 'README.md' })
+				srcArchive.file(join(rootDir, 'pnpm-lock.yaml'), { name: 'pnpm-lock.yaml' })
+				srcArchive.file(join(rootDir, 'pnpm-workspace.yaml'), { name: 'pnpm-workspace.yaml' })
+				srcArchive.file(join(rootDir, 'tsconfig.json'), { name: 'tsconfig.json' })
+				srcArchive.file(join(rootDir, '.eslintrc.json'), { name: '.eslintrc.json' })
 
-        // Add necessary packages
-        for (const pkg of [ 'extension' ]) {
-          for await (const file of readdirRecursive(join(rootDir, 'packages', pkg))) {
-            srcArchive.file(file.path, { name: `packages/${pkg}/${file.name}` })
-          }
-        }
+				// Add necessary packages
+				for (const pkg of [ 'extension' ]) {
+					for await (const file of readdirRecursive(join(rootDir, 'packages', pkg))) {
+						srcArchive.file(file.path, { name: `packages/${pkg}/${file.name}` })
+					}
+				}
 
-        await srcArchive.finalize()
-      }
-    },
-  }
+				await srcArchive.finalize()
+			}
+		},
+	}
 }

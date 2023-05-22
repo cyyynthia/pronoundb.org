@@ -1,26 +1,26 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-    "strictBindCallApply": true,
-    "strictFunctionTypes": true,
-    "strictPropertyInitialization": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+	"compilerOptions": {
+		"strict": true,
+		"alwaysStrict": true,
+		"strictNullChecks": true,
+		"strictBindCallApply": true,
+		"strictFunctionTypes": true,
+		"strictPropertyInitialization": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"isolatedModules": true,
 
-    "noImplicitThis": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitAny": true,
-    "allowUnreachableCode": false,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": false,
+		"noImplicitThis": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitAny": true,
+		"allowUnreachableCode": false,
+		"allowSyntheticDefaultImports": true,
+		"allowJs": false,
 
-    "lib": [ "esnext" ],
-    "target": "esnext",
-    "module": "esnext",
-    "moduleResolution": "node"
-  }
+		"lib": [ "esnext" ],
+		"target": "esnext",
+		"module": "esnext",
+		"moduleResolution": "node"
+	}
 }

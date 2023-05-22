@@ -38,125 +38,125 @@ export const match = /^https:\/\/(.+\.)?github\.com/
 export { default as Icon } from 'simple-icons/icons/github.svg'
 
 async function injectUserProfile () {
-  const userId = document.querySelector<HTMLElement>('[data-scope-id]')!.dataset.scopeId
-  const list = document.querySelector('.vcard-details')
-  if (!userId || !list) return
+	const userId = document.querySelector<HTMLElement>('[data-scope-id]')!.dataset.scopeId
+	const list = document.querySelector('.vcard-details')
+	if (!userId || !list) return
 
-  const pronouns = await fetchPronouns('github', userId)
-  if (pronouns === 'unspecified') return
+	const pronouns = await fetchPronouns('github', userId)
+	if (pronouns === 'unspecified') return
 
-  const el = h(
-    'li',
-    {
-      class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
-      itemprop: 'pronouns',
-      show_title: false,
-      'aria-label': `Pronouns: ${formatPronouns(pronouns)}`,
-    },
-    commentDiscussion({ class: 'octicon' }),
-    h('span', { class: 'p-label' }, formatPronouns(pronouns))
-  )
+	const el = h(
+		'li',
+		{
+			class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
+			itemprop: 'pronouns',
+			show_title: false,
+			'aria-label': `Pronouns: ${formatPronouns(pronouns)}`,
+		},
+		commentDiscussion({ class: 'octicon' }),
+		h('span', { class: 'p-label' }, formatPronouns(pronouns))
+	)
 
-  list.appendChild(el)
+	list.appendChild(el)
 
-  // Tabs do not trigger a page reload but does re-render everything, so we need to re-inject
-  document.querySelectorAll('.UnderlineNav-item').forEach((tab) => {
-    let hasTriggered = false
-    tab.addEventListener('click', () => {
-      if (hasTriggered) return
+	// Tabs do not trigger a page reload but does re-render everything, so we need to re-inject
+	document.querySelectorAll('.UnderlineNav-item').forEach((tab) => {
+		let hasTriggered = false
+		tab.addEventListener('click', () => {
+			if (hasTriggered) return
 
-      hasTriggered = true
-      const interval = setInterval(() => {
-        if (!document.querySelector('.vcard-details [itemprop="pronouns"]')) {
-          clearInterval(interval)
-          injectUserProfile()
-        }
-      }, 100)
-    })
-  })
+			hasTriggered = true
+			const interval = setInterval(() => {
+				if (!document.querySelector('.vcard-details [itemprop="pronouns"]')) {
+					clearInterval(interval)
+					injectUserProfile()
+				}
+			}, 100)
+		})
+	})
 }
 
 async function injectProfileLists () {
-  const items = Array.from(document.querySelectorAll('.user-profile-nav + * .d-table')) as HTMLElement[]
+	const items = Array.from(document.querySelectorAll('.user-profile-nav + * .d-table')) as HTMLElement[]
 
-  items.forEach(async (item) => {
-    const pronouns = await fetchPronouns('github', item.querySelector('img')!.src.match(/\/u\/(\d+)/)![1])
-    if (pronouns === 'unspecified') return
+	items.forEach(async (item) => {
+		const pronouns = await fetchPronouns('github', item.querySelector('img')!.src.match(/\/u\/(\d+)/)![1])
+		if (pronouns === 'unspecified') return
 
-    const col = item.querySelector<HTMLElement>('.d-table-cell + .d-table-cell')!
-    let about = col.querySelector('.mb-0')
-    const margin = Boolean(about)
-    if (!about) {
-      about = h('p', { class: 'color-fg-muted text-small mb-0' })
-      col.appendChild(about)
-    }
+		const col = item.querySelector<HTMLElement>('.d-table-cell + .d-table-cell')!
+		let about = col.querySelector('.mb-0')
+		const margin = Boolean(about)
+		if (!about) {
+			about = h('p', { class: 'color-fg-muted text-small mb-0' })
+			col.appendChild(about)
+		}
 
-    about.appendChild(
-      h(
-        'span',
-        { class: margin ? 'ml-3' : '' },
-        commentDiscussion({ class: 'octicon' }),
-        '\n  ',
-        formatPronouns(pronouns)
-      )
-    )
-  })
+		about.appendChild(
+			h(
+				'span',
+				{ class: margin ? 'ml-3' : '' },
+				commentDiscussion({ class: 'octicon' }),
+				'\n  ',
+				formatPronouns(pronouns)
+			)
+		)
+	})
 }
 
 function injectHoverCards () {
-  const popover = document.querySelector<HTMLElement>('.js-hovercard-content > .Popover-message')!
+	const popover = document.querySelector<HTMLElement>('.js-hovercard-content > .Popover-message')!
 
-  const observer = new MutationObserver(
-    async () => {
-      const startHeight = popover.getBoundingClientRect().height
-      const hv = popover.querySelector<HTMLElement>('[data-hydro-view]')?.dataset?.hydroView
-      if (!hv) return
+	const observer = new MutationObserver(
+		async () => {
+			const startHeight = popover.getBoundingClientRect().height
+			const hv = popover.querySelector<HTMLElement>('[data-hydro-view]')?.dataset?.hydroView
+			if (!hv) return
 
-      const { event_type: type, payload: { card_user_id: userId } } = JSON.parse(hv)
-      if (type !== 'user-hovercard-hover') return
+			const { event_type: type, payload: { card_user_id: userId } } = JSON.parse(hv)
+			if (type !== 'user-hovercard-hover') return
 
-      const block = popover.querySelector('section:nth-child(3)')
-      if (!block) return
+			const block = popover.querySelector('section:nth-child(3)')
+			if (!block) return
 
-      const pronouns = await fetchPronouns('github', String(userId))
-      if (pronouns === 'unspecified') return
+			const pronouns = await fetchPronouns('github', String(userId))
+			if (pronouns === 'unspecified') return
 
-      block.parentElement?.insertBefore(
-        h(
-          'section',
-          { class: 'color-fg-muted' },
-          commentDiscussion({ class: 'octicon' }),
-          ' ',
-          formatPronouns(pronouns)
-        ),
-        block
-      )
+			block.parentElement?.insertBefore(
+				h(
+					'section',
+					{ class: 'color-fg-muted' },
+					commentDiscussion({ class: 'octicon' }),
+					' ',
+					formatPronouns(pronouns)
+				),
+				block
+			)
 
-      if (popover.className.includes('Popover-message--bottom')) {
-        const delta = popover.getBoundingClientRect().height - startHeight
-        if (delta > 0 && popover.parentElement) {
-          popover.parentElement.style.top = `${parseInt(popover.parentElement.style.top, 10) - delta}px`
-        }
-      }
-    }
-  )
+			if (popover.className.includes('Popover-message--bottom')) {
+				const delta = popover.getBoundingClientRect().height - startHeight
+				if (delta > 0 && popover.parentElement) {
+					popover.parentElement.style.top = `${parseInt(popover.parentElement.style.top, 10) - delta}px`
+				}
+			}
+		}
+	)
 
-  observer.observe(popover, { childList: true })
+	observer.observe(popover, { childList: true })
 }
 
 export function inject () {
-  if (document.querySelector('.user-profile-bio')) {
-    injectUserProfile()
+	if (document.querySelector('.user-profile-bio')) {
+		injectUserProfile()
 
-    const tab = new URLSearchParams(location.search).get('tab')
-    if (tab === 'followers' || tab === 'following') {
-      injectProfileLists()
-    }
-  }
+		const tab = new URLSearchParams(location.search).get('tab')
+		if (tab === 'followers' || tab === 'following') {
+			injectProfileLists()
+		}
+	}
 
-  injectHoverCards()
+	injectHoverCards()
 
-  document.head.appendChild(
-    h('style', null, '.js-hovercard-content .d-flex .overflow-hidden.ml-3 .mt-2 + .mt-2 { margin-top: 4px !important; }')
-  )
+	document.head.appendChild(
+		h('style', null, '.js-hovercard-content .d-flex .overflow-hidden.ml-3 .mt-2 + .mt-2 { margin-top: 4px !important; }')
+	)
 }

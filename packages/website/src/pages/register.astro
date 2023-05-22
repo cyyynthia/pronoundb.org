@@ -42,14 +42,14 @@ if (await authenticate(Astro)) return Astro.redirect('/me')
 const flash = handleFlash(Astro)
 ---
 <Layout flash={flash} title='Register an account'>
-  <PageHeader>
-    <Fragment slot='namespace'>Authentication</Fragment>
-    <Fragment>Register an account</Fragment>
-  </PageHeader>
+	<PageHeader>
+		<Fragment slot='namespace'>Authentication</Fragment>
+		<Fragment>Register an account</Fragment>
+	</PageHeader>
 
-  <p class='mb-2'>
-    Make sure to give the <Link href='/privacy'>Privacy Policy</Link> a look.
-    Registering an account on PronounDB will be seen as an acceptance of it.
-  </p>
-  <OAuthProviderList intent='register'/>
+	<p class='mb-2'>
+		Make sure to give the <Link href='/privacy'>Privacy Policy</Link> a look.
+		Registering an account on PronounDB will be seen as an acceptance of it.
+	</p>
+	<OAuthProviderList intent='register'/>
 </Layout>

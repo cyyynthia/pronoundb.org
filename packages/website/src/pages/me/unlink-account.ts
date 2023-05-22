@@ -33,29 +33,29 @@ import { removeLinkedAccount } from '@server/database/account.js'
 import { setFlash } from '@server/flash.js'
 
 export async function post (ctx: APIContext) {
-  const user = await authenticate(ctx)
-  if (!user) return new Response('401: Unauthorized', { status: 401 })
+	const user = await authenticate(ctx)
+	if (!user) return new Response('401: Unauthorized', { status: 401 })
 
-  const body = await ctx.request.formData().catch(() => null)
-  const csrfToken = body?.get('csrfToken')
-  const platform = body?.get('platform')
-  const id = body?.get('id')
+	const body = await ctx.request.formData().catch(() => null)
+	const csrfToken = body?.get('csrfToken')
+	const platform = body?.get('platform')
+	const id = body?.get('id')
 
 
-  if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
-    setFlash(ctx, 'E_CSRF')
-    return ctx.redirect('/me')
-  }
+	if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
+		setFlash(ctx, 'E_CSRF')
+		return ctx.redirect('/me')
+	}
 
-  if (typeof platform !== 'string' || typeof id !== 'string') {
-    return new Response('400: Bad request', { status: 400 })
-  }
+	if (typeof platform !== 'string' || typeof id !== 'string') {
+		return new Response('400: Bad request', { status: 400 })
+	}
 
-  LinkedAccountsRemovalCount.inc({ platform: platform })
-  removeLinkedAccount(user._id, platform, id)
-  return ctx.redirect('/me')
+	LinkedAccountsRemovalCount.inc({ platform: platform })
+	removeLinkedAccount(user._id, platform, id)
+	return ctx.redirect('/me')
 }
 
 export function all () {
-  return new Response('405: Method not allowed', { status: 405 })
+	return new Response('405: Method not allowed', { status: 405 })
 }

@@ -31,55 +31,55 @@ import { queryRuntime } from '../runtime'
 export type QueryElement = string | { $find: string, $in: string[] }
 
 export function fetchPropUnchecked (target: HTMLElement, propPath: QueryElement[]) {
-  let res = target as any
-  for (const prop of propPath) {
-    if (!res) break
-    if (typeof prop === 'string') {
-      res = res[prop]
-      continue
-    }
+	let res = target as any
+	for (const prop of propPath) {
+		if (!res) break
+		if (typeof prop === 'string') {
+			res = res[prop]
+			continue
+		}
 
-    const queue = [ res ]
-    res = null
-    for (let i = 0; i < 1_000 && queue.length; i++) {
-      const el = queue.shift()
-      if (prop.$find in el) {
-        res = el
-        break
-      }
+		const queue = [ res ]
+		res = null
+		for (let i = 0; i < 1_000 && queue.length; i++) {
+			const el = queue.shift()
+			if (prop.$find in el) {
+				res = el
+				break
+			}
 
-      for (const p of prop.$in) {
-        // eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
-        if (p in el && el[p] != null) queue.push(el[p])
-      }
-    }
-  }
+			for (const p of prop.$in) {
+				// eslint-disable-next-line eqeqeq -- Intentional check for undefined & null
+				if (p in el && el[p] != null) queue.push(el[p])
+			}
+		}
+	}
 
-  return res
+	return res
 }
 
 export function fetchProp (target: HTMLElement, propPath: QueryElement[]) {
-  if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') return queryRuntime(target, propPath, 'generic')
-  return Promise.resolve(fetchPropUnchecked(target.wrappedJSObject, propPath))
+	if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') return queryRuntime(target, propPath, 'generic')
+	return Promise.resolve(fetchPropUnchecked(target.wrappedJSObject, propPath))
 }
 
 export function fetchVueProp (target: HTMLElement, propPath: QueryElement[]): any {
-  return fetchProp(target, [ '__vue__', ...propPath ])
+	return fetchProp(target, [ '__vue__', ...propPath ])
 }
 
 export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): any {
-  if (import.meta.env.PDB_BROWSER_TARGET === 'chrome' && 'extension' in chrome) return queryRuntime(target, propPath, 'react')
-  if (import.meta.env.PDB_BROWSER_TARGET === 'firefox') target = target.wrappedJSObject
+	if (import.meta.env.PDB_BROWSER_TARGET === 'chrome' && 'extension' in chrome) return queryRuntime(target, propPath, 'react')
+	if (import.meta.env.PDB_BROWSER_TARGET === 'firefox') target = target.wrappedJSObject
 
-  const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
-  if (!reactKey) {
-    return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
-      ? Promise.resolve(null)
-      : null
-  }
+	const reactKey = Object.keys(target).find((k) => k.startsWith('__reactInternalInstance') || k.startsWith('__reactFiber'))
+	if (!reactKey) {
+		return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
+			? Promise.resolve(null)
+			: null
+	}
 
-  const res = fetchPropUnchecked(target, [ reactKey, ...propPath ])
-  return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
-    ? Promise.resolve(res)
-    : res
+	const res = fetchPropUnchecked(target, [ reactKey, ...propPath ])
+	return import.meta.env.PDB_BROWSER_TARGET === 'firefox'
+		? Promise.resolve(res)
+		: res
 }

@@ -1,12 +1,12 @@
 {
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "types": [ "vite/client" ],
-    "lib": [ "esnext", "dom", "dom.iterable" ],
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"types": [ "vite/client" ],
+		"lib": [ "esnext", "dom", "dom.iterable" ],
 
-    "jsx": "preserve",
-    "jsxFactory": "h",
-    "jsxFragmentFactory": "Fragment"
-  },
-  "include": [ "./src/**/*", "vite.config.ts" ]
+		"jsx": "preserve",
+		"jsxFactory": "h",
+		"jsxFragmentFactory": "Fragment"
+	},
+	"include": [ "./src/**/*", "vite.config.ts" ]
 }

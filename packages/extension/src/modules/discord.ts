@@ -37,170 +37,170 @@ export const match = /^https:\/\/(.+\.)?discord\.com\/(channels|activity|login|a
 export { default as Icon } from 'simple-icons/icons/discord.svg'
 
 const Styles = {
-  header: css({
-    fontFamily: 'var(--font-display)',
-    fontSize: '12px',
-    fontWeight: '700',
-    lineHeight: '16px',
-    color: 'var(--header-primary)',
-    textTransform: 'uppercase',
-    marginBottom: '8px',
-  }),
-  text: css({
-    fontSize: '14px',
-    lineHeight: '18px',
-    fontWeight: '400',
-    color: 'var(--text-normal)',
-  }),
-  messageHeader: css({
-    display: 'inline-block',
-    color: 'var(--text-muted)',
-    fontSize: '.75rem',
-    lineHeight: '1.375rem',
-    fontWeight: '500',
-    height: '1.25rem',
-    cursor: 'default',
-    pointerEvents: 'none',
-    textIndent: '0',
-  }),
+	header: css({
+		fontFamily: 'var(--font-display)',
+		fontSize: '12px',
+		fontWeight: '700',
+		lineHeight: '16px',
+		color: 'var(--header-primary)',
+		textTransform: 'uppercase',
+		marginBottom: '8px',
+	}),
+	text: css({
+		fontSize: '14px',
+		lineHeight: '18px',
+		fontWeight: '400',
+		color: 'var(--text-normal)',
+	}),
+	messageHeader: css({
+		display: 'inline-block',
+		color: 'var(--text-muted)',
+		fontSize: '.75rem',
+		lineHeight: '1.375rem',
+		fontWeight: '500',
+		height: '1.25rem',
+		cursor: 'default',
+		pointerEvents: 'none',
+		textIndent: '0',
+	}),
 }
 
 async function handleMessage (node: HTMLElement) {
-  const header = node.getElementsByTagName('h3').item(0)
-  if (!header || !header.getAttribute('aria-labelledby')?.startsWith('message-username')) return
+	const header = node.getElementsByTagName('h3').item(0)
+	if (!header || !header.getAttribute('aria-labelledby')?.startsWith('message-username')) return
 
-  const id = await fetchReactProp(node, [ 'return', 'return', 'memoizedProps', 'message', 'author', 'id' ])
-  if (!id) return
+	const id = await fetchReactProp(node, [ 'return', 'return', 'memoizedProps', 'message', 'author', 'id' ])
+	if (!id) return
 
-  const pronouns = await fetchPronouns('discord', id)
-  if (pronouns === 'unspecified') return
+	const pronouns = await fetchPronouns('discord', id)
+	if (pronouns === 'unspecified') return
 
-  const element = h('span', { class: 'pronoundb-pronouns', style: Styles.messageHeader }, ` • ${formatPronouns(pronouns)}`)
-  if (node.firstElementChild?.className.includes('compact-')) {
-    const usernameSection = node.querySelector('[id^="message-username"]')
-    if (usernameSection) usernameSection.insertBefore(element, usernameSection.lastChild)
-    return
-  }
+	const element = h('span', { class: 'pronoundb-pronouns', style: Styles.messageHeader }, ` • ${formatPronouns(pronouns)}`)
+	if (node.firstElementChild?.className.includes('compact-')) {
+		const usernameSection = node.querySelector('[id^="message-username"]')
+		if (usernameSection) usernameSection.insertBefore(element, usernameSection.lastChild)
+		return
+	}
 
-  header.appendChild(element)
+	header.appendChild(element)
 }
 
 async function handleUserPopOut (node: HTMLElement) {
-  const id = await fetchReactProp(node, [ { $find: 'userId', $in: [ 'child', 'memoizedProps' ] }, 'userId' ])
-  if (!id) return
+	const id = await fetchReactProp(node, [ { $find: 'userId', $in: [ 'child', 'memoizedProps' ] }, 'userId' ])
+	if (!id) return
 
-  const pronouns = await fetchPronouns('discord', id)
-  if (pronouns === 'unspecified') return
+	const pronouns = await fetchPronouns('discord', id)
+	if (pronouns === 'unspecified') return
 
-  const pronounsSection = h(
-    'div',
-    { style: css({ padding: '12px 0 0' }) },
-    h('div', { style: Styles.header }, 'Pronouns'),
-    h('div', { style: Styles.text }, formatPronouns(pronouns))
-  )
+	const pronounsSection = h(
+		'div',
+		{ style: css({ padding: '12px 0 0' }) },
+		h('div', { style: Styles.header }, 'Pronouns'),
+		h('div', { style: Styles.text }, formatPronouns(pronouns))
+	)
 
-  const sinceBlock = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling?.parentElement
-  if (!sinceBlock) return
+	const sinceBlock = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling?.parentElement
+	if (!sinceBlock) return
 
-  sinceBlock.parentElement?.insertBefore(pronounsSection, sinceBlock)
+	sinceBlock.parentElement?.insertBefore(pronounsSection, sinceBlock)
 
-  setTimeout(() => {
-    const { y, height } = node.getBoundingClientRect()
-    const bottom = window.innerHeight - y - height - 16
-    if (bottom < 0) node.style.top = `${parseInt(node.style.top, 10) + bottom}px`
-  }, 5)
+	setTimeout(() => {
+		const { y, height } = node.getBoundingClientRect()
+		const bottom = window.innerHeight - y - height - 16
+		if (bottom < 0) node.style.top = `${parseInt(node.style.top, 10) + bottom}px`
+	}, 5)
 }
 
 async function handleUserModal (node: HTMLElement) {
-  const id = await fetchReactProp(node, [ 'child', 'memoizedProps', 'user', 'id' ])
-  if (!id) return
+	const id = await fetchReactProp(node, [ 'child', 'memoizedProps', 'user', 'id' ])
+	if (!id) return
 
-  const pronouns = await fetchPronouns('discord', id)
-  if (pronouns === 'unspecified') return
+	const pronouns = await fetchPronouns('discord', id)
+	if (pronouns === 'unspecified') return
 
-  const container = node.querySelector<HTMLElement>('[class^="userInfoSection"]')
-  if (!container) return
+	const container = node.querySelector<HTMLElement>('[class^="userInfoSection"]')
+	if (!container) return
 
-  const frag = document.createDocumentFragment()
-  frag.appendChild(h('div', { class: 'userInfoSectionHeader-owo', style: Styles.header }, 'Pronouns'))
-  frag.appendChild(h('div', { style: Styles.text + css({ marginBottom: '16px' }) }, formatPronouns(pronouns)))
+	const frag = document.createDocumentFragment()
+	frag.appendChild(h('div', { class: 'userInfoSectionHeader-owo', style: Styles.header }, 'Pronouns'))
+	frag.appendChild(h('div', { style: Styles.text + css({ marginBottom: '16px' }) }, formatPronouns(pronouns)))
 
-  container.classList.add('has-pronouns')
+	container.classList.add('has-pronouns')
 
-  const sinceHeader = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling
-  if (!sinceHeader) return
+	const sinceHeader = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling
+	if (!sinceHeader) return
 
-  container.insertBefore(frag, sinceHeader)
+	container.insertBefore(frag, sinceHeader)
 }
 
 async function handleAutocompleteRow (row: HTMLElement) {
-  if (row.querySelector('.pronoundb-autocomplete-pronouns')) return
+	if (row.querySelector('.pronoundb-autocomplete-pronouns')) return
 
-  const id = await fetchReactProp(row, [ 'return', 'return', 'return', 'return', 'key' ])
-  if (!id) return
+	const id = await fetchReactProp(row, [ 'return', 'return', 'return', 'return', 'key' ])
+	if (!id) return
 
-  const pronouns = await fetchPronouns('discord', id)
-  if (pronouns === 'unspecified') return
+	const pronouns = await fetchPronouns('discord', id)
+	if (pronouns === 'unspecified') return
 
-  const tag = row.querySelector('[class*="autocompleteRowContentSecondary-"]')
-  if (!tag) return
+	const tag = row.querySelector('[class*="autocompleteRowContentSecondary-"]')
+	if (!tag) return
 
-  const element = document.createElement('span')
-  element.className = 'pronoundb-autocomplete-pronouns'
-  element.innerText = ` • ${formatPronouns(pronouns)}`
-  tag.appendChild(element)
+	const element = document.createElement('span')
+	element.className = 'pronoundb-autocomplete-pronouns'
+	element.innerText = ` • ${formatPronouns(pronouns)}`
+	tag.appendChild(element)
 }
 
 function handleMutation (mutations: MutationRecord[]) {
-  for (const { addedNodes } of mutations) {
-    for (const node of addedNodes) {
-      if (node instanceof HTMLElement) {
-        if (node.id.startsWith('chat-messages-')) {
-          handleMessage(node)
-          continue
-        }
+	for (const { addedNodes } of mutations) {
+		for (const node of addedNodes) {
+			if (node instanceof HTMLElement) {
+				if (node.id.startsWith('chat-messages-')) {
+					handleMessage(node)
+					continue
+				}
 
-        if (node.className.startsWith('chat-') || node.className.startsWith('chatContent-')) {
-          node.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
-          continue
-        }
+				if (node.className.startsWith('chat-') || node.className.startsWith('chatContent-')) {
+					node.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
+					continue
+				}
 
-        if (node.id.startsWith('popout_') && node.querySelector('div[role="dialog"] > [class^="userPopout"]')) {
-          handleUserPopOut(node)
-          continue
-        }
+				if (node.id.startsWith('popout_') && node.querySelector('div[role="dialog"] > [class^="userPopout"]')) {
+					handleUserPopOut(node)
+					continue
+				}
 
-        if (node.querySelector('div[class^="userInfoSection-"]')) {
-          if (node.querySelector('[aria-modal="true"]')) {
-            handleUserModal(node)
-            continue
-          }
+				if (node.querySelector('div[class^="userInfoSection-"]')) {
+					if (node.querySelector('[aria-modal="true"]')) {
+						handleUserModal(node)
+						continue
+					}
 
-          const modal = node.parentElement?.parentElement?.parentElement?.parentElement
-          if (modal) handleUserModal(modal)
-          continue
-        }
+					const modal = node.parentElement?.parentElement?.parentElement?.parentElement
+					if (modal) handleUserModal(modal)
+					continue
+				}
 
-        if (node.className.startsWith('autocomplete-')) {
-          const rows = Array.from(node.querySelectorAll('[class*="autocompleteRow-"]')) as HTMLElement[]
-          rows.filter((row) => row?.querySelector('[role="img"]')).forEach((row) => handleAutocompleteRow(row))
-          continue
-        }
+				if (node.className.startsWith('autocomplete-')) {
+					const rows = Array.from(node.querySelectorAll('[class*="autocompleteRow-"]')) as HTMLElement[]
+					rows.filter((row) => row?.querySelector('[role="img"]')).forEach((row) => handleAutocompleteRow(row))
+					continue
+				}
 
-        if (node.className.startsWith('autocompleteRow-') && node.querySelector('[role="img"]')) {
-          handleAutocompleteRow(node)
-          continue
-        }
-      }
-    }
-  }
+				if (node.className.startsWith('autocompleteRow-') && node.querySelector('[role="img"]')) {
+					handleAutocompleteRow(node)
+					continue
+				}
+			}
+		}
+	}
 }
 
 export function inject () {
-  // Process messages already loaded
-  document.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
+	// Process messages already loaded
+	document.querySelectorAll<HTMLElement>('li[id^=chat-messages-]').forEach((m) => handleMessage(m))
 
-  // Mutation observer
-  const observer = new MutationObserver(handleMutation)
-  observer.observe(document, { childList: true, subtree: true })
+	// Mutation observer
+	const observer = new MutationObserver(handleMutation)
+	observer.observe(document, { childList: true, subtree: true })
 }

@@ -30,30 +30,30 @@ import { Endpoints, WEBSITE } from './constants.js'
 
 // ONBOARDING & CHANGE LOGS
 chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === 'install') {
-    chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
-  }
+	if (details.reason === 'install') {
+		chrome.tabs.create({ url: `${WEBSITE}/onboarding` })
+	}
 
-  if (details.reason === 'update') {
-    // const prev = details.previousVersion!.split('.').map(Number)
-    // if (prev[0] === 0 && prev[1] < 6) {
-    //   chrome.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
-    // }
-  }
+	if (details.reason === 'update') {
+		// const prev = details.previousVersion!.split('.').map(Number)
+		// if (prev[0] === 0 && prev[1] < 6) {
+		//   chrome.tabs.create({ url: `${WEBSITE}/changelog/2021-11` })
+		// }
+	}
 })
 
 // HTTP HANDLER
 chrome.runtime.onMessage.addListener((request, _, cb) => {
-  if (request.kind === 'http') {
-    const url = request.ids.length === 1
-      ? Endpoints.LOOKUP(request.platform, request.ids[0])
-      : Endpoints.LOOKUP_BULK(request.platform, request.ids)
+	if (request.kind === 'http') {
+		const url = request.ids.length === 1
+			? Endpoints.LOOKUP(request.platform, request.ids[0])
+			: Endpoints.LOOKUP_BULK(request.platform, request.ids)
 
-    fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${import.meta.env.PDB_EXT_VERSION}` } })
-      .then((r) => r.json())
-      .then((d) => cb({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
-      .catch((e) => cb({ success: false, error: e }))
+		fetch(url, { headers: { 'x-pronoundb-source': `WebExtension/${import.meta.env.PDB_EXT_VERSION}` } })
+			.then((r) => r.json())
+			.then((d) => cb({ success: true, data: request.ids.length === 1 ? { [request.ids[0]]: d.pronouns } : d }))
+			.catch((e) => cb({ success: false, error: e }))
 
-    return true
-  }
+		return true
+	}
 })

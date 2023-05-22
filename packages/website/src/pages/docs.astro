@@ -40,83 +40,83 @@ import Link from '@components/Link.astro'
 const flash = handleFlash(Astro)
 ---
 <Layout flash={flash} title='API Documentation'>
-  <PageHeader>
-    <Fragment slot='namespace'>About PronounDB</Fragment>
-    <Fragment>API Documentation</Fragment>
-  </PageHeader>
-  <div class='mb-4 bg-blue-300 font-semibold p-4 dark:text-black'>
-    This will be rewritten soon, with a better look and a new API that includes new features. Stay tuned!
-  </div>
+	<PageHeader>
+		<Fragment slot='namespace'>About PronounDB</Fragment>
+		<Fragment>API Documentation</Fragment>
+	</PageHeader>
+	<div class='mb-4 bg-blue-300 font-semibold p-4 dark:text-black'>
+		This will be rewritten soon, with a better look and a new API that includes new features. Stay tuned!
+	</div>
 
-  <h2 class='text-2xl font-bold mb-2' id='endpoints'>API endpoints</h2>
-  <h3 class='text-xl font-bold mb-2' id='lookup'>Lookup an account</h3>
-  <p class='font-semibold'>GET /api/v1/lookup?platform=[platform]&amp;id=[id]</p>
-  <p>Query parameters</p>
-  <ul class='list-inside list-disc mb-2'>
-    <li><code>platform</code>: A supported platform as described below.</li>
-    <li><code>id</code>: Account ID.</li>
-  </ul>
-  <p class='mb-4'>Response: A JSON object with a <code>pronouns</code> property.</p>
+	<h2 class='text-2xl font-bold mb-2' id='endpoints'>API endpoints</h2>
+	<h3 class='text-xl font-bold mb-2' id='lookup'>Lookup an account</h3>
+	<p class='font-semibold'>GET /api/v1/lookup?platform=[platform]&amp;id=[id]</p>
+	<p>Query parameters</p>
+	<ul class='list-inside list-disc mb-2'>
+		<li><code>platform</code>: A supported platform as described below.</li>
+		<li><code>id</code>: Account ID.</li>
+	</ul>
+	<p class='mb-4'>Response: A JSON object with a <code>pronouns</code> property.</p>
 
-  <h3 class='text-xl font-bold mb-2' id='bulk'>Lookup accounts in bulk</h3>
-  <p class='font-semibold'>GET /api/v1/lookup-bulk?platform=[platform]&amp;ids=[ids...]</p>
-  <p>Query parameters</p>
-  <ul class='list-inside list-disc mb-2'>
-    <li><code>platform</code>: A supported platform as described below.</li>
-    <li><code>ids</code>: Comma-separated Account IDs. Maximum 50.</li>
-  </ul>
-  <p class='mb-4'>Response: A map of IDs with their corresponding set of pronouns.</p>
+	<h3 class='text-xl font-bold mb-2' id='bulk'>Lookup accounts in bulk</h3>
+	<p class='font-semibold'>GET /api/v1/lookup-bulk?platform=[platform]&amp;ids=[ids...]</p>
+	<p>Query parameters</p>
+	<ul class='list-inside list-disc mb-2'>
+		<li><code>platform</code>: A supported platform as described below.</li>
+		<li><code>ids</code>: Comma-separated Account IDs. Maximum 50.</li>
+	</ul>
+	<p class='mb-4'>Response: A map of IDs with their corresponding set of pronouns.</p>
 
-  <h3 class='text-xl font-bold mb-2' id='shields-io'>shields.io endpoint</h3>
-  <div class='mb-2'>
-    You can use shields.io's endpoint functionality to create a badge of your pronouns using PronounDB's API. The
-    endpoint is at <code>/shields/[pronoundbId].json</code>. By default, everything will be in lowercase, but you can
-    add the <code>capitalize</code> query parameter to change this behavior. The PronounDB ID is shown under
-    "Advanced settings" in your account screen.
-  </div>
-  <div class='mb-2'>
-    See <Link href='https://shields.io/endpoint'>shields.io's docs</Link> for more information. Below is an example
-    badge of the website's developer pronouns.
-  </div>
-  <div class='mb-6'>
-    <pre class='mb-3 overflow-x-auto bg-gray-200 dark:bg-gray-700 p-2 text-sm'>https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6.json</pre>
-    <img src="https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6.json" alt="">
-  </div>
+	<h3 class='text-xl font-bold mb-2' id='shields-io'>shields.io endpoint</h3>
+	<div class='mb-2'>
+		You can use shields.io's endpoint functionality to create a badge of your pronouns using PronounDB's API. The
+		endpoint is at <code>/shields/[pronoundbId].json</code>. By default, everything will be in lowercase, but you can
+		add the <code>capitalize</code> query parameter to change this behavior. The PronounDB ID is shown under
+		"Advanced settings" in your account screen.
+	</div>
+	<div class='mb-2'>
+		See <Link href='https://shields.io/endpoint'>shields.io's docs</Link> for more information. Below is an example
+		badge of the website's developer pronouns.
+	</div>
+	<div class='mb-6'>
+		<pre class='mb-3 overflow-x-auto bg-gray-200 dark:bg-gray-700 p-2 text-sm'>https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6.json</pre>
+		<img src="https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6.json" alt="">
+	</div>
 
-  <h2 class='text-2xl font-bold mb-2' id='data-types'>Data types</h2>
-  <h3 class='text-xl font-bold mb-2' id='data-pronouns'>Pronouns</h3>
-  <ul class='list-inside list-disc mb-4'>
-    <li><code>unspecified</code>: Unspecified</li>
-    <li><code>hh</code>: he/him</li>
-    <li><code>hi</code>: he/it</li>
-    <li><code>hs</code>: he/she</li>
-    <li><code>ht</code>: he/they</li>
-    <li><code>ih</code>: it/him</li>
-    <li><code>ii</code>: it/its</li>
-    <li><code>is</code>: it/she</li>
-    <li><code>it</code>: it/they</li>
-    <li><code>shh</code>: she/he</li>
-    <li><code>sh</code>: she/her</li>
-    <li><code>si</code>: she/it</li>
-    <li><code>st</code>: she/they</li>
-    <li><code>th</code>: they/he</li>
-    <li><code>ti</code>: they/it</li>
-    <li><code>ts</code>: they/she</li>
-    <li><code>tt</code>: they/them</li>
-    <li><code>any</code>: Any pronouns</li>
-    <li><code>other</code>: Other pronouns</li>
-    <li><code>ask</code>: Ask me my pronouns</li>
-    <li><code>avoid</code>: Avoid pronouns, use my name</li>
-  </ul>
+	<h2 class='text-2xl font-bold mb-2' id='data-types'>Data types</h2>
+	<h3 class='text-xl font-bold mb-2' id='data-pronouns'>Pronouns</h3>
+	<ul class='list-inside list-disc mb-4'>
+		<li><code>unspecified</code>: Unspecified</li>
+		<li><code>hh</code>: he/him</li>
+		<li><code>hi</code>: he/it</li>
+		<li><code>hs</code>: he/she</li>
+		<li><code>ht</code>: he/they</li>
+		<li><code>ih</code>: it/him</li>
+		<li><code>ii</code>: it/its</li>
+		<li><code>is</code>: it/she</li>
+		<li><code>it</code>: it/they</li>
+		<li><code>shh</code>: she/he</li>
+		<li><code>sh</code>: she/her</li>
+		<li><code>si</code>: she/it</li>
+		<li><code>st</code>: she/they</li>
+		<li><code>th</code>: they/he</li>
+		<li><code>ti</code>: they/it</li>
+		<li><code>ts</code>: they/she</li>
+		<li><code>tt</code>: they/them</li>
+		<li><code>any</code>: Any pronouns</li>
+		<li><code>other</code>: Other pronouns</li>
+		<li><code>ask</code>: Ask me my pronouns</li>
+		<li><code>avoid</code>: Avoid pronouns, use my name</li>
+	</ul>
 
-  <h3 class='text-xl font-bold mb-2' id='data-platforms'>Platforms</h3>
-  <ul class='list-inside list-disc'>
-    {providers.map((p) => <li><code>{p}</code></li>)}
-  </ul>
+	<h3 class='text-xl font-bold mb-2' id='data-platforms'>Platforms</h3>
+	<ul class='list-inside list-disc'>
+		{providers.map((p) => <li><code>{p}</code></li>)}
+	</ul>
 </Layout>
 
 <style>
-  code {
-    @apply px-1 bg-gray-200 dark:bg-gray-700
-  }
+	code {
+		@apply px-1 bg-gray-200 dark:bg-gray-700
+	}
 </style>

@@ -30,27 +30,27 @@ import test from './test.js'
 import { expect } from '@playwright/test'
 
 test('Profile shows pronouns', async ({ page }) => {
-  await page.goto('https://github.com/cyyynthia')
-  await expect(page.locator('.vcard-details >> text=it/its')).toHaveCount(1)
+	await page.goto('https://github.com/cyyynthia')
+	await expect(page.locator('.vcard-details >> text=it/its')).toHaveCount(1)
 })
 
 test('Followers/following page shows pronouns', async ({ page }) => {
-  await page.goto('https://github.com/cyyynthia?tab=followers')
-  await expect(page.locator('.Layout-main p >> text=they/them')).toHaveCount(50)
+	await page.goto('https://github.com/cyyynthia?tab=followers')
+	await expect(page.locator('.Layout-main p >> text=they/them')).toHaveCount(50)
 })
 
 test('Hovercard shows pronouns', async ({ page }) => {
-  await page.goto('https://github.com/cyyynthia/pronoundb.org')
-  await page.locator('[data-hovercard-url="/users/cyyynthia/hovercard"]').first().hover()
-  await expect(page.locator('.Popover-message >> text=it/its')).toHaveCount(1)
+	await page.goto('https://github.com/cyyynthia/pronoundb.org')
+	await page.locator('[data-hovercard-url="/users/cyyynthia/hovercard"]').first().hover()
+	await expect(page.locator('.Popover-message >> text=it/its')).toHaveCount(1)
 })
 
 test.describe('Implementation quirks', () => {
-  test('Profile pronouns stay when changing tab', async ({ page }) => {
-    await page.goto('https://github.com/cyyynthia?tab=stars')
-    await page.locator('.UnderlineNav >> text=Overview').first().click()
-    await expect(page.locator('.vcard-details >> text=it/its')).toHaveCount(1)
-    await page.locator('.UnderlineNav >> text=Stars').first().click()
-    await expect(page.locator('.vcard-details >> text=it/its')).toHaveCount(1)
-  })
+	test('Profile pronouns stay when changing tab', async ({ page }) => {
+		await page.goto('https://github.com/cyyynthia?tab=stars')
+		await page.locator('.UnderlineNav >> text=Overview').first().click()
+		await expect(page.locator('.vcard-details >> text=it/its')).toHaveCount(1)
+		await page.locator('.UnderlineNav >> text=Stars').first().click()
+		await expect(page.locator('.vcard-details >> text=it/its')).toHaveCount(1)
+	})
 })

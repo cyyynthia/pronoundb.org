@@ -39,15 +39,15 @@ export const tokenUrl = 'https://api.twitter.com/2/oauth2/token'
 export const scopes = [ 'users.read', 'tweet.read' ]
 
 export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
-  const res = await fetch('https://api.twitter.com/2/users/me', {
-    headers: {
-      authorization: `Bearer ${token}`,
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-    },
-  })
+	const res = await fetch('https://api.twitter.com/2/users/me', {
+		headers: {
+			authorization: `Bearer ${token}`,
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+		},
+	})
 
-  if (!res.ok) return null
-  const { data } = await res.json()
+	if (!res.ok) return null
+	const { data } = await res.json()
 
-  return { id: data.id, name: `${data.name} (@${data.username})`, platform: 'twitter' }
+	return { id: data.id, name: `${data.name} (@${data.username})`, platform: 'twitter' }
 }

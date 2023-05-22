@@ -37,29 +37,29 @@ const INTENTS = [ 'register', 'login', 'link' ]
 const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
 
 export async function get (ctx: APIContext) {
-  const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
-  if (!platform) return new Response('400: Invalid provider', { status: 400 })
+	const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
+	if (!platform) return new Response('400: Invalid provider', { status: 400 })
 
-  const token = ctx.cookies.get('token').value
-  const intent = ctx.url.searchParams.get('intent') ?? 'login'
-  const user = token ? await authenticate(ctx) : null
+	const token = ctx.cookies.get('token').value
+	const intent = ctx.url.searchParams.get('intent') ?? 'login'
+	const user = token ? await authenticate(ctx) : null
 
-  if (!INTENTS.includes(intent)) {
-    return new Response('400: Invalid intent', { status: 400 })
-  }
+	if (!INTENTS.includes(intent)) {
+		return new Response('400: Invalid intent', { status: 400 })
+	}
 
-  if ((intent === 'register' || intent === 'login') && user) {
-    return ctx.redirect('/me')
-  }
+	if ((intent === 'register' || intent === 'login') && user) {
+		return ctx.redirect('/me')
+	}
 
-  if (intent === 'link' && !user) {
-    return ctx.redirect('/')
-  }
+	if (intent === 'link' && !user) {
+		return ctx.redirect('/')
+	}
 
-  switch (platform.oauthVersion) {
-    case 1:
-      return authorize1(ctx, platform) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
-    case 2:
-      return authorize2(ctx, platform)
-  }
+	switch (platform.oauthVersion) {
+		case 1:
+			return authorize1(ctx, platform) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
+		case 2:
+			return authorize2(ctx, platform)
+	}
 }

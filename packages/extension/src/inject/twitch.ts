@@ -29,59 +29,59 @@
 import { fetchReactProp } from '../utils/proxy'
 
 export default function () {
-  const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')
-  const kCustomHandler = Symbol('pdb.ttv.custom-handler')
+	const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')
+	const kCustomHandler = Symbol('pdb.ttv.custom-handler')
 
-  window.addEventListener('message', async (e) => {
-    if (e.source === window && e.data?.source === 'pronoundb') {
-      const data = e.data.payload
-      if (data.action === 'ttv.inject-chat') {
-        const chat = document.querySelector<HTMLElement>('.chat-list--default')
-        if (!chat) return
+	window.addEventListener('message', async (e) => {
+		if (e.source === window && e.data?.source === 'pronoundb') {
+			const data = e.data.payload
+			if (data.action === 'ttv.inject-chat') {
+				const chat = document.querySelector<HTMLElement>('.chat-list--default')
+				if (!chat) return
 
-        const handler = await fetchReactProp(chat, [ { $find: 'messageHandlerAPI', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messageHandlerAPI' ])
-        if (handler.handleMessage[kCustomHandler]) return
+				const handler = await fetchReactProp(chat, [ { $find: 'messageHandlerAPI', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messageHandlerAPI' ])
+				if (handler.handleMessage[kCustomHandler]) return
 
-        const ogDesc = Reflect.getOwnPropertyDescriptor(handler, 'handleMessage')!
-        Reflect.defineProperty(handler, kOriginalHandler, ogDesc)
+				const ogDesc = Reflect.getOwnPropertyDescriptor(handler, 'handleMessage')!
+				Reflect.defineProperty(handler, kOriginalHandler, ogDesc)
 
-        const patchedHandleMessage = (m: any) => {
-          if (m?.id && m.user?.userID) {
-            window.postMessage({
-              source: 'pronoundb',
-              payload: {
-                action: 'ttv.chat.msg',
-                id: m.id,
-                user: m.user.userID,
-              },
-            }, e.origin)
-          }
+				const patchedHandleMessage = (m: any) => {
+					if (m?.id && m.user?.userID) {
+						window.postMessage({
+							source: 'pronoundb',
+							payload: {
+								action: 'ttv.chat.msg',
+								id: m.id,
+								user: m.user.userID,
+							},
+						}, e.origin)
+					}
 
-          handler[kOriginalHandler](m)
-        }
+					handler[kOriginalHandler](m)
+				}
 
-        // @ts-expect-error
-        patchedHandleMessage[kCustomHandler] = true
-        Reflect.defineProperty(handler, 'handleMessage', {
-          value: import.meta.env.PDB_BROWSER_TARGET !== 'chrome'
-            ? cloneInto(patchedHandleMessage, window, { cloneFunctions: true })
-            : patchedHandleMessage,
-        })
+				// @ts-expect-error
+				patchedHandleMessage[kCustomHandler] = true
+				Reflect.defineProperty(handler, 'handleMessage', {
+					value: import.meta.env.PDB_BROWSER_TARGET !== 'chrome'
+						? cloneInto(patchedHandleMessage, window, { cloneFunctions: true })
+						: patchedHandleMessage,
+				})
 
-        const messages = await fetchReactProp(chat, [ { $find: 'messagesHash', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messagesHash' ])
-        for (const m of messages) {
-          if (m?.id && m.user?.userID) {
-            window.postMessage({
-              source: 'pronoundb',
-              payload: {
-                action: 'ttv.chat.msg',
-                id: m.id,
-                user: m.user.userID,
-              },
-            }, e.origin)
-          }
-        }
-      }
-    }
-  })
+				const messages = await fetchReactProp(chat, [ { $find: 'messagesHash', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messagesHash' ])
+				for (const m of messages) {
+					if (m?.id && m.user?.userID) {
+						window.postMessage({
+							source: 'pronoundb',
+							payload: {
+								action: 'ttv.chat.msg',
+								id: m.id,
+								user: m.user.userID,
+							},
+						}, e.origin)
+					}
+				}
+			}
+		}
+	})
 }

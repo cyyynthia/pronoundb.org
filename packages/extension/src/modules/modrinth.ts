@@ -40,96 +40,96 @@ export const match = /^https:\/\/modrinth\.com/
 export { default as Icon } from '../../assets/modrinth.svg'
 
 async function fetchUntilData (el: HTMLElement, queries: QueryElement[][]) {
-  for (let i = 1; i < 20; i++) {
-    for (const query of queries) {
-      const data = await fetchVueProp(el, query)
-      if (data !== void 0) return data
-    }
+	for (let i = 1; i < 20; i++) {
+		for (const query of queries) {
+			const data = await fetchVueProp(el, query)
+			if (data !== void 0) return data
+		}
 
-    await new Promise((r) => setTimeout(r, i * 25))
-  }
+		await new Promise((r) => setTimeout(r, i * 25))
+	}
 
-  return null
+	return null
 }
 
 async function processProfileInfo () {
-  const layout = document.getElementById('main') as HTMLElement
-  const githubId = await fetchUntilData(layout, [
-    [ 'user', 'github_id' ],
-    [ '$children', '0', 'user', 'github_id' ],
-    [ '$parent', '$children', '0', 'user', 'github_id' ],
-  ])
-  if (!githubId) return
+	const layout = document.getElementById('main') as HTMLElement
+	const githubId = await fetchUntilData(layout, [
+		[ 'user', 'github_id' ],
+		[ '$children', '0', 'user', 'github_id' ],
+		[ '$parent', '$children', '0', 'user', 'github_id' ],
+	])
+	if (!githubId) return
 
-  const pronouns = await fetchPronouns('github', githubId.toString())
-  if (pronouns === 'unspecified') return
+	const pronouns = await fetchPronouns('github', githubId.toString())
+	if (pronouns === 'unspecified') return
 
-  const stat = document.querySelector<HTMLElement>('.primary-stat')
-  if (!stat) return
+	const stat = document.querySelector<HTMLElement>('.primary-stat')
+	if (!stat) return
 
-  const pronounsInfo = stat.cloneNode() as HTMLElement
+	const pronounsInfo = stat.cloneNode() as HTMLElement
 
-  // zzzzzz thanks vue' "scoped" styles (1 scope targets 99% of the app) (there are no conflicting classes) (:
-  const vData = Object.keys(pronounsInfo.dataset).find((d) => d.startsWith('v-'))!
-  const dataAttr = `data-${vData}`
+	// zzzzzz thanks vue' "scoped" styles (1 scope targets 99% of the app) (there are no conflicting classes) (:
+	const vData = Object.keys(pronounsInfo.dataset).find((d) => d.startsWith('v-'))!
+	const dataAttr = `data-${vData}`
 
-  const icon = messageCircle({ class: 'primary-stat__icon', [dataAttr]: '' })
-  const [ a, b ] = formatPronounsSuffixed(pronouns)
-  const span = h(
-    'div',
-    { class: 'primary-stat__text', [dataAttr]: '' },
-    h('span', { class: 'primary-stat__counter', [dataAttr]: '' }, a),
-    ' ',
-    h('span', { class: 'primary-stat__label', [dataAttr]: '' }, b)
-  )
+	const icon = messageCircle({ class: 'primary-stat__icon', [dataAttr]: '' })
+	const [ a, b ] = formatPronounsSuffixed(pronouns)
+	const span = h(
+		'div',
+		{ class: 'primary-stat__text', [dataAttr]: '' },
+		h('span', { class: 'primary-stat__counter', [dataAttr]: '' }, a),
+		' ',
+		h('span', { class: 'primary-stat__label', [dataAttr]: '' }, b)
+	)
 
-  pronounsInfo.appendChild(icon)
-  pronounsInfo.appendChild(span)
-  stat.parentElement?.insertBefore(pronounsInfo, stat)
+	pronounsInfo.appendChild(icon)
+	pronounsInfo.appendChild(span)
+	stat.parentElement?.insertBefore(pronounsInfo, stat)
 }
 
 async function processTeamMembers () {
-  const layout = document.getElementById('main') as HTMLElement
-  const members = await fetchUntilData(layout, [
-    [ 'members' ],
-    [ '$children', '0', 'members' ],
-    [ '$parent', '$children', '0', 'members' ],
-  ])
-  if (!members) return
+	const layout = document.getElementById('main') as HTMLElement
+	const members = await fetchUntilData(layout, [
+		[ 'members' ],
+		[ '$children', '0', 'members' ],
+		[ '$parent', '$children', '0', 'members' ],
+	])
+	if (!members) return
 
-  // Weird Firefox behavior telling me I don't have access to the object if I use .map
-  const promises = []
-  for (let i = 0; i < members.length; i++) {
-    promises.push(fetchPronouns('github', members[i].user.github_id.toString()))
-  }
+	// Weird Firefox behavior telling me I don't have access to the object if I use .map
+	const promises = []
+	for (let i = 0; i < members.length; i++) {
+		promises.push(fetchPronouns('github', members[i].user.github_id.toString()))
+	}
 
-  const membersPronouns = await Promise.all(promises)
-  for (let i = 0; i < members.length; i++) {
-    const member = members[i]
-    const pronouns = membersPronouns[i]
-    if (pronouns === 'unspecified') continue
+	const membersPronouns = await Promise.all(promises)
+	for (let i = 0; i < members.length; i++) {
+		const member = members[i]
+		const pronouns = membersPronouns[i]
+		if (pronouns === 'unspecified') continue
 
-    const linkEl = document.querySelector(`.normal-page__info .team-member .member-info a[href='/user/${member.name}']`)
-    if (!linkEl) continue
+		const linkEl = document.querySelector(`.normal-page__info .team-member .member-info a[href='/user/${member.name}']`)
+		if (!linkEl) continue
 
-    const newLink = linkEl.cloneNode(true)
-    const p = newLink.firstChild as HTMLElement
-    p.style.margin = '0'
+		const newLink = linkEl.cloneNode(true)
+		const p = newLink.firstChild as HTMLElement
+		p.style.margin = '0'
 
-    linkEl.parentElement?.replaceChild(
-      h(
-        'div',
-        { style: css({ display: 'flex', alignItems: 'center', gap: '4px', margin: '0.2rem 0' }) },
-        newLink,
-        h(
-          'span',
-          { style: css({ fontSize: 'var(--font-size-xs)' }) },
-          `(${formatPronouns(pronouns)})`
-        )
-      ),
-      linkEl
-    )
-  }
+		linkEl.parentElement?.replaceChild(
+			h(
+				'div',
+				{ style: css({ display: 'flex', alignItems: 'center', gap: '4px', margin: '0.2rem 0' }) },
+				newLink,
+				h(
+					'span',
+					{ style: css({ fontSize: 'var(--font-size-xs)' }) },
+					`(${formatPronouns(pronouns)})`
+				)
+			),
+			linkEl
+		)
+	}
 }
 
 // Modrinth doesn't expose GH ID here. :shrug:
@@ -144,38 +144,38 @@ async function processTeamMembers () {
 // }
 
 function processPage () {
-  if (document.querySelector('.normal-page__info .team-member')) {
-    processTeamMembers()
-  }
+	if (document.querySelector('.normal-page__info .team-member')) {
+		processTeamMembers()
+	}
 
-  if (document.querySelector('.user-header-wrapper')) {
-    processProfileInfo()
-  }
+	if (document.querySelector('.user-header-wrapper')) {
+		processProfileInfo()
+	}
 }
 
 function handleMutation (nodes: MutationRecord[]) {
-  // let itemsSeen = false
-  for (const { addedNodes } of nodes) {
-    for (const added of addedNodes) {
-      if (added instanceof HTMLElement) {
-        // if (!itemsSeen && added.classList.contains('project-card')) {
-        //   itemsSeen = true
-        //   processProjectItems()
-        // }
+	// let itemsSeen = false
+	for (const { addedNodes } of nodes) {
+		for (const added of addedNodes) {
+			if (added instanceof HTMLElement) {
+				// if (!itemsSeen && added.classList.contains('project-card')) {
+				//   itemsSeen = true
+				//   processProjectItems()
+				// }
 
-        if (added.id === 'main') {
-          processPage()
-        }
-      }
-    }
-  }
+				if (added.id === 'main') {
+					processPage()
+				}
+			}
+		}
+	}
 }
 
 export function inject () {
-  // Process loaded page
-  processPage()
+	// Process loaded page
+	processPage()
 
-  // Start observer
-  const observer = new MutationObserver(handleMutation)
-  observer.observe(document, { childList: true, subtree: true })
+	// Start observer
+	const observer = new MutationObserver(handleMutation)
+	observer.observe(document, { childList: true, subtree: true })
 }

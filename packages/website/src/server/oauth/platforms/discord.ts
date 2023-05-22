@@ -38,15 +38,15 @@ export const tokenUrl = 'https://discord.com/api/v10/oauth2/token'
 export const scopes = [ 'identify' ]
 
 export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
-  const res = await fetch('https://discord.com/api/v10/users/@me', {
-    headers: {
-      authorization: `Bearer ${token}`,
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-    },
-  })
+	const res = await fetch('https://discord.com/api/v10/users/@me', {
+		headers: {
+			authorization: `Bearer ${token}`,
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+		},
+	})
 
-  if (!res.ok) return null
-  const data = await res.json()
+	if (!res.ok) return null
+	const data = await res.json()
 
-  return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
+	return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
 }

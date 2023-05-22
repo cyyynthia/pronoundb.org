@@ -34,111 +34,111 @@ import { randomUUID, createHash } from 'crypto'
 import { encode } from 'querystring'
 
 export type OAuth2Params = {
-  oauthVersion: 2
-  oauthUsePkce?: boolean
-  clientId: string
-  clientSecret: string
+	oauthVersion: 2
+	oauthUsePkce?: boolean
+	clientId: string
+	clientSecret: string
 
-  authorizationUrl: string
-  tokenUrl: string
-  scopes: string[]
+	authorizationUrl: string
+	tokenUrl: string
+	scopes: string[]
 
-  getSelf: (token: string) => Promise<ExternalAccount | FlashMessage | null>
+	getSelf: (token: string) => Promise<ExternalAccount | FlashMessage | null>
 }
 
 const states = new Set<string>()
 const challenges = new Map<string, string>()
 
 export async function authorize ({ url, params, cookies, redirect, site }: APIContext, oauth: OAuth2Params) {
-  const intent = url.searchParams.get('intent') ?? 'login'
-  const callbackPath = new URL('callback', url).pathname
-  const callbackUrl = new URL(callbackPath, site)
+	const intent = url.searchParams.get('intent') ?? 'login'
+	const callbackPath = new URL('callback', url).pathname
+	const callbackUrl = new URL(callbackPath, site)
 
-  const state = randomUUID()
-  const fullState = `${params.platform}-${state}-${intent}`
-  states.add(fullState)
+	const state = randomUUID()
+	const fullState = `${params.platform}-${state}-${intent}`
+	states.add(fullState)
 
-  const parameters: Record<string, string> = {
-    state: state,
-    response_type: 'code',
-    scope: oauth.scopes.join(' '),
-    client_id: oauth.clientId,
-    redirect_uri: callbackUrl.href,
-  }
+	const parameters: Record<string, string> = {
+		state: state,
+		response_type: 'code',
+		scope: oauth.scopes.join(' '),
+		client_id: oauth.clientId,
+		redirect_uri: callbackUrl.href,
+	}
 
-  if (oauth.oauthUsePkce) {
-    const challenge = randomUUID()
-    parameters.code_challenge = createHash('sha256').update(challenge).digest('base64url')
-    parameters.code_challenge_method = 'S256'
-    challenges.set(fullState, challenge)
-  }
+	if (oauth.oauthUsePkce) {
+		const challenge = randomUUID()
+		parameters.code_challenge = createHash('sha256').update(challenge).digest('base64url')
+		parameters.code_challenge_method = 'S256'
+		challenges.set(fullState, challenge)
+	}
 
-  setTimeout(() => {
-    states.delete(fullState)
-    challenges.delete(fullState)
-  }, 300e3)
+	setTimeout(() => {
+		states.delete(fullState)
+		challenges.delete(fullState)
+	}, 300e3)
 
-  cookies.set('state', state, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  return redirect(`${oauth.authorizationUrl}?${encode(parameters)}`)
+	cookies.set('state', state, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+	cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+	return redirect(`${oauth.authorizationUrl}?${encode(parameters)}`)
 }
 
 export async function callback ({ url, params, cookies, site }: APIContext, oauth: OAuth2Params) {
-  const stateCookie = cookies.get('state').value
-  const intentCookie = cookies.get('intent').value
-  const state = url.searchParams.get('state')
-  const code = url.searchParams.get('code')
+	const stateCookie = cookies.get('state').value
+	const intentCookie = cookies.get('intent').value
+	const state = url.searchParams.get('state')
+	const code = url.searchParams.get('code')
 
-  if (!stateCookie || !intentCookie || !state || !code) {
-    return 'E_CSRF'
-  }
+	if (!stateCookie || !intentCookie || !state || !code) {
+		return 'E_CSRF'
+	}
 
-  const fullState = `${params.platform}-${state}-${intentCookie}`
-  const expectedState = `${params.platform}-${stateCookie}-${intentCookie}`
-  if (fullState !== expectedState || !states.delete(fullState)) {
-    return 'E_CSRF'
-  }
+	const fullState = `${params.platform}-${state}-${intentCookie}`
+	const expectedState = `${params.platform}-${stateCookie}-${intentCookie}`
+	if (fullState !== expectedState || !states.delete(fullState)) {
+		return 'E_CSRF'
+	}
 
-  const cleanRedirectUrl = new URL(url.pathname, site)
-  const parameters: Record<string, string> = {
-    state: state,
-    client_id: oauth.clientId,
-    client_secret: oauth.clientSecret,
-    redirect_uri: cleanRedirectUrl.href,
-    scope: oauth.scopes.join(' '),
-    grant_type: 'authorization_code',
-    code: code,
-  }
+	const cleanRedirectUrl = new URL(url.pathname, site)
+	const parameters: Record<string, string> = {
+		state: state,
+		client_id: oauth.clientId,
+		client_secret: oauth.clientSecret,
+		redirect_uri: cleanRedirectUrl.href,
+		scope: oauth.scopes.join(' '),
+		grant_type: 'authorization_code',
+		code: code,
+	}
 
-  if (oauth.oauthUsePkce) {
-    parameters.code_verifier = challenges.get(fullState)!
-    challenges.delete(fullState)
-  }
+	if (oauth.oauthUsePkce) {
+		parameters.code_verifier = challenges.get(fullState)!
+		challenges.delete(fullState)
+	}
 
-  const res = await fetch(oauth.tokenUrl, {
-    method: 'POST',
-    headers: {
-      accept: 'application/json',
-      'content-type': 'application/x-www-form-urlencoded',
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-      authorization: `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`,
-    },
-    body: encode(parameters),
-  })
+	const res = await fetch(oauth.tokenUrl, {
+		method: 'POST',
+		headers: {
+			accept: 'application/json',
+			'content-type': 'application/x-www-form-urlencoded',
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+			authorization: `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`,
+		},
+		body: encode(parameters),
+	})
 
-  if (!res.ok) {
-    return null
-  }
+	if (!res.ok) {
+		return null
+	}
 
-  const { access_token: accessToken } = await res.json()
-  if (!accessToken) {
-    return null
-  }
+	const { access_token: accessToken } = await res.json()
+	if (!accessToken) {
+		return null
+	}
 
-  const user = await oauth.getSelf(accessToken)
-  if (!user) {
-    return 'E_OAUTH_FETCH'
-  }
+	const user = await oauth.getSelf(accessToken)
+	if (!user) {
+		return 'E_OAUTH_FETCH'
+	}
 
-  return user
+	return user
 }

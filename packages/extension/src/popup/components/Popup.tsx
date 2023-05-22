@@ -37,41 +37,41 @@ import * as Views from './Views'
 import { getModule } from '../../modules'
 
 function Main ({ view }: { view: ViewState }) {
-  const [ mdl, setMdl ] = useState<false | null | ExtensionModule>(false)
-  useEffect(() => void getModule().then((m) => setMdl(m)), [ setMdl ])
+	const [ mdl, setMdl ] = useState<false | null | ExtensionModule>(false)
+	useEffect(() => void getModule().then((m) => setMdl(m)), [ setMdl ])
 
-  if (view === ViewState.MAIN) {
-    if (mdl === false) return null
-    if (!mdl) return <Views.Unsupported/>
-    return <Views.Main module={mdl}/>
-  }
+	if (view === ViewState.MAIN) {
+		if (mdl === false) return null
+		if (!mdl) return <Views.Unsupported/>
+		return <Views.Main module={mdl}/>
+	}
 
-  if (view === ViewState.SETTINGS) {
-    return <Views.Settings/>
-  }
+	if (view === ViewState.SETTINGS) {
+		return <Views.Settings/>
+	}
 
-  return null
+	return null
 }
 
 export default function Popup () {
-  const [ selfPronouns, setSelfPronouns ] = useState(null)
-  const [ view, setView ] = useState(ViewState.MAIN)
-  const openPronounsSelector = useCallback(() => { chrome.tabs.create({ url: `${WEBSITE}/me` }) }, [])
-  const openSettings = useCallback(() => { setView(ViewState.SETTINGS) }, [])
-  const closeSettings = useCallback(() => { setView(ViewState.MAIN) }, [])
+	const [ selfPronouns, setSelfPronouns ] = useState(null)
+	const [ view, setView ] = useState(ViewState.MAIN)
+	const openPronounsSelector = useCallback(() => { chrome.tabs.create({ url: `${WEBSITE}/me` }) }, [])
+	const openSettings = useCallback(() => { setView(ViewState.SETTINGS) }, [])
+	const closeSettings = useCallback(() => { setView(ViewState.MAIN) }, [])
 
-  useEffect(() => {
-    fetch(Endpoints.LOOKUP_SELF, { credentials: 'include' })
-      .then((r) => r.json())
-      .then((u) => setSelfPronouns(u.pronouns ?? null))
-      .catch()
-  }, [])
+	useEffect(() => {
+		fetch(Endpoints.LOOKUP_SELF, { credentials: 'include' })
+			.then((r) => r.json())
+			.then((u) => setSelfPronouns(u.pronouns ?? null))
+			.catch()
+	}, [])
 
-  return (
-    <div class='flex flex-col h-full'>
-      <Header view={view} onOpenSettings={openSettings} onCloseSettings={closeSettings}/>
-      <Main view={view}/>
-      <Footer selfPronouns={selfPronouns} onOpenPronounsSelector={openPronounsSelector}/>
-    </div>
-  )
+	return (
+		<div class='flex flex-col h-full'>
+			<Header view={view} onOpenSettings={openSettings} onCloseSettings={closeSettings}/>
+			<Main view={view}/>
+			<Footer selfPronouns={selfPronouns} onOpenPronounsSelector={openPronounsSelector}/>
+		</div>
+	)
 }

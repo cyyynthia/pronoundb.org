@@ -29,20 +29,20 @@
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  darkMode: 'media',
-  content: [ './**/*.html', './src/**/*.tsx' ],
-  theme: {
-    fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
-    extend: {
-      colors: {
-        pink: {
-          DEFAULT: '#f49898',
-          dark: '#bb6570',
-        },
-        cyan: colors.cyan,
-        gray: colors.neutral,
-      },
-    },
-  },
-  plugins: [],
+	darkMode: 'media',
+	content: [ './**/*.html', './src/**/*.tsx' ],
+	theme: {
+		fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+		extend: {
+			colors: {
+				pink: {
+					DEFAULT: '#f49898',
+					dark: '#bb6570',
+				},
+				cyan: colors.cyan,
+				gray: colors.neutral,
+			},
+		},
+	},
+	plugins: [],
 }

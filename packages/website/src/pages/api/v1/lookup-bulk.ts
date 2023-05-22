@@ -32,91 +32,91 @@ import { findPronounsOf } from '@server/database/account.js'
 import { providers } from '@server/oauth/providers.js'
 
 export async function get (ctx: APIContext) {
-  const platform = ctx.url.searchParams.get('platform')
-  const idsStr = ctx.url.searchParams.get('ids')
+	const platform = ctx.url.searchParams.get('platform')
+	const idsStr = ctx.url.searchParams.get('ids')
 
-  if (!platform || !idsStr) {
-    return new Response(
-      JSON.stringify({
-        errorCode: 400,
-        error: 'Bad request',
-        message: '`platform` and `ids` query parameters are required.',
-      }),
-      { status: 400, headers: { 'content-type': 'application/json' } }
-    )
-  }
+	if (!platform || !idsStr) {
+		return new Response(
+			JSON.stringify({
+				errorCode: 400,
+				error: 'Bad request',
+				message: '`platform` and `ids` query parameters are required.',
+			}),
+			{ status: 400, headers: { 'content-type': 'application/json' } }
+		)
+	}
 
-  if (!providers.includes(platform)) {
-    return new Response(
-      JSON.stringify({
-        errorCode: 400,
-        error: 'Bad request',
-        message: '`platform` is not a valid platform.',
-      }),
-      { status: 400, headers: { 'content-type': 'application/json' } }
-    )
-  }
+	if (!providers.includes(platform)) {
+		return new Response(
+			JSON.stringify({
+				errorCode: 400,
+				error: 'Bad request',
+				message: '`platform` is not a valid platform.',
+			}),
+			{ status: 400, headers: { 'content-type': 'application/json' } }
+		)
+	}
 
-  const ids = new Set(idsStr.split(',').filter((a) => a))
-  const idsCount = ids.size
-  if (idsCount < 1 || idsCount > 50) {
-    return new Response(
-      JSON.stringify({
-        errorCode: 400,
-        error: 'Bad request',
-        message: '`ids` must contain between 1 and 50 IDs.',
-      }),
-      { status: 400, headers: { 'content-type': 'application/json' } }
-    )
-  }
+	const ids = new Set(idsStr.split(',').filter((a) => a))
+	const idsCount = ids.size
+	if (idsCount < 1 || idsCount > 50) {
+		return new Response(
+			JSON.stringify({
+				errorCode: 400,
+				error: 'Bad request',
+				message: '`ids` must contain between 1 and 50 IDs.',
+			}),
+			{ status: 400, headers: { 'content-type': 'application/json' } }
+		)
+	}
 
-  const cursor = findPronounsOf(platform, Array.from(ids))
-  const res = Object.create(null)
-  for await (const user of cursor) {
-    res[user.account.id] = user.pronouns
-    ids.delete(user.account.id)
-  }
+	const cursor = findPronounsOf(platform, Array.from(ids))
+	const res = Object.create(null)
+	for await (const user of cursor) {
+		res[user.account.id] = user.pronouns
+		ids.delete(user.account.id)
+	}
 
-  const idsHitCount = idsCount - ids.size
-  for (const id of ids) {
-    res[id] = 'unspecified'
-  }
+	const idsHitCount = idsCount - ids.size
+	for (const id of ids) {
+		res[id] = 'unspecified'
+	}
 
-  // Collect metrics
-  const method = idsCount === 1 ? 'single' : 'bulk'
-  LookupRequestsCounter.inc({ platform: platform, method: method })
-  LookupIdsCounter.inc({ platform: platform }, idsCount)
-  LookupHitCounter.inc({ platform: platform }, idsHitCount)
-  if (method === 'bulk') {
-    LookupBulkSizeHistogram.observe({ platform: platform }, idsCount)
-  }
+	// Collect metrics
+	const method = idsCount === 1 ? 'single' : 'bulk'
+	LookupRequestsCounter.inc({ platform: platform, method: method })
+	LookupIdsCounter.inc({ platform: platform }, idsCount)
+	LookupHitCounter.inc({ platform: platform }, idsHitCount)
+	if (method === 'bulk') {
+		LookupBulkSizeHistogram.observe({ platform: platform }, idsCount)
+	}
 
-  const body = JSON.stringify(res)
-  return new Response(body, {
-    headers: {
-      vary: 'origin',
-      'access-control-allow-methods': 'GET',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'x-pronoundb-source',
-      'access-control-max-age': '600',
-      'content-type': 'application/json',
-    },
-  })
+	const body = JSON.stringify(res)
+	return new Response(body, {
+		headers: {
+			vary: 'origin',
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': '*',
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-max-age': '600',
+			'content-type': 'application/json',
+		},
+	})
 }
 
 export function options () {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      vary: 'origin',
-      'access-control-allow-methods': 'GET',
-      'access-control-allow-origin': '*',
-      'access-control-allow-headers': 'x-pronoundb-source',
-      'access-control-max-age': '600',
-    },
-  })
+	return new Response(null, {
+		status: 204,
+		headers: {
+			vary: 'origin',
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': '*',
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-max-age': '600',
+		},
+	})
 }
 
 export function all () {
-  return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
+	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }

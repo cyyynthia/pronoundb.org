@@ -38,16 +38,16 @@ export const tokenUrl = 'https://github.com/login/oauth/access_token'
 export const scopes = []
 
 export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
-  const res = await fetch('https://api.github.com/user', {
-    headers: {
-      accept: 'application/vnd.github.v3+json',
-      authorization: `token ${token}`,
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-    },
-  })
+	const res = await fetch('https://api.github.com/user', {
+		headers: {
+			accept: 'application/vnd.github.v3+json',
+			authorization: `token ${token}`,
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+		},
+	})
 
-  if (!res.ok) return null
-  const data = await res.json()
+	if (!res.ok) return null
+	const data = await res.json()
 
-  return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
+	return { id: data.id.toString(), name: data.name ? `${data.name} (${data.login})` : data.login, platform: 'github' }
 }

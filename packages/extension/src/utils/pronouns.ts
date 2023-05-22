@@ -31,96 +31,96 @@ chrome.storage.sync.get([ 'pronouns.case' ], ({ 'pronouns.case': pCase }) => (pr
 chrome.storage.onChanged.addListener((changes) => (pronounsCase = changes['pronouns.case']?.newValue || pronounsCase))
 
 export const LegacyPronouns: Record<string, string | string[]> = {
-  // -- Contributors: please keep the list sorted alphabetically.
-  hh: [ 'he/him', 'He/Him' ],
-  hi: [ 'he/it', 'He/It' ],
-  hs: [ 'he/she', 'He/She' ],
-  ht: [ 'he/they', 'He/They' ],
-  ih: [ 'it/he', 'It/He' ],
-  ii: [ 'it/its', 'It/Its' ],
-  is: [ 'it/she', 'It/She' ],
-  it: [ 'it/they', 'It/They' ],
-  shh: [ 'she/he', 'She/He' ],
-  sh: [ 'she/her', 'She/Her' ],
-  si: [ 'she/it', 'She/It' ],
-  st: [ 'she/they', 'She/They' ],
-  th: [ 'they/he', 'They/He' ],
-  ti: [ 'they/it', 'They/It' ],
-  ts: [ 'they/she', 'They/She' ],
-  tt: [ 'they/them', 'They/Them' ],
-  // --
-  any: 'Any pronouns',
-  other: 'Other pronouns',
-  ask: 'Ask me my pronouns',
-  avoid: 'Avoid pronouns, use my name',
+	// -- Contributors: please keep the list sorted alphabetically.
+	hh: [ 'he/him', 'He/Him' ],
+	hi: [ 'he/it', 'He/It' ],
+	hs: [ 'he/she', 'He/She' ],
+	ht: [ 'he/they', 'He/They' ],
+	ih: [ 'it/he', 'It/He' ],
+	ii: [ 'it/its', 'It/Its' ],
+	is: [ 'it/she', 'It/She' ],
+	it: [ 'it/they', 'It/They' ],
+	shh: [ 'she/he', 'She/He' ],
+	sh: [ 'she/her', 'She/Her' ],
+	si: [ 'she/it', 'She/It' ],
+	st: [ 'she/they', 'She/They' ],
+	th: [ 'they/he', 'They/He' ],
+	ti: [ 'they/it', 'They/It' ],
+	ts: [ 'they/she', 'They/She' ],
+	tt: [ 'they/them', 'They/Them' ],
+	// --
+	any: 'Any pronouns',
+	other: 'Other pronouns',
+	ask: 'Ask me my pronouns',
+	avoid: 'Avoid pronouns, use my name',
 }
 
 let p = 'pronouns'
 export const LegacyPronounsWithSuffix: Record<string, [ string | string[], string ]> = {
-  // -- Contributors: please keep the list sorted alphabetically.
-  hh: [ LegacyPronouns.hh, p ],
-  hi: [ LegacyPronouns.hi, p ],
-  hs: [ LegacyPronouns.hs, p ],
-  ht: [ LegacyPronouns.ht, p ],
-  ih: [ LegacyPronouns.ih, p ],
-  ii: [ LegacyPronouns.ii, p ],
-  is: [ LegacyPronouns.is, p ],
-  it: [ LegacyPronouns.it, p ],
-  shh: [ LegacyPronouns.shh, p ],
-  sh: [ LegacyPronouns.sh, p ],
-  si: [ LegacyPronouns.si, p ],
-  st: [ LegacyPronouns.st, p ],
-  th: [ LegacyPronouns.th, p ],
-  ti: [ LegacyPronouns.ti, p ],
-  ts: [ LegacyPronouns.ts, p ],
-  tt: [ LegacyPronouns.tt, p ],
-  // --
-  any: [ 'Any', p ],
-  other: [ 'Other', p ],
-  ask: [ 'Ask me', 'my pronouns' ],
-  avoid: [ 'Avoid', 'pronouns, use my name' ],
+	// -- Contributors: please keep the list sorted alphabetically.
+	hh: [ LegacyPronouns.hh, p ],
+	hi: [ LegacyPronouns.hi, p ],
+	hs: [ LegacyPronouns.hs, p ],
+	ht: [ LegacyPronouns.ht, p ],
+	ih: [ LegacyPronouns.ih, p ],
+	ii: [ LegacyPronouns.ii, p ],
+	is: [ LegacyPronouns.is, p ],
+	it: [ LegacyPronouns.it, p ],
+	shh: [ LegacyPronouns.shh, p ],
+	sh: [ LegacyPronouns.sh, p ],
+	si: [ LegacyPronouns.si, p ],
+	st: [ LegacyPronouns.st, p ],
+	th: [ LegacyPronouns.th, p ],
+	ti: [ LegacyPronouns.ti, p ],
+	ts: [ LegacyPronouns.ts, p ],
+	tt: [ LegacyPronouns.tt, p ],
+	// --
+	any: [ 'Any', p ],
+	other: [ 'Other', p ],
+	ask: [ 'Ask me', 'my pronouns' ],
+	avoid: [ 'Avoid', 'pronouns, use my name' ],
 }
 
 export const LegacyPronounsShort: Record<string, string | string[]> = {
-  ...LegacyPronouns,
-  any: [ 'any', 'Any' ],
-  other: [ 'other', 'Other' ],
-  ask: [ 'ask', 'Ask' ],
-  avoid: [ 'avoid', 'Avoid' ],
+	...LegacyPronouns,
+	any: [ 'any', 'Any' ],
+	other: [ 'other', 'Other' ],
+	ask: [ 'ask', 'Ask' ],
+	avoid: [ 'avoid', 'Avoid' ],
 }
 
 export function formatPronouns (id: string) {
-  const pronouns = LegacyPronouns[id]
-  const idx = pronounsCase === 'lower' ? 0 : 1
-  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+	const pronouns = LegacyPronouns[id]
+	const idx = pronounsCase === 'lower' ? 0 : 1
+	return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
 export function formatPronounsShort (id: string) {
-  const pronouns = LegacyPronounsShort[id]
-  const idx = pronounsCase === 'lower' ? 0 : 1
-  return Array.isArray(pronouns) ? pronouns[idx] : pronouns
+	const pronouns = LegacyPronounsShort[id]
+	const idx = pronounsCase === 'lower' ? 0 : 1
+	return Array.isArray(pronouns) ? pronouns[idx] : pronouns
 }
 
 export function formatPronounsSuffixed (id: string) {
-  const pronouns = LegacyPronounsWithSuffix[id]
-  const idx = pronounsCase === 'lower' ? 0 : 1
-  return [
-    Array.isArray(pronouns[0]) ? pronouns[0][idx] : pronouns[0],
-    pronouns[1],
-  ]
+	const pronouns = LegacyPronounsWithSuffix[id]
+	const idx = pronounsCase === 'lower' ? 0 : 1
+	return [
+		Array.isArray(pronouns[0]) ? pronouns[0][idx] : pronouns[0],
+		pronouns[1],
+	]
 }
 
 export function formatPronounsLong (id: string) {
-  switch (id) {
-    case 'any':
-      return 'Goes by any pronouns'
-    case 'other':
-      return 'Goes by pronouns not available on PronounDB'
-    case 'ask':
-      return 'Prefers people to ask for their pronouns'
-    case 'avoid':
-      return 'Wants to avoid pronouns'
-    default:
-      return `Goes by "${formatPronouns(id)}" pronouns`
-  }
+	switch (id) {
+		case 'any':
+			return 'Goes by any pronouns'
+		case 'other':
+			return 'Goes by pronouns not available on PronounDB'
+		case 'ask':
+			return 'Prefers people to ask for their pronouns'
+		case 'avoid':
+			return 'Wants to avoid pronouns'
+		default:
+			return `Goes by "${formatPronouns(id)}" pronouns`
+	}
 }

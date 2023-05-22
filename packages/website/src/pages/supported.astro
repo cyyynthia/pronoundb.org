@@ -39,16 +39,16 @@ import Platform from '@components/Platform.astro'
 import Link from '@components/Link.astro'
 
 type PlatformInfo = {
-  name: string
-  color: string
-  icon: string
-  via?: string
-  supported?: boolean
-  thirdPartyOnly?: boolean
+	name: string
+	color: string
+	icon: string
+	via?: string
+	supported?: boolean
+	thirdPartyOnly?: boolean
 }
 
 const platforms: PlatformInfo[] = Object.values(
-  import.meta.glob<PlatformInfo>('../components/platforms/*.ts', { eager: true })
+	import.meta.glob<PlatformInfo>('../components/platforms/*.ts', { eager: true })
 )
 
 const platformsWithIntegration = platforms.filter((p) => p.supported !== false && !p.thirdPartyOnly)
@@ -57,34 +57,34 @@ const platformsWithoutIntegration = platforms.filter((p) => p.supported !== fals
 const flash = handleFlash(Astro)
 ---
 <Layout flash={flash} title='Supported platforms'>
-  <PageHeader>
-    <Fragment slot='namespace'>About PronounDB</Fragment>
-    <Fragment>Supported platforms</Fragment>
-  </PageHeader>
-  <div class='mb-4'>
-    PronounDB aims to support as many platforms as possible, so pronouns can easily be shared and changed everywhere by just a few clicks. Here's the full list of platforms supported by PronounDB:
-  </div>
-  <PlatformGrid>
-    {platformsWithIntegration.map((platform) => (
-      <Platform color={platform.color}>
-        <Fragment>{platform.name}{platform.via && <span class='font-normal'> (via {platform.via})</span>}</Fragment>
-        <Fragment slot='icon' set:html={platform.icon}/>
-        <span slot='sub'>No preview available</span>
-      </Platform>
-    ))}
-  </PlatformGrid>
+	<PageHeader>
+		<Fragment slot='namespace'>About PronounDB</Fragment>
+		<Fragment>Supported platforms</Fragment>
+	</PageHeader>
+	<div class='mb-4'>
+		PronounDB aims to support as many platforms as possible, so pronouns can easily be shared and changed everywhere by just a few clicks. Here's the full list of platforms supported by PronounDB:
+	</div>
+	<PlatformGrid>
+		{platformsWithIntegration.map((platform) => (
+			<Platform color={platform.color}>
+				<Fragment>{platform.name}{platform.via && <span class='font-normal'> (via {platform.via})</span>}</Fragment>
+				<Fragment slot='icon' set:html={platform.icon}/>
+				<span slot='sub'>No preview available</span>
+			</Platform>
+		))}
+	</PlatformGrid>
 
-  <h2 class='text-xl font-bold mt-8 mb-2'>Platforms without integrations</h2>
-  <p class='mb-4'>
-    While PronounDB's browser extension doesn't support these directly, these platforms are listed for third party
-    developers to make cool integrations with PronounDB via the <Link href='/docs'>API</Link>.
-  </p>
-  <PlatformGrid>
-    {platformsWithoutIntegration.map((platform) => (
-      <Platform color={platform.color}>
-        <Fragment>{platform.name}{platform.via && <span class='font-normal'> (via {platform.via})</span>}</Fragment>
-        <Fragment slot='icon' set:html={platform.icon}/>
-      </Platform>
-    ))}
-  </PlatformGrid>
+	<h2 class='text-xl font-bold mt-8 mb-2'>Platforms without integrations</h2>
+	<p class='mb-4'>
+		While PronounDB's browser extension doesn't support these directly, these platforms are listed for third party
+		developers to make cool integrations with PronounDB via the <Link href='/docs'>API</Link>.
+	</p>
+	<PlatformGrid>
+		{platformsWithoutIntegration.map((platform) => (
+			<Platform color={platform.color}>
+				<Fragment>{platform.name}{platform.via && <span class='font-normal'> (via {platform.via})</span>}</Fragment>
+				<Fragment slot='icon' set:html={platform.icon}/>
+			</Platform>
+		))}
+	</PlatformGrid>
 </Layout>

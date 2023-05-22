@@ -31,64 +31,64 @@ import { ObjectId } from 'mongodb'
 import { findById } from '@server/database/account.js'
 
 export const LegacyPronouns: Record<string, string | string[]> = {
-  // -- Contributors: please keep the list sorted alphabetically.
-  hh: [ 'he/him', 'He/Him' ],
-  hi: [ 'he/it', 'He/It' ],
-  hs: [ 'he/she', 'He/She' ],
-  ht: [ 'he/they', 'He/They' ],
-  ih: [ 'it/him', 'It/Him' ],
-  ii: [ 'it/its', 'It/Its' ],
-  is: [ 'it/she', 'It/She' ],
-  it: [ 'it/they', 'It/They' ],
-  shh: [ 'she/he', 'She/He' ],
-  sh: [ 'she/her', 'She/Her' ],
-  si: [ 'she/it', 'She/It' ],
-  st: [ 'she/they', 'She/They' ],
-  th: [ 'they/he', 'They/He' ],
-  ti: [ 'they/it', 'They/It' ],
-  ts: [ 'they/she', 'They/She' ],
-  tt: [ 'they/them', 'They/Them' ],
-  // --
-  any: 'Any pronouns',
-  other: 'Other pronouns',
-  ask: 'Ask me my pronouns',
-  avoid: 'Avoid pronouns, use my name',
+	// -- Contributors: please keep the list sorted alphabetically.
+	hh: [ 'he/him', 'He/Him' ],
+	hi: [ 'he/it', 'He/It' ],
+	hs: [ 'he/she', 'He/She' ],
+	ht: [ 'he/they', 'He/They' ],
+	ih: [ 'it/him', 'It/Him' ],
+	ii: [ 'it/its', 'It/Its' ],
+	is: [ 'it/she', 'It/She' ],
+	it: [ 'it/they', 'It/They' ],
+	shh: [ 'she/he', 'She/He' ],
+	sh: [ 'she/her', 'She/Her' ],
+	si: [ 'she/it', 'She/It' ],
+	st: [ 'she/they', 'She/They' ],
+	th: [ 'they/he', 'They/He' ],
+	ti: [ 'they/it', 'They/It' ],
+	ts: [ 'they/she', 'They/She' ],
+	tt: [ 'they/them', 'They/Them' ],
+	// --
+	any: 'Any pronouns',
+	other: 'Other pronouns',
+	ask: 'Ask me my pronouns',
+	avoid: 'Avoid pronouns, use my name',
 }
 
 function formatPronouns (pronounsId: string, capitalize: boolean) {
-  const pronouns = LegacyPronouns[pronounsId]
-  return Array.isArray(pronouns) ? pronouns[capitalize ? 1 : 0] : pronouns
+	const pronouns = LegacyPronouns[pronounsId]
+	return Array.isArray(pronouns) ? pronouns[capitalize ? 1 : 0] : pronouns
 }
 
 export async function get ({ url, params }: APIContext) {
-  if (!params.id || !ObjectId.isValid(params.id)) {
-    return new Response('400: Bad request', { status: 400 })
-  }
+	if (!params.id || !ObjectId.isValid(params.id)) {
+		return new Response('400: Bad request', { status: 400 })
+	}
 
-  const id = new ObjectId(params.id)
-  const user = await findById(id)
+	const id = new ObjectId(params.id)
+	const user = await findById(id)
 
-  if (!user || user.pronouns === 'unspecified') {
-    return {
-      body: JSON.stringify({
-        schemaVersion: 1,
-        label: 'error',
-        message: 'not found',
-        isError: true,
-      }),
-    }
-  }
+	if (!user || user.pronouns === 'unspecified') {
+		return {
+			body: JSON.stringify({
+				schemaVersion: 1,
+				label: 'error',
+				message: 'not found',
+				isError: true,
+			}),
+		}
+	}
 
-  const capitalize = url.searchParams.has('capitalize')
-  return {
-    body: JSON.stringify({
-      schemaVersion: 1,
-      label: capitalize ? 'Pronouns' : 'pronouns',
-      message: formatPronouns(user.pronouns, capitalize),
-    }),
-  }
+	const capitalize = url.searchParams.has('capitalize')
+	return {
+		body: JSON.stringify({
+			schemaVersion: 1,
+			label: capitalize ? 'Pronouns' : 'pronouns',
+			message: formatPronouns(user.pronouns, capitalize),
+		}),
+	}
 }
 
 export function all () {
-  return new Response('405: Method not allowed', { status: 405 })
+	return new Response('405: Method not allowed', { status: 405 })
 }

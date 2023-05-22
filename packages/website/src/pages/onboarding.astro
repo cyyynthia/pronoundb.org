@@ -43,47 +43,47 @@ const authenticated = hasValidToken(Astro)
 const flash = handleFlash(Astro)
 ---
 <Layout flash={flash} title='Welcome'>
-  <PageHeader>
-    <Fragment>Welcome!</Fragment>
-  </PageHeader>
+	<PageHeader>
+		<Fragment>Welcome!</Fragment>
+	</PageHeader>
 
-  <p class='mb-2'>
-    Thank you for installing the extension! You'll finally no longer have to go through the trouble of reminding
-    pronouns for every single person you see on the Internet! Amazing!
-  </p>
-  <p class='mb-2'>
-    Whenever you interact with someone who uses PronounDB, you'll see their pronouns show up, so you know how to
-    refer to that person. It'll also show up on people's profiles, so you can lookup people's pronouns easily.
-  </p>
-  <p class='mb-6'>
-    Feeling unsure about what pronouns are about? Make sure to give the <Link href='/pronouns-101'>Pronouns 101</Link>
-    guide a look!
-  </p>
+	<p class='mb-2'>
+		Thank you for installing the extension! You'll finally no longer have to go through the trouble of reminding
+		pronouns for every single person you see on the Internet! Amazing!
+	</p>
+	<p class='mb-2'>
+		Whenever you interact with someone who uses PronounDB, you'll see their pronouns show up, so you know how to
+		refer to that person. It'll also show up on people's profiles, so you can lookup people's pronouns easily.
+	</p>
+	<p class='mb-6'>
+		Feeling unsure about what pronouns are about? Make sure to give the <Link href='/pronouns-101'>Pronouns 101</Link>
+		guide a look!
+	</p>
 
-  <h2 class='text-xl font-bold mb-2'>Share your own pronouns</h2>
-  <p class='mb-6'>
-    You can let other people know your pronouns by {authenticated
-      ? <Link href='/me'>going to your account</Link>
-      : <><Link href='/login'>logging in</Link> or <Link href='/register'>creating an account</Link></>
-    }, linking your accounts, and pick the sets of pronouns you'd like people to use on you. They'll then be able to
-    know how to refer to you as well!
-  </p>
+	<h2 class='text-xl font-bold mb-2'>Share your own pronouns</h2>
+	<p class='mb-6'>
+		You can let other people know your pronouns by {authenticated
+			? <Link href='/me'>going to your account</Link>
+			: <><Link href='/login'>logging in</Link> or <Link href='/register'>creating an account</Link></>
+		}, linking your accounts, and pick the sets of pronouns you'd like people to use on you. They'll then be able to
+		know how to refer to you as well!
+	</p>
 
-  <h2 class='text-xl font-bold mb-2'>Spread the word!</h2>
-  <p class='mb-6'>
-    This extension is only useful if people use it! The more people use it, the less people will be hesitant or
-    do mistakes about your pronouns!
-  </p>
+	<h2 class='text-xl font-bold mb-2'>Spread the word!</h2>
+	<p class='mb-6'>
+		This extension is only useful if people use it! The more people use it, the less people will be hesitant or
+		do mistakes about your pronouns!
+	</p>
 
-  <h2 class='text-xl font-bold mb-2'>Rate the extension</h2>
-  <p class='mb-6'>
-    Enjoying the extension? You can leave a review on your extension store to let me know you're appreciating
-    it. <Heart/>
-  </p>
+	<h2 class='text-xl font-bold mb-2'>Rate the extension</h2>
+	<p class='mb-6'>
+		Enjoying the extension? You can leave a review on your extension store to let me know you're appreciating
+		it. <Heart/>
+	</p>
 
-  <h2 class='text-xl font-bold mb-2'>Feeling generous?</h2>
-  <p>
-    If you wish, you can <Link href='https://ko-fi.com/cyyynthia'>donate</Link> so I can buy enough cookies and coffee
-    to stay alive! Donations help paying for the hosting of the website, which isn't free, unlike the extension! 🥰
-  </p>
+	<h2 class='text-xl font-bold mb-2'>Feeling generous?</h2>
+	<p>
+		If you wish, you can <Link href='https://ko-fi.com/cyyynthia'>donate</Link> so I can buy enough cookies and coffee
+		to stay alive! Donations help paying for the hosting of the website, which isn't free, unlike the extension! 🥰
+	</p>
 </Layout>

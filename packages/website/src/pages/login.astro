@@ -38,11 +38,11 @@ if (await authenticate(Astro)) return Astro.redirect('/me')
 const flash = handleFlash(Astro)
 ---
 <Layout flash={flash} title='Login to your account'>
-  <PageHeader>
-    <Fragment slot='namespace'>Authentication</Fragment>
-    <Fragment>Login to your account</Fragment>
-  </PageHeader>
+	<PageHeader>
+		<Fragment slot='namespace'>Authentication</Fragment>
+		<Fragment>Login to your account</Fragment>
+	</PageHeader>
 
-  <p class='mb-2'>Make sure to select an account you already linked on PronounDB.</p>
-  <OAuthProviderList intent='login'/>
+	<p class='mb-2'>Make sure to select an account you already linked on PronounDB.</p>
+	<OAuthProviderList intent='login'/>
 </Layout>

@@ -29,31 +29,31 @@
 import type { Plugin } from 'vite'
 
 export default function transform (): Plugin {
-  let isDev = false
-  return {
-    name: 'pdb-ext-transform-code',
-    configResolved: (cfg) => void (isDev = !!cfg.build.watch),
+	let isDev = false
+	return {
+		name: 'pdb-ext-transform-code',
+		configResolved: (cfg) => void (isDev = !!cfg.build.watch),
 
-    // Remove references to innerHTML
-    transform: (code) =>
-      !isDev && code.includes('dangerouslySetInnerHTML')
-        ? code.replace(/;[^;]+innerHTML.*?}/, '}')
-        : void 0,
+		// Remove references to innerHTML
+		transform: (code) =>
+			!isDev && code.includes('dangerouslySetInnerHTML')
+				? code.replace(/;[^;]+innerHTML.*?}/, '}')
+				: void 0,
 
-    // Replace references to __BUILD_CHUNK__ to actual assets
-    generateBundle: (_cfg, bundle) => {
-      const chunks = Object.values(bundle).filter((c) => c.type === 'chunk')
-      for (const file in bundle) {
-        if (file in bundle) {
-          const chunk = bundle[file]
-          if (chunk.type === 'chunk') {
-            chunk.code = chunk.code.replace(
-              /window\.__BUILD_CHUNK__\.([a-z]+)/g,
-              (_, chk) => JSON.stringify(chunks.find((c) => c.name === chk)?.fileName)
-            )
-          }
-        }
-      }
-    },
-  }
+		// Replace references to __BUILD_CHUNK__ to actual assets
+		generateBundle: (_cfg, bundle) => {
+			const chunks = Object.values(bundle).filter((c) => c.type === 'chunk')
+			for (const file in bundle) {
+				if (file in bundle) {
+					const chunk = bundle[file]
+					if (chunk.type === 'chunk') {
+						chunk.code = chunk.code.replace(
+							/window\.__BUILD_CHUNK__\.([a-z]+)/g,
+							(_, chk) => JSON.stringify(chunks.find((c) => c.name === chk)?.fileName)
+						)
+					}
+				}
+			}
+		},
+	}
 }

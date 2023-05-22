@@ -40,71 +40,71 @@ const INTENTS = [ 'register', 'login', 'link' ]
 const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
 
 export async function get (ctx: APIContext) {
-  const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
-  if (!platform) return new Response('400: Invalid provider', { status: 400 })
+	const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`]
+	if (!platform) return new Response('400: Invalid provider', { status: 400 })
 
-  const token = ctx.cookies.get('token').value
-  const intent = ctx.cookies.get('intent').value ?? 'login'
-  const user = token ? await authenticate(ctx) : null
+	const token = ctx.cookies.get('token').value
+	const intent = ctx.cookies.get('intent').value ?? 'login'
+	const user = token ? await authenticate(ctx) : null
 
-  if ((intent === 'register' || intent === 'login') && user) {
-    return ctx.redirect('/me')
-  }
+	if ((intent === 'register' || intent === 'login') && user) {
+		return ctx.redirect('/me')
+	}
 
-  if (intent === 'link' && !user) {
-    return ctx.redirect('/')
-  }
+	if (intent === 'link' && !user) {
+		return ctx.redirect('/')
+	}
 
-  if (!INTENTS.includes(intent)) {
-    return new Response('400: Invalid intent', { status: 400 })
-  }
+	if (!INTENTS.includes(intent)) {
+		return new Response('400: Invalid intent', { status: 400 })
+	}
 
-  let external: ExternalAccount | FlashMessage | null
-  switch (platform.oauthVersion) {
-    case 1:
-      external = await callback1(ctx, platform)
-      break
-    case 2:
-      external = await callback2(ctx, platform)
-      break
-  }
+	let external: ExternalAccount | FlashMessage | null
+	switch (platform.oauthVersion) {
+		case 1:
+			external = await callback1(ctx, platform)
+			break
+		case 2:
+			external = await callback2(ctx, platform)
+			break
+	}
 
-  if (!external || typeof external === 'string') {
-    setFlash(ctx, external || 'E_OAUTH_GENERIC')
-    return ctx.redirect(intent === 'link' ? '/me' : '/')
-  }
+	if (!external || typeof external === 'string') {
+		setFlash(ctx, external || 'E_OAUTH_GENERIC')
+		return ctx.redirect(intent === 'link' ? '/me' : '/')
+	}
 
-  if (intent === 'link') {
-    const existingAccount = await findByExternalAccount(external)
-    if (existingAccount && !existingAccount._id.equals(user!._id)) {
-      setFlash(ctx, 'E_ACCOUNT_TAKEN')
-      return ctx.redirect('/me')
-    }
+	if (intent === 'link') {
+		const existingAccount = await findByExternalAccount(external)
+		if (existingAccount && !existingAccount._id.equals(user!._id)) {
+			setFlash(ctx, 'E_ACCOUNT_TAKEN')
+			return ctx.redirect('/me')
+		}
 
-    if (!existingAccount) {
-      LinkedAccountsAddCount.inc({ platform: external.platform })
-      await addLinkedAccount(user!._id, external)
-    }
+		if (!existingAccount) {
+			LinkedAccountsAddCount.inc({ platform: external.platform })
+			await addLinkedAccount(user!._id, external)
+		}
 
-    return ctx.redirect('/me')
-  }
+		return ctx.redirect('/me')
+	}
 
-  const account = intent === 'register'
-    ? await createAccount(external)
-    : await findByExternalAccount(external).then((acc) => acc?._id)
+	const account = intent === 'register'
+		? await createAccount(external)
+		: await findByExternalAccount(external).then((acc) => acc?._id)
 
-  if (!account) {
-    setFlash(ctx, intent === 'register' ? 'E_ACCOUNT_EXISTS' : 'E_ACCOUNT_NOT_FOUND')
-    return ctx.redirect('/')
-  }
+	if (!account) {
+		setFlash(ctx, intent === 'register' ? 'E_ACCOUNT_EXISTS' : 'E_ACCOUNT_NOT_FOUND')
+		return ctx.redirect('/')
+	}
 
-  if (intent === 'register') {
-    CreatedAccountCount.inc({ platform: external.platform })
-    LinkedAccountsAddCount.inc({ platform: external.platform })
-  }
+	if (intent === 'register') {
+		CreatedAccountCount.inc({ platform: external.platform })
+		LinkedAccountsAddCount.inc({ platform: external.platform })
+	}
 
-  const authToken = generateToken({ id: account.toString() })
-  ctx.cookies.set('token', authToken, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
-  if (intent === 'register') setFlash(ctx, 'S_REGISTERED')
-  return ctx.redirect('/me')
+	const authToken = generateToken({ id: account.toString() })
+	ctx.cookies.set('token', authToken, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
+	if (intent === 'register') setFlash(ctx, 'S_REGISTERED')
+	return ctx.redirect('/me')
 }

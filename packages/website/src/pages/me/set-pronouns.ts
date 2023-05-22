@@ -31,23 +31,23 @@ import { authenticate } from '@server/auth.js'
 import { updatePronouns } from '@server/database/account.js'
 
 const LEGACY_PRONOUNS = [
-  'hh', 'hi', 'hs', 'ht', 'ih', 'ii', 'is', 'it', 'shh', 'sh', 'si',
-  'st', 'th', 'ti', 'ts', 'tt', 'any', 'other', 'ask', 'avoid',
+	'hh', 'hi', 'hs', 'ht', 'ih', 'ii', 'is', 'it', 'shh', 'sh', 'si',
+	'st', 'th', 'ti', 'ts', 'tt', 'any', 'other', 'ask', 'avoid',
 ]
 
 export async function put (ctx: APIContext) {
-  const user = await authenticate(ctx)
-  if (!user) return new Response('401: Unauthorized', { status: 401 })
+	const user = await authenticate(ctx)
+	if (!user) return new Response('401: Unauthorized', { status: 401 })
 
-  const pronouns = await ctx.request.text()
-  if (!LEGACY_PRONOUNS.includes(pronouns)) {
-    return new Response('400: Bad request', { status: 400 })
-  }
+	const pronouns = await ctx.request.text()
+	if (!LEGACY_PRONOUNS.includes(pronouns)) {
+		return new Response('400: Bad request', { status: 400 })
+	}
 
-  updatePronouns(user._id, pronouns)
-  return new Response(null, { status: 204 })
+	updatePronouns(user._id, pronouns)
+	return new Response(null, { status: 204 })
 }
 
 export function all () {
-  return new Response('405: Method not allowed', { status: 405 })
+	return new Response('405: Method not allowed', { status: 405 })
 }

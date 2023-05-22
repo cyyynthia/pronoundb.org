@@ -30,18 +30,18 @@ import { initializeRuntime } from './runtime'
 import { getModule } from './modules'
 
 getModule().then((currentMdl) => {
-  if (currentMdl) {
-    const key = `${currentMdl.id}.enabled`
-    chrome.storage.sync.get([ key ]).then(async ({ [key]: enabled }) => {
-      if (enabled ?? true) {
-        if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') {
-          await initializeRuntime()
-        }
+	if (currentMdl) {
+		const key = `${currentMdl.id}.enabled`
+		chrome.storage.sync.get([ key ]).then(async ({ [key]: enabled }) => {
+			if (enabled ?? true) {
+				if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') {
+					await initializeRuntime()
+				}
 
-        currentMdl.main?.()
-        currentMdl.inject()
-        console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
-      }
-    })
-  }
+				currentMdl.main?.()
+				currentMdl.inject()
+				console.log(`[PronounDB] Loaded ${currentMdl.id} module.`)
+			}
+		})
+	}
 })

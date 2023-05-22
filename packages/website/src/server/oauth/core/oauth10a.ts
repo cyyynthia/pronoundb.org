@@ -35,34 +35,34 @@ import { encode, decode } from 'querystring'
 import { type FlashMessage, setFlash } from '../../flash.js'
 
 export type OAuth1Params = {
-  oauthVersion: 1
-  clientId: string
-  clientSecret: string
+	oauthVersion: 1
+	clientId: string
+	clientSecret: string
 
-  requestUrl: string
-  authorizationUrl: string
-  tokenUrl: string
-  scopes: string[]
+	requestUrl: string
+	authorizationUrl: string
+	tokenUrl: string
+	scopes: string[]
 
-  getSelf: (token: string, tokenSecret: string) => Promise<ExternalAccount | FlashMessage | null>
+	getSelf: (token: string, tokenSecret: string) => Promise<ExternalAccount | FlashMessage | null>
 }
 
 type OAuthToken = {
-  clientId: string
-  clientSecret: string
-  token?: string
-  tokenSecret?: string
+	clientId: string
+	clientSecret: string
+	token?: string
+	tokenSecret?: string
 }
 
 type Authorization = {
-  nonce: string
-  secret: string
+	nonce: string
+	secret: string
 }
 
 type ProviderResponse = {
-  oauth_token: string
-  oauth_token_secret: string
-  oauth_callback_confirmed?: boolean
+	oauth_token: string
+	oauth_token_secret: string
+	oauth_callback_confirmed?: boolean
 }
 
 export type AuthenticatedRequestInit = Omit<RequestInit, 'body'> & { body?: Record<string, any> | null, token: OAuthToken }
@@ -70,130 +70,130 @@ export type AuthenticatedRequestInit = Omit<RequestInit, 'body'> & { body?: Reco
 export type AuthenticatedResponse = { nonce: string, response: Response }
 
 function rfcUriEncode (data: string | ParsedUrlQueryInput) {
-  return (typeof data === 'string' ? encodeURIComponent(data) : encode(data))
-    .replace(/!/g, '%21')
-    .replace(/'/g, '%27')
-    .replace(/\(/g, '%28')
-    .replace(/\)/g, '%29')
-    .replace(/\*/g, '%2A')
+	return (typeof data === 'string' ? encodeURIComponent(data) : encode(data))
+		.replace(/!/g, '%21')
+		.replace(/'/g, '%27')
+		.replace(/\(/g, '%28')
+		.replace(/\)/g, '%29')
+		.replace(/\*/g, '%2A')
 }
 
 export async function authenticatedFetch (url: string | URL, init: AuthenticatedRequestInit) {
-  url = new URL(url)
-  const tokenSecret = init.token.tokenSecret ? rfcUriEncode(init.token.tokenSecret) : ''
-  const secret = rfcUriEncode(init.token.clientSecret)
+	url = new URL(url)
+	const tokenSecret = init.token.tokenSecret ? rfcUriEncode(init.token.tokenSecret) : ''
+	const secret = rfcUriEncode(init.token.clientSecret)
 
-  const nonce = randomUUID()
-  const params: Record<string, any> = {
-    ...init.body || {},
-    oauth_timestamp: String(Math.floor(Date.now() / 1000)),
-    oauth_nonce: nonce,
-    oauth_version: '1.0A',
-    oauth_signature_method: 'HMAC-SHA1',
-    oauth_consumer_key: init.token.clientId,
-  }
+	const nonce = randomUUID()
+	const params: Record<string, any> = {
+		...init.body || {},
+		oauth_timestamp: String(Math.floor(Date.now() / 1000)),
+		oauth_nonce: nonce,
+		oauth_version: '1.0A',
+		oauth_signature_method: 'HMAC-SHA1',
+		oauth_consumer_key: init.token.clientId,
+	}
 
-  if (init.token.token) params.oauth_token = init.token.token
+	if (init.token.token) params.oauth_token = init.token.token
 
-  const paramsPair = Object.entries(params).sort(
-    ([ ka, va ], [ kb, vb ]) =>
-      ka === kb
-        ? va > vb ? 1 : -1
-        : ka > kb ? 1 : -1
-  )
+	const paramsPair = Object.entries(params).sort(
+		([ ka, va ], [ kb, vb ]) =>
+			ka === kb
+				? va > vb ? 1 : -1
+				: ka > kb ? 1 : -1
+	)
 
-  const method = init.method?.toUpperCase() ?? 'GET'
-  const paramsString = paramsPair.map(([ k, v ]) => `${rfcUriEncode(k)}=${rfcUriEncode(v)}`).join('&')
-  const sigBase = `${method}&${rfcUriEncode(url.href)}&${rfcUriEncode(paramsString)}`
-  paramsPair.push([ 'oauth_signature', createHmac('sha1', `${secret}&${tokenSecret}`).update(sigBase).digest('base64') ])
-  const authorization = paramsPair.filter(([ k ]) => k.startsWith('oauth_')).map(([ k, v ]) => `${k}="${rfcUriEncode(v)}"`).join(',')
+	const method = init.method?.toUpperCase() ?? 'GET'
+	const paramsString = paramsPair.map(([ k, v ]) => `${rfcUriEncode(k)}=${rfcUriEncode(v)}`).join('&')
+	const sigBase = `${method}&${rfcUriEncode(url.href)}&${rfcUriEncode(paramsString)}`
+	paramsPair.push([ 'oauth_signature', createHmac('sha1', `${secret}&${tokenSecret}`).update(sigBase).digest('base64') ])
+	const authorization = paramsPair.filter(([ k ]) => k.startsWith('oauth_')).map(([ k, v ]) => `${k}="${rfcUriEncode(v)}"`).join(',')
 
-  return {
-    nonce: nonce,
-    response: await fetch(url, {
-      ...init,
-      headers: {
-        ...init.headers || {},
-        authorization: `OAuth ${authorization}`,
-        'content-type': 'application/x-www-form-urlencoded',
-      },
-      body: init.body ? encode(init.body) : null,
-    }),
-  }
+	return {
+		nonce: nonce,
+		response: await fetch(url, {
+			...init,
+			headers: {
+				...init.headers || {},
+				authorization: `OAuth ${authorization}`,
+				'content-type': 'application/x-www-form-urlencoded',
+			},
+			body: init.body ? encode(init.body) : null,
+		}),
+	}
 }
 
 const pending = new Map<string, Authorization>()
 
 export async function authorize (ctx: APIContext, oauth: OAuth1Params) {
-  const intent = ctx.url.searchParams.get('intent') ?? 'login'
-  const callbackPath = new URL('callback', ctx.url).pathname
-  const callbackUrl = new URL(callbackPath, ctx.site)
+	const intent = ctx.url.searchParams.get('intent') ?? 'login'
+	const callbackPath = new URL('callback', ctx.url).pathname
+	const callbackUrl = new URL(callbackPath, ctx.site)
 
-  const { nonce, response } = await authenticatedFetch(oauth.requestUrl, {
-    method: 'POST',
-    token: { clientId: oauth.clientId, clientSecret: oauth.clientSecret },
-    headers: { 'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)' },
-    body: { oauth_callback: callbackUrl.href },
-  })
+	const { nonce, response } = await authenticatedFetch(oauth.requestUrl, {
+		method: 'POST',
+		token: { clientId: oauth.clientId, clientSecret: oauth.clientSecret },
+		headers: { 'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)' },
+		body: { oauth_callback: callbackUrl.href },
+	})
 
-  if (!response.ok) {
-    setFlash(ctx, 'E_OAUTH_10A_EXCHANGE')
-    return null
-  }
+	if (!response.ok) {
+		setFlash(ctx, 'E_OAUTH_10A_EXCHANGE')
+		return null
+	}
 
-  const requestToken = decode(await response.text()) as unknown as ProviderResponse
-  if (!requestToken.oauth_callback_confirmed) {
-    setFlash(ctx, 'E_OAUTH_10A_EXCHANGE')
-    return null
-  }
+	const requestToken = decode(await response.text()) as unknown as ProviderResponse
+	if (!requestToken.oauth_callback_confirmed) {
+		setFlash(ctx, 'E_OAUTH_10A_EXCHANGE')
+		return null
+	}
 
-  const fullToken = `${ctx.params.platform}-${requestToken.oauth_token}-${intent}`
-  pending.set(fullToken, { nonce: nonce, secret: requestToken.oauth_token_secret })
-  setTimeout(() => pending.delete(fullToken), 300e3)
+	const fullToken = `${ctx.params.platform}-${requestToken.oauth_token}-${intent}`
+	pending.set(fullToken, { nonce: nonce, secret: requestToken.oauth_token_secret })
+	setTimeout(() => pending.delete(fullToken), 300e3)
 
-  ctx.cookies.set('nonce', nonce, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  ctx.cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
-  return ctx.redirect(`${oauth.authorizationUrl}?oauth_token=${requestToken.oauth_token}`)
+	ctx.cookies.set('nonce', nonce, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+	ctx.cookies.set('intent', intent, { path: callbackUrl.pathname, maxAge: 300, httpOnly: true, secure: import.meta.env.PROD })
+	return ctx.redirect(`${oauth.authorizationUrl}?oauth_token=${requestToken.oauth_token}`)
 }
 
 export async function callback ({ url, params, cookies }: APIContext, oauth: OAuth1Params) {
-  const nonceCookie = cookies.get('nonce').value
-  const intentCookie = cookies.get('intent').value
-  const token = url.searchParams.get('oauth_token')
-  const verifier = url.searchParams.get('oauth_verifier')
+	const nonceCookie = cookies.get('nonce').value
+	const intentCookie = cookies.get('intent').value
+	const token = url.searchParams.get('oauth_token')
+	const verifier = url.searchParams.get('oauth_verifier')
 
-  if (!nonceCookie || !intentCookie || !token || !verifier) {
-    return 'E_CSRF'
-  }
+	if (!nonceCookie || !intentCookie || !token || !verifier) {
+		return 'E_CSRF'
+	}
 
-  const fullToken = `${params.platform}-${token}-${intentCookie}`
-  const authorization = pending.get(fullToken)
-  if (!authorization || nonceCookie !== authorization.nonce) {
-    return 'E_CSRF'
-  }
+	const fullToken = `${params.platform}-${token}-${intentCookie}`
+	const authorization = pending.get(fullToken)
+	if (!authorization || nonceCookie !== authorization.nonce) {
+		return 'E_CSRF'
+	}
 
-  pending.delete(fullToken)
-  const { response } = await authenticatedFetch(oauth.tokenUrl, {
-    method: 'POST',
-    headers: { 'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)' },
-    body: { oauth_verifier: verifier },
-    token: {
-      clientId: oauth.clientId,
-      clientSecret: oauth.clientSecret,
-      token: token,
-      tokenSecret: authorization.secret,
-    },
-  })
+	pending.delete(fullToken)
+	const { response } = await authenticatedFetch(oauth.tokenUrl, {
+		method: 'POST',
+		headers: { 'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)' },
+		body: { oauth_verifier: verifier },
+		token: {
+			clientId: oauth.clientId,
+			clientSecret: oauth.clientSecret,
+			token: token,
+			tokenSecret: authorization.secret,
+		},
+	})
 
-  if (!response.ok) {
-    return null
-  }
+	if (!response.ok) {
+		return null
+	}
 
-  const tokens = decode(await response.text()) as unknown as ProviderResponse
-  const user = await oauth.getSelf(tokens.oauth_token, tokens.oauth_token_secret)
-  if (!user) {
-    return 'E_OAUTH_FETCH'
-  }
+	const tokens = decode(await response.text()) as unknown as ProviderResponse
+	const user = await oauth.getSelf(tokens.oauth_token, tokens.oauth_token_secret)
+	if (!user) {
+		return 'E_OAUTH_FETCH'
+	}
 
-  return user
+	return user
 }

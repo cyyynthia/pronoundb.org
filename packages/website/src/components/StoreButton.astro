@@ -34,58 +34,58 @@ import firefoxSvg from 'simple-icons/icons/firefoxbrowser.svg?raw'
 import edgeSvg from 'simple-icons/icons/microsoftedge.svg?raw'
 
 const STORES = {
-  chrome: { name: 'Chrome', icon: chromeSvg },
-  firefox: { name: 'Firefox', icon: firefoxSvg },
-  edge: { name: 'Edge', icon: edgeSvg },
+	chrome: { name: 'Chrome', icon: chromeSvg },
+	firefox: { name: 'Firefox', icon: firefoxSvg },
+	edge: { name: 'Edge', icon: edgeSvg },
 } as const
 
 export interface Props {
-  store: keyof typeof STORES
-  version: string
-  users: number
-  stars: number
-  url: string
+	store: keyof typeof STORES
+	version: string
+	users: number
+	stars: number
+	url: string
 }
 
 const { store, version, users, stars, url } = Astro.props
 ---
 <div class='flex-1'>
-  <a href={url} target='_blank' rel='noreferrer' class:list={[ 'flex gap-2 font-semibold store-btn', store ]}>
-    <div class='w-5 h-5 fill-current'>
-      <Fragment set:html={STORES[store].icon}/>
-    </div>
-    <span>
-      Get for {STORES[store].name}
-    </span>
-  </a>
-  <div class='flex gap-2 items-center mt-1 text-gray-700 dark:text-gray-100 text-sm'>
-    <span>Version {version}</span>
-    <span>•</span>
-    <span>{users}+ users</span>
-    <span>•</span>
-    <span><Stars stars={stars}/></span>
-  </div>
+	<a href={url} target='_blank' rel='noreferrer' class:list={[ 'flex gap-2 font-semibold store-btn', store ]}>
+		<div class='w-5 h-5 fill-current'>
+			<Fragment set:html={STORES[store].icon}/>
+		</div>
+		<span>
+			Get for {STORES[store].name}
+		</span>
+	</a>
+	<div class='flex gap-2 items-center mt-1 text-gray-700 dark:text-gray-100 text-sm'>
+		<span>Version {version}</span>
+		<span>•</span>
+		<span>{users}+ users</span>
+		<span>•</span>
+		<span><Stars stars={stars}/></span>
+	</div>
 </div>
 
 <style>
-  .store-btn {
-    @apply flex items-center justify-center bg-gray-200 px-6 pt-3 pb-4 rounded dark:bg-gray-700 relative overflow-hidden;
-  }
+	.store-btn {
+		@apply flex items-center justify-center bg-gray-200 px-6 pt-3 pb-4 rounded dark:bg-gray-700 relative overflow-hidden;
+	}
 
-  .store-btn::after {
-    @apply block absolute h-2 inset-x-0 bottom-0;
-    content: '';
-  }
+	.store-btn::after {
+		@apply block absolute h-2 inset-x-0 bottom-0;
+		content: '';
+	}
 
-  .chrome::after {
-    background: linear-gradient(90deg, #4285f4, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853);
-  }
+	.chrome::after {
+		background: linear-gradient(90deg, #4285f4, #4285f4 25%, #ea4335 25%, #ea4335 50%, #fbbc05 50%, #fbbc05 75%, #34a853 75%, #34a853);
+	}
 
-  .firefox::after {
-    background: linear-gradient(90deg, #ff3c61, #fe7c38);
-  }
+	.firefox::after {
+		background: linear-gradient(90deg, #ff3c61, #fe7c38);
+	}
 
-  .edge::after {
-    background: linear-gradient(90deg, #4bc8f6, #35d6c7 55%, #49be77);
-  }
+	.edge::after {
+		background: linear-gradient(90deg, #4bc8f6, #35d6c7 55%, #49be77);
+	}
 </style>

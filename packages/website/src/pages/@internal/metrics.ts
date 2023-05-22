@@ -29,6 +29,6 @@
 import { metrics } from '@server/metrics.js'
 
 export async function get () {
-  const m = await metrics()
-  return new Response(m)
+	const m = await metrics()
+	return new Response(m)
 }

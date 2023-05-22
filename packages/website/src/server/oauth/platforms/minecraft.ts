@@ -38,105 +38,105 @@ export const tokenUrl = 'https://login.live.com/oauth20_token.srf'
 export const scopes = [ 'XboxLive.signin' ]
 
 export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
-  const headers = {
-    accept: 'application/json',
-    'content-type': 'application/json',
-    'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-  }
+	const headers = {
+		accept: 'application/json',
+		'content-type': 'application/json',
+		'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+	}
 
-  // Begin Xbox Live Auth
-  const xliveRes = await fetch('https://user.auth.xboxlive.com/user/authenticate', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      Properties: {
-        AuthMethod: 'RPS',
-        SiteName: 'user.auth.xboxlive.com',
-        RpsTicket: `d=${token}`,
-      },
-      RelyingParty: 'http://auth.xboxlive.com',
-      TokenType: 'JWT',
-    }),
-  })
+	// Begin Xbox Live Auth
+	const xliveRes = await fetch('https://user.auth.xboxlive.com/user/authenticate', {
+		method: 'POST',
+		headers: headers,
+		body: JSON.stringify({
+			Properties: {
+				AuthMethod: 'RPS',
+				SiteName: 'user.auth.xboxlive.com',
+				RpsTicket: `d=${token}`,
+			},
+			RelyingParty: 'http://auth.xboxlive.com',
+			TokenType: 'JWT',
+		}),
+	})
 
-  if (!xliveRes.ok) {
-    // Allow garbage collection
-    await xliveRes.arrayBuffer()
-    return 'E_XLIVE_AUTHENTICATION'
-  }
+	if (!xliveRes.ok) {
+		// Allow garbage collection
+		await xliveRes.arrayBuffer()
+		return 'E_XLIVE_AUTHENTICATION'
+	}
 
-  const xlive = await xliveRes.json()
-  // End Xbox Live Auth
+	const xlive = await xliveRes.json()
+	// End Xbox Live Auth
 
-  // Begin Xbox XSTS Auth
-  const xstsRes = await fetch('https://xsts.auth.xboxlive.com/xsts/authorize', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      Properties: {
-        SandboxId: 'RETAIL',
-        UserTokens: [ xlive.Token ],
-      },
-      RelyingParty: 'rp://api.minecraftservices.com/',
-      TokenType: 'JWT',
-    }),
-  })
+	// Begin Xbox XSTS Auth
+	const xstsRes = await fetch('https://xsts.auth.xboxlive.com/xsts/authorize', {
+		method: 'POST',
+		headers: headers,
+		body: JSON.stringify({
+			Properties: {
+				SandboxId: 'RETAIL',
+				UserTokens: [ xlive.Token ],
+			},
+			RelyingParty: 'rp://api.minecraftservices.com/',
+			TokenType: 'JWT',
+		}),
+	})
 
-  if (!xstsRes.ok) {
-    if (xstsRes.status === 401) {
-      const error = await xstsRes.json()
-      if (error.XErr === 2148916233) return 'E_XLIVE_NO_ACCOUNT'
-      if (error.XErr === 2148916235) return 'E_XLIVE_UNAVAILABLE'
-      if (error.XErr === 2148916238) return 'E_XLIVE_CHILD'
-    } else {
-      // Allow garbage collection
-      await xstsRes.arrayBuffer()
-    }
+	if (!xstsRes.ok) {
+		if (xstsRes.status === 401) {
+			const error = await xstsRes.json()
+			if (error.XErr === 2148916233) return 'E_XLIVE_NO_ACCOUNT'
+			if (error.XErr === 2148916235) return 'E_XLIVE_UNAVAILABLE'
+			if (error.XErr === 2148916238) return 'E_XLIVE_CHILD'
+		} else {
+			// Allow garbage collection
+			await xstsRes.arrayBuffer()
+		}
 
-    return 'E_XLIVE_AUTHORIZATION'
-  }
+		return 'E_XLIVE_AUTHORIZATION'
+	}
 
-  const xsts = await xstsRes.json()
-  // End Xbox XSTS Auth
+	const xsts = await xstsRes.json()
+	// End Xbox XSTS Auth
 
-  // Begin Minecraft Auth
-  const minecraftRes = await fetch('https://api.minecraftservices.com/authentication/login_with_xbox', {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({
-      identityToken: `XBL3.0 x=${xlive.DisplayClaims.xui[0].uhs};${xsts.Token}`,
-    }),
-  })
+	// Begin Minecraft Auth
+	const minecraftRes = await fetch('https://api.minecraftservices.com/authentication/login_with_xbox', {
+		method: 'POST',
+		headers: headers,
+		body: JSON.stringify({
+			identityToken: `XBL3.0 x=${xlive.DisplayClaims.xui[0].uhs};${xsts.Token}`,
+		}),
+	})
 
-  if (!minecraftRes.ok) {
-    // Allow garbage collection
-    await minecraftRes.arrayBuffer()
-    return 'E_MC_AUTH'
-  }
+	if (!minecraftRes.ok) {
+		// Allow garbage collection
+		await minecraftRes.arrayBuffer()
+		return 'E_MC_AUTH'
+	}
 
-  const minecraftToken = await minecraftRes.json()
-  // End Minecraft Auth
+	const minecraftToken = await minecraftRes.json()
+	// End Minecraft Auth
 
-  /// AUTHENTICATION PIPELINE END
+	/// AUTHENTICATION PIPELINE END
 
-  // User data wooo
-  const profileRes = await fetch('https://api.minecraftservices.com/minecraft/profile', {
-    headers: {
-      accept: 'application/json',
-      authorization: `Bearer ${minecraftToken.access_token}`,
-      'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-    },
-  })
+	// User data wooo
+	const profileRes = await fetch('https://api.minecraftservices.com/minecraft/profile', {
+		headers: {
+			accept: 'application/json',
+			authorization: `Bearer ${minecraftToken.access_token}`,
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+		},
+	})
 
-  if (!profileRes.ok) {
-    // Allow garbage collection
-    await profileRes.arrayBuffer()
-    return null
-  }
+	if (!profileRes.ok) {
+		// Allow garbage collection
+		await profileRes.arrayBuffer()
+		return null
+	}
 
-  const data = await profileRes.json()
-  if (!data.id) return 'E_MC_NO_LICENSE'
+	const data = await profileRes.json()
+	if (!data.id) return 'E_MC_NO_LICENSE'
 
-  const uuid = `${data.id.slice(0, 8)}-${data.id.slice(8, 12)}-${data.id.slice(12, 16)}-${data.id.slice(16, 20)}-${data.id.slice(20)}`
-  return { id: uuid, name: data.name, platform: 'minecraft' }
+	const uuid = `${data.id.slice(0, 8)}-${data.id.slice(8, 12)}-${data.id.slice(12, 16)}-${data.id.slice(16, 20)}-${data.id.slice(20)}`
+	return { id: uuid, name: data.name, platform: 'minecraft' }
 }

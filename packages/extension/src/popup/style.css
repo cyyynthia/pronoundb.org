@@ -31,71 +31,71 @@
 @tailwind utilities;
 
 @layer base {
-  @font-face {
-    font-family: 'Quicksand';
-    font-style: normal;
-    font-display: swap;
-    src: url(../../assets/fonts/quicksand-regular.woff2) format('woff2');
-  }
+	@font-face {
+		font-family: 'Quicksand';
+		font-style: normal;
+		font-display: swap;
+		src: url(../../assets/fonts/quicksand-regular.woff2) format('woff2');
+	}
 
-  @font-face {
-    font-family: 'Quicksand';
-    font-style: normal;
-    font-weight: 600;
-    font-display: swap;
-    src: url(../../assets/fonts/quicksand-semibold.woff2) format('woff2');
-  }
+	@font-face {
+		font-family: 'Quicksand';
+		font-style: normal;
+		font-weight: 600;
+		font-display: swap;
+		src: url(../../assets/fonts/quicksand-semibold.woff2) format('woff2');
+	}
 
-  @font-face {
-    font-family: 'Quicksand';
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url(../../assets/fonts/quicksand-bold.woff2) format('woff2');
-  }
+	@font-face {
+		font-family: 'Quicksand';
+		font-style: normal;
+		font-weight: 700;
+		font-display: swap;
+		src: url(../../assets/fonts/quicksand-bold.woff2) format('woff2');
+	}
 
-  html, body {
-    @apply font-sans text-black bg-white h-full;
-    width: 360px;
-    height: 480px;
-    max-width: 360px;
-    max-height: 480px;
-    overflow: hidden;
-  }
+	html, body {
+		@apply font-sans text-black bg-white h-full;
+		width: 360px;
+		height: 480px;
+		max-width: 360px;
+		max-height: 480px;
+		overflow: hidden;
+	}
 
-  main {
-    overflow-y: auto;
-  }
+	main {
+		overflow-y: auto;
+	}
 }
 
 @layer components {
-  .link {
-    @apply text-blue-800 hover:underline dark:text-cyan-200;
-  }
+	.link {
+		@apply text-blue-800 hover:underline dark:text-cyan-200;
+	}
 
-  .checkbox {
-    @apply relative m-1 cursor-pointer;
-  }
+	.checkbox {
+		@apply relative m-1 cursor-pointer;
+	}
 
-  .checkbox input {
-    @apply z-10 cursor-pointer appearance-none bg-transparent border-0 shadow-none absolute w-full h-full p-1 -top-1 -left-1 box-content;
-  }
+	.checkbox input {
+		@apply z-10 cursor-pointer appearance-none bg-transparent border-0 shadow-none absolute w-full h-full p-1 -top-1 -left-1 box-content;
+	}
 
-  .checkbox div {
-    @apply w-8 h-3 rounded-lg relative bg-gray-300;
-  }
+	.checkbox div {
+		@apply w-8 h-3 rounded-lg relative bg-gray-300;
+	}
 
-  .checkbox div::before {
-    content: '';
-    filter: brightness(0.7);
-    @apply w-4 h-4 rounded-full absolute -left-0.5 -top-0.5 bg-gray-300;
-  }
+	.checkbox div::before {
+		content: '';
+		filter: brightness(0.7);
+		@apply w-4 h-4 rounded-full absolute -left-0.5 -top-0.5 bg-gray-300;
+	}
 
-  .checkbox input:checked + div {
-    @apply bg-pink;
-  }
+	.checkbox input:checked + div {
+		@apply bg-pink;
+	}
 
-  .checkbox input:checked + div::before {
-    @apply bg-pink left-auto -right-0.5;
-  }
+	.checkbox input:checked + div::before {
+		@apply bg-pink left-auto -right-0.5;
+	}
 }

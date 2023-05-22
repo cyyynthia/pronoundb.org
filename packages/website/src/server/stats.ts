@@ -34,83 +34,83 @@ const EDGE = 'https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxi
 
 let lastFetch: number
 let stats = {
-  users: 0,
-  chrome: {
-    version: '0.0.0',
-    users: 0,
-    rating: 0,
-  },
-  firefox: {
-    version: '0.0.0',
-    users: 0,
-    rating: 0,
-  },
-  edge: {
-    version: '0.0.0',
-    users: 0,
-    rating: 0,
-  },
+	users: 0,
+	chrome: {
+		version: '0.0.0',
+		users: 0,
+		rating: 0,
+	},
+	firefox: {
+		version: '0.0.0',
+		users: 0,
+		rating: 0,
+	},
+	edge: {
+		version: '0.0.0',
+		users: 0,
+		rating: 0,
+	},
 }
 
 async function fetchChromeStats () {
-  const data = await fetch(CHROME).then((r) => r.text())
-  const version = data.match(/itemprop="version" content="([0-9.]+)/)?.[1] ?? '0.0.0'
-  const install = data.match(/itemprop="interactionCount" content="UserDownloads:([0-9,]+)/)?.[1]?.replace(/,/g, '') ?? '0'
-  const stars = Number(data.match(/class="rsw-stars".*?([0-9.]+)/)?.[1] ?? 0)
+	const data = await fetch(CHROME).then((r) => r.text())
+	const version = data.match(/itemprop="version" content="([0-9.]+)/)?.[1] ?? '0.0.0'
+	const install = data.match(/itemprop="interactionCount" content="UserDownloads:([0-9,]+)/)?.[1]?.replace(/,/g, '') ?? '0'
+	const stars = Number(data.match(/class="rsw-stars".*?([0-9.]+)/)?.[1] ?? 0)
 
-  return {
-    version: version,
-    users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
-    rating: Math.round(stars * 2) / 2,
-  }
+	return {
+		version: version,
+		users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
+		rating: Math.round(stars * 2) / 2,
+	}
 }
 
 async function fetchFirefoxStats () {
-  const data = await fetch(FIREFOX).then((r) => r.json()) as any
-  const install = data.average_daily_users.toString()
+	const data = await fetch(FIREFOX).then((r) => r.json()) as any
+	const install = data.average_daily_users.toString()
 
-  return {
-    version: data.current_version.version,
-    users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
-    rating: Math.round(data.ratings.average * 2) / 2,
-  }
+	return {
+		version: data.current_version.version,
+		users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
+		rating: Math.round(data.ratings.average * 2) / 2,
+	}
 }
 
 async function fetchEdgeStats () {
-  const data = await fetch(EDGE).then((r) => r.json()) as any
-  const install = data.activeInstallCount.toString()
+	const data = await fetch(EDGE).then((r) => r.json()) as any
+	const install = data.activeInstallCount.toString()
 
-  return {
-    version: data.version,
-    users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
-    rating: Math.round(data.averageRating * 2) / 2,
-  }
+	return {
+		version: data.version,
+		users: Number(`${install[0]}${'0'.repeat(install.length - 1)}`),
+		rating: Math.round(data.averageRating * 2) / 2,
+	}
 }
 
 async function fetchStats () {
-  lastFetch = Date.now() // Update last fetch immediately to prevent concurrent re-fetches
-  const [ count, chrome, firefox, edge ] = await Promise.all([
-    database.collection('accounts').estimatedDocumentCount(),
-    fetchChromeStats(),
-    fetchFirefoxStats(),
-    fetchEdgeStats(),
-  ])
+	lastFetch = Date.now() // Update last fetch immediately to prevent concurrent re-fetches
+	const [ count, chrome, firefox, edge ] = await Promise.all([
+		database.collection('accounts').estimatedDocumentCount(),
+		fetchChromeStats(),
+		fetchFirefoxStats(),
+		fetchEdgeStats(),
+	])
 
-  stats = {
-    users: count,
-    chrome: chrome,
-    firefox: firefox,
-    edge: edge,
-  }
+	stats = {
+		users: count,
+		chrome: chrome,
+		firefox: firefox,
+		edge: edge,
+	}
 }
 
 await fetchStats()
 export default function getStats () {
-  if ((Date.now() - lastFetch) > 3600e3 && import.meta.env.PROD) {
-    // Initiate a re-fetch in background, but don't wait for new data
-    // We can serve stale data and wait for new one to arrive
-    fetchStats()
-  }
+	if ((Date.now() - lastFetch) > 3600e3 && import.meta.env.PROD) {
+		// Initiate a re-fetch in background, but don't wait for new data
+		// We can serve stale data and wait for new one to arrive
+		fetchStats()
+	}
 
-  return stats
+	return stats
 }

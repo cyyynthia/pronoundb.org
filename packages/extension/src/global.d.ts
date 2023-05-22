@@ -29,17 +29,17 @@
 import '@types/chrome'
 
 declare global {
-  // Used to test for Firefox's existence
-  const browser: undefined | typeof chrome
+	// Used to test for Firefox's existence
+	const browser: undefined | typeof chrome
 
-  const cloneInto: (object: any, ctx: any, opts?: any) => void
+	const cloneInto: (object: any, ctx: any, opts?: any) => void
 
-  interface Window {
-    wrappedJSObject: this
-    __BUILD_CHUNK__: Record<string, string>
-  }
+	interface Window {
+		wrappedJSObject: this
+		__BUILD_CHUNK__: Record<string, string>
+	}
 
-  interface Element {
-    wrappedJSObject: this
-  }
+	interface Element {
+		wrappedJSObject: this
+	}
 }

@@ -31,17 +31,17 @@ import { validateCsrf } from '@server/auth.js'
 import { setFlash } from '@server/flash.js'
 
 export async function post (ctx: APIContext) {
-  const body = await ctx.request.formData().catch(() => null)
-  const csrfToken = body?.get('csrfToken')
-  if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
-    setFlash(ctx, 'E_CSRF')
-    return ctx.redirect('/')
-  }
+	const body = await ctx.request.formData().catch(() => null)
+	const csrfToken = body?.get('csrfToken')
+	if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
+		setFlash(ctx, 'E_CSRF')
+		return ctx.redirect('/')
+	}
 
-  ctx.cookies.delete('token')
-  return ctx.redirect('/')
+	ctx.cookies.delete('token')
+	return ctx.redirect('/')
 }
 
 export function all () {
-  return new Response('405: Method not allowed', { status: 405 })
+	return new Response('405: Method not allowed', { status: 405 })
 }

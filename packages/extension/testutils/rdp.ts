@@ -32,91 +32,91 @@ import { setTimeout as wait } from 'timers/promises'
 import { connect } from 'net'
 
 export type AddonInstallResponse = {
-  addonId: string
-  innerWindowId: string
-  consoleActor: string
+	addonId: string
+	innerWindowId: string
+	consoleActor: string
 }
 
 export default class RDPConnection {
-  #connection: Socket
+	#connection: Socket
 
-  #payloads: EventEmitter
+	#payloads: EventEmitter
 
-  #actors: Record<string, string> = {}
+	#actors: Record<string, string> = {}
 
-  constructor (port: number) {
-    this.#payloads = new EventEmitter()
-    this.#connection = connect(port, '127.0.0.1')
-    this.#connection.on('data', (buf) => {
-      let cursor = 0
-      const blob = buf.toString()
-      while (cursor < blob.length) {
-        const sepIdx = blob.indexOf(':')
-        const dataStart = sepIdx + 1
-        const dataLength = Number(blob.slice(0, sepIdx))
-        cursor += dataStart + dataLength
+	constructor (port: number) {
+		this.#payloads = new EventEmitter()
+		this.#connection = connect(port, '127.0.0.1')
+		this.#connection.on('data', (buf) => {
+			let cursor = 0
+			const blob = buf.toString()
+			while (cursor < blob.length) {
+				const sepIdx = blob.indexOf(':')
+				const dataStart = sepIdx + 1
+				const dataLength = Number(blob.slice(0, sepIdx))
+				cursor += dataStart + dataLength
 
-        const data = blob.slice(dataStart, dataStart + dataLength)
-        const payload = JSON.parse(data)
-        this.#payloads.emit(payload.type || '*', payload)
-      }
-    })
+				const data = blob.slice(dataStart, dataStart + dataLength)
+				const payload = JSON.parse(data)
+				this.#payloads.emit(payload.type || '*', payload)
+			}
+		})
 
-    this.#payloads.once('*', () => {
-      this.#send({ to: 'root', type: 'getRoot' })
-        .then((actors) => (this.#actors = actors))
-    })
-  }
+		this.#payloads.once('*', () => {
+			this.#send({ to: 'root', type: 'getRoot' })
+				.then((actors) => (this.#actors = actors))
+		})
+	}
 
-  async installAddon (path: string): Promise<AddonInstallResponse> {
-    while (!this.#actors.addonsActor) await wait(100)
+	async installAddon (path: string): Promise<AddonInstallResponse> {
+		while (!this.#actors.addonsActor) await wait(100)
 
-    const installRes = await this.#send({
-      to: this.#actors.addonsActor,
-      type: 'installTemporaryAddon',
-      addonPath: path,
-    })
+		const installRes = await this.#send({
+			to: this.#actors.addonsActor,
+			type: 'installTemporaryAddon',
+			addonPath: path,
+		})
 
-    await wait(50)
-    const installedAddons = await this.#send({ to: 'root', type: 'listAddons' })
-    const addon = installedAddons.addons.find((a: any) => a.id === installRes.addon.id)
+		await wait(50)
+		const installedAddons = await this.#send({ to: 'root', type: 'listAddons' })
+		const addon = installedAddons.addons.find((a: any) => a.id === installRes.addon.id)
 
-    const target = await this.#send({ to: addon.actor, type: 'getTarget' })
-    return {
-      addonId: addon.manifestURL.slice(16, 52),
-      innerWindowId: target.form.innerWindowId,
-      consoleActor: target.form.consoleActor,
-    }
-  }
+		const target = await this.#send({ to: addon.actor, type: 'getTarget' })
+		return {
+			addonId: addon.manifestURL.slice(16, 52),
+			innerWindowId: target.form.innerWindowId,
+			consoleActor: target.form.consoleActor,
+		}
+	}
 
-  async evaluate (code: string, consoleActor: string, windowId: string): Promise<void> {
-    await this.#send({
-      to: consoleActor,
-      type: 'evaluateJSAsync',
-      innerWindowID: windowId,
-      text: code,
-      url: 'rdp client',
-      frameActor: '',
-      selectedNodeActor: '',
-      selectedObjectActor: '',
-    }, 'evaluationResult')
-  }
+	async evaluate (code: string, consoleActor: string, windowId: string): Promise<void> {
+		await this.#send({
+			to: consoleActor,
+			type: 'evaluateJSAsync',
+			innerWindowID: windowId,
+			text: code,
+			url: 'rdp client',
+			frameActor: '',
+			selectedNodeActor: '',
+			selectedObjectActor: '',
+		}, 'evaluationResult')
+	}
 
-  async waitFor (event: string) {
-    return new Promise((resolve) => {
-      this.#payloads.once(event, resolve)
-    })
-  }
+	async waitFor (event: string) {
+		return new Promise((resolve) => {
+			this.#payloads.once(event, resolve)
+		})
+	}
 
-  close () {
-    this.#connection.end()
-  }
+	close () {
+		this.#connection.end()
+	}
 
-  async #send (payload: any, responseType: string = '*'): Promise<any> {
-    return new Promise<any>((resolve) => {
-      const data = JSON.stringify(payload)
-      this.#connection.write(`${data.length}:${data}`)
-      this.#payloads.once(responseType, resolve)
-    })
-  }
+	async #send (payload: any, responseType: string = '*'): Promise<any> {
+		return new Promise<any>((resolve) => {
+			const data = JSON.stringify(payload)
+			this.#connection.write(`${data.length}:${data}`)
+			this.#payloads.once(responseType, resolve)
+		})
+	}
 }
