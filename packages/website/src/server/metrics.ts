@@ -119,11 +119,10 @@ export const LookupHitCounter = new Counter({
 
 /// INTERNAL HEALTH METRICS
 // some more metrics might be welcome
-// for now I just log this one so I can know roughly when I can ditch Tokenize migration code
-export const LegacyTokenizeMigrationCounter = new Counter({
-	name: 'pronoundb_tokenize_migration_total',
-	help: 'tokens migrated from legacy tokenize to jwt',
-	labelNames: [],
+export const ApiCallVersionCounter = new Counter({
+	name: 'pronoundb_api_call_total',
+	help: 'calls to the api per version',
+	labelNames: [ 'version' ],
 })
 
 /// HELPERS

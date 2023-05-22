@@ -27,11 +27,13 @@
  */
 
 import type { APIContext } from 'astro'
-import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram } from '@server/metrics.js'
+import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram, ApiCallVersionCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
 import { providers } from '@server/oauth/providers.js'
 
 export async function get (ctx: APIContext) {
+	ApiCallVersionCounter.inc({ version: 1 })
+
 	const platform = ctx.url.searchParams.get('platform')
 	const idsStr = ctx.url.searchParams.get('ids')
 

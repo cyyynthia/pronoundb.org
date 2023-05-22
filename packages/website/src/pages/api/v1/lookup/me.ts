@@ -28,6 +28,7 @@
 
 import type { APIContext } from 'astro'
 import { authenticate } from '@server/auth.js'
+import { ApiCallVersionCounter } from '@server/metrics'
 
 function getCorsHeaders (request: APIContext['request']) {
 	const origin = request.headers.get('origin')
@@ -52,6 +53,8 @@ function getCorsHeaders (request: APIContext['request']) {
 }
 
 export async function get (ctx: APIContext) {
+	ApiCallVersionCounter.inc({ version: 1 })
+
 	const user = await authenticate(ctx, true)
 	const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
 	return new Response(body, {

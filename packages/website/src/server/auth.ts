@@ -28,9 +28,8 @@
 
 import type { APIContext } from 'astro'
 import { ObjectId } from 'mongodb'
-import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto'
+import { createHash, randomBytes, timingSafeEqual } from 'crypto'
 import { createSigner, createVerifier } from 'fast-jwt'
-import { LegacyTokenizeMigrationCounter } from './metrics.js'
 import { findById } from './database/account.js'
 
 export type JwtPayload = { id: string }
@@ -113,37 +112,4 @@ export function validateCsrf ({ cookies }: APIContext, csrf: string) {
 	csrfStore.delete(token)
 	const csrfBuffer = Buffer.from(csrf, 'base64url')
 	return expected.length === csrfBuffer.length && timingSafeEqual(expected, csrfBuffer)
-}
-
-// Legacy tokenize migration
-export function migrateAuth ({ cookies }: APIContext) {
-	if (!import.meta.env.LEGACY_SECRET_KEY) return
-
-	let token = cookies.get('token').value
-	if (!token || token.startsWith('ey')) return
-
-	const [ id, gen, sig ] = token.split('.')
-	if (!id || !gen || !sig) return
-
-	const expectedSig = createHmac('sha256', import.meta.env.LEGACY_SECRET_KEY)
-		.update(`TTF.1.${id}.${gen}`)
-		.digest('base64')
-		.replace(/=/g, '')
-
-	if (!safeEqual(sig, expectedSig)) return
-
-	LegacyTokenizeMigrationCounter.inc()
-	token = generateToken({ id: Buffer.from(id, 'base64').toString() })
-	cookies.set('token', token, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
-}
-
-function safeEqual (str1: string, str2: string) {
-	if (str1.length !== str2.length) return false
-
-	let mismatch = 0
-	for (let i = 0; i < str1.length; i++) {
-		mismatch |= str1.charCodeAt(i) ^ str2.charCodeAt(i)
-	}
-
-	return mismatch === 0
 }
