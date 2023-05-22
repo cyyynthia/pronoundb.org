@@ -41,7 +41,6 @@ export async function post (ctx: APIContext) {
 	const platform = body?.get('platform')
 	const id = body?.get('id')
 
-
 	if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
 		setFlash(ctx, 'E_CSRF')
 		return ctx.redirect('/me')
@@ -49,6 +48,11 @@ export async function post (ctx: APIContext) {
 
 	if (typeof platform !== 'string' || typeof id !== 'string') {
 		return new Response('400: Bad request', { status: 400 })
+	}
+
+	if (user.accounts.length === 1) {
+		setFlash(ctx, 'E_ONLY_ACCOUNT')
+		return ctx.redirect('/me')
 	}
 
 	LinkedAccountsRemovalCount.inc({ platform: platform })

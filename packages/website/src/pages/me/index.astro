@@ -93,7 +93,7 @@ const csrf = createCsrf(Astro)
 						<input type='hidden' name='csrfToken' value={csrf}/>
 						<input type='hidden' name='platform' value={account.platform}/>
 						<input type='hidden' name='id' value={account.id}/>
-						<button class='cursor-pointer w-full h-hull' title='Unlink account' set:html={xSvg}/>
+						{user.accounts.length !== 1 && <button class='cursor-pointer w-full h-hull' title='Unlink account' set:html={xSvg}/>}
 					</form>
 				</Platform>
 			)

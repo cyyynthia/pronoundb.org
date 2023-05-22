@@ -43,6 +43,7 @@ export const FlashMessages = <const> {
 	E_ACCOUNT_EXISTS: 'This account already exists in our database. Did you mean to login?',
 	E_ACCOUNT_NOT_FOUND: 'This account does not exist in our database. Did you mean to register?',
 	E_ACCOUNT_TAKEN: 'This account has already been linked to another PronounDB account.',
+	E_ONLY_ACCOUNT: 'You cannot unlink your only linked account. If you want to get rid of it, you must delete your account.',
 
 	E_XLIVE_AUTHENTICATION: 'Could not authenticate with Xbox Live servers.',
 	E_XLIVE_NO_ACCOUNT: 'There are no Xbox Live account associated to your Microsoft account.',
