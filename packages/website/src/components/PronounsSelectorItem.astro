@@ -27,29 +27,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { PronounSets } from '@pronoundb/pronouns/sets'
+import type { SetDefinition } from '@pronoundb/pronouns/sets'
 import { formatPronounSet } from '@pronoundb/pronouns/formatter'
 
 export interface Props {
 	id: number
 	set: string | undefined
 	locale: string
+	def: SetDefinition
 }
 
-const { id, set, locale } = Astro.props
-
-const setDefinition = PronounSets[locale]
-if (!setDefinition) throw new Error('Invalid locale')
+const { id, set, locale, def } = Astro.props
 
 const th = id === 1 ? '1st' : id === 2 ? '2nd' : '3rd'
 
 const nominative = id === 1
-	? setDefinition.categories.nominative
-	: setDefinition.categories.nominative.filter((s) => !setDefinition.properties.unique.includes(s))
+	? def.categories.nominative
+	: def.categories.nominative.filter((s) => !def.properties.unique.includes(s))
 
 const meta = id === 1
-	? setDefinition.categories.meta
-	: setDefinition.categories.meta.filter((s) => !setDefinition.properties.unique.includes(s))
+	? def.categories.meta
+	: def.categories.meta.filter((s) => !def.properties.unique.includes(s))
 ---
 <div class={`selector-${id}`}>
 	<div class='font-bold text-sm flex items-center justify-between'>

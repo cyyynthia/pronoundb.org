@@ -51,8 +51,8 @@ const csrf = createCsrf(Astro)
 <Layout flash={flash} title='My Account'>
 	<noscript>
 		<p class='mb-4 px-4 py-2 font-semibold text-red-600 border border-red-600 rounded'>
-			JavaScript is disabled in your browser. For a better experience and a smarter pronouns picker, you should
-			enable JavaScript in your browser.
+			JavaScript is disabled in your browser. The pronouns picker is not able to perform local validation and
+			assist you ensuring your entry is valid.
 		</p>
 	</noscript>
 
@@ -68,7 +68,7 @@ const csrf = createCsrf(Astro)
 
 	<h2 class='text-xl font-bold mb-2'>Pronouns</h2>
 	<p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically within their category.</p>
-	<PronounsSelector sets={user.sets.en} locale='en'/>
+	<PronounsSelector sets={user.sets.en} locale='en' csrf={csrf}/>
 
 	<h2 class='text-xl font-bold mb-2'>Linked accounts</h2>
 	<p class='mb-2'>You can add or remove accounts at any time.</p>

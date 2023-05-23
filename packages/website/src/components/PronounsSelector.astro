@@ -28,21 +28,49 @@
  */
 
 import type { Sets } from '@pronoundb/pronouns/sets'
+import { PronounSets } from '@pronoundb/pronouns/sets'
+import { formatPronounSet } from '@pronoundb/pronouns/formatter'
 import PronounsSelectorItem from './PronounsSelectorItem.astro'
 
 export interface Props {
 	sets: Sets | undefined
 	locale: string
+	csrf: string
 }
 
-const { sets, locale } = Astro.props
+const { sets, locale, csrf } = Astro.props
+
+const def = PronounSets[locale]
+if (!def) throw new Error('Invalid locale')
 ---
+<noscript>
+	<div class='mb-4 px-4 py-2 font-semibold text-blue-600 border border-blue-600 rounded'>
+		<p>As JavaScript is disabled in your web browser, no local validation of your input will be performed.</p>
+		<p>Make sure your entry follows the following rules:</p>
+		<ul class='list-disc list-inside pl-4'>
+			<li>A set cannot be used more than once.</li>
+			<li>You cannot leave blanks: defining the 1st set and 3rd set but leaving 2nd set empty will be rejected.</li>
+			{def.properties.final.length !== 0 && (
+				<>
+					<li>The following sets are "final", and all inputs after one of these must be left blank:</li>
+					<ul class='list-disc list-inside pl-8'>
+						{def.properties.final.map((f) => (
+							<li>{formatPronounSet(f, false, locale)}</li>
+						))}
+					</ul>
+				</>
+			)}
+		</ul>
+	</div>
+</noscript>
 <form method='post' action='/me/update-pronouns' class='nojs' data-pronouns-picker-form>
+	<input type='hidden' name='csrfToken' value={csrf}/>
 	<input type='hidden' name='locale' value={locale}/>
-	<div class='w-full grid grid-cols-3 gap-4 mb-4'>
-		<PronounsSelectorItem id={1} set={sets?.[0]} locale={locale} />
-		<PronounsSelectorItem id={2} set={sets?.[1]} locale={locale} />
-		<PronounsSelectorItem id={3} set={sets?.[2]} locale={locale} />
+
+	<div class='w-full grid md:grid-cols-3 gap-x-4 gap-y-2 mb-4'>
+		<PronounsSelectorItem id={1} set={sets?.[0]} locale={locale} def={def} />
+		<PronounsSelectorItem id={2} set={sets?.[1]} locale={locale} def={def} />
+		<PronounsSelectorItem id={3} set={sets?.[2]} locale={locale} def={def} />
 	</div>
 
 	<div class='my-4 nojs-hidden' aria-hidden='true'>
