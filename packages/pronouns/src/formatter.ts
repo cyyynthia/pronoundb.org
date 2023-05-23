@@ -26,28 +26,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { APIContext } from 'astro'
-import { authenticate } from '@server/auth.js'
-import { updatePronouns } from '@server/database/account.js'
+import type { Sets } from './sets.js'
 
-const LEGACY_PRONOUNS = [
-	'hh', 'hi', 'hs', 'ht', 'ih', 'ii', 'is', 'it', 'shh', 'sh', 'si',
-	'st', 'th', 'ti', 'ts', 'tt', 'any', 'other', 'ask', 'avoid',
-]
-
-export async function put (ctx: APIContext) {
-	const user = await authenticate(ctx)
-	if (!user) return new Response('401: Unauthorized', { status: 401 })
-
-	const pronouns = await ctx.request.text()
-	if (!LEGACY_PRONOUNS.includes(pronouns)) {
-		return new Response('400: Bad request', { status: 400 })
-	}
-
-	updatePronouns(user._id, pronouns)
-	return new Response(null, { status: 204 })
+export function formatPronouns (sets: Sets, capitalize: boolean, locale: string) {
+	// TODO
+	return ''
 }
 
-export function all () {
-	return new Response('405: Method not allowed', { status: 405 })
+export function formatPronounsShort (sets: Sets, capitalize: boolean, locale: string) {
+	// TODO
+	return ''
+}
+
+export function formatPronounsLong (sets: Sets, capitalize: boolean, locale: string) {
+	// TODO
+	return ''
+}
+
+export function formatPronounsSuffixed (sets: Sets, capitalize: boolean, locale: string) {
+	// TODO
+	return [ '', '' ]
 }

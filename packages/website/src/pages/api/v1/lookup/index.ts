@@ -27,6 +27,8 @@
  */
 
 import type { APIContext } from 'astro'
+import { transformSetsToIdentifier } from '@pronoundb/pronouns/legacy'
+
 import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, ApiCallVersionCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
 import { providers } from '@server/oauth/providers.js'
@@ -68,7 +70,7 @@ export async function get (ctx: APIContext) {
 	LookupIdsCounter.inc({ platform: platform })
 	if (user) LookupHitCounter.inc({ platform: platform })
 
-	const body = JSON.stringify({ pronouns: user?.pronouns ?? 'unspecified' })
+	const body = JSON.stringify({ pronouns: transformSetsToIdentifier(user?.sets.en) })
 	return new Response(body, {
 		headers: {
 			vary: 'origin',

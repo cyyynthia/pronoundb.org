@@ -33,7 +33,7 @@ import { handleFlash } from '@server/flash.js'
 import Layout from '@layouts/Layout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import Link from '@components/Link.astro'
-import LegacyPronounsSelector from '@components/LegacyPronounsSelector.astro'
+// import LegacyPronounsSelector from '@components/LegacyPronounsSelector.astro'
 import Platform from '@components/Platform.astro'
 
 import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
@@ -51,8 +51,8 @@ const csrf = createCsrf(Astro)
 <Layout flash={flash} title='My Account'>
 	<noscript>
 		<p class='mb-4 px-4 py-2 font-semibold text-red-600 border border-red-600 rounded'>
-			JavaScript is disabled in your browser. You may experience issues and changes may not be applied! Make sure to
-			enable it in your browser settings.
+			JavaScript is disabled in your browser. For a better experience and a smarter pronouns picker, you should
+			enable JavaScript in your browser.
 		</p>
 	</noscript>
 
@@ -67,7 +67,7 @@ const csrf = createCsrf(Astro)
 
 	<h2 class='text-xl font-bold mb-2'>Pronouns</h2>
 	<p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically.</p>
-	<LegacyPronounsSelector id='pronouns-selector' selected={user.pronouns}/>
+	<!-- <LegacyPronounsSelector id='pronouns-selector' selected={user.pronouns}/> -->
 
 	<h2 class='text-xl font-bold mb-2'>Linked accounts</h2>
 	<p class='mb-2'>You can add or remove accounts at any time.</p>
@@ -121,8 +121,3 @@ const csrf = createCsrf(Astro)
 		</button>
 	</form>
 </Layout>
-
-<script>
-	const selector = document.getElementById('pronouns-selector') as HTMLSelectElement
-	selector.addEventListener('change', () => fetch('/me/set-pronouns', { method: 'PUT', body: selector.value }))
-</script>

@@ -28,47 +28,20 @@
 
 import type { APIContext } from 'astro'
 import { ObjectId } from 'mongodb'
+import { formatPronouns } from '@pronoundb/pronouns/formatter'
 import { findById } from '@server/database/account.js'
-
-export const LegacyPronouns: Record<string, string | string[]> = {
-	// -- Contributors: please keep the list sorted alphabetically.
-	hh: [ 'he/him', 'He/Him' ],
-	hi: [ 'he/it', 'He/It' ],
-	hs: [ 'he/she', 'He/She' ],
-	ht: [ 'he/they', 'He/They' ],
-	ih: [ 'it/him', 'It/Him' ],
-	ii: [ 'it/its', 'It/Its' ],
-	is: [ 'it/she', 'It/She' ],
-	it: [ 'it/they', 'It/They' ],
-	shh: [ 'she/he', 'She/He' ],
-	sh: [ 'she/her', 'She/Her' ],
-	si: [ 'she/it', 'She/It' ],
-	st: [ 'she/they', 'She/They' ],
-	th: [ 'they/he', 'They/He' ],
-	ti: [ 'they/it', 'They/It' ],
-	ts: [ 'they/she', 'They/She' ],
-	tt: [ 'they/them', 'They/Them' ],
-	// --
-	any: 'Any pronouns',
-	other: 'Other pronouns',
-	ask: 'Ask me my pronouns',
-	avoid: 'Avoid pronouns, use my name',
-}
-
-function formatPronouns (pronounsId: string, capitalize: boolean) {
-	const pronouns = LegacyPronouns[pronounsId]
-	return Array.isArray(pronouns) ? pronouns[capitalize ? 1 : 0] : pronouns
-}
 
 export async function get ({ url, params }: APIContext) {
 	if (!params.id || !ObjectId.isValid(params.id)) {
 		return new Response('400: Bad request', { status: 400 })
 	}
 
+	const locale = params.locale || 'en'
 	const id = new ObjectId(params.id)
 	const user = await findById(id)
+	const sets = user?.sets[locale]
 
-	if (!user || user.pronouns === 'unspecified') {
+	if (!sets) {
 		return {
 			body: JSON.stringify({
 				schemaVersion: 1,
@@ -84,7 +57,7 @@ export async function get ({ url, params }: APIContext) {
 		body: JSON.stringify({
 			schemaVersion: 1,
 			label: capitalize ? 'Pronouns' : 'pronouns',
-			message: formatPronouns(user.pronouns, capitalize),
+			message: formatPronouns(sets, capitalize, locale),
 		}),
 	}
 }

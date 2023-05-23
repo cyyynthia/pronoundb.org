@@ -1,0 +1,8 @@
+{
+	"root": true,
+	"extends": "../../.eslintrc.json",
+	"parserOptions": {
+		"project": "./tsconfig.json",
+		"extraFileExtensions": [ ".mjs" ]
+	}
+}
