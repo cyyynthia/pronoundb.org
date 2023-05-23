@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// @ts-nocheck
+
 import type { Sets } from './sets.js'
 
 export function formatPronouns (sets: Sets, capitalize: boolean, locale: string) {
@@ -43,7 +45,12 @@ export function formatPronounsLong (sets: Sets, capitalize: boolean, locale: str
 	return ''
 }
 
-export function formatPronounsSuffixed (sets: Sets, capitalize: boolean, locale: string) {
+export function formatPronounsSplit (sets: Sets, capitalize: boolean, locale: string) {
 	// TODO
 	return [ '', '' ]
+}
+
+export function formatPronounSet (set: string, capitalize: boolean, locale: string) {
+	// TODO
+	return set
 }

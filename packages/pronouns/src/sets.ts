@@ -26,6 +26,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import * as enSets from './sets/en.js'
+
 export type Sets = [ string ] | [ string, string ] | [ string, string, string ]
 
-// TODO: define sets
+type SetDefinitionInner<T = string | readonly string[]> = {
+	readonly standard: T
+	readonly capitalized: T
+}
+
+export type SetDefinition = {
+	readonly sets: {
+		readonly [set: string]: {
+			readonly classic: SetDefinitionInner
+			readonly short?: SetDefinitionInner
+			readonly long?: SetDefinitionInner
+			readonly split?: SetDefinitionInner<readonly [ string | readonly string[], string ]>
+		}
+	}
+	readonly categories: {
+		readonly nominative: readonly string[]
+		readonly meta: readonly string[]
+	}
+	readonly properties: {
+		readonly unique: readonly string[]
+		readonly final: readonly string[]
+	}
+	readonly defaultSplit: {
+		readonly idx: number
+		readonly array: readonly string[]
+	}
+}
+
+export const PronounSets: Record<string, SetDefinition> = {
+	en: enSets,
+}
