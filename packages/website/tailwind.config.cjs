@@ -36,7 +36,10 @@ module.exports = {
 		'./src/layouts/*.astro',
 	],
 	theme: {
-		fontFamily: { sans: [ 'Quicksand', 'sans-serif' ] },
+		fontFamily: {
+			sans: [ 'Quicksand', 'sans-serif' ],
+			mono: [ 'JetBrains Mono', 'monospace' ],
+		},
 		container: {
 			screens: {
 				'sm': '640px',

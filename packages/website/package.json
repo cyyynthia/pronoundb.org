@@ -18,7 +18,8 @@
 	"dependencies": {
 		"fast-jwt": "^3.0.0",
 		"mongodb": "^5.5.0",
-		"prom-client": "^14.2.0"
+		"prom-client": "^14.2.0",
+		"shiki": "^0.14.2"
 	},
 	"devDependencies": {
 		"@astrojs/node": "^5.1.4",

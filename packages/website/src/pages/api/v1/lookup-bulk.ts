@@ -31,7 +31,14 @@ import { transformSetsToIdentifier } from '@pronoundb/pronouns/legacy'
 
 import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram, ApiCallVersionCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
-import { providers } from '@server/oauth/providers.js'
+
+const providers = [
+	'discord',
+	'github',
+	'minecraft',
+	'twitch',
+	'twitter',
+]
 
 export async function get (ctx: APIContext) {
 	ApiCallVersionCounter.inc({ version: 1 })

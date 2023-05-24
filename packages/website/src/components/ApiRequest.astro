@@ -1,0 +1,122 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import { Code } from 'astro/components'
+
+import Link from './Link.astro'
+import Heart from './Heart.astro'
+
+const COLORS = {
+	GET: 'bg-blue-400',
+	POST: 'bg-green-400',
+	PUT: 'bg-yellow-400',
+	PATCH: 'bg-yellow-400',
+	DELETE: 'bg-red-400',
+}
+
+type TypeDef = { [param: string]: { optional?: boolean, comment?: string, type: string | TypeDef } }
+
+export interface Props {
+	method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+	path: string[]
+
+	typesPreamble?: string
+	typeParams?: TypeDef
+	typeBody?: TypeDef
+	typeResponse?: TypeDef
+
+	examplePath: string
+	exampleStatus: string
+	exampleBody?: any
+	exampleResponse?: any
+}
+
+const { method, path, typesPreamble, typeParams, typeBody, typeResponse, examplePath, exampleStatus, exampleBody, exampleResponse } = Astro.props
+
+function typeToString (def: TypeDef, prefix = '') {
+	let res = '{'
+	for (const k in def) {
+		if (k in def) {
+			res += '\n'
+			if (def[k].comment) res += `${prefix}\t// ${def[k].comment}\n`
+			res += `${prefix}\t${k}`
+			if (def[k].optional) res += '?'
+			res += `: ${typeof def[k].type === 'string' ? def[k].type : typeToString(def[k].type, `${prefix}\t`)}`
+		}
+	}
+
+	res += `\n${prefix}}`
+	return res
+}
+
+let typeDefinition = ''
+if (typesPreamble) typeDefinition += `${typesPreamble}\n\n`
+if (typeParams) typeDefinition += `type RequestParams = ${typeToString(typeParams)}\n\n`
+if (typeBody) typeDefinition += `type RequestBody = ${typeToString(typeBody)}\n\n`
+if (typeResponse) typeDefinition += `type ResponseBody = ${typeToString(typeResponse)}\n\n`
+
+let httpRequest = `${method} ${examplePath}`
+if (exampleBody) httpRequest += `\nContent-Type: application/json\n\n${JSON.stringify(exampleBody, null, '\t')}`
+
+let httpResponse = `HTTP/2 ${exampleStatus}`
+if (exampleResponse) httpResponse += `\nContent-Type: application/json\n\n${JSON.stringify(exampleResponse, null, '\t')}`
+---
+<section class='w-full lg:grid lg:grid-cols-2 bg-gray-600 dark:bg-gray-700 text-white font-mono rounded mb-8'>
+	<section class='mb-4 lg:border-r lg:mb-0 border-gray-500 py-2 px-4'>
+		<div class='font-bold flex gap-3 items-center pt-1 pb-2 border-b border-gray-500'>
+			<span class:list={[ COLORS[method], 'text-black px-4' ]}>{method}</span>
+			<span>
+				{path.map((p, i) => <span class={i % 2 ? 'text-orange-300' : ''}>{p}</span>)}
+			</span>
+		</div>
+
+		<div class='mt-3'>
+			<slot/>
+		</div>
+
+		<div class='mt-2'>
+			<div class='font-bold'>Request types</div>
+			<Code code={typeDefinition.trim()} lang='ts'/>
+		</div>
+	</section>
+	<section class='py-2 px-4'>
+		<h3 class='font-bold'>Example request</h3>
+		<Code code={httpRequest} lang='http'/>
+
+		<h3 class='font-bold mt-4'>Example response</h3>
+		<Code code={httpResponse} lang='http'/>
+	</section>
+</section>
+
+<style>
+	section :global(.astro-code) {
+		@apply rounded px-4 py-2;
+		background: #303030 !important;
+	}
+</style>
