@@ -29,28 +29,74 @@
 // @ts-nocheck
 
 import type { Sets } from './sets.js'
+import { PronounSets } from './sets.js'
 
 export function formatPronouns (sets: Sets, capitalize: boolean, locale: string) {
-	// TODO
-	return ''
+	if (sets.length === 1) return formatPronounSet(sets[0], capitalize, locale)
+
+	const def = PronounSets[locale]
+	if (!def) throw new Error(`Invalid locale '${locale}'`)
+
+	const res = []
+	for (const set of sets) {
+		if (!(set in def.sets)) throw new Error(`Invalid set '${set}'`)
+		const pronounDef = def.sets[set].short ?? def.sets[set].classic
+		const pronouns = capitalize
+			? pronounDef.capitalized
+			: pronounDef.standard
+
+		res.push(Array.isArray(pronouns) ? pronouns[0] : pronouns)
+	}
+
+	return res.join('/')
 }
 
 export function formatPronounsShort (sets: Sets, capitalize: boolean, locale: string) {
-	// TODO
-	return ''
+	const def = PronounSets[locale]
+	if (!def) throw new Error(`Invalid locale '${locale}'`)
+
+	const res = []
+	for (const set of sets.slice(0, 2)) {
+		if (!(set in def.sets)) throw new Error(`Invalid set '${set}'`)
+		const pronounDef = def.sets[set].short ?? def.sets[set].classic
+		const pronouns = capitalize
+			? pronounDef.capitalized
+			: pronounDef.standard
+
+		res.push(Array.isArray(pronouns) ? pronouns[0] : pronouns)
+	}
+
+	return res.join('/')
 }
 
-export function formatPronounsLong (sets: Sets, capitalize: boolean, locale: string) {
-	// TODO
-	return ''
-}
+export function formatPronounsLong (sets: Sets, locale: string) {
+	const def = PronounSets[locale]
+	if (!def) throw new Error(`Invalid locale '${locale}'`)
 
-export function formatPronounsSplit (sets: Sets, capitalize: boolean, locale: string) {
-	// TODO
-	return [ '', '' ]
+	return def.formatLong(sets)
 }
 
 export function formatPronounSet (set: string, capitalize: boolean, locale: string) {
-	// TODO
-	return set
+	const def = PronounSets[locale]
+	if (!def) throw new Error(`Invalid locale '${locale}'`)
+	if (!(set in def.sets)) throw new Error(`Invalid set '${set}'`)
+
+	const pronouns = capitalize
+		? def.sets[set].classic.capitalized ?? def.sets[set].classic.standard
+		: def.sets[set].classic.standard
+
+	return Array.isArray(pronouns) ? pronouns.join('/') : pronouns as string
+}
+
+export function formatPronounSetShort (set: string, capitalize: boolean, locale: string) {
+	const def = PronounSets[locale]
+	if (!def) throw new Error(`Invalid locale '${locale}'`)
+	if (!(set in def.sets)) throw new Error(`Invalid set '${set}'`)
+
+	const pronounDef = def.sets[set].short ?? def.sets[set].classic
+	const pronouns = capitalize
+		? pronounDef.capitalized ?? pronounDef.standard
+		: pronounDef.standard
+
+	return Array.isArray(pronouns) ? pronouns.join('/') : pronouns as string
 }

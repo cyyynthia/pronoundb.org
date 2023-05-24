@@ -49,7 +49,7 @@ if (!def) throw new Error('Invalid locale')
 		<p>Make sure your entry follows the following rules:</p>
 		<ul class='list-disc list-inside pl-4'>
 			<li>A set cannot be used more than once.</li>
-			<li>You cannot leave blanks: defining the 1st set and 3rd set but leaving 2nd set empty will be rejected.</li>
+			<li>You cannot leave blanks between sets: defining the 1st set and 3rd set but leaving 2nd set empty will be rejected.</li>
 			{def.properties.final.length !== 0 && (
 				<>
 					<li>The following sets are "final", and all inputs after one of these must be left blank:</li>
@@ -199,7 +199,7 @@ if (!def) throw new Error('Invalid locale')
 			if (sets.length) {
 				previewNormal.innerText = formatPronouns(sets, false, form.locale.value)
 				previewShort.innerText = formatPronounsShort(sets, false, form.locale.value)
-				previewLong.innerText = formatPronounsLong(sets, false, form.locale.value)
+				previewLong.innerText = formatPronounsLong(sets, form.locale.value)
 			} else {
 				previewNormal.innerText = previewShort.innerText = previewLong.innerText = 'no pronouns specified...'
 			}

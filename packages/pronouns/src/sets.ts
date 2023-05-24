@@ -32,7 +32,7 @@ export type Sets = [ string ] | [ string, string ] | [ string, string, string ]
 
 type SetDefinitionInner<T = string | readonly string[]> = {
 	readonly standard: T
-	readonly capitalized: T
+	readonly capitalized?: T
 }
 
 export type SetDefinition = {
@@ -40,8 +40,6 @@ export type SetDefinition = {
 		readonly [set: string]: {
 			readonly classic: SetDefinitionInner
 			readonly short?: SetDefinitionInner
-			readonly long?: SetDefinitionInner
-			readonly split?: SetDefinitionInner<readonly [ string | readonly string[], string ]>
 		}
 	}
 	readonly categories: {
@@ -52,10 +50,8 @@ export type SetDefinition = {
 		readonly unique: readonly string[]
 		readonly final: readonly string[]
 	}
-	readonly defaultSplit: {
-		readonly idx: number
-		readonly array: readonly string[]
-	}
+
+	readonly formatLong: (sets: Sets) => string
 }
 
 export const PronounSets: Record<string, SetDefinition> = {

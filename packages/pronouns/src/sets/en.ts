@@ -26,6 +26,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { Sets } from '../sets.js'
+import { formatPronounSetShort } from '../formatter.js'
+
 //!\\ CONTRIBUTORS, KEEP PRONOUNS SORTED PER CATEGORY AND ALPHABETICALLY //!\\
 
 export const sets = <const> {
@@ -58,58 +61,38 @@ export const sets = <const> {
 	// Meta
 	any: {
 		classic: {
-			standard: 'any pronouns',
-			capitalized: 'Any pronouns',
+			standard: 'Any pronouns',
 		},
 		short: {
 			standard: 'any',
 			capitalized: 'Any',
 		},
-		split: {
-			standard: [ 'any', 'pronouns' ],
-			capitalized: [ 'Any', 'pronouns' ],
-		},
 	},
 	ask: {
 		classic: {
-			standard: 'ask me my pronouns',
-			capitalized: 'Ask me my pronouns',
+			standard: 'Ask me my pronouns',
 		},
 		short: {
 			standard: 'ask',
 			capitalized: 'Ask',
-		},
-		split: {
-			standard: [ 'ask me', 'my pronouns' ],
-			capitalized: [ 'Ask me', 'my pronouns' ],
 		},
 	},
 	avoid: {
 		classic: {
-			standard: 'ask me my pronouns',
-			capitalized: 'Ask me my pronouns',
+			standard: 'Avoid pronouns, use my name',
 		},
 		short: {
-			standard: 'ask',
-			capitalized: 'Ask',
-		},
-		split: {
-			standard: [ 'ask me', 'my pronouns' ],
-			capitalized: [ 'Ask me', 'my pronouns' ],
+			standard: 'avoid',
+			capitalized: 'Avoid',
 		},
 	},
 	other: {
 		classic: {
-			standard: 'other pronouns',
-			capitalized: 'Other pronouns',
+			standard: 'Other pronouns',
 		},
 		short: {
 			standard: 'other',
 			capitalized: 'Other',
-		},
-		split: {
-			standard: [ 'other', 'pronouns' ],
-			capitalized: [ 'Other', 'pronouns' ],
 		},
 	},
 }
@@ -124,7 +107,36 @@ export const properties = {
 	final: [ 'any', 'ask', 'avoid', 'other' ],
 }
 
-export const defaultSplit = {
-	idx: 0,
-	array: [ '', 'pronouns' ],
+export function formatLong (s: Sets) {
+	if (s[0] === 'ask') {
+		return 'Prefers people to ask for their pronouns'
+	}
+
+	if (s[0] === 'avoid') {
+		return 'Wants to avoid pronouns'
+	}
+
+	if (s[0] === 'other') {
+		return 'Goes by pronouns not available on PronounDB'
+	}
+
+	let res = 'Goes by '
+	for (let i = 0; i < s.length; i++) {
+		const set = s[i]
+		if (set === 'ask') {
+			return `${res} pronouns. You may also ask this person for additional info`
+		}
+
+		if (set === 'other') {
+			return `${res} pronouns. This person also goes by pronouns not available on PronounDB`
+		}
+
+		const pronouns = formatPronounSetShort(set, false, 'en')
+
+		if (i) res += ', '
+		if (i === s.length - 1) res += 'or '
+		res += set === 'any' ? pronouns : `"${pronouns}"`
+	}
+
+	return `${res} pronouns`
 }
