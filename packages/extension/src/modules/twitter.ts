@@ -57,11 +57,11 @@ async function injectProfileHeader (username?: string) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('twitter', id)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const prevPronouns = header.querySelector<HTMLElement>('[data-pronoundb]')
 	if (prevPronouns) {
-		prevPronouns.replaceChild(document.createTextNode(formatPronouns(pronouns)), prevPronouns.childNodes[1])
+		prevPronouns.replaceChild(document.createTextNode(formatPronouns(pronouns.sets.en)), prevPronouns.childNodes[1])
 		return
 	}
 
@@ -71,7 +71,7 @@ async function injectProfileHeader (username?: string) {
 			'span',
 			{ class: template.className, 'data-pronoundb': 'true' },
 			topics({ class: template.children[0].getAttribute('class')! }),
-			formatPronouns(pronouns)
+			formatPronouns(pronouns.sets.en)
 		)
 	)
 }
@@ -81,7 +81,7 @@ async function injectTweet (tweet: HTMLElement) {
 	const retweetId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
 
 	const pronouns = await fetchPronouns('twitter', retweetId || directId)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const dateContainer = tweet.querySelector(tweet.dataset.testid === 'tweet' ? 'a time' : 'time')?.parentElement
 	const parentContainer = dateContainer?.parentElement
@@ -95,7 +95,7 @@ async function injectTweet (tweet: HTMLElement) {
 			{ class: `${containerClass} pronoundb-container` },
 			h('span', { class: 'pronoundb-void' }, '​'),
 			h('span', { class: 'pronoundb-separator' }, '·'),
-			h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns))
+			h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns.sets.en))
 		)
 	)
 }
@@ -109,7 +109,7 @@ async function injectProfilePopOut (popout: HTMLElement) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('twitter', id)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const childClass = template.children[0].className
 	const parentClass = template.className
@@ -135,7 +135,7 @@ async function injectProfilePopOut (popout: HTMLElement) {
 					marginRight: '4px',
 				}),
 			}),
-			formatPronouns(pronouns)
+			formatPronouns(pronouns.sets.en)
 		)
 	)
 

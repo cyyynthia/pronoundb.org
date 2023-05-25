@@ -52,6 +52,8 @@ export function formatPronouns (sets: Sets, capitalize: boolean, locale: string)
 }
 
 export function formatPronounsShort (sets: Sets, capitalize: boolean, locale: string) {
+	if (sets.length === 1) return formatPronounSetShort(sets[0], capitalize, locale)
+
 	const def = PronounSets[locale]
 	if (!def) throw new Error(`Invalid locale '${locale}'`)
 

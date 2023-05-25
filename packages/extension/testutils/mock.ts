@@ -26,31 +26,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const TestPronouns: Record<string, Record<string, string>> = {
+const TestPronouns: Record<string, Record<string, string[]>> = {
 	twitter: {
 		// @cyyynthia_
-		1300929324154060800: 'ii',
+		1300929324154060800: [ 'it' ],
 	},
 	github: {
 		// cyyynthia
-		9999055: 'ii',
+		9999055: [ 'it' ],
 	},
 	twitch: {
 		// cyyynthia_
-		103493295: 'ii',
+		103493295: [ 'it' ],
 	},
 }
 
 export function processRequest (urlStr: string): any {
 	const url = new URL(urlStr)
 	const platform = url.searchParams.get('platform')!
-	if (urlStr.includes('lookup-bulk')) {
-		const ids = url.searchParams.get('ids')!.split(',')
-		const res: Record<string, string> = {}
-		for (const id of ids) res[id] = TestPronouns[platform]?.[id] ?? 'tt'
-		return res
+	const ids = url.searchParams.get('ids')!.split(',')
+	const res: Record<string, any> = {}
+	for (const id of ids) {
+		res[id] = {
+			sets: {
+				en: TestPronouns[platform]?.[id] ?? [ 'they' ],
+			},
+		}
 	}
 
-	const id = url.searchParams.get('id')!
-	return { pronouns: TestPronouns[platform]?.[id] ?? 'tt' }
+	return res
 }

@@ -43,7 +43,7 @@ async function injectUserProfile () {
 	if (!userId || !list) return
 
 	const pronouns = await fetchPronouns('github', userId)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const el = h(
 		'li',
@@ -51,10 +51,10 @@ async function injectUserProfile () {
 			class: 'vcard-detail pt-1 css-truncate css-truncate-target hide-sm hide-md',
 			itemprop: 'pronouns',
 			show_title: false,
-			'aria-label': `Pronouns: ${formatPronouns(pronouns)}`,
+			'aria-label': `Pronouns: ${formatPronouns(pronouns.sets.en)}`,
 		},
 		commentDiscussion({ class: 'octicon' }),
-		h('span', { class: 'p-label' }, formatPronouns(pronouns))
+		h('span', { class: 'p-label' }, formatPronouns(pronouns.sets.en))
 	)
 
 	list.appendChild(el)
@@ -81,7 +81,7 @@ async function injectProfileLists () {
 
 	items.forEach(async (item) => {
 		const pronouns = await fetchPronouns('github', item.querySelector('img')!.src.match(/\/u\/(\d+)/)![1])
-		if (pronouns === 'unspecified') return
+		if (!pronouns || !pronouns.sets.en) return
 
 		const col = item.querySelector<HTMLElement>('.d-table-cell + .d-table-cell')!
 		let about = col.querySelector('.mb-0')
@@ -97,7 +97,7 @@ async function injectProfileLists () {
 				{ class: margin ? 'ml-3' : '' },
 				commentDiscussion({ class: 'octicon' }),
 				'\n  ',
-				formatPronouns(pronouns)
+				formatPronouns(pronouns.sets.en)
 			)
 		)
 	})
@@ -119,7 +119,7 @@ function injectHoverCards () {
 			if (!block) return
 
 			const pronouns = await fetchPronouns('github', String(userId))
-			if (pronouns === 'unspecified') return
+			if (!pronouns || !pronouns.sets.en) return
 
 			block.parentElement?.insertBefore(
 				h(
@@ -127,7 +127,7 @@ function injectHoverCards () {
 					{ class: 'color-fg-muted' },
 					commentDiscussion({ class: 'octicon' }),
 					' ',
-					formatPronouns(pronouns)
+					formatPronouns(pronouns.sets.en)
 				),
 				block
 			)

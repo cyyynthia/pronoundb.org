@@ -30,6 +30,11 @@ import * as enSets from './sets/en.js'
 
 export type Sets = [ string ] | [ string, string ] | [ string, string, string ]
 
+export type UserData = {
+	decoration: string | null
+	sets: { [locale: string]: Sets }
+}
+
 type SetDefinitionInner<T = string | readonly string[]> = {
 	readonly standard: T
 	readonly capitalized?: T

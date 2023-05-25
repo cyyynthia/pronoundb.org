@@ -64,7 +64,7 @@ export function fetchProp (target: HTMLElement, propPath: QueryElement[]) {
 }
 
 export function fetchVueProp (target: HTMLElement, propPath: QueryElement[]): any {
-	return fetchProp(target, [ '__vue__', ...propPath ])
+	return fetchProp(target, [ '__vue_app__', ...propPath ])
 }
 
 export function fetchReactProp (target: HTMLElement, propPath: QueryElement[]): any {

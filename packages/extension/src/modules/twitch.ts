@@ -28,6 +28,7 @@
 
 import { whisper } from '../icons/twitch'
 
+import type { Sets } from '@pronoundb/pronouns/sets'
 import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchReactProp } from '../utils/proxy'
@@ -46,7 +47,7 @@ const settings = {
 	chatStyle: 'badge',
 }
 
-function createBadge (pronouns: string) {
+function createBadge (pronouns: Sets) {
 	return h(
 		'span',
 		{
@@ -85,7 +86,7 @@ async function injectChat (element: HTMLElement) {
 	}
 
 	const pronouns = await fetchPronouns('twitch', userId)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	if (settings.chatStyle === 'badge') {
 		const badgesContainer = isFFZ
@@ -100,7 +101,7 @@ async function injectChat (element: HTMLElement) {
 					class: 'pronoundb-chat-badge',
 					style: css({ display: 'inline', position: 'relative', bottom: '-1px', marginRight: '4px' }),
 				},
-				createBadge(pronouns)
+				createBadge(pronouns.sets.en)
 			),
 			badgesContainer.firstChild!
 		)
@@ -112,7 +113,7 @@ async function injectChat (element: HTMLElement) {
 					class: 'pronoundb-chat-inline',
 					style: (element.getAttribute('style') || '') + css({ opacity: '0.7' }),
 				},
-				` (${formatPronounsShort(pronouns)})`
+				` (${formatPronounsShort(pronouns.sets.en)})`
 			)
 		)
 	}
@@ -138,7 +139,7 @@ async function inject7tvChat (message: HTMLElement) {
 
 	if (!userId) return
 	const pronouns = await fetchPronouns('twitch', userId)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const user = message.querySelector<HTMLElement>('.seventv-chat-user')
 	if (!user) return
@@ -151,7 +152,7 @@ async function inject7tvChat (message: HTMLElement) {
 					class: 'pronoundb-chat-badge',
 					style: css({ display: 'inline', position: 'relative', bottom: '-1px', marginRight: '4px' }),
 				},
-				createBadge(pronouns)
+				createBadge(pronouns.sets.en)
 			),
 			user.firstChild!
 		)
@@ -163,7 +164,7 @@ async function inject7tvChat (message: HTMLElement) {
 					class: 'pronoundb-chat-inline',
 					style: css({ opacity: '0.7' }),
 				},
-				` (${formatPronounsShort(pronouns)})`
+				` (${formatPronounsShort(pronouns.sets.en)})`
 			)
 		)
 	}
@@ -178,11 +179,11 @@ async function injectWhisperHeader (header: HTMLElement) {
 	}
 
 	let pronouns = await fetchPronouns('twitch', container.dataset.interlocutorId!)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const username = header.querySelector('span')
 	username!.parentElement!.appendChild(
-		h('div', { class: 'pronoundb-whisper-header', style: css({ marginLeft: '4px' }) }, createBadge(pronouns))
+		h('div', { class: 'pronoundb-whisper-header', style: css({ marginLeft: '4px' }) }, createBadge(pronouns.sets.en))
 	)
 }
 
@@ -195,7 +196,7 @@ async function injectViewerCard (element: HTMLElement) {
 	if (!cardId) return
 
 	const pronouns = await fetchPronouns('twitch', cardId)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	container.appendChild(
 		h(
@@ -215,7 +216,7 @@ async function injectViewerCard (element: HTMLElement) {
 						fontSize: 'var(--font-size-6)',
 					}),
 				},
-				formatPronounsLong(pronouns)
+				formatPronounsLong(pronouns.sets.en)
 			)
 		)
 	)
@@ -229,14 +230,14 @@ async function injectStreamerAbout () {
 	if (!streamerId) return
 
 	const pronouns = await fetchPronouns('twitch', streamerId)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const el = document.querySelector('.about-section div + div span div')
 	if (!el) return
 
 	const prevPronounsContainer = el.querySelector<HTMLElement>('.pronoundb-streamer-about div')
 	if (prevPronounsContainer) {
-		prevPronounsContainer.innerText = formatPronouns(pronouns)
+		prevPronounsContainer.innerText = formatPronouns(pronouns.sets.en)
 		return
 	}
 
@@ -253,7 +254,7 @@ async function injectStreamerAbout () {
 		}, '·')
 	)
 
-	el.appendChild(h('div', {}, formatPronouns(pronouns)))
+	el.appendChild(h('div', {}, formatPronouns(pronouns.sets.en)))
 }
 
 function bind7tvCompat () {

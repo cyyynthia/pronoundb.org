@@ -29,7 +29,7 @@
 import type { ExtensionModule } from '../../modules'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
-import { WEBSITE, Endpoints } from '../../constants.js'
+import { Endpoints } from '../../constants.js'
 import { Header, Footer } from './Layout'
 import { ViewState } from './Views'
 import * as Views from './Views'
@@ -56,14 +56,13 @@ function Main ({ view }: { view: ViewState }) {
 export default function Popup () {
 	const [ selfPronouns, setSelfPronouns ] = useState(null)
 	const [ view, setView ] = useState(ViewState.MAIN)
-	const openPronounsSelector = useCallback(() => { chrome.tabs.create({ url: `${WEBSITE}/me` }) }, [])
 	const openSettings = useCallback(() => { setView(ViewState.SETTINGS) }, [])
 	const closeSettings = useCallback(() => { setView(ViewState.MAIN) }, [])
 
 	useEffect(() => {
 		fetch(Endpoints.LOOKUP_SELF, { credentials: 'include' })
-			.then((r) => r.json())
-			.then((u) => setSelfPronouns(u.pronouns ?? null))
+			.then((r) => r.ok ? r.json() : null)
+			.then((d) => setSelfPronouns(d))
 			.catch()
 	}, [])
 
@@ -71,7 +70,7 @@ export default function Popup () {
 		<div class='flex flex-col h-full'>
 			<Header view={view} onOpenSettings={openSettings} onCloseSettings={closeSettings}/>
 			<Main view={view}/>
-			<Footer selfPronouns={selfPronouns} onOpenPronounsSelector={openPronounsSelector}/>
+			<Footer selfPronouns={selfPronouns}/>
 		</div>
 	)
 }

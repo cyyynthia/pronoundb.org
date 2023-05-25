@@ -46,10 +46,10 @@ const mockCodeJs = mockCodeTs
 	.replace(/: (Record<.*>|string|any)/g, '')
 	.replace('export function', 'function')
 	// "Minify" the code
-	.replace(/^((.\*| *\/\/).*)?\n/gm, '') // Comments & empty lines
+	.replace(/^((.\*|[ \t]*\/\/).*)?\n/gm, '') // Comments & empty lines
 	.replace(/([{,])\n/g, '$1') // Empty lines (no ;)
 	.replace(/\n/g, ';') // Empty lines (;)
-	.replace(/ {2,}/g, '') // Multi spaces
+	.replace(/\t/g, '') // Indent
 	.replace(/[ ,]?([=:{}(]|\?\?) ?/g, '$1') // Useless space/symbols
 
 const injectJsCode = `${mockCodeJs}\nglobalThis.fetch = (u) => Promise.resolve({ json: () => Promise.resolve(processRequest(u)) })`
