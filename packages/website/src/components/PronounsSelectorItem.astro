@@ -55,7 +55,7 @@ const meta = id === 1
 	</div>
 	<select class='w-full px-4 py-2 border rounded bg-transparent border-gray-700 dark:border-gray-400' name={`pronouns-set-${id}`}>
 		<option class='dark:bg-gray-800' value='unspecified' selected={!set || set === 'unspecified'}>
-			{id === 1 ? 'Unspecified' : 'Pick another set...'}
+			{id === 1 ? 'Unspecified' : `No ${th} set`}
 		</option>
 		<optgroup class='dark:bg-gray-800' label='Nominative pronouns'>
 			{nominative.map((s) => (

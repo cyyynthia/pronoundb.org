@@ -29,9 +29,6 @@
 
 import { Code } from 'astro/components'
 
-import Link from './Link.astro'
-import Heart from './Heart.astro'
-
 const COLORS = {
 	GET: 'bg-blue-400',
 	POST: 'bg-green-400',
@@ -64,10 +61,10 @@ function typeToString (def: TypeDef, prefix = '') {
 	for (const k in def) {
 		if (k in def) {
 			res += '\n'
-			if (def[k].comment) res += `${prefix}\t// ${def[k].comment}\n`
+			if (def[k]!.comment) res += `${prefix}\t// ${def[k]!.comment}\n`
 			res += `${prefix}\t${k}`
-			if (def[k].optional) res += '?'
-			res += `: ${typeof def[k].type === 'string' ? def[k].type : typeToString(def[k].type, `${prefix}\t`)}`
+			if (def[k]!.optional) res += '?'
+			res += `: ${typeof def[k]!.type === 'string' ? def[k]!.type : typeToString(def[k]!.type as any, `${prefix}\t`)}`
 		}
 	}
 

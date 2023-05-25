@@ -100,6 +100,7 @@ const flash = handleFlash(Astro)
 	>
 		<p class='mb-4'>Looks up the data saved in PronounDB for one or more (up to 50) account for a given platform.</p>
 		<p class='mb-4'>The response is a map of IDs to the corresponding data. If an ID is not in our database, it will not be present in the response.</p>
+		<p class='mb-4'>It is <b>strongly recommended</b> to fetch IDs in bulk when possible and applicable, to help preent hitting and potential rate limits.</p>
 	</ApiRequest>
 
 	<ApiRequest
@@ -183,9 +184,9 @@ const flash = handleFlash(Astro)
 			<li><code>{locale}</code> locale</li>
 			<ul class='list-disc list-inside pl-6'>
 				<li>Nominative</li>
-				<ul class='list-disc list-inside pl-6'>{PronounSets[locale].categories.nominative.map((s) => <li><code>{s}</code>: {formatPronounSet(s, false, locale)}</li>)}</ul>
+				<ul class='list-disc list-inside pl-6'>{PronounSets[locale]!.categories.nominative.map((s) => <li><code>{s}</code>: {formatPronounSet(s, false, locale)}</li>)}</ul>
 				<li>Meta sets</li>
-				<ul class='list-disc list-inside pl-6'>{PronounSets[locale].categories.meta.map((s) => <li><code>{s}</code>: {formatPronounSet(s, false, locale)}</li>)}</ul>
+				<ul class='list-disc list-inside pl-6'>{PronounSets[locale]!.categories.meta.map((s) => <li><code>{s}</code>: {formatPronounSet(s, false, locale)}</li>)}</ul>
 			</ul>
 		))}
 	</ul>
@@ -195,7 +196,7 @@ const flash = handleFlash(Astro)
 		{providers.map((p) => (
 			<li>
 				<code>{p}</code>
-				{p in PLATFORM_NOTES && `(${PLATFORM_NOTES[p]})`}
+				{p in PLATFORM_NOTES && `(${PLATFORM_NOTES[p as keyof typeof PLATFORM_NOTES]})`}
 			</li>
 		))}
 	</ul>
