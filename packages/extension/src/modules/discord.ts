@@ -73,9 +73,9 @@ async function handleMessage (node: HTMLElement) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('discord', id)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
-	const element = h('span', { class: 'pronoundb-pronouns', style: Styles.messageHeader }, ` • ${formatPronouns(pronouns)}`)
+	const element = h('span', { class: 'pronoundb-pronouns', style: Styles.messageHeader }, ` • ${formatPronouns(pronouns.sets.en)}`)
 	if (node.firstElementChild?.className.includes('compact-')) {
 		const usernameSection = node.querySelector('[id^="message-username"]')
 		if (usernameSection) usernameSection.insertBefore(element, usernameSection.lastChild)
@@ -90,13 +90,13 @@ async function handleUserPopOut (node: HTMLElement) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('discord', id)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const pronounsSection = h(
 		'div',
 		{ style: css({ padding: '12px 0 0' }) },
 		h('div', { style: Styles.header }, 'Pronouns'),
-		h('div', { style: Styles.text }, formatPronouns(pronouns))
+		h('div', { style: Styles.text }, formatPronouns(pronouns.sets.en))
 	)
 
 	const sinceBlock = node.querySelector<HTMLElement>('[class^="memberSinceContainer"]')?.previousElementSibling?.parentElement
@@ -116,14 +116,14 @@ async function handleUserModal (node: HTMLElement) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('discord', id)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const container = node.querySelector<HTMLElement>('[class^="userInfoSection"]')
 	if (!container) return
 
 	const frag = document.createDocumentFragment()
 	frag.appendChild(h('div', { class: 'userInfoSectionHeader-owo', style: Styles.header }, 'Pronouns'))
-	frag.appendChild(h('div', { style: Styles.text + css({ marginBottom: '16px' }) }, formatPronouns(pronouns)))
+	frag.appendChild(h('div', { style: Styles.text + css({ marginBottom: '16px' }) }, formatPronouns(pronouns.sets.en)))
 
 	container.classList.add('has-pronouns')
 
@@ -140,14 +140,14 @@ async function handleAutocompleteRow (row: HTMLElement) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('discord', id)
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const tag = row.querySelector('[class*="autocompleteRowContentSecondary-"]')
 	if (!tag) return
 
 	const element = document.createElement('span')
 	element.className = 'pronoundb-autocomplete-pronouns'
-	element.innerText = ` • ${formatPronouns(pronouns)}`
+	element.innerText = ` • ${formatPronouns(pronouns.sets.en)}`
 	tag.appendChild(element)
 }
 

@@ -28,21 +28,42 @@
  */
 
 import { handleFlash } from '@server/flash.js'
-import { providers } from '@server/oauth/providers.js'
 
 import Layout from '@layouts/Layout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import Link from '@components/Link.astro'
 
+import xOctagon from 'feather-icons/dist/icons/x-octagon.svg?raw'
+
 const flash = handleFlash(Astro)
 ---
-<Layout flash={flash} title='API Documentation'>
+<Layout flash={flash} title='API v1 Documentation'>
 	<PageHeader>
 		<Fragment slot='namespace'>About PronounDB</Fragment>
-		<Fragment>API Documentation</Fragment>
+		<Fragment>API v1 Documentation</Fragment>
 	</PageHeader>
-	<div class='mb-4 bg-blue-300 font-semibold p-4 dark:text-black'>
-		This will be rewritten soon, with a better look and a new API that includes new features. Stay tuned!
+
+	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded text-red-600 border-red-600 dark:text-red-orange dark:border-red-orange'>
+		<div class='w-6 h-6 shrink-0' set:html={xOctagon}/>
+		<div>
+			<p>
+				API v1 is deprecated. Please migrate to the newer <a href='/wiki/api-docs' class='underline'>API v2</a>,
+				and please do not use API v1 for writing any new code interacting with PronounDB.
+			</p>
+			<p>
+				While API v1 will contiue to operate, newer features of PronounDB are not available. New platforms
+				cannot be queried on API v1, and some new sets might not be available on API v1 which will result in
+				people using these having their sets fallback to <code class='font-normal'>other</code>.
+			</p>
+			<hr class='border-red-600 dark:border-red-orange my-2' />
+			<p>
+				See the <a href='#apiv2-compatibility' class='underline'>API v2 compatibility</a> section of this doc for
+				more details about the compatibility of newer features, and how they are handled by API v1.
+			</p>
+			<p>
+				API v1 will permanently cease its operations <u class='font-bold'>June 1st, 2024</u>.
+			</p>
+		</div>
 	</div>
 
 	<h2 class='text-2xl font-bold mb-2' id='endpoints'>API endpoints</h2>
@@ -64,21 +85,33 @@ const flash = handleFlash(Astro)
 	</ul>
 	<p class='mb-4'>Response: A map of IDs with their corresponding set of pronouns.</p>
 
-	<h3 class='text-xl font-bold mb-2' id='shields-io'>shields.io endpoint</h3>
-	<div class='mb-2'>
-		You can use shields.io's endpoint functionality to create a badge of your pronouns using PronounDB's API. The
-		endpoint is at <code>/shields/[pronoundbId].json</code>. By default, everything will be in lowercase, but you can
-		add the <code>capitalize</code> query parameter to change this behavior. The PronounDB ID is shown under
-		"Advanced settings" in your account screen.
-	</div>
-	<div class='mb-2'>
-		See <Link href='https://shields.io/endpoint'>shields.io's docs</Link> for more information. Below is an example
-		badge of the website's developer pronouns.
-	</div>
-	<div class='mb-6'>
-		<pre class='mb-3 overflow-x-auto bg-gray-200 dark:bg-gray-700 p-2 text-sm'>https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6.json</pre>
-		<img src="https://img.shields.io/endpoint?color=f49898&amp;style=flat-square&amp;url=https%3A%2F%2Fpronoundb.org%2Fshields%2F5fd62c00985db32c8e80d5b6.json" alt="">
-	</div>
+	<h2 class='text-2xl font-bold mb-2' id='apiv2-compatibility'>API v2 compatibility</h2>
+	<p class='mb-2'>
+		No feature from API v2 other than pronouns is available on API v1. Only platforms supported at the time of API
+		v1 deprecation are supported; see the <Link href='#data-types'>Data Types</Link> section for the final list of
+		platforms API v1 will answer queries for.
+	</p>
+	<p>
+		Pronouns are converted from the API v2 format to the APIv1 identifiers according to the following algorithm:
+	</p>
+	<ul class='list-inside list-disc mb-2'>
+		<li>Consider <code>sets</code> an array of sets:</li>
+		<li>If <code>sets[0]</code> is <code>avoid</code>, then return <code>avoid</code></li>
+		<li>If <code>sets</code> contains <code>any</code>, then return <code>any</code></li>
+		<li>If <code>sets</code> contains <code>ask</code>, then return <code>ask</code></li>
+
+		<li>If <code>sets[0]</code> is either <code>he</code>, <code>it</code>, <code>she</code>, or <code>they</code></li>
+		<ul class='list-inside list-disc pl-6'>
+			<li>If <code>sets[1]</code> is also either of the above sets, then return the identifier for the combined set</li>
+			<li>Else, return the legacy identifier for <code>sets[0]</code></li>
+		</ul>
+
+		<li>Else, fallback to <code>other</code>.</li>
+	</ul>
+	<p class='mb-4'>
+		Note: only English sets are considered; if the user only has sets for other languages, it will show up
+		as <code>unspecified</code> in the responses.
+	</p>
 
 	<h2 class='text-2xl font-bold mb-2' id='data-types'>Data types</h2>
 	<h3 class='text-xl font-bold mb-2' id='data-pronouns'>Pronouns</h3>
@@ -108,7 +141,11 @@ const flash = handleFlash(Astro)
 
 	<h3 class='text-xl font-bold mb-2' id='data-platforms'>Platforms</h3>
 	<ul class='list-inside list-disc'>
-		{providers.map((p) => <li><code>{p}</code></li>)}
+		<li><code>discord</code></li>
+		<li><code>github</code></li>
+		<li><code>minecraft</code></li>
+		<li><code>twitch</code></li>
+		<li><code>twitter</code></li>
 	</ul>
 </Layout>
 

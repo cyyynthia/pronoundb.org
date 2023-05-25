@@ -1,0 +1,212 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import type { Sets } from '@pronoundb/pronouns/sets'
+import { PronounSets } from '@pronoundb/pronouns/sets'
+import { formatPronounSet } from '@pronoundb/pronouns/formatter'
+import PronounsSelectorItem from './PronounsSelectorItem.astro'
+
+export interface Props {
+	sets: Sets | undefined
+	locale: string
+	csrf: string
+}
+
+const { sets, locale, csrf } = Astro.props
+
+const def = PronounSets[locale]
+if (!def) throw new Error('Invalid locale')
+---
+<noscript>
+	<div class='mb-4 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
+		<p>As JavaScript is disabled in your web browser, no local validation of your input will be performed.</p>
+		<p>Make sure your entry follows the following rules:</p>
+		<ul class='list-disc list-inside pl-4'>
+			<li>A set cannot be used more than once.</li>
+			<li>You cannot leave blanks between sets: defining the 1st set and 3rd set but leaving 2nd set empty will be rejected.</li>
+			{def.properties.final.length !== 0 && (
+				<>
+					<li>The following sets are "final", and all inputs after one of these must be left blank:</li>
+					<ul class='list-disc list-inside pl-8'>
+						{def.properties.final.map((f) => (
+							<li>{formatPronounSet(f, false, locale)}</li>
+						))}
+					</ul>
+				</>
+			)}
+		</ul>
+	</div>
+</noscript>
+<form method='post' action='/me/update-pronouns' class='nojs' data-pronouns-picker-form>
+	<input type='hidden' name='csrfToken' value={csrf}/>
+	<input type='hidden' name='locale' value={locale}/>
+
+	<div class='w-full grid md:grid-cols-3 gap-x-4 gap-y-2 mb-4'>
+		<PronounsSelectorItem id={1} set={sets?.[0]} locale={locale} def={def} />
+		<PronounsSelectorItem id={2} set={sets?.[1]} locale={locale} def={def} />
+		<PronounsSelectorItem id={3} set={sets?.[2]} locale={locale} def={def} />
+	</div>
+
+	<div class='my-4 nojs-hidden' aria-hidden='true'>
+		<p>This is how your pronouns will be displayed:</p>
+		<ul class='list-disc list-inside pl-4'>
+			<li>Normal: <span class='px-1 bg-gray-200 dark:bg-gray-700 preview-normal'></span></li>
+			<li>Short: <span class='px-1 bg-gray-200 dark:bg-gray-700 preview-short'></span></li>
+			<li>Long: <span class='px-1 bg-gray-200 dark:bg-gray-700 preview-long'></span></li>
+		</ul>
+	</div>
+
+	<button class='text-green-700 border-green-700 dark:text-green-400 dark:border-green-400 font-semibold py-1 px-3 border rounded mb-8' type='submit'>
+		Save changes
+	</button>
+</form>
+
+<style>
+	.nojs-hidden {
+		display: none;
+	}
+</style>
+
+<script>
+	import type { Sets } from '@pronoundb/pronouns/sets'
+	import { PronounSets } from '@pronoundb/pronouns/sets'
+	import { formatPronouns, formatPronounsShort, formatPronounsLong } from '@pronoundb/pronouns/formatter'
+
+	for (const form of document.querySelectorAll<HTMLFormElement>('[data-pronouns-picker-form]')) {
+		for (const hidden of form.querySelectorAll('.nojs-hidden')) {
+			hidden.classList.remove('nojs-hidden')
+			hidden.setAttribute('aria-hidden', 'false')
+		}
+
+		const def = PronounSets[form.locale.value]!
+
+		const submitButton = form.querySelector<HTMLElement>('button')!
+		submitButton.classList.add('hidden')
+
+		const picker1 = form.querySelector<HTMLElement>('.selector-1')!
+		const picker2 = form.querySelector<HTMLElement>('.selector-2')!
+		const picker3 = form.querySelector<HTMLElement>('.selector-3')!
+
+		const pickerSelect1 = picker1.querySelector<HTMLSelectElement>('select')!
+		const pickerSelect2 = picker2.querySelector<HTMLSelectElement>('select')!
+		const pickerSelect3 = picker3.querySelector<HTMLSelectElement>('select')!
+
+		const pickerDisabled2 = picker2.querySelector<HTMLElement>('.disabled')!
+		const pickerDisabled3 = picker3.querySelector<HTMLElement>('.disabled')!
+
+		const previewNormal = form.querySelector<HTMLElement>('.preview-normal')!
+		const previewShort = form.querySelector<HTMLElement>('.preview-short')!
+		const previewLong = form.querySelector<HTMLElement>('.preview-long')!
+
+		function onChange () {
+			const sets: Sets = [] as any
+
+			const set1 = pickerSelect1.value
+			const set2 = pickerSelect2.value
+			const set3 = pickerSelect3.value
+
+			// Reset everything
+			for (const opt of form.querySelectorAll('option[disabled]')) {
+				opt.removeAttribute('disabled')
+			}
+
+			pickerSelect1.value = 'unspecified'
+
+			picker2.classList.add('hidden')
+			picker2.setAttribute('aria-hidden', 'true')
+			pickerSelect2.classList.remove('hidden')
+			pickerSelect2.setAttribute('aria-hidden', 'false')
+			pickerDisabled2.classList.add('hidden')
+			pickerDisabled2.setAttribute('aria-hidden', 'true')
+			pickerSelect2.value = 'unspecified'
+
+			picker3.classList.add('hidden')
+			picker3.setAttribute('aria-hidden', 'true')
+			pickerSelect3.classList.remove('hidden')
+			pickerSelect3.setAttribute('aria-hidden', 'false')
+			pickerDisabled3.classList.add('hidden')
+			pickerDisabled3.setAttribute('aria-hidden', 'true')
+			pickerSelect3.value = 'unspecified'
+
+			// Re-render things as needed
+			if (set1 !== 'unspecified') {
+				pickerSelect1.value = set1
+				sets.push(set1)
+
+				picker2.classList.remove('hidden')
+				picker2.setAttribute('aria-hidden', 'false')
+
+				pickerSelect2.querySelector(`option[value='${set1}'`)?.setAttribute('disabled', 'true')
+				pickerSelect3.querySelector(`option[value='${set1}'`)?.setAttribute('disabled', 'true')
+
+				if (def.properties.final.includes(set1)) {
+					pickerSelect2.classList.add('hidden')
+					pickerSelect2.setAttribute('aria-hidden', 'true')
+					pickerDisabled2.classList.remove('hidden')
+					pickerDisabled2.setAttribute('aria-hidden', 'false')
+				} else if (set2 !== 'unspecified') {
+					pickerSelect2.value = set2
+					sets.push(set2)
+
+					picker3.classList.remove('hidden')
+					picker3.setAttribute('aria-hidden', 'false')
+
+					pickerSelect1.querySelector(`option[value='${set2}'`)?.setAttribute('disabled', 'true')
+					pickerSelect3.querySelector(`option[value='${set2}'`)?.setAttribute('disabled', 'true')
+
+					if (def.properties.final.includes(set2)) {
+						pickerSelect3.classList.add('hidden')
+						pickerSelect3.setAttribute('aria-hidden', 'true')
+						pickerDisabled3.classList.remove('hidden')
+						pickerDisabled3.setAttribute('aria-hidden', 'false')
+					} else if (set3 !== 'unspecified') {
+						pickerSelect3.value = set3
+						sets.push(set3)
+
+						pickerSelect1.querySelector(`option[value='${set3}'`)?.setAttribute('disabled', 'true')
+						pickerSelect2.querySelector(`option[value='${set3}'`)?.setAttribute('disabled', 'true')
+					}
+				}
+			}
+
+			// Update preview
+			if (sets.length) {
+				previewNormal.innerText = formatPronouns(sets, false, form.locale.value)
+				previewShort.innerText = formatPronounsShort(sets, false, form.locale.value)
+				previewLong.innerText = formatPronounsLong(sets, form.locale.value)
+			} else {
+				previewNormal.innerText = previewShort.innerText = previewLong.innerText = 'no pronouns specified...'
+			}
+		}
+
+		form.addEventListener('change', onChange)
+		form.addEventListener('change', () => submitButton.classList.remove('hidden'), { once: true })
+		onChange()
+	}
+</script>

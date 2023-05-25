@@ -27,27 +27,63 @@
  */
 
 import type { APIContext } from 'astro'
+
 import { authenticate } from '@server/auth.js'
-import { updatePronouns } from '@server/database/account.js'
+import { ApiCallVersionCounter } from '@server/metrics.js'
 
-const LEGACY_PRONOUNS = [
-	'hh', 'hi', 'hs', 'ht', 'ih', 'ii', 'is', 'it', 'shh', 'sh', 'si',
-	'st', 'th', 'ti', 'ts', 'tt', 'any', 'other', 'ask', 'avoid',
-]
+function getCorsHeaders (request: APIContext['request']) {
+	const origin = request.headers.get('origin')
+	const isFirefox = request.headers.get('origin')?.startsWith('moz-extension://')
 
-export async function put (ctx: APIContext) {
-	const user = await authenticate(ctx)
-	if (!user) return new Response('401: Unauthorized', { status: 401 })
+	return isFirefox
+		? {
+			vary: 'origin',
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': origin!,
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-allow-credentials': 'true',
+			'access-control-max-age': '600',
+		}
+		: {
+			vary: 'origin',
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': '*',
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-max-age': '600',
+		}
+}
 
-	const pronouns = await ctx.request.text()
-	if (!LEGACY_PRONOUNS.includes(pronouns)) {
-		return new Response('400: Bad request', { status: 400 })
+export async function get (ctx: APIContext) {
+	ApiCallVersionCounter.inc({ version: 2 })
+
+	const user = await authenticate(ctx, true)
+	if (!user) {
+		return new Response(null, {
+			status: 404,
+			...getCorsHeaders(ctx.request),
+		})
 	}
 
-	updatePronouns(user._id, pronouns)
-	return new Response(null, { status: 204 })
+	const body = JSON.stringify({
+		decoration: user.decoration,
+		sets: user.sets,
+	})
+
+	return new Response(body, {
+		headers: {
+			...getCorsHeaders(ctx.request),
+			'content-type': 'application/json',
+		},
+	})
+}
+
+export function options ({ request }: APIContext) {
+	return new Response(null, {
+		status: 204,
+		headers: getCorsHeaders(request),
+	})
 }
 
 export function all () {
-	return new Response('405: Method not allowed', { status: 405 })
+	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }

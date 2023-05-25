@@ -27,50 +27,74 @@
  */
 
 import type { APIContext } from 'astro'
-import { transformSetsToIdentifier } from '@pronoundb/pronouns/legacy'
 
-import { authenticate } from '@server/auth.js'
+import { ObjectId } from 'mongodb'
 import { ApiCallVersionCounter } from '@server/metrics.js'
+import { findById } from '@server/database/account.js'
 
-function getCorsHeaders (request: APIContext['request']) {
-	const origin = request.headers.get('origin')
-	const isFirefox = request.headers.get('origin')?.startsWith('moz-extension://')
+export async function get (ctx: APIContext) {
+	ApiCallVersionCounter.inc({ version: 2 })
 
-	return isFirefox
-		? {
-			vary: 'origin',
-			'access-control-allow-methods': 'GET',
-			'access-control-allow-origin': origin!,
-			'access-control-allow-headers': 'x-pronoundb-source',
-			'access-control-allow-credentials': 'true',
-			'access-control-max-age': '600',
-		}
-		: {
-			vary: 'origin',
+	if (!ctx.params.id || !ObjectId.isValid(ctx.params.id)) {
+		return new Response(
+			JSON.stringify({ code: 400, error: 'Bad request', message: 'Invalid user ID' }),
+			{
+				status: 400,
+				headers: {
+					'access-control-allow-methods': 'GET',
+					'access-control-allow-origin': '*',
+					'access-control-allow-headers': 'x-pronoundb-source',
+					'access-control-max-age': '600',
+					'content-type': 'application/json',
+				},
+			}
+		)
+	}
+
+	const id = new ObjectId(ctx.params.id)
+	const user = await findById(id)
+	if (!user) {
+		return new Response(
+			JSON.stringify({ code: 404, error: 'Not found' }),
+			{
+				status: 404,
+				headers: {
+					'access-control-allow-methods': 'GET',
+					'access-control-allow-origin': '*',
+					'access-control-allow-headers': 'x-pronoundb-source',
+					'access-control-max-age': '600',
+					'content-type': 'application/json',
+				},
+			}
+		)
+	}
+
+	const body = JSON.stringify({
+		id: ctx.params.id,
+		decoration: user.decoration,
+		sets: user.sets,
+	})
+
+	return new Response(body, {
+		headers: {
 			'access-control-allow-methods': 'GET',
 			'access-control-allow-origin': '*',
 			'access-control-allow-headers': 'x-pronoundb-source',
 			'access-control-max-age': '600',
-		}
-}
-
-export async function get (ctx: APIContext) {
-	ApiCallVersionCounter.inc({ version: 1 })
-
-	const user = await authenticate(ctx, true)
-	const body = JSON.stringify({ pronouns: transformSetsToIdentifier(user?.sets.en) })
-	return new Response(body, {
-		headers: {
-			...getCorsHeaders(ctx.request),
 			'content-type': 'application/json',
 		},
 	})
 }
 
-export function options ({ request }: APIContext) {
+export function options () {
 	return new Response(null, {
 		status: 204,
-		headers: getCorsHeaders(request),
+		headers: {
+			'access-control-allow-methods': 'GET',
+			'access-control-allow-origin': '*',
+			'access-control-allow-headers': 'x-pronoundb-source',
+			'access-control-max-age': '600',
+		},
 	})
 }
 

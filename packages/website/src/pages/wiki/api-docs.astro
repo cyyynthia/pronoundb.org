@@ -1,0 +1,214 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import { PronounSets } from '@pronoundb/pronouns/sets'
+import { formatPronounSet } from '@pronoundb/pronouns/formatter'
+
+import { handleFlash } from '@server/flash.js'
+import { providers } from '@server/oauth/providers.js'
+
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import ApiRequest from '@components/ApiRequest.astro'
+import Link from '@components/Link.astro'
+
+import infoIcon from 'feather-icons/dist/icons/info.svg?raw'
+
+const PLATFORM_NOTES = {
+	minecraft: 'UUIDs must be formatted with dashes',
+}
+
+const flash = handleFlash(Astro)
+---
+<Layout flash={flash} title='API v2 Documentation'>
+	<PageHeader>
+		<Fragment slot='namespace'>About PronounDB</Fragment>
+		<Fragment>API v2 Documentation</Fragment>
+	</PageHeader>
+
+	<h2 class='text-2xl font-bold mb-2' id='endpoints'>Endpoint routes</h2>
+	<ApiRequest
+		method='GET'
+		path={[ '/api/v2/lookup?platform=', '[platform]', '&ids=', '[ids]' ]}
+
+		typeParams={{
+			platform: {
+				optional: false,
+				comment: 'See below for a list of supported platforms',
+				type: 'string',
+			},
+			ids: {
+				optional: false,
+				comment: 'Items are separated by ",". Example: 13,27,31',
+				type: 'string[]',
+			},
+		}}
+		typeResponse={{
+			'[userId: string]': {
+				optional: false,
+				type: {
+					sets: {
+						optional: false,
+						comment: 'See below for a list of supported sets',
+						type: {
+							'[locale: string]': {
+								optional: false,
+								comment: 'See below for a list of supported locales',
+								type: 'string[]',
+							},
+						},
+					},
+				},
+			},
+		}}
+
+		examplePath='/api/v2/lookup?platform=discord&ids=94762492923748352,246652610747039744'
+		exampleStatus='200 OK'
+		exampleResponse={{
+			'94762492923748352': {
+				sets: {
+					en: [ 'she', 'it' ]
+				}
+			}
+		}}
+	>
+		<p class='mb-4'>Looks up the data saved in PronounDB for one or more (up to 50) account for a given platform.</p>
+		<p class='mb-4'>The response is a map of IDs to the corresponding data. If an ID is not in our database, it will not be present in the response.</p>
+	</ApiRequest>
+
+	<ApiRequest
+		method='GET'
+		path={[ '/api/v2/users/', '[id]' ]}
+
+		typeParams={{
+			id: {
+				optional: false,
+				type: 'string',
+			},
+		}}
+		typeResponse={{
+			id: {
+				optional: false,
+				type: 'string',
+			},
+			sets: {
+				optional: false,
+				type: {
+					'[locale: string]': {
+						optional: false,
+						type: 'string[]',
+					},
+				},
+			},
+		}}
+
+		examplePath='/api/v2/users/5fd62c00985db32c8e80d5b6'
+		exampleStatus='200 OK'
+		exampleResponse={{
+			id: '5fd62c00985db32c8e80d5b6',
+			sets: {
+				en: [ 'she', 'it' ]
+			}
+		}}
+	>
+		<p class='mb-4'>Looks up the data saved for a given PronounDB user. Will return a 404 Not Found error if the user does not exist.</p>
+	</ApiRequest>
+
+
+	<ApiRequest
+		method='GET'
+		path={[ '/shields/', '[pronoundbId]', '.json?', '[capitalize]', '&locale=', '[locale]' ]}
+
+		typeParams={{
+			pronoundbId: {
+				optional: false,
+				type: 'string',
+			},
+			capitalize: {
+				optional: true,
+				type: 'boolean',
+			},
+			locale: {
+				optional: true,
+				type: 'string',
+			},
+		}}
+
+		examplePath='/shields/5fd62c00985db32c8e80d5b6.json'
+		exampleStatus='200 OK'
+		exampleResponse={{
+			schemaVersion: 1,
+			label: 'pronouns',
+			message: 'she/it',
+		}}
+	>
+		<p class='mb-4'>Returns a shields.io-compatible JSON object to be used as part of shields.io endpoint feature.</p>
+		<p class='mb-4'>Learn more on <a class='underline' href='https://shields.io/endpoint' target='_blank' rel='noreferrer'>shields.io's documentation</a>.</p>
+	</ApiRequest>
+
+	<h2 class='text-2xl font-bold mb-2' id='sets'>Supported sets</h2>
+	<p class='mb-2'>Each locale has a list of pronouns set available to it.</p>
+	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
+		<div class='w-6 h-6 shrink-0' set:html={infoIcon}/>
+		<p>Only the "en" locale is supported at this time.</p>
+	</div>
+	<ul class='list-disc list-inside mb-4'>
+		{Object.keys(PronounSets).map((locale) => (
+			<li><code>{locale}</code> locale</li>
+			<ul class='list-disc list-inside pl-6'>
+				<li>Nominative</li>
+				<ul class='list-disc list-inside pl-6'>{PronounSets[locale].categories.nominative.map((s) => <li><code>{s}</code>: {formatPronounSet(s, false, locale)}</li>)}</ul>
+				<li>Meta sets</li>
+				<ul class='list-disc list-inside pl-6'>{PronounSets[locale].categories.meta.map((s) => <li><code>{s}</code>: {formatPronounSet(s, false, locale)}</li>)}</ul>
+			</ul>
+		))}
+	</ul>
+
+	<h2 class='text-2xl font-bold mb-2' id='paltforms'>Supported platforms</h2>
+	<ul class='list-inside list-disc mb-4'>
+		{providers.map((p) => (
+			<li>
+				<code>{p}</code>
+				{p in PLATFORM_NOTES && `(${PLATFORM_NOTES[p]})`}
+			</li>
+		))}
+	</ul>
+
+	<h2 class='text-2xl font-bold mb-2' id='legacy-v1'>Legacy API v1</h2>
+	<p class='mb-4'>
+		If you need it, the <Link href='/wiki/legacy-api-docs'>documentation for API v1</Link> is still available.
+		Beware, API v1 is <b>deprecated</b> and scheduled for removal on <b>June 1st, 2024</b>
+	</p>
+</Layout>
+
+<style>
+	code {
+		@apply px-1 bg-gray-200 dark:bg-gray-700
+	}
+</style>

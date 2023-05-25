@@ -26,6 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { UserData } from '@pronoundb/pronouns/sets'
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
 
@@ -41,7 +42,7 @@ type HeaderProps = {
 	onCloseSettings: () => void
 }
 
-type FooterProps = { selfPronouns: string | null, onOpenPronounsSelector: () => void }
+type FooterProps = { selfPronouns: UserData | null }
 
 const CUTE_COMMENTS = [
 	'So cute!',
@@ -49,13 +50,6 @@ const CUTE_COMMENTS = [
 	'Fits you well!',
 	'That\'s adorable!',
 ]
-
-const specialNotes = {
-	unspecified: 'You didn\'t specify your pronouns yet.',
-	other: 'You\'re going by other pronouns than the ones available on PronounDB.',
-	ask: 'You want people to ask for your pronouns.',
-	avoid: 'You want people to avoid using pronouns on you.',
-}
 
 export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) {
 	return (
@@ -75,7 +69,7 @@ export function Header ({ view, onOpenSettings, onCloseSettings }: HeaderProps) 
 	)
 }
 
-export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
+export function Footer ({ selfPronouns }: FooterProps) {
 	const cute = useMemo(() => Math.random() * CUTE_COMMENTS.length | 0, [])
 
 	return (
@@ -83,10 +77,12 @@ export function Footer ({ selfPronouns, onOpenPronounsSelector }: FooterProps) {
 			{selfPronouns
 				? (
 					<div class='py-2 px-4 border-t border-gray-200 dark:border-gray-700'>
-						{selfPronouns in specialNotes
-							? <p>{specialNotes[selfPronouns as keyof typeof specialNotes]}</p>
-							: <p>You're going by {formatPronouns(selfPronouns)}. {CUTE_COMMENTS[cute]}</p>}
-						<button class='link' onClick={onOpenPronounsSelector}>Change pronouns</button>
+						{selfPronouns.sets.en
+							? selfPronouns.sets.en[0] === 'avoid'
+								? <p>You want people to avoid using pronouns on you.</p>
+								: <p>Your pronouns are set to "{formatPronouns(selfPronouns.sets.en)}". {CUTE_COMMENTS[cute]}</p>
+							: <p>You didn't specify your pronouns yet.</p>}
+						<a class='link' href='https://pronoundb.org/me' target='_blank' rel='noreferrer'>Change pronouns</a>
 					</div>
 				)
 				: (

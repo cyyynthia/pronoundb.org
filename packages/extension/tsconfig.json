@@ -3,6 +3,7 @@
 	"compilerOptions": {
 		"types": [ "vite/client" ],
 		"lib": [ "esnext", "dom", "dom.iterable" ],
+		"moduleResolution": "bundler",
 
 		"jsx": "preserve",
 		"jsxFactory": "h",

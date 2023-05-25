@@ -27,9 +27,18 @@
  */
 
 import type { APIContext } from 'astro'
+import { transformSetsToIdentifier } from '@pronoundb/pronouns/legacy'
+
 import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram, ApiCallVersionCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
-import { providers } from '@server/oauth/providers.js'
+
+const providers = [
+	'discord',
+	'github',
+	'minecraft',
+	'twitch',
+	'twitter',
+]
 
 export async function get (ctx: APIContext) {
 	ApiCallVersionCounter.inc({ version: 1 })
@@ -75,7 +84,7 @@ export async function get (ctx: APIContext) {
 	const cursor = findPronounsOf(platform, Array.from(ids))
 	const res = Object.create(null)
 	for await (const user of cursor) {
-		res[user.account.id] = user.pronouns
+		res[user.account.id] = transformSetsToIdentifier(user.sets.en)
 		ids.delete(user.account.id)
 	}
 

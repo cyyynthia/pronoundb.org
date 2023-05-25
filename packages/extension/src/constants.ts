@@ -26,10 +26,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-export const WEBSITE = import.meta.env && import.meta.env.DEV ? 'http://pronoundb.localhost:8080' : 'https://pronoundb.org'
+export const WEBSITE = import.meta.env && import.meta.env.DEV ? 'http://localhost:8080' : 'https://pronoundb.org'
 
 export const Endpoints = {
-	LOOKUP: (platform: string, id: string) => `${WEBSITE}/api/v1/lookup?platform=${platform}&id=${id}`,
-	LOOKUP_BULK: (platform: string, ids: string[]) => `${WEBSITE}/api/v1/lookup-bulk?platform=${platform}&ids=${ids.join(',')}`,
-	LOOKUP_SELF: `${WEBSITE}/api/v1/lookup/me`,
+	LOOKUP: (platform: string, ids: string[]) => `${WEBSITE}/api/v2/lookup?platform=${platform}&ids=${ids.join(',')}`,
+	LOOKUP_SELF: `${WEBSITE}/api/v2/users/self`,
 }

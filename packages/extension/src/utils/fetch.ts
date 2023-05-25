@@ -26,11 +26,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import type { UserData } from '@pronoundb/pronouns/sets'
 import type { Deferred } from './deferred'
 import { createDeferred } from './deferred'
 import { LRUMap } from './lru/lru'
 
-async function doFetch (platform: string, queue: Map<string, Deferred<string>>) {
+async function doFetch (platform: string, queue: Map<string, Deferred<UserData | null>>) {
 	queue = new Map(queue) // clone the map
 
 	// Request is done by the background worker to avoid CSP issues.
@@ -44,7 +45,7 @@ async function doFetch (platform: string, queue: Map<string, Deferred<string>>) 
 
 	if (!res.success) {
 		console.error('[PronounDB::fetch] Failed to fetch:', res.error)
-		for (const v of queue.values()) v.resolve('unspecified')
+		for (const v of queue.values()) v.resolve(null)
 		return
 	}
 
@@ -55,11 +56,11 @@ async function doFetch (platform: string, queue: Map<string, Deferred<string>>) 
 	}
 }
 
-type State = { timer: NodeJS.Timer | null, queue: Map<string, Deferred<string>> }
+type State = { timer: NodeJS.Timer | null, queue: Map<string, Deferred<UserData | null>> }
 const state: Record<string, State> = {}
-async function queueFetch (platform: string, id: string): Promise<string> {
+async function queueFetch (platform: string, id: string): Promise<UserData | null> {
 	if (!state[platform]) state[platform] = { timer: null, queue: new Map() }
-	const deferred = createDeferred<string>()
+	const deferred = createDeferred<UserData | null>()
 	if (!state[platform].timer) {
 		state[platform].timer = setTimeout(() => {
 			doFetch(platform, state[platform].queue)
@@ -79,8 +80,8 @@ async function queueFetch (platform: string, id: string): Promise<string> {
 	return deferred.promise
 }
 
-const cache = new LRUMap<string, Promise<string>>(10000)
-export function fetchPronouns (platform: string, id: string): Promise<string> {
+const cache = new LRUMap<string, Promise<UserData | null>>(10000)
+export function fetchPronouns (platform: string, id: string): Promise<UserData | null> {
 	const key = `${platform}::${id}`
 	if (!cache.has(key)) {
 		const pronouns = queueFetch(platform, id)

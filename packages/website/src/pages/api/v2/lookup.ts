@@ -27,60 +27,103 @@
  */
 
 import type { APIContext } from 'astro'
-import { transformSetsToIdentifier } from '@pronoundb/pronouns/legacy'
 
-import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, ApiCallVersionCounter } from '@server/metrics.js'
+import { LookupRequestsCounter, LookupIdsCounter, LookupHitCounter, LookupBulkSizeHistogram, ApiCallVersionCounter } from '@server/metrics.js'
 import { findPronounsOf } from '@server/database/account.js'
-
-const providers = [
-	'discord',
-	'github',
-	'minecraft',
-	'twitch',
-	'twitter',
-]
+import { providers } from '@server/oauth/providers.js'
 
 export async function get (ctx: APIContext) {
-	ApiCallVersionCounter.inc({ version: 1 })
+	ApiCallVersionCounter.inc({ version: 2 })
 
 	const platform = ctx.url.searchParams.get('platform')
-	const id = ctx.url.searchParams.get('id')
+	const idsStr = ctx.url.searchParams.get('ids')
 
-	if (!platform || !id) {
+	if (!platform || !idsStr) {
 		return new Response(
 			JSON.stringify({
-				errorCode: 400,
+				code: 400,
 				error: 'Bad request',
-				message: '`platform` and `id` query parameters are required.',
+				message: '`platform` and `ids` query parameters are required.',
 			}),
-			{ status: 400, headers: { 'content-type': 'application/json' } }
+			{
+				status: 400,
+				headers: {
+					'access-control-allow-methods': 'GET',
+					'access-control-allow-origin': '*',
+					'access-control-allow-headers': 'x-pronoundb-source',
+					'access-control-max-age': '600',
+					'content-type': 'application/json',
+				},
+			}
 		)
 	}
 
 	if (!providers.includes(platform)) {
 		return new Response(
 			JSON.stringify({
-				errorCode: 400,
+				code: 400,
 				error: 'Bad request',
 				message: '`platform` is not a valid platform.',
 			}),
-			{ status: 400, headers: { 'content-type': 'application/json' } }
+			{
+				status: 400,
+				headers: {
+					'access-control-allow-methods': 'GET',
+					'access-control-allow-origin': '*',
+					'access-control-allow-headers': 'x-pronoundb-source',
+					'access-control-max-age': '600',
+					'content-type': 'application/json',
+				},
+			}
 		)
 	}
 
-	const cursor = findPronounsOf(platform, [ id ])
-	const user = await cursor.next()
-	await cursor.close()
+	const ids = new Set(idsStr.split(',').filter((a) => a))
+	const idsCount = ids.size
+	if (idsCount < 1 || idsCount > 50) {
+		return new Response(
+			JSON.stringify({
+				code: 400,
+				error: 'Bad request',
+				message: '`ids` must contain between 1 and 50 IDs.',
+			}),
+			{
+				status: 400,
+				headers: {
+					'access-control-allow-methods': 'GET',
+					'access-control-allow-origin': '*',
+					'access-control-allow-headers': 'x-pronoundb-source',
+					'access-control-max-age': '600',
+					'content-type': 'application/json',
+				},
+			}
+		)
+	}
+
+	const cursor = findPronounsOf(platform, Array.from(ids))
+
+	let idsHitCount = 0
+	const res = Object.create(null)
+	for await (const user of cursor) {
+		idsHitCount++
+		res[user.account.id] = {
+			decoration: user.decoration,
+			sets: user.sets,
+		}
+	}
 
 	// Collect metrics
-	LookupRequestsCounter.inc({ platform: platform, method: 'single' })
-	LookupIdsCounter.inc({ platform: platform })
-	if (user) LookupHitCounter.inc({ platform: platform })
+	const method = idsCount === 1 ? 'single' : 'bulk'
+	LookupRequestsCounter.inc({ platform: platform, method: method })
+	LookupIdsCounter.inc({ platform: platform }, idsCount)
+	LookupHitCounter.inc({ platform: platform }, idsHitCount)
+	if (method === 'bulk') {
+		LookupBulkSizeHistogram.observe({ platform: platform }, idsCount)
+	}
 
-	const body = JSON.stringify({ pronouns: transformSetsToIdentifier(user?.sets.en) })
+	const body = JSON.stringify(res)
 	return new Response(body, {
 		headers: {
-			vary: 'origin',
 			'access-control-allow-methods': 'GET',
 			'access-control-allow-origin': '*',
 			'access-control-allow-headers': 'x-pronoundb-source',
@@ -94,7 +137,6 @@ export function options () {
 	return new Response(null, {
 		status: 204,
 		headers: {
-			vary: 'origin',
 			'access-control-allow-methods': 'GET',
 			'access-control-allow-origin': '*',
 			'access-control-allow-headers': 'x-pronoundb-source',

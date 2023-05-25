@@ -1,0 +1,35 @@
+{
+	"name": "@pronoundb/pronouns",
+	"version": "0.1.0",
+	"description": "PronounDB internal pronouns sets definition and formatter",
+	"repository": "git@github.com:cyyynthia/pronoundb.org.git",
+	"author": "Cynthia <cynthia@cynthia.dev>",
+	"license": "BSD-3-Clause",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"build": "tsc",
+		"lint": "eslint --ext ts src"
+	},
+	"devDependencies": {
+		"@types/node": "^20.2.3",
+		"@typescript-eslint/eslint-plugin": "^5.59.6",
+		"@typescript-eslint/parser": "^5.59.6",
+		"eslint": "^8.41.0",
+		"typescript": "^5.0.4"
+	},
+	"exports": {
+		"./sets": {
+			"import": "./dist/sets.js",
+			"types": "./dist/sets.d.ts"
+		},
+		"./formatter": {
+			"import": "./dist/formatter.js",
+			"types": "./dist/formatter.d.ts"
+		},
+		"./legacy": {
+			"import": "./dist/legacy.js",
+			"types": "./dist/legacy.d.ts"
+		}
+	}
+}

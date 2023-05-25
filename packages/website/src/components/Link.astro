@@ -33,6 +33,6 @@ export interface Props {
 
 const { href } = Astro.props
 ---
-{href.startsWith('/')
+{href.startsWith('/') || href.startsWith('#')
 	? <a href={href} class='text-blue-800 hover:underline dark:text-cyan-200'><slot/></a>
 	: <a href={href} target='_blank' rel='noreferrer' class='text-blue-800 hover:underline dark:text-cyan-200'><slot/></a>}

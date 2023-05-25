@@ -1,0 +1,85 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import type { SetDefinition } from '@pronoundb/pronouns/sets'
+import { formatPronounSet } from '@pronoundb/pronouns/formatter'
+
+export interface Props {
+	id: number
+	set: string | undefined
+	locale: string
+	def: SetDefinition
+}
+
+const { id, set, locale, def } = Astro.props
+
+const th = id === 1 ? '1st' : id === 2 ? '2nd' : '3rd'
+
+const nominative = id === 1
+	? def.categories.nominative
+	: def.categories.nominative.filter((s) => !def.properties.unique.includes(s))
+
+const meta = id === 1
+	? def.categories.meta
+	: def.categories.meta.filter((s) => !def.properties.unique.includes(s))
+---
+<div class={`selector-${id}`}>
+	<div class='font-bold text-sm flex items-center justify-between'>
+		<span>{th} set</span>
+	</div>
+	<select class='w-full px-4 py-2 border rounded bg-transparent border-gray-700 dark:border-gray-400' name={`pronouns-set-${id}`}>
+		<option class='dark:bg-gray-800' value='unspecified' selected={!set || set === 'unspecified'}>
+			{id === 1 ? 'Unspecified' : 'Pick another set...'}
+		</option>
+		<optgroup class='dark:bg-gray-800' label='Nominative pronouns'>
+			{nominative.map((s) => (
+				<option class='dark:bg-gray-800' value={s} selected={set === s}>
+					{formatPronounSet(s, false, locale)}
+				</option>
+			))}
+		</optgroup>
+		<optgroup class='dark:bg-gray-800' label='Meta sets'>
+			{meta.map((s) => (
+				<option class='dark:bg-gray-800' value={s} selected={set === s}>
+					{formatPronounSet(s, false, locale)}
+				</option>
+			))}
+		</optgroup>
+	</select>
+
+	<div class='disabled w-full italic border-2 border-gray-400 border-dashed rounded-md px-6 py-1.5 flex items-center hidden' aria-hidden='true'>
+		Cannot pick another set
+	</div>
+</div>
+
+<style>
+	.nojs-hidden {
+		display: none;
+	}
+</style>

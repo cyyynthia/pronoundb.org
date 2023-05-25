@@ -27,6 +27,7 @@
  */
 
 import type { ObjectId } from 'mongodb'
+import type { Sets } from '@pronoundb/pronouns/sets'
 import database from './database.js'
 
 export const collection = database.collection<Account>('accounts')
@@ -34,8 +35,9 @@ await collection.createIndex({ 'accounts.id': 1, 'accounts.platform': 1 })
 await collection.createIndex({ 'accounts.platform': 1 })
 
 export type Account = {
-	pronouns: string
 	accounts: ExternalAccount[]
+	decoration: string | null
+	sets: { [locale: string]: Sets }
 }
 
 export type ExternalAccount = {
@@ -45,15 +47,21 @@ export type ExternalAccount = {
 }
 
 export type PronounsOfUser = {
-	pronouns: string
 	account: ExternalAccount
+	decoration: string
+	sets: { [locale: string]: Sets }
 }
 
 export async function createAccount (from: ExternalAccount) {
 	const existingAccount = await findByExternalAccount(from)
 	if (existingAccount) return null
 
-	const result = await collection.insertOne({ accounts: [ from ], pronouns: 'unspecified' })
+	const result = await collection.insertOne({
+		accounts: [ from ],
+		decoration: null,
+		sets: {},
+	})
+
 	return result.insertedId
 }
 
@@ -93,7 +101,8 @@ export function findPronounsOf (platform: string, externalIds: string[]) {
 		{
 			$project: {
 				_id: 0,
-				pronouns: 1,
+				decoration: 1,
+				sets: 1,
 				account: {
 					$first: {
 						$filter: {
@@ -113,8 +122,16 @@ export function findPronounsOf (platform: string, externalIds: string[]) {
 	])
 }
 
-export async function updatePronouns (userId: ObjectId, pronouns: string) {
-	await collection.updateOne({ _id: userId }, { $set: { pronouns: pronouns } })
+export async function updatePronouns (userId: ObjectId, pronouns: Sets, locale: string) {
+	await collection.updateOne({ _id: userId }, { $set: { [`sets.${locale}`]: pronouns } })
+}
+
+export async function deletePronouns (userId: ObjectId, locale: string) {
+	await collection.updateOne({ _id: userId }, { $unset: { [`sets.${locale}`]: 1 } })
+}
+
+export async function updateDecoration (userId: ObjectId, decoration: string) {
+	await collection.updateOne({ _id: userId }, { $set: { decoration: decoration } })
 }
 
 export async function addLinkedAccount (userId: ObjectId, account: ExternalAccount) {

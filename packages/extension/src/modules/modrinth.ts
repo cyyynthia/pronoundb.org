@@ -29,7 +29,7 @@
 import type { QueryElement } from '../utils/proxy'
 import { messageCircle } from '../icons/feather'
 
-import { formatPronouns, formatPronounsSuffixed } from '../utils/pronouns'
+import { formatPronouns } from '../utils/pronouns'
 import { fetchPronouns } from '../utils/fetch'
 import { fetchVueProp } from '../utils/proxy'
 import { h, css } from '../utils/dom'
@@ -62,7 +62,7 @@ async function processProfileInfo () {
 	if (!githubId) return
 
 	const pronouns = await fetchPronouns('github', githubId.toString())
-	if (pronouns === 'unspecified') return
+	if (!pronouns || !pronouns.sets.en) return
 
 	const stat = document.querySelector<HTMLElement>('.primary-stat')
 	if (!stat) return
@@ -74,13 +74,10 @@ async function processProfileInfo () {
 	const dataAttr = `data-${vData}`
 
 	const icon = messageCircle({ class: 'primary-stat__icon', [dataAttr]: '' })
-	const [ a, b ] = formatPronounsSuffixed(pronouns)
 	const span = h(
 		'div',
 		{ class: 'primary-stat__text', [dataAttr]: '' },
-		h('span', { class: 'primary-stat__counter', [dataAttr]: '' }, a),
-		' ',
-		h('span', { class: 'primary-stat__label', [dataAttr]: '' }, b)
+		h('span', { class: 'primary-stat__label', [dataAttr]: '' }, formatPronouns(pronouns.sets.en))
 	)
 
 	pronounsInfo.appendChild(icon)
@@ -107,7 +104,7 @@ async function processTeamMembers () {
 	for (let i = 0; i < members.length; i++) {
 		const member = members[i]
 		const pronouns = membersPronouns[i]
-		if (pronouns === 'unspecified') continue
+		if (!pronouns || !pronouns.sets.en) continue
 
 		const linkEl = document.querySelector(`.normal-page__info .team-member .member-info a[href='/user/${member.name}']`)
 		if (!linkEl) continue
@@ -124,7 +121,7 @@ async function processTeamMembers () {
 				h(
 					'span',
 					{ style: css({ fontSize: 'var(--font-size-xs)' }) },
-					`(${formatPronouns(pronouns)})`
+					`(${formatPronouns(pronouns.sets.en)})`
 				)
 			),
 			linkEl

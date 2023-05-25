@@ -33,7 +33,7 @@ import { handleFlash } from '@server/flash.js'
 import Layout from '@layouts/Layout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import Link from '@components/Link.astro'
-import LegacyPronounsSelector from '@components/LegacyPronounsSelector.astro'
+import PronounsSelector from '@components/PronounsSelector.astro'
 import Platform from '@components/Platform.astro'
 
 import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
@@ -51,8 +51,8 @@ const csrf = createCsrf(Astro)
 <Layout flash={flash} title='My Account'>
 	<noscript>
 		<p class='mb-4 px-4 py-2 font-semibold text-red-600 border border-red-600 rounded'>
-			JavaScript is disabled in your browser. You may experience issues and changes may not be applied! Make sure to
-			enable it in your browser settings.
+			JavaScript is disabled in your browser. The pronouns picker is not able to perform local validation and
+			assist you ensuring your entry is valid.
 		</p>
 	</noscript>
 
@@ -61,13 +61,14 @@ const csrf = createCsrf(Astro)
 		Welcome back! Want to change your pronouns, or link a new account? You're at the right place!
 	</p>
 	<p class='mb-4'>
-		All of the changes are saved automatically, and should take no more than a minute to apply on our end. In some
-		cases, users may have pronouns in cache and will need a page reload to see the change (e.g.: on a Twitch chat)
+		All changes made here are saved on our end instantly and should take no longer than a minute to apply. In some
+		cases, users may have pronouns in their local cache and will need to refresh their page to see the change take
+		effect (e.g.: on a Twitch chat)
 	</p>
 
 	<h2 class='text-xl font-bold mb-2'>Pronouns</h2>
-	<p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically.</p>
-	<LegacyPronounsSelector id='pronouns-selector' selected={user.pronouns}/>
+	<p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically within their category.</p>
+	<PronounsSelector sets={user.sets.en} locale='en' csrf={csrf}/>
 
 	<h2 class='text-xl font-bold mb-2'>Linked accounts</h2>
 	<p class='mb-2'>You can add or remove accounts at any time.</p>
@@ -106,7 +107,7 @@ const csrf = createCsrf(Astro)
 
 	<h2 class='text-xl font-bold mb-2'>Advanced settings</h2>
 	<p class='mb-1'>PronounDB ID: <code class='bg-gray-200 px-1 rounded dark:bg-gray-700'>{user._id.toString()}</code></p>
-	<p class='mb-4'>This ID may be useful for some of the <Link href='/docs'>API endpoints</Link>.</p>
+	<p class='mb-4'>This ID may be useful for some of the <Link href='/wiki/api-docs'>API endpoints</Link>.</p>
 
 	<h3 class='text-lg font-semibold mb-2'>Delete my account</h3>
 	<p class='mb-1'>
@@ -121,8 +122,3 @@ const csrf = createCsrf(Astro)
 		</button>
 	</form>
 </Layout>
-
-<script>
-	const selector = document.getElementById('pronouns-selector') as HTMLSelectElement
-	selector.addEventListener('change', () => fetch('/me/set-pronouns', { method: 'PUT', body: selector.value }))
-</script>
