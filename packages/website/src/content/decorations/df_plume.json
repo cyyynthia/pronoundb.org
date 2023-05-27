@@ -1,0 +1,8 @@
+{
+	"version": 1,
+	"name": "Gardener",
+	"color": "#BAD9B5",
+	"elements": {
+		"bottom_right": "leafy.svg"
+	}
+}

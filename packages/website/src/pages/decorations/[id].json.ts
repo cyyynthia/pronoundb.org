@@ -26,39 +26,52 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const SVG = [ 'svg', 'symbol', 'path', 'g' ]
-export function h (tag: string, props: Record<string, any> | null, ...child: Array<Node | string | null | false>): HTMLElement | SVGElement {
-	const e = SVG.includes(tag)
-		? document.createElementNS('http://www.w3.org/2000/svg', tag)
-		: document.createElement(tag)
+import type { APIContext } from 'astro'
+import { getCollection, getEntry } from 'astro:content'
+import { readFile } from 'fs/promises'
+import { XMLParser } from 'fast-xml-parser'
 
-	if (props) {
-		for (const key in props) {
-			if (key in props) {
-				if (key.startsWith('on')) {
-					const event = key.slice(2).toLowerCase()
-					e.addEventListener(event, props[key])
-				} else {
-					e.setAttribute(key, String(props[key]))
-				}
-			}
-		}
+const DECORATION_SVG_ROOT = import.meta.env.DEV
+	? new URL('../../assets/decorations/', import.meta.url)
+	: new URL('../../../src/assets/decorations/', import.meta.url)
+
+async function loadSvg (resource: string) {
+	const svg = await readFile(new URL(resource, DECORATION_SVG_ROOT))
+	const parser = new XMLParser({ ignoreAttributes: false })
+	const xml = parser.parse(svg).svg
+
+	return {
+		v: xml['@_viewBox'],
+		p: xml.path.map((p: any) => ({
+			c: p['@_fill'],
+			d: p['@_d'],
+		})),
 	}
-
-	for (const c of child) {
-		if (!c) continue
-		e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
-	}
-
-	return e
 }
 
-export function css (style: Record<string, string>): string {
-	let res = ''
-	for (const prop in style) {
-		if (Object.prototype.hasOwnProperty.call(style, prop)) {
-			res += `${prop.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`)}:${style[prop]};`
-		}
+export const prerender = true
+
+export async function getStaticPaths () {
+	const decorations = await getCollection('decorations')
+	return decorations.map((d) => ({ params: { id: d.id } }))
+}
+
+export async function get ({ params: { id } }: APIContext) {
+	if (!id) throw new Error('An ID is required!')
+
+	const decorationEntry = await getEntry('decorations', id)
+	if (!decorationEntry) throw new Error('Invalid decoration?!')
+
+	const decoration = { ...decorationEntry.data }
+	decoration.elements = { ...decoration.elements }
+
+	if (decoration.elements.top_left) {
+		decoration.elements.top_left = await loadSvg(decoration.elements.top_left)
 	}
-	return res
+
+	if (decoration.elements.bottom_right) {
+		decoration.elements.bottom_right = await loadSvg(decoration.elements.bottom_right)
+	}
+
+	return { body: JSON.stringify(decoration) }
 }

@@ -85,7 +85,7 @@ export function Settings () {
 	}, [ setSettings ])
 
 	useEffect(() => {
-		chrome.storage.sync.get([ 'pronouns.case', ...modules.map((mdl) => `${mdl.id}.enabled`) ])
+		chrome.storage.sync.get([ 'pronouns.case', 'decorations', ...modules.map((mdl) => `${mdl.id}.enabled`) ])
 			.then((s) => setSettings(s))
 	}, [])
 
@@ -99,6 +99,17 @@ export function Settings () {
 				name='pronouns.case'
 				value={settings['pronouns.case']}
 				options={[ [ 'lower', 'aaa/aaa' ], [ 'pascal', 'Aaa/Aaa' ] ]}
+			/>
+			<Checkbox
+				onInput={onInput}
+				name='decorations'
+				value={settings.decorations !== false}
+				label={
+					<div class='flex gap-2 items-center'>
+						<span class='bg-blue-300 text-black font-bold text-sm rounded-xl px-2'>BETA</span>
+						<span>Enable decorations</span>
+					</div>
+				}
 			/>
 
 			<div class='flex gap-2 items-center mb-3'>

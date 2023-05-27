@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { fetchReactProp } from '../utils/proxy'
+import { fetchReactProp } from '../../utils/proxy'
 
 export default function () {
 	const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')

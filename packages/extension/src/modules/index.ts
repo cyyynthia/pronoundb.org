@@ -39,10 +39,10 @@ export type ExtensionModule = {
 }
 
 const modules: ExtensionModule[] = []
-const rawModules = import.meta.glob<ExtensionModule>('./*.ts', { eager: true })
+const rawModules = import.meta.glob<ExtensionModule>('./**/main.ts', { eager: true })
 for (const mdl in rawModules) {
 	if (mdl in rawModules) {
-		modules.push({ ...rawModules[mdl], id: mdl.slice(2, -3) })
+		modules.push({ ...rawModules[mdl], id: mdl.slice(2, -8) })
 	}
 }
 

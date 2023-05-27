@@ -28,7 +28,7 @@
 
 import { createDeferred } from './utils/deferred'
 import { fetchPropUnchecked, fetchReactProp } from './utils/proxy'
-const injectModules = import.meta.glob<{ default: Function }>('./inject/*.ts', { eager: true })
+const injectModules = import.meta.glob<{ default: Function }>('./modules/**/inject.ts', { eager: true })
 
 type QueryElement = string | { $find: string, $in: string[] }
 

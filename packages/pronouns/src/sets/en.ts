@@ -133,8 +133,11 @@ export function formatLong (s: Sets) {
 
 		const pronouns = formatPronounSetShort(set, false, 'en')
 
-		if (i) res += ', '
-		if (i === s.length - 1) res += 'or '
+		if (i) {
+			res += ', '
+			if (i === s.length - 1) res += 'or '
+		}
+
 		res += set === 'any' ? pronouns : `"${pronouns}"`
 	}
 

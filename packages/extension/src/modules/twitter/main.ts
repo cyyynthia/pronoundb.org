@@ -26,12 +26,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { topics } from '../icons/twitter'
+import { topics } from '../../icons/twitter'
 
-import { formatPronouns } from '../utils/pronouns'
-import { fetchPronouns } from '../utils/fetch'
-import { fetchReactProp } from '../utils/proxy'
-import { h, css } from '../utils/dom'
+import { formatPronouns } from '../../utils/pronouns'
+import { fetchPronouns } from '../../utils/fetch'
+import { fetchReactProp } from '../../utils/proxy'
+import { h, css } from '../../utils/dom'
 
 export const name = 'Twitter'
 export const color = '#1DA1F2'

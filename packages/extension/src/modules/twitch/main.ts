@@ -26,14 +26,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { whisper } from '../icons/twitch'
+import { whisper } from '../../icons/twitch'
 
-import type { Sets } from '@pronoundb/pronouns/sets'
-import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../utils/pronouns'
-import { fetchPronouns } from '../utils/fetch'
-import { fetchReactProp } from '../utils/proxy'
-import { h, css } from '../utils/dom'
-import { LRUMap } from '../utils/lru/lru'
+import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../../utils/pronouns'
+import { fetchPronouns } from '../../utils/fetch'
+import { fetchReactProp } from '../../utils/proxy'
+import { h, css } from '../../utils/dom'
+import { LRUMap } from '../../utils/lru/lru'
+
+import badgeComponent from './components/badge'
 
 export const name = 'Twitch'
 export const color = '#9146FF'
@@ -45,23 +46,6 @@ const settings = {
 	popout: true,
 	streamer: true,
 	chatStyle: 'badge',
-}
-
-function createBadge (pronouns: Sets) {
-	return h(
-		'span',
-		{
-			style: css({
-				display: 'inline-block',
-				borderRadius: 'var(--border-radius-medium)',
-				backgroundColor: 'var(--color-background-button-secondary-default)',
-				color: 'var(--color-text-button-secondary)',
-				lineHeight: '1.8rem',
-				padding: '0 2px',
-			}),
-		},
-		formatPronounsShort(pronouns)
-	)
 }
 
 const usersCache = Object.create(null)
@@ -95,14 +79,7 @@ async function injectChat (element: HTMLElement) {
 		if (!badgesContainer) return
 
 		badgesContainer.insertBefore(
-			h(
-				'div',
-				{
-					class: 'pronoundb-chat-badge',
-					style: css({ display: 'inline', position: 'relative', bottom: '-1px', marginRight: '4px' }),
-				},
-				createBadge(pronouns.sets.en)
-			),
+			badgeComponent(pronouns),
 			badgesContainer.firstChild!
 		)
 	} else {
@@ -146,14 +123,7 @@ async function inject7tvChat (message: HTMLElement) {
 
 	if (settings.chatStyle === 'badge') {
 		user.insertBefore(
-			h(
-				'div',
-				{
-					class: 'pronoundb-chat-badge',
-					style: css({ display: 'inline', position: 'relative', bottom: '-1px', marginRight: '4px' }),
-				},
-				createBadge(pronouns.sets.en)
-			),
+			badgeComponent(pronouns),
 			user.firstChild!
 		)
 	} else {
@@ -181,9 +151,12 @@ async function injectWhisperHeader (header: HTMLElement) {
 	let pronouns = await fetchPronouns('twitch', container.dataset.interlocutorId!)
 	if (!pronouns || !pronouns.sets.en) return
 
+	const badge = badgeComponent(pronouns)
+	badge.setAttribute('style', css({ position: 'absolute', top: '50%', transform: 'translateY(-50%)' }))
+
 	const username = header.querySelector('span')
 	username!.parentElement!.appendChild(
-		h('div', { class: 'pronoundb-whisper-header', style: css({ marginLeft: '4px' }) }, createBadge(pronouns.sets.en))
+		h('div', { style: css({ marginLeft: '8px' }) }, badge)
 	)
 }
 

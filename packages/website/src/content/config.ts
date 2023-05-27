@@ -26,39 +26,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const SVG = [ 'svg', 'symbol', 'path', 'g' ]
-export function h (tag: string, props: Record<string, any> | null, ...child: Array<Node | string | null | false>): HTMLElement | SVGElement {
-	const e = SVG.includes(tag)
-		? document.createElementNS('http://www.w3.org/2000/svg', tag)
-		: document.createElement(tag)
+import { z, defineCollection } from 'astro:content'
 
-	if (props) {
-		for (const key in props) {
-			if (key in props) {
-				if (key.startsWith('on')) {
-					const event = key.slice(2).toLowerCase()
-					e.addEventListener(event, props[key])
-				} else {
-					e.setAttribute(key, String(props[key]))
-				}
-			}
-		}
-	}
+const decorations = defineCollection({
+	type: 'data',
+	schema: z.object({
+		name: z.string(),
+		color: z.string(),
+		elements: z.object({
+			top_left: z.string().optional(),
+			bottom_right: z.string().optional(),
+		}),
+	}),
+})
 
-	for (const c of child) {
-		if (!c) continue
-		e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)
-	}
-
-	return e
-}
-
-export function css (style: Record<string, string>): string {
-	let res = ''
-	for (const prop in style) {
-		if (Object.prototype.hasOwnProperty.call(style, prop)) {
-			res += `${prop.replace(/[A-Z]/g, (s) => `-${s.toLowerCase()}`)}:${style[prop]};`
-		}
-	}
-	return res
+export const collections = {
+	decorations: decorations,
 }

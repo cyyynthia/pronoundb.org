@@ -26,18 +26,18 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { QueryElement } from '../utils/proxy'
-import { messageCircle } from '../icons/feather'
+import type { QueryElement } from '../../utils/proxy'
+import { messageCircle } from '../../icons/feather'
 
-import { formatPronouns } from '../utils/pronouns'
-import { fetchPronouns } from '../utils/fetch'
-import { fetchVueProp } from '../utils/proxy'
-import { h, css } from '../utils/dom'
+import { formatPronouns } from '../../utils/pronouns'
+import { fetchPronouns } from '../../utils/fetch'
+import { fetchVueProp } from '../../utils/proxy'
+import { h, css } from '../../utils/dom'
 
 export const name = 'Modrinth'
 export const color = '#30B27B'
 export const match = /^https:\/\/modrinth\.com/
-export { default as Icon } from '../../assets/modrinth.svg'
+export { default as Icon } from '../../../assets/modrinth.svg'
 
 async function fetchUntilData (el: HTMLElement, queries: QueryElement[][]) {
 	for (let i = 1; i < 20; i++) {
