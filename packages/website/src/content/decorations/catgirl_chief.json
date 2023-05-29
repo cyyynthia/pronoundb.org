@@ -1,5 +1,6 @@
 {
 	"version": 1,
+	"limited": true,
 	"name": "Developer",
 	"color": "#F49898",
 	"elements": {

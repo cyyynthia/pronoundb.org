@@ -31,6 +31,8 @@ import { z, defineCollection } from 'astro:content'
 const decorations = defineCollection({
 	type: 'data',
 	schema: z.object({
+		version: z.number(),
+		limited: z.boolean(),
 		name: z.string(),
 		color: z.string(),
 		elements: z.object({

@@ -62,16 +62,17 @@ export async function get ({ params: { id } }: APIContext) {
 	const decorationEntry = await getEntry('decorations', id)
 	if (!decorationEntry) throw new Error('Invalid decoration?!')
 
-	const decoration = { ...decorationEntry.data }
-	decoration.elements = { ...decoration.elements }
+	const decoration = decorationEntry.data
 
-	if (decoration.elements.top_left) {
-		decoration.elements.top_left = await loadSvg(decoration.elements.top_left)
+	return {
+		body: JSON.stringify({
+			version: decoration.version,
+			name: decoration.name,
+			color: decoration.color,
+			elements: {
+				top_left: decoration.elements.top_left && await loadSvg(decoration.elements.top_left),
+				bottom_right: decoration.elements.bottom_right && await loadSvg(decoration.elements.bottom_right),
+			},
+		}),
 	}
-
-	if (decoration.elements.bottom_right) {
-		decoration.elements.bottom_right = await loadSvg(decoration.elements.bottom_right)
-	}
-
-	return { body: JSON.stringify(decoration) }
 }

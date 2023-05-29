@@ -1,5 +1,6 @@
 {
 	"version": 1,
+	"limited": true,
 	"name": "Gardener",
 	"color": "#BAD9B5",
 	"elements": {

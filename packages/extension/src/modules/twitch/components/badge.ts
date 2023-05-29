@@ -48,23 +48,21 @@ const BADGE_INNER = css({
 })
 
 const BADGE_DECORATION_1 = css({
-	display: 'flex',
 	position: 'absolute',
 	width: '14px',
 	top: '0',
 	left: '0',
 	transform: 'translate(-50%, -50%)',
-	color: '#18181b',
+	color: 'var(--color-background-alt)',
 })
 
 const BADGE_DECORATION_2 = css({
-	display: 'flex',
 	position: 'absolute',
 	width: '14px',
 	bottom: '0',
 	right: '2px',
 	transform: 'translate(50%, 50%)',
-	color: '#18181b',
+	color: 'var(--color-background-alt)',
 })
 
 export default function badge (data: UserData) {
