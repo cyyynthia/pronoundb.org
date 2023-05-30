@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+export const prerender = true
+
 import type { APIContext } from 'astro'
 import { getCollection, getEntry } from 'astro:content'
 import { readFile } from 'fs/promises'
@@ -48,8 +50,6 @@ async function loadSvg (resource: string) {
 		})),
 	}
 }
-
-export const prerender = true
 
 export async function getStaticPaths () {
 	const decorations = await getCollection('decorations')
