@@ -1,6 +1,7 @@
 {
 	"version": 1,
 	"limited": true,
+	"collection": "Dev & friends",
 	"name": "Kanin's fox",
 	"color": "#E08C73",
 	"elements": {

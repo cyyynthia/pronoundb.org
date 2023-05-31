@@ -26,24 +26,21 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z, defineCollection } from 'astro:content'
+import type { WithId } from 'mongodb'
+import type { Account } from './database/account.js'
+import { createHash } from 'crypto'
 
-const decorations = defineCollection({
-	type: 'data',
-	schema: z.object({
-		version: z.number(),
-		limited: z.boolean().optional(),
-		collection: z.string().optional(),
-		name: z.string(),
-		color: z.string(),
-		elements: z.object({
-			top_left: z.string().optional(),
-			bottom_right: z.string().optional(),
-		}),
-	})
-		.refine((a) => !a.limited || !!a.collection),
-})
+function hash (seed: string, data: Uint8Array): number {
+	const md5 = createHash('md5').update(seed).update(data).digest()
+	return md5[0]!
+}
 
-export const collections = {
-	decorations: decorations,
+export function isUserPartOfExperiment (user: WithId<Account>, experiment: string) {
+	const rollout = Number(process.env[`EXPERIMENT_${experiment.toUpperCase()}_ROLLOUT`])
+	if (!rollout || isNaN(rollout)) {
+		return false
+	}
+
+	const group = hash(experiment, user._id.id)
+	return group < rollout
 }

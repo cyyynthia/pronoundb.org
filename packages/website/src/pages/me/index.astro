@@ -27,6 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { isUserPartOfExperiment } from '@server/experiment.js'
 import { authenticate, createCsrf } from '@server/auth.js'
 import { handleFlash } from '@server/flash.js'
 
@@ -34,10 +35,12 @@ import Layout from '@layouts/Layout.astro'
 import PageHeader from '@components/PageHeader.astro'
 import Link from '@components/Link.astro'
 import PronounsSelector from '@components/PronounsSelector.astro'
+import DecorationSelector from '@components/DecorationSelector.astro'
 import Platform from '@components/Platform.astro'
 
 import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
 import xSvg from 'feather-icons/dist/icons/x.svg?raw'
+import infoIcon from 'feather-icons/dist/icons/info.svg?raw'
 
 type Platform = { name: string, color: string, icon: string }
 const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', { eager: true })
@@ -45,6 +48,7 @@ const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', 
 const user = await authenticate(Astro)
 if (!user) return Astro.redirect('/login')
 
+const hasDecorations = user.availableDecorations?.length || isUserPartOfExperiment(user, 'decorations')
 const flash = handleFlash(Astro)
 const csrf = createCsrf(Astro)
 ---
@@ -67,8 +71,35 @@ const csrf = createCsrf(Astro)
 	</p>
 
 	<h2 class='text-xl font-bold mb-2'>Pronouns</h2>
-	<p class='mb-2'>To avoid any form of biases, pronouns are sorted alphabetically within their category.</p>
+	<p class='mb-2'>
+		To avoid any form of biases, pronouns are sorted alphabetically within their category. You're not required to
+		set everything, just pick what you need.
+	</p>
 	<PronounsSelector sets={user.sets.en} locale='en' csrf={csrf}/>
+
+	{hasDecorations && (
+		<>
+			<h2 class='text-xl font-bold mb-2 flex gap-4 items-center'>
+				<span>Decoration</span>
+				<span class='bg-blue-300 text-black font-bold text-sm rounded-xl px-2'>BETA</span>
+			</h2>
+			<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
+				<div class='w-6 h-6 shrink-0' set:html={infoIcon}/>
+				<p>For the time being, decorations only appear on pronouns badges in Twitch chat. They're shown to everyone, but only a subset of users can pick theirs. Lucky you!</p>
+			</div>
+			<p class='mb-2'>
+				Decorations are a way to make your profile cuter. It adds a colored border and decorative elements to
+				your profile picture (and in some cases, on your pronouns), on compatible websites. The decoration can
+				only be seen by users of the extension. Other users can decide to disable the decorations feature on
+				their end, in their extension settings.
+			</p>
+			<DecorationSelector
+				selected={user.decoration}
+				exclusives={user.availableDecorations ?? []}
+				csrf={csrf}
+			/>
+		</>
+	)}
 
 	<h2 class='text-xl font-bold mb-2'>Linked accounts</h2>
 	<p class='mb-2'>You can add or remove accounts at any time.</p>

@@ -63,7 +63,7 @@ if (!def) throw new Error('Invalid locale')
 		</ul>
 	</div>
 </noscript>
-<form method='post' action='/me/update-pronouns' class='nojs' data-pronouns-picker-form>
+<form class='mb-8' method='post' action='/me/update-pronouns' class='nojs' data-pronouns-picker-form>
 	<input type='hidden' name='csrfToken' value={csrf}/>
 	<input type='hidden' name='locale' value={locale}/>
 
@@ -82,7 +82,7 @@ if (!def) throw new Error('Invalid locale')
 		</ul>
 	</div>
 
-	<button class='text-green-700 border-green-700 dark:text-green-400 dark:border-green-400 font-semibold py-1 px-3 border rounded mb-8' type='submit'>
+	<button class='text-green-700 border-green-700 dark:text-green-400 dark:border-green-400 font-semibold py-1 px-3 border rounded' type='submit'>
 		Save changes
 	</button>
 </form>

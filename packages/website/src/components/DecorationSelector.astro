@@ -1,0 +1,103 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+import type { CollectionEntry } from 'astro:content'
+import { getCollection } from 'astro:content'
+import Decoration from './Decoration.astro'
+
+type Deco = CollectionEntry<'decorations'>['data']
+
+export interface Props {
+	selected: string | null
+	exclusives: string[]
+	csrf: string
+}
+
+const CATEGORIES_HARDCORDED_ORDER = [
+	'Dev & friends',
+	'Subscribers',
+	'Donators',
+]
+
+function compareDecoration (deco1: Deco, deco2: Deco) {
+	if (deco1.data.collection && deco2.data.collection) {
+		const hc1 = CATEGORIES_HARDCORDED_ORDER.indexOf(deco1.data.collection) + 1
+		const hc2 = CATEGORIES_HARDCORDED_ORDER.indexOf(deco2.data.collection) + 1
+		if (hc1 && hc2) return hc1 - hc2
+		if (hc1) return -1
+		if (hc2) return 1
+
+		return deco1.data.collection > deco2.data.collection
+			? -1
+			: deco1.data.collection < deco2.data.collection
+				? 1
+				: 0
+	}
+
+	if (deco1.data.collection && !deco2.data.collection) {
+		return -1
+	}
+
+	if (!deco1.data.collection && deco2.data.collection) {
+		return 1
+	}
+
+	return deco1.data.name > deco2.data.name
+			? -1
+			: deco1.data.name < deco2.data.name
+				? 1
+				: 0
+}
+
+const { csrf, exclusives, selected } = Astro.props
+const decorationsAll = await getCollection('decorations')
+
+const decorations = decorationsAll
+	.filter((d) => !d.data.limited || exclusives.includes(d.id))
+	.sort(compareDecoration)
+---
+<form class='mb-8' method='post' action='/me/update-decoration' data-decoration-picker-form>
+	<input type='hidden' name='csrfToken' value={csrf}/>
+
+	<div class='grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6'>
+		<Decoration decoration={null} selected={!selected}/>
+		{decorations.map((d) => <Decoration decoration={d} selected={selected === d.id}/>)}
+	</div>
+
+	<button class='text-green-700 border-green-700 dark:text-green-400 dark:border-green-400 font-semibold py-1 px-3 border rounded mt-4' type='submit'>
+		Save changes
+	</button>
+</form>
+
+<script>
+	for (const form of document.querySelectorAll<HTMLFormElement>('[data-decoration-picker-form]')) {
+		form.querySelector('button')!.classList.add('hidden')
+		form.addEventListener('change', () => form.querySelector('button')!.classList.remove('hidden'), { once: true })
+	}
+</script>

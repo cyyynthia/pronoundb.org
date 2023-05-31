@@ -1,6 +1,7 @@
 {
 	"version": 1,
 	"limited": true,
+	"collection": "Dev & friends",
 	"name": "Developer",
 	"color": "#F49898",
 	"elements": {

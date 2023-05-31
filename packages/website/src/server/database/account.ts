@@ -38,6 +38,8 @@ export type Account = {
 	accounts: ExternalAccount[]
 	decoration: string | null
 	sets: { [locale: string]: Sets }
+
+	availableDecorations: string[]
 }
 
 export type ExternalAccount = {
@@ -60,6 +62,8 @@ export async function createAccount (from: ExternalAccount) {
 		accounts: [ from ],
 		decoration: null,
 		sets: {},
+
+		availableDecorations: [],
 	})
 
 	return result.insertedId
@@ -122,6 +126,8 @@ export function findPronounsOf (platform: string, externalIds: string[]) {
 	])
 }
 
+// UPDATE PRONOUNS
+
 export async function updatePronouns (userId: ObjectId, pronouns: Sets, locale: string) {
 	await collection.updateOne({ _id: userId }, { $set: { [`sets.${locale}`]: pronouns } })
 }
@@ -130,9 +136,13 @@ export async function deletePronouns (userId: ObjectId, locale: string) {
 	await collection.updateOne({ _id: userId }, { $unset: { [`sets.${locale}`]: 1 } })
 }
 
-export async function updateDecoration (userId: ObjectId, decoration: string) {
+// UPDATE DECORATIONS
+
+export async function updateDecoration (userId: ObjectId, decoration: string | null) {
 	await collection.updateOne({ _id: userId }, { $set: { decoration: decoration } })
 }
+
+// UPDATE ACCOUNTS
 
 export async function addLinkedAccount (userId: ObjectId, account: ExternalAccount) {
 	await collection.updateOne({ _id: userId }, { $push: { accounts: account } })
@@ -141,6 +151,8 @@ export async function addLinkedAccount (userId: ObjectId, account: ExternalAccou
 export async function removeLinkedAccount (userId: ObjectId, platform: string, externalId: string) {
 	await collection.updateOne({ _id: userId }, { $pull: { accounts: { platform: platform, id: externalId } } })
 }
+
+// DELETE
 
 export async function deleteAccount (id: ObjectId) {
 	await collection.deleteOne({ _id: id })

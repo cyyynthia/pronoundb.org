@@ -1,6 +1,7 @@
 {
 	"version": 1,
 	"limited": true,
+	"collection": "Dev & friends",
 	"name": "Gardener",
 	"color": "#BAD9B5",
 	"elements": {

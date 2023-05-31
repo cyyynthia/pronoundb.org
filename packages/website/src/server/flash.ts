@@ -34,6 +34,7 @@ export const FlashMessages = <const> {
 	// Success
 	S_REGISTERED: 'Welcome!! Thank you for creating your PronounDB account. Start by setting your pronouns, and then consider linking your other accounts. Have a great stay!',
 	S_PRONOUNS_UPDATED: 'Your pronouns have been updated. Changes might take up to a minute to propagate.',
+	S_DECORATION_UPDATED: 'Your decoration has been updated. Changes might take up to a minute to propagate.',
 	S_ACC_DELETED: 'Your account has been successfully deleted. Sorry to see you go!',
 
 	// Error
@@ -59,6 +60,8 @@ export const FlashMessages = <const> {
 	E_PRONOUNS_DUPLICATE_ENTRIES: 'One set have been entered multiple times.',
 	E_PRONOUNS_INVALID_PLACEMENT: 'A set only available as 1st (and only) set has been specified as 2nd or 3rd set.',
 	E_PRONOUNS_EXTRA_SETS: 'Invalid set order: constrains regarding set orders have not been respected.',
+
+	E_UNKNOWN_DECORATION: 'The decoration you\'ve entered is invalid.',
 }
 
 export function handleFlash ({ cookies }: AstroGlobal) {

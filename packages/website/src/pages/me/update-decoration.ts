@@ -26,24 +26,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { z, defineCollection } from 'astro:content'
+import type { APIContext } from 'astro'
+import { getCollection } from 'astro:content'
+import { authenticate, validateCsrf } from '@server/auth.js'
+import { updateDecoration } from '@server/database/account.js'
+import { setFlash } from '@server/flash.js'
 
-const decorations = defineCollection({
-	type: 'data',
-	schema: z.object({
-		version: z.number(),
-		limited: z.boolean().optional(),
-		collection: z.string().optional(),
-		name: z.string(),
-		color: z.string(),
-		elements: z.object({
-			top_left: z.string().optional(),
-			bottom_right: z.string().optional(),
-		}),
-	})
-		.refine((a) => !a.limited || !!a.collection),
-})
+const decorations = await getCollection('decorations')
 
-export const collections = {
-	decorations: decorations,
+export async function post (ctx: APIContext) {
+	const user = await authenticate(ctx)
+	if (!user) return new Response('401: Unauthorized', { status: 401 })
+
+	const body = await ctx.request.formData().catch(() => null)
+	const csrfToken = body?.get('csrfToken')
+	const decoration = body?.get('decoration')
+
+	if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
+		setFlash(ctx, 'E_CSRF')
+		return ctx.redirect('/me')
+	}
+
+	if (typeof decoration !== 'string' && decoration !== null) {
+		return new Response('400: Bad request', { status: 400 })
+	}
+
+	if (decoration !== '_null' && !decorations.find((c) => c.id === decoration)) {
+		setFlash(ctx, 'E_UNKNOWN_DECORATION')
+		return ctx.redirect('/me')
+	}
+
+	await updateDecoration(user._id, decoration === '_null' ? null : decoration)
+	setFlash(ctx, 'S_DECORATION_UPDATED')
+	return ctx.redirect('/me')
+}
+
+export function all () {
+	return new Response('405: Method not allowed', { status: 405 })
 }
