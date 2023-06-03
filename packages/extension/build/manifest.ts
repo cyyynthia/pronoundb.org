@@ -114,7 +114,7 @@ export default function manifest (): Plugin {
 				delete manifestData.action
 				delete manifestData.host_permissions
 				delete manifestData.optional_host_permissions
-				delete manifestData.content_security_policy
+				manifestData.content_security_policy = manifestData.content_security_policy.extension_pages
 			}
 
 			this.emitFile({

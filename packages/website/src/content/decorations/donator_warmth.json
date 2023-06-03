@@ -1,0 +1,17 @@
+{
+	"version": 1,
+	"limited": true,
+	"collection": "Donators",
+	"name": "Warmth",
+	"border": {
+		"type": "linear-gradient",
+		"angle": 100,
+		"colors": [
+			{ "c": "#FDD264", "o": "0%" },
+			{ "c": "#EB5353", "o": "100%" }
+		]
+	},
+	"animation": {
+		"border": "rotate"
+	}
+}

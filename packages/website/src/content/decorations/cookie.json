@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"name": "Cookie",
+	"border": {
+		"type": "solid",
+		"color": "#DA9F83"
+	},
+	"elements": {
+		"top_left": "cookie.svg"
+	}
+}

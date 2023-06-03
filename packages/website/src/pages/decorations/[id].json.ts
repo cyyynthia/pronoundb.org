@@ -67,12 +67,15 @@ export async function get ({ params: { id } }: APIContext) {
 	return {
 		body: JSON.stringify({
 			version: decoration.version,
+			limited: decoration.limited,
+			collection: decoration.collection,
 			name: decoration.name,
-			color: decoration.color,
-			elements: {
+			border: decoration.border,
+			elements: decoration.elements && {
 				top_left: decoration.elements.top_left && await loadSvg(decoration.elements.top_left),
 				bottom_right: decoration.elements.bottom_right && await loadSvg(decoration.elements.bottom_right),
 			},
+			animation: decoration.animation,
 		}),
 	}
 }

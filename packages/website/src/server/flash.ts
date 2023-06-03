@@ -33,12 +33,14 @@ export type FlashMessage = keyof typeof FlashMessages
 export const FlashMessages = <const> {
 	// Success
 	S_REGISTERED: 'Welcome!! Thank you for creating your PronounDB account. Start by setting your pronouns, and then consider linking your other accounts. Have a great stay!',
-	S_PRONOUNS_UPDATED: 'Your pronouns have been updated. Changes might take up to a minute to propagate.',
-	S_DECORATION_UPDATED: 'Your decoration has been updated. Changes might take up to a minute to propagate.',
+	S_PRONOUNS_UPDATED: 'Your pronouns have been updated. Changes might take up to a few minutes to propagate.',
+	S_DECORATION_UPDATED: 'Your decoration has been updated. Changes might take up to a few minutes to propagate.',
 	S_ACC_DELETED: 'Your account has been successfully deleted. Sorry to see you go!',
 
 	// Error
 	E_CSRF: 'Verification of the authenticity of the submission failed (CSRF check). Please try again.',
+	E_EXPERIMENT_NOT_IN_BUCKET: 'This feature is experimental and you do not have been granted access yet.',
+
 	E_OAUTH_GENERIC: 'An unknown error occurred while authenticating with the third party service.',
 	E_OAUTH_FETCH: 'Could not fetch information about your external account.',
 	E_OAUTH_10A_EXCHANGE: 'Could not initialize the authentication request with the third party.',
@@ -61,7 +63,8 @@ export const FlashMessages = <const> {
 	E_PRONOUNS_INVALID_PLACEMENT: 'A set only available as 1st (and only) set has been specified as 2nd or 3rd set.',
 	E_PRONOUNS_EXTRA_SETS: 'Invalid set order: constrains regarding set orders have not been respected.',
 
-	E_UNKNOWN_DECORATION: 'The decoration you\'ve entered is invalid.',
+	E_DECORATION_UNKNOWN: 'The decoration you\'ve entered is invalid.',
+	E_DECORATION_LOCKED: 'The decoration you\'ve selected is not available to you.',
 }
 
 export function handleFlash ({ cookies }: AstroGlobal) {

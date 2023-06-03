@@ -1,0 +1,16 @@
+{
+	"version": 1,
+	"name": "Cogs",
+	"border": {
+		"type": "solid",
+		"color": "#C3591D"
+	},
+	"elements": {
+		"top_left": "cog.svg",
+		"bottom_right": "cog_small.svg"
+	},
+	"animation": {
+		"top_left": "rotate",
+		"bottom_right": "rotate"
+	}
+}

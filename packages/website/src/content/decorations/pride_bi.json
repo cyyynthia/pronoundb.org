@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"name": "Pride bisexual",
+	"border": {
+		"type": "conic-gradient",
+		"angle": -1,
+		"colors": [
+			{ "c": "#D872AC", "o": "10%" },
+			{ "c": "#D872AC", "o": "30%" },
+			{ "c": "#957DAD", "o": "50%" },
+			{ "c": "#6AA9ED", "o": "70%" },
+			{ "c": "#6AA9ED", "o": "90%" }
+		]
+	},
+	"elements": {
+		"top_left": "bi_flag.svg"
+	}
+}

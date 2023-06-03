@@ -1,0 +1,14 @@
+{
+	"version": 1,
+	"limited": true,
+	"collection": "Subscribers",
+	"name": "Cherry Blossom",
+	"color": "#F4ABBA",
+	"border": {
+		"type": "solid",
+		"color": "#F4ABBA"
+	},
+	"elements": {
+		"top_left": "cherry_blossom.svg"
+	}
+}

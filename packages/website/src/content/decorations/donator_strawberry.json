@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"limited": true,
+	"collection": "Subscribers",
+	"name": "Strawberry",
+	"border": {
+		"type": "solid",
+		"color": "#BE1931"
+	},
+	"elements": {
+		"top_left": "strawberry.svg"
+	}
+}

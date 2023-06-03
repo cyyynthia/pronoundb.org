@@ -28,6 +28,8 @@
 
 import { z, defineCollection } from 'astro:content'
 
+const atLeastOneKey = (obj: any) => !obj || Object.keys(obj).length !== 0
+
 const decorations = defineCollection({
 	type: 'data',
 	schema: z.object({
@@ -35,13 +37,33 @@ const decorations = defineCollection({
 		limited: z.boolean().optional(),
 		collection: z.string().optional(),
 		name: z.string(),
-		color: z.string(),
+		color: z.string().optional(),
+		border: z.union([
+			z.object({
+				type: z.literal('solid'),
+				color: z.string(),
+			}),
+			z.object({
+				type: z.union([ z.literal('linear-gradient'), z.literal('conic-gradient') ]),
+				angle: z.number().optional(),
+				colors: z.array(
+					z.object({
+						c: z.string(),
+						o: z.string(),
+					})
+				),
+			}),
+		]),
 		elements: z.object({
 			top_left: z.string().optional(),
 			bottom_right: z.string().optional(),
-		}),
-	})
-		.refine((a) => !a.limited || !!a.collection),
+		}).optional().refine(atLeastOneKey),
+		animation: z.object({
+			border: z.string().optional(),
+			top_left: z.string().optional(),
+			bottom_right: z.string().optional(),
+		}).optional().refine(atLeastOneKey),
+	}),
 })
 
 export const collections = {

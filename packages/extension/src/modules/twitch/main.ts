@@ -41,6 +41,11 @@ export const color = '#9146FF'
 export const match = /^https:\/\/(.+\.)?twitch\.tv/
 export { default as Icon } from 'simple-icons/icons/twitch.svg'
 
+import stylesheet from './style.css?raw'
+const styleElement = document.createElement('style')
+styleElement.appendChild(document.createTextNode(stylesheet))
+document.head.appendChild(styleElement)
+
 const settings = {
 	chat: true,
 	popout: true,
@@ -101,20 +106,39 @@ async function injectChat (element: HTMLElement) {
 	}
 }
 
+let stvCompatInjected = false
 const msgUserMap = new LRUMap<string, string>(500)
+async function get7tvUserId (messageId: string) {
+	let userId = msgUserMap.get(messageId)
+
+	// eslint-disable-next-line no-unmodified-loop-condition
+	while (!stvCompatInjected) await new Promise((r) => setTimeout(r, 100))
+
+	for (let i = 0; i < 25 && !userId; i++) {
+		// Sometimes the IDs are a bit slow to arrive...
+		// We wait for them for up to 500 ms.
+		await new Promise((r) => setTimeout(r, 20))
+		userId = msgUserMap.get(messageId)
+	}
+
+	if (!userId) {
+		// Didn't receive a user id for a message, probably an injection fail (?)
+		// Attempt to re-bind the 7tv compat layer out of precaution
+		// It'll no-op if it is already bound properly
+		console.warn('[PronounDB] 7TV compat: Could not resolve user ID. Attempting re-injection')
+		bind7tvCompat()
+	}
+
+	return userId
+}
+
 async function inject7tvChat (message: HTMLElement) {
 	const messageId = message.getAttribute('msg-id')
 	if (!messageId) return
 
-	let userId = msgUserMap.get(messageId)
-	for (let i = 0; i < 10 && !userId; i++) {
-		// Sometimes the IDs are a bit slow to arrive...
-		// We wait for them for up to 100 ms.
-		await new Promise((r) => setTimeout(r, 10))
-		userId = msgUserMap.get(messageId)
-	}
-
+	const userId = await get7tvUserId(messageId)
 	if (!userId) return
+
 	const pronouns = await fetchPronouns('twitch', userId)
 	if (!pronouns || !pronouns.sets.en) return
 
@@ -230,16 +254,36 @@ async function injectStreamerAbout () {
 	el.appendChild(h('div', {}, formatPronouns(pronouns.sets.en)))
 }
 
+function handle7tvMessage (e: MessageEvent) {
+	if (e.source === window && e.data?.source === 'pronoundb') {
+		const data = e.data.payload
+		if (data.action === 'ttv.chat.msg') {
+			msgUserMap.set(data.id, data.user)
+		}
+	}
+}
+
 function bind7tvCompat () {
-	window.postMessage({ source: 'pronoundb', payload: { action: 'ttv.inject-chat' } })
-	window.addEventListener('message', (e) => {
+	stvCompatInjected = false
+
+	// Send inject request
+	const send = () => window.postMessage({ source: 'pronoundb', payload: { action: 'ttv.inject-chat' } })
+	const interval = setInterval(send, 1e3)
+	send()
+
+	// Await for the acknowledgement of injection
+	const onMsg = (e: MessageEvent) => {
 		if (e.source === window && e.data?.source === 'pronoundb') {
 			const data = e.data.payload
-			if (data.action === 'ttv.chat.msg') {
-				msgUserMap.set(data.id, data.user)
+			if (data.action === 'ttv.inject-chat.ack') {
+				clearInterval(interval)
+				window.removeEventListener('message', onMsg)
+				stvCompatInjected = true
 			}
 		}
-	})
+	}
+
+	window.addEventListener('message', onMsg)
 }
 
 function handleMutation (nodes: MutationRecord[]) {
@@ -273,6 +317,7 @@ function handleMutation (nodes: MutationRecord[]) {
 					}
 
 					if (added.classList.contains('seventv-chat-scroller')) {
+						console.log('[PronounDB] 7TV detected. Injecting compatibility code')
 						bind7tvCompat()
 						continue
 					}
@@ -333,6 +378,13 @@ export function inject () {
 	// Process all existing elements
 	document.querySelectorAll<HTMLElement>('.chat-author__display-name').forEach((el) => injectChat(el))
 	if (document.querySelector('.about-section')) injectStreamerAbout()
+
+	// Inject 7tv compat code
+	window.addEventListener('message', handle7tvMessage)
+	if (document.querySelector('.seventv-chat-scroller')) {
+		console.log('[PronounDB] 7TV detected. Injecting compatibility code')
+		bind7tvCompat()
+	}
 
 	// Start observer
 	const observer = new MutationObserver(handleMutation)

@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"name": "Day time",
+	"border": {
+		"type": "solid",
+		"color": "#FFAC33"
+	},
+	"elements": {
+		"top_left": "sun.svg"
+	}
+}

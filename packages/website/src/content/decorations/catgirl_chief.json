@@ -4,6 +4,10 @@
 	"collection": "Dev & friends",
 	"name": "Developer",
 	"color": "#F49898",
+	"border": {
+		"type": "solid",
+		"color": "#F49898"
+	},
 	"elements": {
 		"top_left": "catgirl_paw.svg"
 	}

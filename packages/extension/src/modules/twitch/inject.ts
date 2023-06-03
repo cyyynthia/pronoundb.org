@@ -28,19 +28,30 @@
 
 import { fetchReactProp } from '../../utils/proxy'
 
-export default function () {
-	const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')
-	const kCustomHandler = Symbol('pdb.ttv.custom-handler')
+const kOriginalHandler = Symbol('pdb.ttv.original-message-handler')
 
+export default function () {
 	window.addEventListener('message', async (e) => {
 		if (e.source === window && e.data?.source === 'pronoundb') {
 			const data = e.data.payload
 			if (data.action === 'ttv.inject-chat') {
+				console.log('[PronounDB] Injecting 7TV compatibility layer')
+
+				// Acknowledge the inject request has been received
+				// Awaited by the extension for validating the injection
+				window.postMessage({ source: 'pronoundb', payload: { action: 'ttv.inject-chat.ack' } }, e.origin)
+
 				const chat = document.querySelector<HTMLElement>('.chat-list--default')
-				if (!chat) return
+				if (!chat) {
+					console.warn('[PronounDB] Could not find the chat element!')
+					return
+				}
 
 				const handler = await fetchReactProp(chat, [ { $find: 'messageHandlerAPI', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messageHandlerAPI' ])
-				if (handler.handleMessage[kCustomHandler]) return
+				if (handler.handleMessage.__pdbCustomHandler) {
+					console.log('[PronounDB] Already injected. Skipping injection')
+					return
+				}
 
 				const ogDesc = Reflect.getOwnPropertyDescriptor(handler, 'handleMessage')!
 				Reflect.defineProperty(handler, kOriginalHandler, ogDesc)
@@ -51,8 +62,8 @@ export default function () {
 							source: 'pronoundb',
 							payload: {
 								action: 'ttv.chat.msg',
-								id: m.id,
 								user: m.user.userID,
+								id: m.id,
 							},
 						}, e.origin)
 					}
@@ -60,13 +71,11 @@ export default function () {
 					handler[kOriginalHandler](m)
 				}
 
-				// @ts-expect-error
-				patchedHandleMessage[kCustomHandler] = true
-				Reflect.defineProperty(handler, 'handleMessage', {
-					value: import.meta.env.PDB_BROWSER_TARGET !== 'chrome'
-						? cloneInto(patchedHandleMessage, window, { cloneFunctions: true })
-						: patchedHandleMessage,
-				})
+				patchedHandleMessage.__pdbCustomHandler = true
+				Reflect.deleteProperty(handler, 'handleMessage')
+				handler.handleMessage = import.meta.env.PDB_BROWSER_TARGET !== 'chrome'
+					? cloneInto(patchedHandleMessage, window, { cloneFunctions: true })
+					: patchedHandleMessage
 
 				const messages = await fetchReactProp(chat, [ { $find: 'messagesHash', $in: [ 'child', 'memoizedProps', 'sibling' ] }, 'messagesHash' ])
 				for (const m of messages) {
@@ -81,6 +90,8 @@ export default function () {
 						}, e.origin)
 					}
 				}
+
+				console.log('[PronounDB] Injected 7TV compatibility layer')
 			}
 		}
 	})

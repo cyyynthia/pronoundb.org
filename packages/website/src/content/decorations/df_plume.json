@@ -4,6 +4,10 @@
 	"collection": "Dev & friends",
 	"name": "Gardener",
 	"color": "#BAD9B5",
+	"border": {
+		"type": "solid",
+		"color": "#BAD9B5"
+	},
 	"elements": {
 		"bottom_right": "leafy.svg"
 	}

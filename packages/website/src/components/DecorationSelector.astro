@@ -53,33 +53,24 @@ function compareDecoration (deco1: Deco, deco2: Deco) {
 		if (hc1) return -1
 		if (hc2) return 1
 
-		return deco1.data.collection > deco2.data.collection
-			? -1
-			: deco1.data.collection < deco2.data.collection
-				? 1
-				: 0
+		if (deco1.data.collection > deco2.data.collection) return -1
+		if (deco1.data.collection < deco2.data.collection) return 1
 	}
 
-	if (deco1.data.collection && !deco2.data.collection) {
-		return -1
-	}
+	if (deco1.data.collection && !deco2.data.collection) return -1
+	if (!deco1.data.collection && deco2.data.collection) return 1
 
-	if (!deco1.data.collection && deco2.data.collection) {
-		return 1
-	}
+	if (deco1.id < deco2.id) return -1
+	if (deco1.id > deco2.id) return 1
 
-	return deco1.data.name > deco2.data.name
-			? -1
-			: deco1.data.name < deco2.data.name
-				? 1
-				: 0
+	return 0
 }
 
 const { csrf, exclusives, selected } = Astro.props
 const decorationsAll = await getCollection('decorations')
 
 const decorations = decorationsAll
-	.filter((d) => !d.data.limited || exclusives.includes(d.id))
+	// .filter((d) => !d.data.limited || exclusives.includes(d.id))
 	.sort(compareDecoration)
 ---
 <form class='mb-8' method='post' action='/me/update-decoration' data-decoration-picker-form>

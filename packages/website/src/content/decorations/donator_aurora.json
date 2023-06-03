@@ -1,0 +1,17 @@
+{
+	"version": 1,
+	"limited": true,
+	"collection": "Donators",
+	"name": "Aurora",
+	"border": {
+		"type": "linear-gradient",
+		"angle": 100,
+		"colors": [
+			{ "c": "#18F89A", "o": "0%" },
+			{ "c": "#C243EE", "o": "100%" }
+		]
+	},
+	"animation": {
+		"border": "rotate"
+	}
+}

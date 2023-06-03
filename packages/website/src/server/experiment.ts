@@ -30,17 +30,12 @@ import type { WithId } from 'mongodb'
 import type { Account } from './database/account.js'
 import { createHash } from 'crypto'
 
-function hash (seed: string, data: Uint8Array): number {
-	const md5 = createHash('md5').update(seed).update(data).digest()
-	return md5[0]!
-}
-
 export function isUserPartOfExperiment (user: WithId<Account>, experiment: string) {
 	const rollout = Number(process.env[`EXPERIMENT_${experiment.toUpperCase()}_ROLLOUT`])
 	if (!rollout || isNaN(rollout)) {
 		return false
 	}
 
-	const group = hash(experiment, user._id.id)
-	return group < rollout
+	const md5 = createHash('md5').update(experiment).update(user._id.id).digest()
+	return md5[0]! < rollout
 }

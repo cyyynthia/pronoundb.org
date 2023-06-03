@@ -48,7 +48,7 @@ const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', 
 const user = await authenticate(Astro)
 if (!user) return Astro.redirect('/login')
 
-const hasDecorations = user.availableDecorations?.length || isUserPartOfExperiment(user, 'decorations')
+const hasDecorations = user.availableDecorations.length || isUserPartOfExperiment(user, 'decorations')
 const flash = handleFlash(Astro)
 const csrf = createCsrf(Astro)
 ---

@@ -1,0 +1,18 @@
+{
+	"version": 1,
+	"name": "Pride lesbian",
+	"border": {
+		"type": "conic-gradient",
+		"angle": -1,
+		"colors": [
+			{ "c": "#EB765A", "o": "10%" },
+			{ "c": "#FBAB74", "o": "30%" },
+			{ "c": "#DDDDDD", "o": "50%" },
+			{ "c": "#F295CC", "o": "70%" },
+			{ "c": "#A36088", "o": "90%" }
+		]
+	},
+	"elements": {
+		"top_left": "lesbian_flag.svg"
+	}
+}

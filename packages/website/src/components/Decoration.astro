@@ -29,6 +29,7 @@
 
 import type { CollectionEntry } from 'astro:content'
 
+import sparklesSvg from '@assets/sparkles.svg?raw'
 import checkedSvg from 'feather-icons/dist/icons/check-circle.svg?raw'
 import slashSvg from 'feather-icons/dist/icons/slash.svg?raw'
 
@@ -40,7 +41,46 @@ export interface Props {
 }
 
 const { decoration, selected } = Astro.props
-const id = Math.random().toString(16).slice(2)
+const id = `decoration-${Math.random().toString(16).slice(2, 10)}`
+
+const topLeft = decoration?.data.elements?.top_left
+const bottomRight = decoration?.data.elements?.bottom_right
+const animationBorder = decoration?.data.animation?.border
+const animationTopLeft = decoration?.data.animation?.top_left
+const animationBottomRight = decoration?.data.animation?.bottom_right
+
+type ColorDef = { c: string, o: string }
+function definitionToColor (def: ColorDef[]) {
+	return def.map(({ c, o }) => `${c} ${o}`).join(', ')
+}
+
+function makeGradientBorder (def: string) {
+	return `border-color: transparent; background: linear-gradient(currentColor, currentColor) padding-box, ${def} border-box`
+}
+
+let style = ''
+switch (decoration?.data.border.type) {
+	case 'solid':
+		style = `border-color: ${decoration.data.border.color}`
+		break
+	case 'linear-gradient': {
+		let angle = decoration.data.border.angle
+		if (angle === -1) angle = 45
+
+		const gradient = definitionToColor(decoration.data.border.colors)
+		style = makeGradientBorder(`linear-gradient(${angle}deg, ${gradient})`)
+		break
+	}
+	case 'conic-gradient': {
+		let angle = decoration.data.border.angle
+		if (angle === -1) angle = -45
+		if (angle === -2) angle = 135
+
+		const gradient = definitionToColor(decoration.data.border.colors)
+		style = makeGradientBorder(`conic-gradient(from ${angle}deg at 50% 50%, ${gradient})`)
+		break
+	}
+}
 ---
 <input type='radio' name='decoration' value={decoration?.id ?? '_null'} id={id} checked={selected} class='hidden' aria-hidden='true'/>
 <label
@@ -62,17 +102,25 @@ const id = Math.random().toString(16).slice(2)
 		{decoration
 			? (
 				<>
-					<div class='w-full h-full border-8 rounded-full' style={`border-color: ${decoration.data.color}`} />
-					{decoration.data.elements.top_left && (
+					<div
+						class:list={[ 'w-full h-full border-8 rounded-full decoration-border', animationBorder && `animation-${animationBorder}` ]}
+						style={style}
+					/>
+					<style>
+						:global(body) {
+							background: ${decoration.data.color}
+						}
+					</style>
+					{topLeft && (
 						<div
-							class='element-top'
-							set:html={DecorationElements[`../assets/decorations/${decoration.data.elements.top_left}`]()}
+							class:list={[ 'element-top', animationTopLeft && `animation-${animationTopLeft}` ]}
+							set:html={DecorationElements[`../assets/decorations/${topLeft}`]()}
 						/>
 					)}
-					{decoration.data.elements.bottom_right && (
+					{bottomRight && (
 						<div
-							class='element-bottom'
-							set:html={DecorationElements[`../assets/decorations/${decoration.data.elements.bottom_right}`]()}
+							class:list={[ 'element-bottom', animationBottomRight && `animation-${animationBottomRight}` ]}
+							set:html={DecorationElements[`../assets/decorations/${bottomRight}`]()}
 						/>
 					)}
 				</>
@@ -82,9 +130,13 @@ const id = Math.random().toString(16).slice(2)
 
 	{decoration?.data.limited && (
 		<div class='limited flex items-center gap-2'>
-			<svg class='shrink-0 w-4' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 2l.19.94a4 4 0 0 0 2.57 2.974L8 6l-.24.086A4 4 0 0 0 5.19 9.06L5 10l-.19-.94a4 4 0 0 0-2.57-2.974L2 6l.24-.086A4 4 0 0 0 4.81 2.94L5 2Zm3 14l.23 1.276a2 2 0 0 0 1.219 1.501L10 19l-.551.223a2 2 0 0 0-1.22 1.5L8 22l-.23-1.276a2 2 0 0 0-1.219-1.501L6 19l.551-.223a2 2 0 0 0 1.22-1.5L8 16Zm8-13l.556 2.654a8 8 0 0 0 5.213 5.92L23 12l-1.231.426a8 8 0 0 0-5.213 5.92L16 21l-.556-2.654a8 8 0 0 0-5.213-5.92L9 12l1.231-.426a8 8 0 0 0 5.213-5.92L16 3Z"></path></svg>
+			<div class='shrink-0 w-4'>
+				<Fragment set:html={sparklesSvg}/>
+			</div>
 			<span class='uppercase text-xs font-bold text-center'>{decoration.data.collection} exclusive</span>
-			<svg class='shrink-0 w-4' xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 2l.19.94a4 4 0 0 0 2.57 2.974L8 6l-.24.086A4 4 0 0 0 5.19 9.06L5 10l-.19-.94a4 4 0 0 0-2.57-2.974L2 6l.24-.086A4 4 0 0 0 4.81 2.94L5 2Zm3 14l.23 1.276a2 2 0 0 0 1.219 1.501L10 19l-.551.223a2 2 0 0 0-1.22 1.5L8 22l-.23-1.276a2 2 0 0 0-1.219-1.501L6 19l.551-.223a2 2 0 0 0 1.22-1.5L8 16Zm8-13l.556 2.654a8 8 0 0 0 5.213 5.92L23 12l-1.231.426a8 8 0 0 0-5.213 5.92L16 21l-.556-2.654a8 8 0 0 0-5.213-5.92L9 12l1.231-.426a8 8 0 0 0 5.213-5.92L16 3Z"></path></svg>
+			<div class='shrink-0 w-4'>
+				<Fragment set:html={sparklesSvg}/>
+			</div>
 		</div>
 	)}
 </label>
@@ -115,17 +167,29 @@ const id = Math.random().toString(16).slice(2)
 
 	.element-top {
 		position: absolute;
-		top: 0;
-		left: 0;
+		top: 13px;
+		left: 13px;
 		width: 50%;
-		transform: translate(-25%, -25%);
+		transform: translate(-50%, -50%);
 	}
 
 	.element-bottom {
 		position: absolute;
-		bottom: 0;
-		right: 0;
+		bottom: 13px;
+		right: 13px;
 		width: 50%;
-		transform: translate(25%, 25%);
+		transform: translate(50%, 50%);
+	}
+
+	.decoration-border.animation-rotate,
+	.element-top.animation-rotate :global(svg),
+	.element-bottom.animation-rotate :global(svg) {
+		border-color: transparent;
+		animation: rotate 7s linear infinite;
+	}
+
+	@keyframes rotate {
+		from { transform: rotate(0); }
+		to { transform: rotate(360deg); }
 	}
 </style>

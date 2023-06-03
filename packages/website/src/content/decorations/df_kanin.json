@@ -4,6 +4,10 @@
 	"collection": "Dev & friends",
 	"name": "Kanin's fox",
 	"color": "#E08C73",
+	"border": {
+		"type": "solid",
+		"color": "#E08C73"
+	},
 	"elements": {
 		"top_left": "kanin_fox_head.svg",
 		"bottom_right": "kanin_fox_tail.svg"

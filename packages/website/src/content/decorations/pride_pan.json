@@ -1,0 +1,17 @@
+{
+	"version": 1,
+	"name": "Pride pansexual",
+	"border": {
+		"type": "conic-gradient",
+		"angle": -1,
+		"colors": [
+			{ "c": "#FF82B1", "o": "16.66%" },
+			{ "c": "#F7F48B", "o": "45%" },
+			{ "c": "#F7F48B", "o": "55%" },
+			{ "c": "#8BD1F9", "o": "83.34%" }
+		]
+	},
+	"elements": {
+		"top_left": "pan_flag.svg"
+	}
+}

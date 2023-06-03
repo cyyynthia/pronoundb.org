@@ -1,0 +1,19 @@
+{
+	"version": 1,
+	"name": "Pride",
+	"border": {
+		"type": "conic-gradient",
+		"angle": -1,
+		"colors": [
+			{ "c": "#F47C7C", "o": "8.33%" },
+			{ "c": "#FFC268", "o": "25%" },
+			{ "c": "#F7F48B", "o": "41.66%" },
+			{ "c": "#A1DE93", "o": "58.33%" },
+			{ "c": "#70A1D7", "o": "75%" },
+			{ "c": "#957DAD", "o": "91.67%" }
+		]
+	},
+	"elements": {
+		"top_left": "pride_flag.svg"
+	}
+}

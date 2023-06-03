@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"limited": true,
+	"collection": "Subscribers",
+	"name": "Ribbon",
+	"border": {
+		"type": "solid",
+		"color": "#DD2E44"
+	},
+	"elements": {
+		"bottom_right": "ribbon.svg"
+	}
+}

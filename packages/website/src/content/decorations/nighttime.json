@@ -1,0 +1,11 @@
+{
+	"version": 1,
+	"name": "Night time",
+	"border": {
+		"type": "solid",
+		"color": "#66757F"
+	},
+	"elements": {
+		"bottom_right": "moon.svg"
+	}
+}

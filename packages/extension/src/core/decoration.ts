@@ -28,18 +28,62 @@
 
 import { h } from '../utils/dom'
 
+export type GradientDefinition = Array<{ c: string, o: string }>
+type DecorationBorderSolid = { type: 'solid', color: string }
+type DecorationGradient = {
+	type: 'linear-gradient' | 'conic-gradient',
+	angle: number
+	colors: GradientDefinition
+}
+
 export type DecorationData = {
 	name: string
-	color: string
+	border: string
 	elements: {
 		topLeft?: SVGElement
 		bottomRight?: SVGElement
+	}
+	animation: {
+		border?: string
+		topLeft?: string
+		bottomRight?: string
 	}
 }
 
 let decorationsEnabled = true
 chrome.storage.sync.get([ 'decorations' ], ({ decorations }) => (decorationsEnabled = decorations !== false))
 chrome.storage.onChanged.addListener((changes) => (decorationsEnabled = changes.decorations.newValue !== false))
+
+function definitionToColor (def: GradientDefinition) {
+	return def.map(({ c, o }) => `${c} ${o}`).join(', ')
+}
+
+// In theory, to get the proper values for -1 and -2 according to my made-up spec, I'd need to do
+// a bit of trigonometry for a precise value. But I'm calling this good enough :p
+function getBorderColor (border: DecorationBorderSolid | DecorationGradient) {
+	switch (border.type) {
+		case 'solid':
+			return border.color
+		case 'linear-gradient': {
+			let angle = border.angle
+			if (angle === -1) angle = 295
+
+			const gradient = definitionToColor(border.colors)
+			return `linear-gradient(${angle}deg, ${gradient})`
+		}
+		case 'conic-gradient': {
+			let angle = border.angle
+			if (angle === -1) angle = 295
+			if (angle === -2) angle = 135
+
+			const gradient = definitionToColor(border.colors)
+			return `conic-gradient(from ${angle}deg at 50% 50%, ${gradient})`
+		}
+	}
+
+	// @ts-expect-error
+	return ''
+}
 
 function renderSvg (data: any) {
 	return h(
@@ -56,10 +100,15 @@ async function doFetch (id: string): Promise<DecorationData | null> {
 	const data = await res.json()
 	return {
 		name: data.name,
-		color: data.color,
+		border: getBorderColor(data.border),
 		elements: {
-			topLeft: data.elements.top_left && renderSvg(data.elements.top_left),
-			bottomRight: data.elements.bottom_right && renderSvg(data.elements.bottom_right),
+			topLeft: data.elements?.top_left && renderSvg(data.elements.top_left),
+			bottomRight: data.elements?.bottom_right && renderSvg(data.elements.bottom_right),
+		},
+		animation: {
+			border: data.animation?.border,
+			topLeft: data.animation?.top_left,
+			bottomRight: data.animation?.bottom_right,
 		},
 	}
 }

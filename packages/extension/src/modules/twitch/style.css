@@ -26,22 +26,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { initializeRuntime } from './runtime'
-import { getModule } from './modules'
+@keyframes pdb-animation-rotate {
+	from { transform: rotate(0) }
+	to { transform: rotate(360deg) }
+}
 
-getModule().then((currentMdl) => {
-	if (currentMdl) {
-		const key = `${currentMdl.id}.enabled`
-		chrome.storage.sync.get([ key ]).then(async ({ [key]: enabled }) => {
-			if (enabled ?? true) {
-				if (import.meta.env.PDB_BROWSER_TARGET === 'chrome') {
-					await initializeRuntime()
-				}
-
-				currentMdl.main?.()
-				currentMdl.inject()
-				console.log(`[PronounDB] Loaded ${currentMdl.id} module`)
-			}
-		})
-	}
-})
+.pronoundb-decoration-animation-rotate .pronoundb-chat-badge-border,
+.pronoundb-decoration-animation-rotate svg {
+	animation: pdb-animation-rotate 7s linear infinite;
+}

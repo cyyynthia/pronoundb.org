@@ -1,0 +1,13 @@
+{
+	"version": 1,
+	"limited": true,
+	"collection": "Donators",
+	"name": "Star",
+	"border": {
+		"type": "solid",
+		"color": "#FDD264"
+	},
+	"elements": {
+		"top_left": "star.svg"
+	}
+}
