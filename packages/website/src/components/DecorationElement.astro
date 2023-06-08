@@ -29,22 +29,16 @@
 
 import type { CollectionEntry } from 'astro:content'
 
-import DecorationElement from './DecorationElement.astro'
-
-import sparklesSvg from '@assets/sparkles.svg?raw'
-import checkedSvg from 'feather-icons/dist/icons/check-circle.svg?raw'
 import slashSvg from 'feather-icons/dist/icons/slash.svg?raw'
 
 const DecorationElements = import.meta.glob('../assets/decorations/*.svg', { as: 'raw' })
 
 export interface Props {
 	decoration: CollectionEntry<'decorations'> | null
-	selected?: boolean
-	demo?: boolean
+	background?: string
 }
 
-const { decoration, selected, demo } = Astro.props
-const id = `decoration-${Math.random().toString(16).slice(2, 10)}`
+const { decoration, background } = Astro.props
 
 const topLeft = decoration?.data.elements?.top_left
 const bottomRight = decoration?.data.elements?.bottom_right
@@ -57,21 +51,22 @@ function definitionToColor (def: ColorDef[]) {
 	return def.map(({ c, o }) => `${c} ${o}`).join(', ')
 }
 
-function makeGradientBorder (def: string) {
-	return `border-color: transparent; background: linear-gradient(currentColor, currentColor) padding-box, ${def} border-box`
+function makeStyle (def: string) {
+	const bg = background ?? 'linear-gradient(currentColor, currentColor)'
+	return `border-color: transparent; background: ${bg} padding-box, ${def} border-box; background-size: contain`
 }
 
 let style = ''
 switch (decoration?.data.border.type) {
 	case 'solid':
-		style = `border-color: ${decoration.data.border.color}`
+		style = makeStyle(decoration.data.border.color)
 		break
 	case 'linear-gradient': {
 		let angle = decoration.data.border.angle
 		if (angle === -1) angle = 45
 
 		const gradient = definitionToColor(decoration.data.border.colors)
-		style = makeGradientBorder(`linear-gradient(${angle}deg, ${gradient})`)
+		style = makeStyle(`linear-gradient(${angle}deg, ${gradient})`)
 		break
 	}
 	case 'conic-gradient': {
@@ -80,64 +75,52 @@ switch (decoration?.data.border.type) {
 		if (angle === -2) angle = 135
 
 		const gradient = definitionToColor(decoration.data.border.colors)
-		style = makeGradientBorder(`conic-gradient(from ${angle}deg at 50% 50%, ${gradient})`)
+		style = makeStyle(`conic-gradient(from ${angle}deg at 50% 50%, ${gradient})`)
 		break
 	}
 }
-
-const Element = demo ? 'div' : 'label'
 ---
-{!demo && <input type='radio' name='decoration' value={decoration?.id ?? '_null'} id={id} checked={selected} class='hidden' aria-hidden='true'/>}
-<Element
-	for={demo ? void 0 : id}
-	role={demo ? void  0 : 'radio'}
-	class:list={[
-		'flex flex-col items-center bg-gray-100 dark:bg-gray-700 px-4 py-2 border-2 rounded relative dark:border-gray-500',
-		!demo && 'cursor-pointer'
-	]}
->
-	<div
-		aria-hidden='true'
-		class='checked hidden rounded-full text-green-600 dark:text-green-500 bg-white dark:bg-gray-800 absolute -top-2 -right-2'
-		set:html={checkedSvg}
-	/>
-
-	<div class='flex flex-col mb-3'>
-		<span class='text-lg font-semibold text-center'>{decoration?.data.name ?? 'No decoration'}</span>
-	</div>
-
-	<div class='w-20 h-20 text-gray-100 dark:text-gray-700 mb-4'>
-		<DecorationElement decoration={decoration}/>
-	</div>
-
-	{decoration?.data.limited && (
-		<div class='limited flex items-center gap-2'>
-			<div class='shrink-0 w-4'>
-				<Fragment set:html={sparklesSvg}/>
-			</div>
-			<span class='uppercase text-xs font-bold text-center'>{decoration.data.collection} exclusive</span>
-			<div class='shrink-0 w-4'>
-				<Fragment set:html={sparklesSvg}/>
-			</div>
-		</div>
-	)}
-</Element>
+<div class='relative w-full h-full'>
+	{decoration
+		? (
+			<Fragment>
+				<div
+					class:list={[ 'w-full h-full border-8 rounded-full decoration-border', animationBorder && `animation-${animationBorder}` ]}
+					style={style}
+				/>
+				{topLeft && (
+					<div
+						class:list={[
+							'w-10 absolute top-[15%] left-[15%] absolute -translate-x-1/2 -translate-y-1/2 element-top',
+							animationTopLeft && `animation-${animationTopLeft}`
+						]}
+						set:html={DecorationElements[`../assets/decorations/${topLeft}`]()}
+					/>
+				)}
+				{bottomRight && (
+					<div
+						class:list={[
+							'w-10 absolute bottom-[15%] right-[15%] absolute translate-x-1/2 translate-y-1/2 element-bottom',
+							animationBottomRight && `animation-${animationBottomRight}`
+						]}
+						set:html={DecorationElements[`../assets/decorations/${bottomRight}`]()}
+					/>
+				)}
+			</Fragment>
+		)
+		: <div class='text-black dark:text-white' set:html={slashSvg}/>}
+</div>
 
 <style>
-	input:checked + label {
-		@apply border-green-500 dark:border-green-400;
+	.decoration-border.animation-rotate,
+	.element-top.animation-rotate :global(svg),
+	.element-bottom.animation-rotate :global(svg) {
+		border-color: transparent;
+		animation: rotate 7s linear infinite;
 	}
 
-	input:checked + label .checked {
-		@apply block;
-	}
-
-	.limited {
-		margin-left: -.5em;
-		margin-right: -.5em;
-	}
-
-	.limited span {
-		letter-spacing: .25em;
+	@keyframes rotate {
+		from { transform: rotate(0); }
+		to { transform: rotate(360deg); }
 	}
 </style>

@@ -1,0 +1,124 @@
+---
+/*
+ * Copyright (c) Cynthia Rey et al., All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+export const prerender = true
+
+import { getEntry } from 'astro:content'
+
+import { PronounSets } from '@pronoundb/pronouns/sets'
+import { formatPronounSet } from '@pronoundb/pronouns/formatter'
+
+import { handleFlash } from '@server/flash.js'
+import { providers } from '@server/oauth/providers.js'
+
+import Layout from '@layouts/Layout.astro'
+import PageHeader from '@components/PageHeader.astro'
+import Decoration from '@components/Decoration.astro'
+import DecorationElement from '@components/DecorationElement.astro'
+import Link from '@components/Link.astro'
+
+import sparklesSvg from '@assets/sparkles.svg?raw'
+import heartSvg from '@assets/2hearts.svg?raw'
+import githubSvg from 'simple-icons/icons/github.svg?raw'
+import kofiSvg from 'simple-icons/icons/kofi.svg?raw'
+
+const CATGIRL_DECORATION = await getEntry('decorations', 'catgirl_chief')
+const DECORATIONS = [
+	await getEntry('decorations', 'donator_blossom'),
+	await getEntry('decorations', 'donator_strawberry'),
+	await getEntry('decorations', 'donator_ribbon'),
+	await getEntry('decorations', 'donator_aurora'),
+	await getEntry('decorations', 'donator_warmth'),
+	await getEntry('decorations', 'donator_star'),
+]
+
+const flash = handleFlash(Astro)
+---
+<Layout flash={flash} title='Donators Decorations'>
+	<PageHeader>
+		<Fragment slot='namespace'>About PronounDB</Fragment>
+		<div class='flex items-center gap-2'>
+			<div class='h-5' set:html={sparklesSvg}/>
+			<span>Donating to PronounDB</span>
+		</div>
+	</PageHeader>
+
+	<div class='flex gap-8 justify-center items-center mt-6 mb-8'>
+		<div class='w-28 h-28 text-white dark:text-gray-800 shrink-0'>
+			<DecorationElement decoration={CATGIRL_DECORATION} background='url(https://cdn.cynthia.dev/avatars/avatar.128.webp)'/>
+		</div>
+		<div>
+			<p class='mb-2'>
+				Hey! I'm Cynthia, the developer of PronounDB. I make PronounDB on my spare free time, and have been
+				maintaining it since September 2020. While I'm super happy to make it and to help folks out there,
+				running PronounDB is not free and the servers unfortunately don't pay for themselves.
+			</p>
+			<p class='mb-2'>
+				You can help me out with that, by donating. Donations allow me to pay for servers, and to pay for the
+				hundreds of hours of work I put in making PronounDB. I've enjoyed every hour of it, but for the most
+				part this has been free work I don't get anything for in return.
+			</p>
+			<p>
+				Donations also go beyond PronounDB. I make a lot of <Link href='https://cynthia.dev'>other things</Link>
+				which you can also support by donating. 🥺
+			</p>
+		</div>
+	</div>
+
+	<div class='flex items-center gap-4 text-2xl font-bold mb-2'>
+		<div class='h-5' set:html={sparklesSvg}/>
+		<h2>Donators Decorations</h2>
+	</div>
+	<p class='mb-4'>
+		As a token of gratitude, donators get additional decorations they can use. There are 3 permanent donator
+		decorations, and 3 additional decorations people who donate monthly can use while they're subscribed.
+	</p>
+	<div class='grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 mb-8'>
+		{DECORATIONS.map((d) => <Decoration demo decoration={d}/>)}
+	</div>
+
+	<div class='flex items-center gap-4 text-2xl font-bold mb-2'>
+		<div class='h-5' set:html={heartSvg}/>
+		<h2>Donate</h2>
+	</div>
+	<p class='mb-4'>
+		You can donate either via GitHub Sponsors or via Ko-fi. Make sure when donating to let me know your PronounDB
+		ID, so I can grant you access to your fancy decorations.
+	</p>
+	<div class='flex items-center gap-4 mb-4'>
+		<a href='https://github.com/sponsors/cyyynthia' target='_blank' rel='noreferrer' class='inline-flex gap-4 items-center border-black dark:border-white font-semibold py-1 px-3 border rounded'>
+			<div class='h-5 fill-current' set:html={githubSvg}/>
+			<span>Donate via GitHub Sponsors</span>
+		</a>
+		<a href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer' class='inline-flex gap-4 items-center border-black dark:border-white font-semibold py-1 px-3 border rounded'>
+			<div class='h-5 fill-current' set:html={kofiSvg}/>
+			<span>Donate via Ko-fi</span>
+		</a>
+	</div>
+</Layout>
