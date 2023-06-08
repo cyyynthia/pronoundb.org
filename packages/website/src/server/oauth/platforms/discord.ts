@@ -37,6 +37,16 @@ export const authorizationUrl = 'https://discord.com/oauth2/authorize'
 export const tokenUrl = 'https://discord.com/api/v10/oauth2/token'
 export const scopes = [ 'identify' ]
 
+function formatName (globalName: string, username: string, discriminator?: string) {
+	const realUsername = !discriminator || discriminator === '0'
+		? username
+		: `${username}#${discriminator}`
+
+	return globalName
+		? `${globalName} (${realUsername})`
+		: realUsername
+}
+
 export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
 	const res = await fetch('https://discord.com/api/v10/users/@me', {
 		headers: {
@@ -48,5 +58,5 @@ export async function getSelf (token: string): Promise<ExternalAccount | FlashMe
 	if (!res.ok) return null
 	const data = await res.json()
 
-	return { id: data.id, name: `${data.username}#${data.discriminator}`, platform: 'discord' }
+	return { id: data.id, name: formatName(data.global_name, data.username, data.discriminator), platform: 'discord' }
 }
