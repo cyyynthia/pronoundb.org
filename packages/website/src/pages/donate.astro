@@ -31,11 +31,7 @@ export const prerender = true
 
 import { getEntry } from 'astro:content'
 
-import { PronounSets } from '@pronoundb/pronouns/sets'
-import { formatPronounSet } from '@pronoundb/pronouns/formatter'
-
 import { handleFlash } from '@server/flash.js'
-import { providers } from '@server/oauth/providers.js'
 
 import Layout from '@layouts/Layout.astro'
 import PageHeader from '@components/PageHeader.astro'
@@ -51,11 +47,11 @@ import kofiSvg from 'simple-icons/icons/kofi.svg?raw'
 const CATGIRL_DECORATION = await getEntry('decorations', 'catgirl_chief')
 const DECORATIONS = [
 	await getEntry('decorations', 'donator_blossom'),
-	await getEntry('decorations', 'donator_strawberry'),
 	await getEntry('decorations', 'donator_ribbon'),
+	await getEntry('decorations', 'donator_strawberry'),
 	await getEntry('decorations', 'donator_aurora'),
-	await getEntry('decorations', 'donator_warmth'),
 	await getEntry('decorations', 'donator_star'),
+	await getEntry('decorations', 'donator_warmth'),
 ]
 
 const flash = handleFlash(Astro)
@@ -69,8 +65,8 @@ const flash = handleFlash(Astro)
 		</div>
 	</PageHeader>
 
-	<div class='flex gap-8 justify-center items-center mt-6 mb-8'>
-		<div class='w-28 h-28 text-white dark:text-gray-800 shrink-0'>
+	<div class='flex flex-col sm:flex-row gap-x-8 gap-y-4 justify-center items-center mt-6 mb-8'>
+		<div class='w-32 h-32 text-white dark:text-gray-800 shrink-0'>
 			<DecorationElement decoration={CATGIRL_DECORATION} background='url(https://cdn.cynthia.dev/avatars/avatar.128.webp)'/>
 		</div>
 		<div>

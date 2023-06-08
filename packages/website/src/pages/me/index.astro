@@ -38,6 +38,7 @@ import PronounsSelector from '@components/PronounsSelector.astro'
 import DecorationSelector from '@components/DecorationSelector.astro'
 import Platform from '@components/Platform.astro'
 
+import sparklesSvg from '@assets/sparkles.svg?raw'
 import userPlusSvg from 'feather-icons/dist/icons/user-plus.svg?raw'
 import xSvg from 'feather-icons/dist/icons/x.svg?raw'
 import infoIcon from 'feather-icons/dist/icons/info.svg?raw'
@@ -49,6 +50,8 @@ const user = await authenticate(Astro)
 if (!user) return Astro.redirect('/login')
 
 const hasDecorations = user.availableDecorations.length || isUserPartOfExperiment(user, 'decorations')
+const isDonator = user.availableDecorations.find((d) => d.startsWith('donator_'))
+
 const flash = handleFlash(Astro)
 const csrf = createCsrf(Astro)
 ---
@@ -95,9 +98,18 @@ const csrf = createCsrf(Astro)
 			</p>
 			<DecorationSelector
 				selected={user.decoration}
-				exclusives={user.availableDecorations ?? []}
+				exclusives={user.availableDecorations}
 				csrf={csrf}
 			/>
+			{!isDonator && (
+				<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded border-amber-500 bg-amber-100 text-amber-700 dark:border-amber-200 dark:bg-yellow-800 dark:text-amber-200 mt-4 mb-8'>
+					<div class='w-6 h-6 shrink-0 ' set:html={sparklesSvg}/>
+					<p>
+						Psst! There's additional decorations you can get by becoming a donator!
+						<a href='/donate' class='underline'>Learn more</a>
+					</p>
+				</div>
+			)}
 		</>
 	)}
 

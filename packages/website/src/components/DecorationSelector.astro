@@ -70,10 +70,10 @@ const { csrf, exclusives, selected } = Astro.props
 const decorationsAll = await getCollection('decorations')
 
 const decorations = decorationsAll
-	// .filter((d) => !d.data.limited || exclusives.includes(d.id))
+	.filter((d) => !d.data.limited || exclusives.includes(d.id))
 	.sort(compareDecoration)
 ---
-<form class='mb-8' method='post' action='/me/update-decoration' data-decoration-picker-form>
+<form method='post' action='/me/update-decoration' data-decoration-picker-form>
 	<input type='hidden' name='csrfToken' value={csrf}/>
 
 	<div class='grid xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6'>
