@@ -96,13 +96,15 @@ const csrf = createCsrf(Astro)
 				only be seen by users of the extension. Other users can decide to disable the decorations feature on
 				their end, in their extension settings.
 			</p>
-			<DecorationSelector
-				selected={user.decoration}
-				exclusives={user.availableDecorations}
-				csrf={csrf}
-			/>
+			<div class='mb-4'>
+				<DecorationSelector
+					selected={user.decoration}
+					exclusives={user.availableDecorations}
+					csrf={csrf}
+				/>
+			</div>
 			{!isDonator && (
-				<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded border-amber-500 bg-amber-100 text-amber-700 dark:border-amber-200 dark:bg-yellow-800 dark:text-amber-200 mt-4 mb-8'>
+				<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded border-amber-500 bg-amber-100 text-amber-700 dark:border-amber-200 dark:bg-yellow-800 dark:text-amber-200 mb-8'>
 					<div class='w-6 h-6 shrink-0 ' set:html={sparklesSvg}/>
 					<p>
 						Psst! There's additional decorations you can get by becoming a donator!

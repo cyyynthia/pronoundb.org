@@ -42,7 +42,6 @@ import Link from '@components/Link.astro'
 import sparklesSvg from '@assets/sparkles.svg?raw'
 import heartSvg from '@assets/2hearts.svg?raw'
 import githubSvg from 'simple-icons/icons/github.svg?raw'
-import kofiSvg from 'simple-icons/icons/kofi.svg?raw'
 
 const CATGIRL_DECORATION = await getEntry('decorations', 'catgirl_chief')
 const DECORATIONS = [
@@ -56,13 +55,10 @@ const DECORATIONS = [
 
 const flash = handleFlash(Astro)
 ---
-<Layout flash={flash} title='Donators Decorations'>
+<Layout flash={flash} title='Donate'>
 	<PageHeader>
 		<Fragment slot='namespace'>About PronounDB</Fragment>
-		<div class='flex items-center gap-2'>
-			<div class='h-5' set:html={sparklesSvg}/>
-			<span>Donating to PronounDB</span>
-		</div>
+		<Fragment>Donating to PronounDB</Fragment>
 	</PageHeader>
 
 	<div class='flex flex-col sm:flex-row gap-x-8 gap-y-4 justify-center items-center mt-6 mb-8'>
@@ -104,17 +100,17 @@ const flash = handleFlash(Astro)
 		<h2>Donate</h2>
 	</div>
 	<p class='mb-4'>
-		You can donate either via GitHub Sponsors or via Ko-fi. Make sure when donating to let me know your PronounDB
-		ID, so I can grant you access to your fancy decorations.
+		You can donate via GitHub Sponsors only at this time (this will require a GitHub account). Make sure to have
+		your GitHub account linked to PronounDB, so I can give you access to the decorations.
+		<i>The process is not automated at this time, so it might get me a few hours or more to get them activated.</i>
 	</p>
 	<div class='flex items-center gap-4 mb-4'>
 		<a href='https://github.com/sponsors/cyyynthia' target='_blank' rel='noreferrer' class='inline-flex gap-4 items-center border-black dark:border-white font-semibold py-1 px-3 border rounded'>
 			<div class='h-5 fill-current' set:html={githubSvg}/>
 			<span>Donate via GitHub Sponsors</span>
 		</a>
-		<a href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer' class='inline-flex gap-4 items-center border-black dark:border-white font-semibold py-1 px-3 border rounded'>
-			<div class='h-5 fill-current' set:html={kofiSvg}/>
-			<span>Donate via Ko-fi</span>
-		</a>
 	</div>
+	<p>
+		I will look into providing other ways of donating that don't require an account in the future.
+	</p>
 </Layout>

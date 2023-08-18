@@ -39,13 +39,16 @@ test('Tweet show pronouns (full view)', async ({ page }) => {
 	await expect(page.locator('article').nth(0).locator('text=, 2022 >> xpath=../.. >> text=it/its')).toHaveCount(1)
 })
 
-test('Tweet show pronouns (inline view)', async ({ page }) => {
+// Mlon Eusk broke Twitter beyond repair - this cannot be tested anymore lol
+test.skip('Tweet show pronouns (inline view)', async ({ page }) => {
 	await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+	await page.pause()
 	await expect(page.locator('article:has-text("Meow!!!") >> [data-testid="User-Name"] >> text=it/its')).toHaveCount(1)
 })
 
 test('Quoted tweet show pronouns', async ({ page }) => {
-	await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+	// await page.goto('https://twitter.com/cyyynthia_/status/1519767535775846402')
+	await page.goto('https://twitter.com/cyyynthia_/status/1519775789075648513')
 	await expect(page.locator('text=Out of Context Cats@OocCats >> text=they/them')).toHaveCount(1)
 })
 
@@ -67,7 +70,8 @@ test('Hovercard shows pronouns', async ({ page }) => {
 test.describe('Implementation quirks', () => {
 	// Test is here because, internally, a retweet is considered posted by the "retweeter" rather than OP.
 	// Relevant issue: https://github.com/cyyynthia/pronoundb.org/issues/55
-	test('Retweets show pronouns of the poster (#55)', async ({ page }) => {
+	// -- Mlon Eusk broke Twitter beyond repair - this cannot be tested anymore lol
+	test.skip('Retweets show pronouns of the poster (#55)', async ({ page }) => {
 		await page.goto('https://twitter.com/cyyynthia_')
 		await page.locator('[data-testid="tweet"]').first().isVisible()
 
@@ -82,7 +86,8 @@ test.describe('Implementation quirks', () => {
 	})
 
 	// ref: https://twitter.com/LizzyReborn/status/1552472059095048192
-	test('Pronouns update when changing profile back and forth', async ({ page }) => {
+	// -- Mlon Eusk broke Twitter beyond repair - this cannot be tested anymore lol
+	test.skip('Pronouns update when changing profile back and forth', async ({ page }) => {
 		await page.goto('https://twitter.com/cyyynthia_')
 		await page.waitForLoadState('networkidle')
 		await expect(page.locator('[data-testid="UserProfileHeader_Items"] >> text=it/its')).toHaveCount(1)
