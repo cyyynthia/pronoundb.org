@@ -26,10 +26,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { UserData } from '@pronoundb/pronouns/sets'
+import type { UserData, Sets } from '@pronoundb/pronouns/sets'
 import type { Deferred } from './deferred'
+import { PronounSets } from '@pronoundb/pronouns/sets'
 import { createDeferred } from './deferred'
 import { LRUMap } from './lru/lru'
+
+function cleanPayload (payload: UserData) {
+	for (const locale in payload.sets) {
+		if (locale in payload.sets) {
+			if (!(locale in PronounSets)) {
+				delete payload.sets[locale]
+				continue
+			}
+
+			const setData = PronounSets[locale]
+			const filtered = payload.sets[locale].filter((p) => p in setData.sets)
+			if (!filtered.length) {
+				delete payload.sets[locale]
+				continue
+			}
+
+			payload.sets[locale] = filtered as Sets
+		}
+	}
+
+	return payload
+}
 
 async function doFetch (platform: string, queue: Map<string, Deferred<UserData | null>>) {
 	queue = new Map(queue) // clone the map
@@ -50,7 +73,7 @@ async function doFetch (platform: string, queue: Map<string, Deferred<UserData |
 	}
 
 	for (const [ k, deferred ] of queue.entries()) {
-		deferred.resolve(res.data[k])
+		deferred.resolve(cleanPayload(res.data[k]))
 	}
 }
 
