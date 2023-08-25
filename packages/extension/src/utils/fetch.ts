@@ -49,14 +49,12 @@ async function doFetch (platform: string, queue: Map<string, Deferred<UserData |
 		return
 	}
 
-	for (const k in res.data) {
-		if (k in res.data) {
-			queue.get(k)?.resolve(res.data[k])
-		}
+	for (const [ k, deferred ] of queue.entries()) {
+		deferred.resolve(res.data[k])
 	}
 }
 
-type State = { timer: NodeJS.Timer | null, queue: Map<string, Deferred<UserData | null>> }
+type State = { timer: NodeJS.Timeout | null, queue: Map<string, Deferred<UserData | null>> }
 const state: Record<string, State> = {}
 async function queueFetch (platform: string, id: string): Promise<UserData | null> {
 	if (!state[platform]) state[platform] = { timer: null, queue: new Map() }

@@ -116,6 +116,7 @@ export default function badge (data: UserData) {
 		fetchDecoration(data.decoration).then((d) => {
 			if (!d) return
 
+			const border = d.border(el)
 			const borderElement = h(
 				'div',
 				{ class: 'pronoundb-chat-badge-border-wrapper', style: BADGE_BORDER_WRAPPER },
@@ -124,7 +125,7 @@ export default function badge (data: UserData) {
 					{ class: 'pronoundb-chat-badge-border-container', style: BADGE_BORDER_CONTAINER },
 					h(
 						'div',
-						{ class: 'pronoundb-chat-badge-border', style: `${BADGE_BORDER_ELEMENT}background:${d.border}` }
+						{ class: 'pronoundb-chat-badge-border', style: `${BADGE_BORDER_ELEMENT}background:${border}` }
 					)
 				)
 			)

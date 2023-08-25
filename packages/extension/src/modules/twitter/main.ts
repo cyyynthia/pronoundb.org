@@ -33,12 +33,39 @@ import { fetchPronouns } from '../../utils/fetch'
 import { fetchReactProp } from '../../utils/proxy'
 import { h, css } from '../../utils/dom'
 
+import { decorateAvatar, clearAvatar } from './avatar'
+
 export const name = 'Twitter'
 export const color = '#1DA1F2'
 export const match = /^https:\/\/(.+\.)?twitter\.com/
 export { default as Icon } from 'simple-icons/icons/twitter.svg'
 
+import stylesheet from './style.css?raw'
+const styleElement = document.createElement('style')
+styleElement.appendChild(document.createTextNode(stylesheet))
+document.head.appendChild(styleElement)
+
+const usernameToIdCache = Object.create(null)
+
+function clearProfileHeader () {
+	document.querySelector('[data-testid="UserProfileHeader_Items"] [data-pronoundb]')?.remove()
+
+	const avatarContainer = document.querySelector<HTMLElement>('[data-testid="primaryColumn"] [data-testid^="UserAvatar-Container"]')
+	if (avatarContainer?.hasAttribute('style') === false) {
+		const decorated = avatarContainer.querySelector<HTMLElement>('.pronoundb-decorated')
+		if (decorated) clearAvatar(decorated)
+	}
+}
+
 async function injectProfileHeader (username?: string) {
+	// Remove stale info from the profile
+	clearProfileHeader()
+
+	// Mark avatar as handled
+	const avatar = document.querySelector<HTMLElement>('[data-testid^="UserAvatar-Container"] a')
+	if (avatar) avatar.dataset.pdbHandled = 'true'
+
+	// Process the header
 	let header: HTMLElement
 	if (username) {
 		let currentUsername
@@ -49,58 +76,101 @@ async function injectProfileHeader (username?: string) {
 			currentUsername = await fetchReactProp(header.parentElement!, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'screen_name' ])
 		} while (currentUsername !== username)
 	} else {
+		username = document.head.querySelector('meta[property="al:android:url"]')?.getAttribute('content')?.split('=')[1]
 		header = document.querySelector<HTMLElement>('[data-testid="UserProfileHeader_Items"]')!
 	}
 
-	const node = header.parentElement!
-	const id = await fetchReactProp(node, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'id_str' ])
+	let id: string
+
+	// Use a cache to avoid round-trips to the webpage context
+	if (username && username in usernameToIdCache) {
+		id = usernameToIdCache[username]
+	} else {
+		const node = header.parentElement!
+		id = await fetchReactProp(node, [ { $find: 'user', $in: [ 'return', 'memoizedProps' ] }, 'user', 'id_str' ])
+		if (username && id) usernameToIdCache[username] = id
+	}
+
 	if (!id) return
 
 	const pronouns = await fetchPronouns('twitter', id)
-	if (!pronouns || !pronouns.sets.en) return
+	if (!pronouns) return
 
-	const prevPronouns = header.querySelector<HTMLElement>('[data-pronoundb]')
-	if (prevPronouns) {
-		prevPronouns.replaceChild(document.createTextNode(formatPronouns(pronouns.sets.en)), prevPronouns.childNodes[1])
-		return
+	if (pronouns.sets.en) {
+		const prevPronouns = header.querySelector<HTMLElement>('[data-pronoundb]')
+		if (prevPronouns) {
+			prevPronouns.replaceChild(document.createTextNode(formatPronouns(pronouns.sets.en)), prevPronouns.childNodes[1])
+			return
+		}
+
+		const template = header.children[header.children.length - 1]
+		header.appendChild(
+			h(
+				'span',
+				{ class: template.className, 'data-pronoundb': 'true' },
+				topics({ class: template.children[0].getAttribute('class')! }),
+				formatPronouns(pronouns.sets.en)
+			)
+		)
 	}
 
-	const template = header.children[header.children.length - 1]
-	header.appendChild(
-		h(
-			'span',
-			{ class: template.className, 'data-pronoundb': 'true' },
-			topics({ class: template.children[0].getAttribute('class')! }),
-			formatPronouns(pronouns.sets.en)
-		)
-	)
+	if (avatar && pronouns.decoration) {
+		decorateAvatar(avatar, pronouns.decoration, 'profile')
+	}
 }
 
 async function injectTweet (tweet: HTMLElement) {
-	const directId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ])
-	const retweetId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
+	// Immediately mark the underlying image as handled; we'll handle it here to avoid doing a double ID lookup
+	let imgWrapper = tweet.querySelector<HTMLElement>('[data-testid="Tweet-User-Avatar"] :is(a, div[role=presentation])')
+	if (imgWrapper) imgWrapper.dataset.pdbHandled = 'true'
 
-	const pronouns = await fetchPronouns('twitter', retweetId || directId)
-	if (!pronouns || !pronouns.sets.en) return
+	// Now process the tweet
+	let id: string
+	// Use a cache to avoid round-trips to the webpage context
+	const username = tweet.querySelector<HTMLElement>('[data-testid="User-Name"] a > div > span')?.innerText.slice(1)
+	if (username && username in usernameToIdCache) {
+		id = usernameToIdCache[username]
+	} else {
+		const directId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ])
+		const retweetId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
+		id = retweetId || directId
+		if (username && id) usernameToIdCache[username] = id
+	}
 
-	const dateContainer = tweet.querySelector(tweet.dataset.testid === 'tweet' ? 'a time' : 'time')?.parentElement
-	const parentContainer = dateContainer?.parentElement
-	if (!dateContainer || !parentContainer) return
+	if (!id) return
 
-	const containerClass = dateContainer.className
-	parentContainer.querySelector('.pronoundb-container')?.remove()
-	parentContainer.appendChild(
-		h(
-			'div',
-			{ class: `${containerClass} pronoundb-container` },
-			h('span', { class: 'pronoundb-void' }, '​'),
-			h('span', { class: 'pronoundb-separator' }, '·'),
-			h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns.sets.en))
+	const pronouns = await fetchPronouns('twitter', id)
+	if (!pronouns) return
+
+	if (pronouns.sets.en) {
+		const dateContainer = tweet.querySelector(tweet.dataset.testid === 'tweet' ? 'a time' : 'time')?.parentElement
+		const parentContainer = dateContainer?.parentElement
+		if (!dateContainer || !parentContainer) return
+
+		const containerClass = dateContainer.className
+		parentContainer.querySelector('.pronoundb-container')?.remove()
+		parentContainer.appendChild(
+			h(
+				'div',
+				{ class: `${containerClass} pronoundb-container` },
+				h('span', { class: 'pronoundb-void' }, '​'),
+				h('span', { class: 'pronoundb-separator' }, '·'),
+				h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns.sets.en))
+			)
 		)
-	)
+	}
+
+	// Now, handle the decoration
+	if (imgWrapper && imgWrapper.tagName === 'A' && pronouns.decoration) {
+		decorateAvatar(imgWrapper, pronouns.decoration, 'tweet')
+	}
 }
 
 async function injectProfilePopOut (popout: HTMLElement) {
+	// Mark avatar as handled
+	const avatar = document.querySelector<HTMLElement>('[data-testid^="UserAvatar-Container"] a')
+	if (avatar) avatar.dataset.pdbHandled = 'true'
+
 	const userInfo = popout.querySelector('a + div')?.parentElement
 	const template = userInfo?.querySelector<HTMLElement>('a[tabindex="-1"] [dir=ltr]')
 	if (!template || !userInfo) return
@@ -109,39 +179,79 @@ async function injectProfilePopOut (popout: HTMLElement) {
 	if (!id) return
 
 	const pronouns = await fetchPronouns('twitter', id)
-	if (!pronouns || !pronouns.sets.en) return
+	if (!pronouns) return
 
-	const childClass = template.children[0].className
-	const parentClass = template.className
-	const element = h(
-		'span',
-		{ class: parentClass, 'data-pronoundb': 'true' },
-		h(
+	if (pronouns.sets.en) {
+		const childClass = template.children[0].className
+		const parentClass = template.className
+		const element = h(
 			'span',
-			{
-				class: childClass,
-				style: css({
-					display: 'flex',
-					alignItems: 'center',
-					marginRight: '4px',
+			{ class: parentClass, 'data-pronoundb': 'true' },
+			h(
+				'span',
+				{
+					class: childClass,
+					style: css({
+						display: 'flex',
+						alignItems: 'center',
+						marginRight: '4px',
+					}),
+				},
+				topics({
+					style: css({
+						color: 'inherit',
+						fill: 'currentColor',
+						width: '1.1em',
+						height: '1.1em',
+						marginRight: '4px',
+					}),
 				}),
-			},
-			topics({
-				style: css({
-					color: 'inherit',
-					fill: 'currentColor',
-					width: '1.1em',
-					height: '1.1em',
-					marginRight: '4px',
-				}),
-			}),
-			formatPronouns(pronouns.sets.en)
+				formatPronouns(pronouns.sets.en)
+			)
 		)
-	)
 
-	const prevPronouns = popout.querySelector('[data-pronoundb]')
-	if (prevPronouns) prevPronouns.remove()
-	userInfo.appendChild(element)
+		const prevPronouns = popout.querySelector('[data-pronoundb]')
+		if (prevPronouns) prevPronouns.remove()
+		userInfo.appendChild(element)
+	}
+
+	if (avatar && pronouns.decoration) {
+		decorateAvatar(avatar, pronouns.decoration, 'popout')
+	}
+}
+
+async function injectAvatarDecoration (img: HTMLElement) {
+	const wrapper = img.parentElement?.parentElement?.parentElement?.parentElement?.parentElement
+	if (!wrapper || wrapper.dataset.pdbHandled === 'true') return
+
+	let id: string
+	if (wrapper.tagName === 'DIV') {
+		// Self user account
+		id = await fetchReactProp(wrapper, [ { $find: 'currentUser', $in: [ 'return', 'memoizedProps' ] }, 'currentUser', 'id_str' ])
+	} else {
+		// Classic flow with cache possibility
+		const username = wrapper.getAttribute('href')?.split('/')[1]
+		if (username && username in usernameToIdCache) {
+			id = usernameToIdCache[username]
+		} else {
+			id = await fetchReactProp(wrapper, [ { $find: 'userId', $in: [ 'return', 'memoizedProps' ] }, 'userId' ])
+			if (username && id) usernameToIdCache[username] = id
+		}
+	}
+
+	if (!id) return
+
+	const pronouns = await fetchPronouns('twitter', id)
+	if (!pronouns) return
+
+	if (pronouns.decoration) {
+		decorateAvatar(wrapper, pronouns.decoration)
+	}
+}
+
+function handleLayoutRepaint () {
+	const header = document.querySelector('[data-testid="UserProfileHeader_Items"]')
+	if (header) injectProfileHeader()
 }
 
 function handleMutation (nodes: MutationRecord[]) {
@@ -151,9 +261,15 @@ function handleMutation (nodes: MutationRecord[]) {
 	for (const { addedNodes } of nodes) {
 		for (const added of addedNodes) {
 			if (added instanceof HTMLElement) {
-				if (added.tagName === 'META' && added.getAttribute('property') === 'al:android:url' && added.getAttribute('content')?.startsWith('twitter://user?')) {
-					const prevPronouns = document.querySelector('[data-testid="UserProfileHeader_Items"] [data-pronoundb]')
-					if (prevPronouns) prevPronouns.remove()
+				if (added.parentElement?.parentElement?.tagName === 'MAIN') {
+					handleLayoutRepaint()
+				}
+
+				if (
+					added.tagName === 'META'
+					&& added.getAttribute('property') === 'al:android:url'
+					&& added.getAttribute('content')?.startsWith('twitter://user?')
+				) {
 					injectProfileHeader(added.getAttribute('content')?.split('=')[1])
 					continue
 				}
@@ -187,14 +303,19 @@ function handleMutation (nodes: MutationRecord[]) {
 					if (link) injectProfilePopOut(link.parentElement!.parentElement!.parentElement!.parentElement!)
 					continue
 				}
+
+				// Decorations
+				if (added.tagName === 'IMG' && added.getAttribute('src')?.includes('/profile_images/')) {
+					injectAvatarDecoration(added)
+					continue
+				}
 			}
 		}
 	}
 }
 
 export function inject () {
-	const header = document.querySelector('[data-testid="UserProfileHeader_Items"]')
-	if (header) injectProfileHeader()
+	handleLayoutRepaint()
 
 	const observer = new MutationObserver(handleMutation)
 	observer.observe(document, { childList: true, subtree: true })
