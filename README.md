@@ -1,6 +1,4 @@
 # PronounDB
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/G2G71TSDF)
-
 [![License](https://img.shields.io/github/license/cyyynthia/pronoundb.org.svg?style=flat-square)](https://github.com/cyyynthia/pronoundb.org/blob/mistress/LICENSE)
 [![Chat on Discord](https://img.shields.io/badge/chat-on%20discord-5865F2?style=flat-square)](https://discord.gg/VnxPeNHHpG)<br/>
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/nblkbiljcjfemkfjnhoobnojjgjdmknf?logo=google-chrome&logoColor=white&style=flat-square)](https://chrome.google.com/webstore/detail/pronoundb/nblkbiljcjfemkfjnhoobnojjgjdmknf)

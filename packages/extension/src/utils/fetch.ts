@@ -33,6 +33,8 @@ import { createDeferred } from './deferred'
 import { LRUMap } from './lru/lru'
 
 function cleanPayload (payload: UserData) {
+	if (!payload || !payload.sets) return payload
+
 	for (const locale in payload.sets) {
 		if (locale in payload.sets) {
 			if (!(locale in PronounSets)) {

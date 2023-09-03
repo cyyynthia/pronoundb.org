@@ -49,7 +49,7 @@ const platforms = import.meta.glob<Platform>('../../components/platforms/*.ts', 
 const user = await authenticate(Astro)
 if (!user) return Astro.redirect('/login')
 
-const hasDecorations = user.availableDecorations.length || isUserPartOfExperiment(user, 'decorations')
+const showDonationCta = isUserPartOfExperiment(user, 'decorations_donation_cta')
 const isDonator = user.availableDecorations.find((d) => d.startsWith('donator_'))
 
 const flash = handleFlash(Astro)
@@ -80,39 +80,35 @@ const csrf = createCsrf(Astro)
 	</p>
 	<PronounsSelector sets={user.sets.en} locale='en' csrf={csrf}/>
 
-	{hasDecorations && (
-		<>
-			<h2 class='text-xl font-bold mb-2 flex gap-4 items-center'>
-				<span>Decoration</span>
-				<span class='bg-blue-300 text-black font-bold text-sm rounded-xl px-2'>BETA</span>
-			</h2>
-			<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
-				<div class='w-6 h-6 shrink-0' set:html={infoIcon}/>
-				<p>For the time being, decorations only appear on pronouns badges in Twitch chat. They're shown to everyone, but only a subset of users can pick theirs. Lucky you!</p>
-			</div>
-			<p class='mb-2'>
-				Decorations are a way to make your profile cuter. It adds a colored border and decorative elements to
-				your profile picture (and in some cases, on your pronouns), on compatible websites. The decoration can
-				only be seen by users of the extension. Other users can decide to disable the decorations feature on
-				their end, in their extension settings.
+	<h2 class='text-xl font-bold mb-2 flex gap-4 items-center'>
+		<span>Decoration</span>
+		<span class='bg-blue-300 text-black font-bold text-sm rounded-xl px-2'>BETA</span>
+	</h2>
+	<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
+		<div class='w-6 h-6 shrink-0' set:html={infoIcon}/>
+		<p>For the time being, decorations only appear on pronouns badges in Twitch chat, and on Twitter.</p>
+	</div>
+	<p class='mb-2'>
+		Decorations are a way to make your profile cuter. It adds a colored border and decorative elements to
+		your profile picture (and in some cases, on your pronouns), on compatible websites. The decoration can
+		only be seen by users of the extension. Other users can decide to disable the decorations feature on
+		their end, in their extension settings.
+	</p>
+	<div class='mb-4'>
+		<DecorationSelector
+			selected={user.decoration}
+			exclusives={user.availableDecorations}
+			csrf={csrf}
+		/>
+	</div>
+	{showDonationCta && !isDonator && (
+		<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded border-amber-500 bg-amber-100 text-amber-700 dark:border-amber-200 dark:bg-yellow-800 dark:text-amber-200 mb-8'>
+			<div class='w-6 h-6 shrink-0 ' set:html={sparklesSvg}/>
+			<p>
+				Psst! There's additional decorations you can get by becoming a donator!
+				<a href='/donate' class='underline'>Learn more</a>
 			</p>
-			<div class='mb-4'>
-				<DecorationSelector
-					selected={user.decoration}
-					exclusives={user.availableDecorations}
-					csrf={csrf}
-				/>
-			</div>
-			{!isDonator && (
-				<div class='flex flex-none gap-4 items-center mb-2 px-4 py-2 font-semibold border rounded border-amber-500 bg-amber-100 text-amber-700 dark:border-amber-200 dark:bg-yellow-800 dark:text-amber-200 mb-8'>
-					<div class='w-6 h-6 shrink-0 ' set:html={sparklesSvg}/>
-					<p>
-						Psst! There's additional decorations you can get by becoming a donator!
-						<a href='/donate' class='underline'>Learn more</a>
-					</p>
-				</div>
-			)}
-		</>
+		</div>
 	)}
 
 	<h2 class='text-xl font-bold mb-2'>Linked accounts</h2>

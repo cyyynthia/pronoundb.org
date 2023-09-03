@@ -28,7 +28,6 @@
 
 import type { APIContext } from 'astro'
 import { getCollection } from 'astro:content'
-import { isUserPartOfExperiment } from '@server/experiment.js'
 import { authenticate, validateCsrf } from '@server/auth.js'
 import { updateDecoration } from '@server/database/account.js'
 import { setFlash } from '@server/flash.js'
@@ -38,12 +37,6 @@ const decorations = await getCollection('decorations')
 export async function post (ctx: APIContext) {
 	const user = await authenticate(ctx)
 	if (!user) return new Response('401: Unauthorized', { status: 401 })
-
-	const hasDecorations = user.availableDecorations.length || isUserPartOfExperiment(user, 'decorations')
-	if (!hasDecorations) {
-		setFlash(ctx, 'E_EXPERIMENT_NOT_IN_BUCKET')
-		return ctx.redirect('/me')
-	}
 
 	const body = await ctx.request.formData().catch(() => null)
 	const csrfToken = body?.get('csrfToken')

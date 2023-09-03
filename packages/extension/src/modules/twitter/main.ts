@@ -122,7 +122,7 @@ async function injectProfileHeader (username?: string) {
 async function injectTweet (tweet: HTMLElement) {
 	// Immediately mark the underlying image as handled; we'll handle it here to avoid doing a double ID lookup
 	let imgWrapper = tweet.querySelector<HTMLElement>('[data-testid="Tweet-User-Avatar"] :is(a, div[role=presentation])')
-	if (imgWrapper) imgWrapper.dataset.pdbHandled = 'true'
+	// if (imgWrapper) imgWrapper.dataset.pdbHandled = 'true'
 
 	// Now process the tweet
 	let id: string
@@ -134,6 +134,7 @@ async function injectTweet (tweet: HTMLElement) {
 		const directId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'user', 'id_str' ])
 		const retweetId = await fetchReactProp(tweet, [ { $find: 'tweet', $in: [ 'return', 'memoizedProps' ] }, 'tweet', 'retweeted_status', 'user', 'id_str' ])
 		id = retweetId || directId
+
 		if (username && id) usernameToIdCache[username] = id
 	}
 
@@ -162,7 +163,7 @@ async function injectTweet (tweet: HTMLElement) {
 
 	// Now, handle the decoration
 	if (imgWrapper && imgWrapper.tagName === 'A' && pronouns.decoration) {
-		decorateAvatar(imgWrapper, pronouns.decoration, 'tweet')
+		// decorateAvatar(imgWrapper, pronouns.decoration, 'tweet')
 	}
 }
 
@@ -226,6 +227,8 @@ async function injectAvatarDecoration (img: HTMLElement) {
 
 	let id: string
 	if (wrapper.tagName === 'DIV') {
+		if (!document.querySelector('header')?.contains(wrapper)) return
+
 		// Self user account
 		id = await fetchReactProp(wrapper, [ { $find: 'currentUser', $in: [ 'return', 'memoizedProps' ] }, 'currentUser', 'id_str' ])
 	} else {
