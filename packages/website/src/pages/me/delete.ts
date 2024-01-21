@@ -45,7 +45,7 @@ export async function post (ctx: APIContext) {
 	}
 
 	DeletedAccountCount.inc()
-	deleteAccount(user._id)
+	await deleteAccount(user._id)
 	ctx.cookies.delete('token')
 	setFlash(ctx, 'S_ACC_DELETED')
 	return ctx.redirect('/')

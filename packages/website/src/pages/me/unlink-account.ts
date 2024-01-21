@@ -56,7 +56,7 @@ export async function post (ctx: APIContext) {
 	}
 
 	LinkedAccountsRemovalCount.inc({ platform: platform })
-	removeLinkedAccount(user._id, platform, id)
+	await removeLinkedAccount(user._id, platform, id)
 	return ctx.redirect('/me')
 }
 
