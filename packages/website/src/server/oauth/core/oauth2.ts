@@ -84,8 +84,8 @@ export async function authorize ({ url, params, cookies, redirect, site }: APICo
 }
 
 export async function callback ({ url, params, cookies, site }: APIContext, oauth: OAuth2Params) {
-	const stateCookie = cookies.get('state').value
-	const intentCookie = cookies.get('intent').value
+	const stateCookie = cookies.get('state')?.value
+	const intentCookie = cookies.get('intent')?.value
 	const state = url.searchParams.get('state')
 	const code = url.searchParams.get('code')
 

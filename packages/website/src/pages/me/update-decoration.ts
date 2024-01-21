@@ -34,7 +34,7 @@ import { setFlash } from '@server/flash.js'
 
 const decorations = await getCollection('decorations')
 
-export async function post (ctx: APIContext) {
+export async function POST (ctx: APIContext) {
 	const user = await authenticate(ctx)
 	if (!user) return new Response('401: Unauthorized', { status: 401 })
 
@@ -69,6 +69,6 @@ export async function post (ctx: APIContext) {
 	return ctx.redirect('/me')
 }
 
-export function all () {
+export function ALL () {
 	return new Response('405: Method not allowed', { status: 405 })
 }

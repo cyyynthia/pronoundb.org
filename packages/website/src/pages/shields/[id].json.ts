@@ -31,7 +31,7 @@ import { ObjectId } from 'mongodb'
 import { formatPronouns } from '@pronoundb/pronouns/formatter'
 import { findById } from '@server/database/account.js'
 
-export async function get ({ url, params }: APIContext) {
+export async function GET ({ url, params }: APIContext) {
 	if (!params.id || !ObjectId.isValid(params.id)) {
 		return new Response('400: Bad request', { status: 400 })
 	}
@@ -42,26 +42,26 @@ export async function get ({ url, params }: APIContext) {
 	const sets = user?.sets[locale]
 
 	if (!sets) {
-		return {
-			body: JSON.stringify({
+		return new Response(
+			JSON.stringify({
 				schemaVersion: 1,
 				label: 'error',
 				message: 'not found',
 				isError: true,
-			}),
-		}
+			})
+		)
 	}
 
 	const capitalize = url.searchParams.has('capitalize')
-	return {
-		body: JSON.stringify({
+	return new Response(
+		JSON.stringify({
 			schemaVersion: 1,
 			label: capitalize ? 'Pronouns' : 'pronouns',
 			message: formatPronouns(sets, capitalize, locale),
 		}),
-	}
+	)
 }
 
-export function all () {
+export function ALL () {
 	return new Response('405: Method not allowed', { status: 405 })
 }

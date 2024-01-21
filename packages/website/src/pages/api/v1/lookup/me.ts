@@ -54,7 +54,7 @@ function getCorsHeaders (request: APIContext['request']) {
 		}
 }
 
-export async function get (ctx: APIContext) {
+export async function GET (ctx: APIContext) {
 	ApiCallVersionCounter.inc({ version: 1 })
 
 	const user = await authenticate(ctx, true)
@@ -67,13 +67,13 @@ export async function get (ctx: APIContext) {
 	})
 }
 
-export function options ({ request }: APIContext) {
+export function OPTIONS ({ request }: APIContext) {
 	return new Response(null, {
 		status: 204,
 		headers: getCorsHeaders(request),
 	})
 }
 
-export function all () {
+export function ALL () {
 	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }

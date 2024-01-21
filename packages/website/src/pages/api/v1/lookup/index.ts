@@ -40,7 +40,7 @@ const providers = [
 	'twitter',
 ]
 
-export async function get (ctx: APIContext) {
+export async function GET (ctx: APIContext) {
 	ApiCallVersionCounter.inc({ version: 1 })
 
 	const platform = ctx.url.searchParams.get('platform')
@@ -90,7 +90,7 @@ export async function get (ctx: APIContext) {
 	})
 }
 
-export function options () {
+export function OPTIONS () {
 	return new Response(null, {
 		status: 204,
 		headers: {
@@ -103,6 +103,6 @@ export function options () {
 	})
 }
 
-export function all () {
+export function ALL () {
 	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }

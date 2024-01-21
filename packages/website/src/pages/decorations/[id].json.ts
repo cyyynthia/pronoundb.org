@@ -56,7 +56,7 @@ export async function getStaticPaths () {
 	return decorations.map((d) => ({ params: { id: d.id } }))
 }
 
-export async function get ({ params: { id } }: APIContext) {
+export async function GET ({ params: { id } }: APIContext) {
 	if (!id) throw new Error('An ID is required!')
 
 	const decorationEntry = await getEntry('decorations', id)
@@ -64,8 +64,8 @@ export async function get ({ params: { id } }: APIContext) {
 
 	const decoration = decorationEntry.data
 
-	return {
-		body: JSON.stringify({
+	return new Response(
+		JSON.stringify({
 			version: decoration.version,
 			limited: decoration.limited,
 			collection: decoration.collection,
@@ -76,6 +76,6 @@ export async function get ({ params: { id } }: APIContext) {
 				bottom_right: decoration.elements.bottom_right && await loadSvg(decoration.elements.bottom_right),
 			},
 			animation: decoration.animation,
-		}),
-	}
+		})
+	)
 }

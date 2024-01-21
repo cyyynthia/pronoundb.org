@@ -30,7 +30,7 @@ import type { APIContext } from 'astro'
 import { validateCsrf } from '@server/auth.js'
 import { setFlash } from '@server/flash.js'
 
-export async function post (ctx: APIContext) {
+export async function POST (ctx: APIContext) {
 	const body = await ctx.request.formData().catch(() => null)
 	const csrfToken = body?.get('csrfToken')
 	if (typeof csrfToken !== 'string' || !validateCsrf(ctx, csrfToken)) {
@@ -42,6 +42,6 @@ export async function post (ctx: APIContext) {
 	return ctx.redirect('/')
 }
 
-export function all () {
+export function ALL () {
 	return new Response('405: Method not allowed', { status: 405 })
 }

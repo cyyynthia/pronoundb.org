@@ -75,16 +75,14 @@ export async function findById (id: ObjectId) {
 
 export async function findByExternalAccount (external: ExternalAccount) {
 	// Find and also update account's display name in one go
-	// This isn't efficient as it requires a write lock every time but I frankly do not care
+	// This isn't efficient as it requires a write lock every time, but I frankly do not care
 	// Future Cynthia, if you're mad know you were already mad at this back when you wrote it you dumbcat
 	// -- Cynthia
-	const result = await collection.findOneAndUpdate(
+	return collection.findOneAndUpdate(
 		{ 'accounts.id': external.id, 'accounts.platform': external.platform },
 		{ $set: { 'accounts.$[account].name': external.name } },
 		{ arrayFilters: [ { 'account.platform': external.platform, 'account.id': external.id } ] }
 	)
-
-	return result.value
 }
 
 export function findPronounsOf (platform: string, externalIds: string[]) {

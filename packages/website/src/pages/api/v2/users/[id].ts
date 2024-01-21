@@ -32,7 +32,7 @@ import { ObjectId } from 'mongodb'
 import { ApiCallVersionCounter } from '@server/metrics.js'
 import { findById } from '@server/database/account.js'
 
-export async function get (ctx: APIContext) {
+export async function GET (ctx: APIContext) {
 	ApiCallVersionCounter.inc({ version: 2 })
 
 	if (!ctx.params.id || !ObjectId.isValid(ctx.params.id)) {
@@ -86,7 +86,7 @@ export async function get (ctx: APIContext) {
 	})
 }
 
-export function options () {
+export function OPTIONS () {
 	return new Response(null, {
 		status: 204,
 		headers: {
@@ -98,6 +98,6 @@ export function options () {
 	})
 }
 
-export function all () {
+export function ALL () {
 	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
 }

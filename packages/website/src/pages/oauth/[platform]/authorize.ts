@@ -36,11 +36,11 @@ type Params = OAuth1Params | OAuth2Params
 const INTENTS = [ 'register', 'login', 'link' ]
 const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
 
-export async function get (ctx: APIContext) {
+export async function GET (ctx: APIContext) {
 	const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`] as Params
 	if (!platform) return new Response('400: Invalid provider', { status: 400 })
 
-	const token = ctx.cookies.get('token').value
+	const token = ctx.cookies.get('token')?.value
 	const intent = ctx.url.searchParams.get('intent') ?? 'login'
 	const user = token ? await authenticate(ctx) : null
 
@@ -58,8 +58,12 @@ export async function get (ctx: APIContext) {
 
 	switch (platform.oauthVersion) {
 		case 1:
-			return authorize1(ctx, platform) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
+			return (await authorize1(ctx, platform)) ?? ctx.redirect(intent === 'link' ? '/me' : '/')
 		case 2:
 			return authorize2(ctx, platform)
 	}
+}
+
+export function ALL () {
+	return new Response('405: Method not allowed', { status: 405 })
 }

@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// This will not be changed to "X"
+// What a stupid name I stg
 export const name = 'Twitter'
 export const color = '#1DA1F2'
-export { default as icon } from 'simple-icons/icons/twitter.svg?raw'
+export { default as icon } from '@assets/twitter.svg?raw'

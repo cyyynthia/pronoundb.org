@@ -30,12 +30,12 @@ import type { APIContext } from 'astro'
 
 // Deprecated; will probably follow the same deprecation & removal schedule than APIv1
 // see https://github.com/cyyynthia/pronoundb.org/issues/68
-export async function get ({ url, redirect }: APIContext) {
+export async function GET ({ url, redirect }: APIContext) {
 	const target = new URL(url)
 	target.pathname += '.json'
 	return redirect(target.href)
 }
 
-export function all () {
+export function ALL () {
 	return new Response('405: Method not allowed', { status: 405 })
 }

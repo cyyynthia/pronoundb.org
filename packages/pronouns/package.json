@@ -12,11 +12,11 @@
 		"lint": "eslint --ext ts src"
 	},
 	"devDependencies": {
-		"@types/node": "^20.5.0",
-		"@typescript-eslint/eslint-plugin": "^6.4.0",
-		"@typescript-eslint/parser": "^6.4.0",
-		"eslint": "^8.47.0",
-		"typescript": "^5.1.6"
+		"@types/node": "^20.11.5",
+		"@typescript-eslint/eslint-plugin": "^6.19.0",
+		"@typescript-eslint/parser": "^6.19.0",
+		"eslint": "^8.56.0",
+		"typescript": "^5.3.3"
 	},
 	"exports": {
 		"./sets": {

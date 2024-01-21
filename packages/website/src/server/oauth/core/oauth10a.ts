@@ -157,8 +157,8 @@ export async function authorize (ctx: APIContext, oauth: OAuth1Params) {
 }
 
 export async function callback ({ url, params, cookies }: APIContext, oauth: OAuth1Params) {
-	const nonceCookie = cookies.get('nonce').value
-	const intentCookie = cookies.get('intent').value
+	const nonceCookie = cookies.get('nonce')?.value
+	const intentCookie = cookies.get('intent')?.value
 	const token = url.searchParams.get('oauth_token')
 	const verifier = url.searchParams.get('oauth_verifier')
 

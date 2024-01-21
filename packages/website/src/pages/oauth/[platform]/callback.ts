@@ -39,12 +39,12 @@ type Params = OAuth1Params | OAuth2Params
 const INTENTS = [ 'register', 'login', 'link' ]
 const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts', { eager: true })
 
-export async function get (ctx: APIContext) {
+export async function GET (ctx: APIContext) {
 	const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`] as Params
 	if (!platform) return new Response('400: Invalid provider', { status: 400 })
 
-	const token = ctx.cookies.get('token').value
-	const intent = ctx.cookies.get('intent').value ?? 'login'
+	const token = ctx.cookies.get('token')?.value
+	const intent = ctx.cookies.get('intent')?.value ?? 'login'
 	const user = token ? await authenticate(ctx) : null
 
 	if ((intent === 'register' || intent === 'login') && user) {
@@ -107,4 +107,8 @@ export async function get (ctx: APIContext) {
 	ctx.cookies.set('token', authToken, { path: '/', maxAge: 365 * 24 * 3600, httpOnly: true, secure: import.meta.env.PROD })
 	if (intent === 'register') setFlash(ctx, 'S_REGISTERED')
 	return ctx.redirect('/me')
+}
+
+export function ALL () {
+	return new Response('405: Method not allowed', { status: 405 })
 }
