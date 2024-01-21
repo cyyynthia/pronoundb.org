@@ -36,7 +36,7 @@ import node from '@astrojs/node'
 
 export default defineConfig({
 	site: process.env.NODE_ENV === 'development'
-		? 'http://localhost:3000/'
+		? 'http://localhost:4321/'
 		: 'https://pronoundb.org/',
 	output: 'server',
 	integrations: [ tailwind() ],

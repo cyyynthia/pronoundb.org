@@ -32,4 +32,4 @@ export const name = 'Modrinth'
 export const color = '#30B27B'
 export const icon = modrinth.replace(/<!--(.|\n)*-->/, '')
 
-export const via = 'GitHub'
+export const supported = false

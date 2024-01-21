@@ -26,7 +26,29 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-const providersGlob = import.meta.glob<any>('./platforms/*.ts', { eager: true })
-export const providers = Object.entries(providersGlob)
-	.filter(([ , v ]) => !v.disabled)
-	.map(([ k ]) => k.slice(12, -3))
+import type { ExternalAccount } from '../../database/account.js'
+import type { FlashMessage } from '../../flash.js'
+
+export const disabled = true // https://github.com/modrinth/labrinth/issues/868
+
+export const oauthVersion = 2
+export const clientId = import.meta.env.OAUTH_MODRINTH_CLIENT
+export const clientSecret = import.meta.env.OAUTH_MODRINTH_SECRET
+
+export const authorizationUrl = 'https://modrinth.com/auth/authorize'
+export const tokenUrl = 'https://api.modrinth.com/_internal/oauth/token'
+export const scopes = [ 'USER_READ' ]
+
+export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
+	const res = await fetch('https://api.modrinth.com/v2/user', {
+		headers: {
+			authorization: `Bearer ${token}`,
+			'user-agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+		},
+	})
+
+	if (!res.ok) return null
+	const { data } = await res.json()
+
+	return { id: data.id, name: `${data.name} (@${data.username})`, platform: 'modrinth' }
+}

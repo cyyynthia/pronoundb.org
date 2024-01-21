@@ -62,7 +62,7 @@ export function generateToken (payload: JwtPayload): string {
 }
 
 export function hasValidToken ({ cookies }: APIContext) {
-	let token = cookies.get('token').value
+	let token = cookies.get('token')?.value
 	if (!token) return false
 
 	try {
@@ -74,7 +74,7 @@ export function hasValidToken ({ cookies }: APIContext) {
 }
 
 export async function authenticate ({ cookies }: APIContext, lax?: boolean) {
-	let token = cookies.get('token').value
+	let token = cookies.get('token')?.value
 	if (!token) return null
 
 	const verifier = lax ? verifierLax : verifierStrict
@@ -90,7 +90,7 @@ export async function authenticate ({ cookies }: APIContext, lax?: boolean) {
 
 const csrfStore = new Map<string, Buffer>()
 export function createCsrf ({ cookies }: APIContext): string {
-	const token = cookies.get('token').value
+	const token = cookies.get('token')?.value
 	if (!token) throw new Error('Cannot generate CSRF tokens for unauthenticated requests.')
 
 	const stored = csrfStore.get(token)
@@ -103,7 +103,7 @@ export function createCsrf ({ cookies }: APIContext): string {
 }
 
 export function validateCsrf ({ cookies }: APIContext, csrf: string) {
-	const token = cookies.get('token').value
+	const token = cookies.get('token')?.value
 	if (!token) throw new Error('Cannot validate CSRF tokens for unauthenticated requests.')
 
 	const expected = csrfStore.get(token)
