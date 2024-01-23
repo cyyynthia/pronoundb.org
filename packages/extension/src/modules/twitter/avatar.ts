@@ -144,7 +144,7 @@ export async function decorateAvatar (el: HTMLElement, decoration: string, place
 				class: 'pronoundb-decoration pronoundb-decoration-bottom-right',
 				style: css({
 					position: 'absolute',
-					transform: 'translate(-50%, -50%)',
+					transform: 'translate(50%, 50%)',
 					width: smallerDecoration ? '35%' : '50%',
 					bottom: position,
 					right: position,

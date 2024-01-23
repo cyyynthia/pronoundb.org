@@ -35,16 +35,18 @@ import { h, css } from '../../utils/dom'
 
 import { decorateAvatar, clearAvatar } from './avatar'
 
+// Never change this to X
 export const name = 'Twitter'
 export const color = '#1DA1F2'
 export const match = /^https:\/\/(.+\.)?twitter\.com/
-export { default as Icon } from 'simple-icons/icons/twitter.svg'
+export { default as Icon } from '../../../assets/twitter.svg'
 
 import stylesheet from './style.css?raw'
 const styleElement = document.createElement('style')
 styleElement.appendChild(document.createTextNode(stylesheet))
 document.head.appendChild(styleElement)
 
+const self = Symbol('username.self')
 const usernameToIdCache = Object.create(null)
 
 function clearProfileHeader () {
@@ -107,8 +109,8 @@ async function injectProfileHeader (username?: string) {
 		header.appendChild(
 			h(
 				'span',
-				{ class: template.className, 'data-pronoundb': 'true' },
-				topics({ class: template.children[0].getAttribute('class')! }),
+				{ class: template.className, style: template.getAttribute('style'), 'data-pronoundb': 'true' },
+				topics({ class: template.children[0]?.getAttribute('class') ?? '' }),
 				formatPronouns(pronouns.sets.en)
 			)
 		)
@@ -120,14 +122,15 @@ async function injectProfileHeader (username?: string) {
 }
 
 async function injectTweet (tweet: HTMLElement) {
-	// Immediately mark the underlying image as handled; we'll handle it here to avoid doing a double ID lookup
 	let imgWrapper = tweet.querySelector<HTMLElement>('[data-testid="Tweet-User-Avatar"] :is(a, div[role=presentation])')
-	// if (imgWrapper) imgWrapper.dataset.pdbHandled = 'true'
+
+	// Immediately mark the underlying image as handled; we'll handle it here to avoid doing a double ID lookup
+	if (imgWrapper) imgWrapper.dataset.pdbHandled = 'true'
 
 	// Now process the tweet
 	let id: string
 	// Use a cache to avoid round-trips to the webpage context
-	const username = tweet.querySelector<HTMLElement>('[data-testid="User-Name"] a > div > span')?.innerText.slice(1)
+	const username = tweet.querySelector<HTMLElement>('[data-testid="User-Name"] > div:nth-child(2) span')?.innerText.slice(1)
 	if (username && username in usernameToIdCache) {
 		id = usernameToIdCache[username]
 	} else {
@@ -153,7 +156,7 @@ async function injectTweet (tweet: HTMLElement) {
 		parentContainer.appendChild(
 			h(
 				'div',
-				{ class: `${containerClass} pronoundb-container` },
+				{ class: `${containerClass} pronoundb-container`, style: dateContainer.getAttribute('style') },
 				h('span', { class: 'pronoundb-void' }, '​'),
 				h('span', { class: 'pronoundb-separator' }, '·'),
 				h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns.sets.en))
@@ -163,7 +166,7 @@ async function injectTweet (tweet: HTMLElement) {
 
 	// Now, handle the decoration
 	if (imgWrapper && imgWrapper.tagName === 'A' && pronouns.decoration) {
-		// decorateAvatar(imgWrapper, pronouns.decoration, 'tweet')
+		decorateAvatar(imgWrapper, pronouns.decoration, 'tweet')
 	}
 }
 
@@ -185,9 +188,15 @@ async function injectProfilePopOut (popout: HTMLElement) {
 	if (pronouns.sets.en) {
 		const childClass = template.children[0].className
 		const parentClass = template.className
+		const parentStyle = template.getAttribute('style')
+
 		const element = h(
 			'span',
-			{ class: parentClass, 'data-pronoundb': 'true' },
+			{
+				class: parentClass,
+				style: parentStyle,
+				'data-pronoundb': 'true'
+			},
 			h(
 				'span',
 				{
@@ -227,10 +236,14 @@ async function injectAvatarDecoration (img: HTMLElement) {
 
 	let id: string
 	if (wrapper.tagName === 'DIV') {
-		if (!document.querySelector('header')?.contains(wrapper)) return
-
-		// Self user account
-		id = await fetchReactProp(wrapper, [ { $find: 'currentUser', $in: [ 'return', 'memoizedProps' ] }, 'currentUser', 'id_str' ])
+		if (!document.querySelector('header')?.contains(wrapper) && !document.querySelector('#layers')?.contains(wrapper)) return
+		if (self in usernameToIdCache) {
+			id = usernameToIdCache[self]
+		} else {
+			// Self user account
+			id = await fetchReactProp(wrapper, [ { $find: 'id_str', $in: [ 'return', 'memoizedProps', 'currentUser', 'viewerUser' ] }, 'id_str' ])
+			if (id) usernameToIdCache[self] = id
+		}
 	} else {
 		// Classic flow with cache possibility
 		const username = wrapper.getAttribute('href')?.split('/')[1]
@@ -238,6 +251,7 @@ async function injectAvatarDecoration (img: HTMLElement) {
 			id = usernameToIdCache[username]
 		} else {
 			id = await fetchReactProp(wrapper, [ { $find: 'userId', $in: [ 'return', 'memoizedProps' ] }, 'userId' ])
+			if (!id) id = await fetchReactProp(wrapper, [ { $find: 'id_str', $in: [ 'return', 'memoizedProps', 'viewerUser' ] }, 'id_str' ])
 			if (username && id) usernameToIdCache[username] = id
 		}
 	}
@@ -301,15 +315,21 @@ function handleMutation (nodes: MutationRecord[]) {
 					continue
 				}
 
-				if (layers.contains(added)) {
-					const link = added.querySelector('a[href*="/following"]')
-					if (link) injectProfilePopOut(link.parentElement!.parentElement!.parentElement!.parentElement!)
-					continue
-				}
-
 				// Decorations
 				if (added.tagName === 'IMG' && added.getAttribute('src')?.includes('/profile_images/')) {
 					injectAvatarDecoration(added)
+					continue
+				}
+
+				if (added.children[0]?.children[0]?.role === 'progressbar' && added.querySelector('[data-testid="createPollButton"]')) {
+					const img = added.querySelector<HTMLElement>('img')
+					if (img) injectAvatarDecoration(img)
+					continue
+				}
+
+				if (layers.contains(added)) {
+					const link = added.querySelector('a[href*="/following"]')
+					if (link) injectProfilePopOut(link.parentElement!.parentElement!.parentElement!.parentElement!)
 					continue
 				}
 			}
