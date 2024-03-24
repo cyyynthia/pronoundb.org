@@ -153,7 +153,7 @@ async function injectTweet (tweet: HTMLElement) {
 		parentContainer.appendChild(
 			h(
 				'div',
-				{ class: `${containerClass} pronoundb-container` },
+				{ class: `${containerClass} pronoundb-container`, style: css({ color: dateContainer.style.color }) },
 				h('span', { class: 'pronoundb-void' }, '​'),
 				h('span', { class: 'pronoundb-separator' }, '·'),
 				h('span', { class: 'pronoundb-pronouns' }, formatPronouns(pronouns.sets.en))
