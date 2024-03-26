@@ -27,6 +27,8 @@
  */
 
 import * as enSets from './sets/en.js'
+import * as nbSets from './sets/nb.js'
+import * as nnSets from './sets/nn.js'
 
 export type Sets = [ string ] | [ string, string ] | [ string, string, string ]
 
@@ -61,4 +63,6 @@ export type SetDefinition = {
 
 export const PronounSets: Record<string, SetDefinition> = {
 	en: enSets,
+	nb: nbSets,
+	nn: nnSets,
 }

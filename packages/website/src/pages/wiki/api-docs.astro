@@ -177,7 +177,7 @@ const flash = handleFlash(Astro)
 	<p class='mb-2'>Each locale has a list of pronouns set available to it.</p>
 	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
 		<div class='w-6 h-6 shrink-0' set:html={infoIcon}/>
-		<p>Only the "en" locale is supported at this time.</p>
+		<p>Only the "en", "nb", and "nn" locales are supported at this time.</p>
 	</div>
 	<ul class='list-disc list-inside mb-4'>
 		{Object.keys(PronounSets).map((locale) => (
