@@ -21,10 +21,10 @@ export async function getSelf (token: string): Promise<ExternalAccount | FlashMe
 		body: JSON.stringify({
 			query: `
 				{
-  					me {
+					me {
 						username
-    					canonicalName
-  					}
+						canonicalName
+					}
 				}
 			`,
 		}),
