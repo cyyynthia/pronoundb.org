@@ -54,7 +54,6 @@ export async function authorize ({ url, params, cookies, redirect, site }: APICo
 	const intent = url.searchParams.get('intent') ?? 'login'
 	const callbackPath = new URL('callback', url).pathname
 	const callbackUrl = new URL(callbackPath, site)
-	console.log(callbackUrl)
 
 	const state = randomUUID()
 	const fullState = `${params.platform}-${state}-${intent}`
