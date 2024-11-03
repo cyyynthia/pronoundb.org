@@ -38,6 +38,7 @@ export type OAuth2Params = {
 	oauthUsePkce?: boolean
 	clientId: string
 	clientSecret: string
+	oauthNoAuthorizationHeader?: boolean
 
 	authorizationUrl: string
 	tokenUrl: string
@@ -53,6 +54,7 @@ export async function authorize ({ url, params, cookies, redirect, site }: APICo
 	const intent = url.searchParams.get('intent') ?? 'login'
 	const callbackPath = new URL('callback', url).pathname
 	const callbackUrl = new URL(callbackPath, site)
+	console.log(callbackUrl)
 
 	const state = randomUUID()
 	const fullState = `${params.platform}-${state}-${intent}`
@@ -115,14 +117,19 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
 		challenges.delete(fullState)
 	}
 
+	const headers: HeadersInit = {
+		Accept: 'application/json',
+		'Content-Type': 'application/x-www-form-urlencoded',
+		'User-Agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
+	}
+
+	if (!oauth.oauthNoAuthorizationHeader) {
+		headers.Authorization = `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`
+	}
+
 	const res = await fetch(oauth.tokenUrl, {
 		method: 'POST',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/x-www-form-urlencoded',
-			'User-Agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-			Authorization: `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`,
-		},
+		headers: headers,
 		body: encode(parameters),
 	})
 

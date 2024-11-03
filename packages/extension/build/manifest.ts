@@ -88,6 +88,7 @@ export default function manifest (): Plugin {
 							'https://*.twitch.tv/*',
 							'https://*.twitter.com/*',
 							'https://*.x.com/*',
+							'https://*.sr.ht/*',
 						],
 					},
 				],
