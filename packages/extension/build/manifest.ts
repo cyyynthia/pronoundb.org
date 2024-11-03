@@ -69,7 +69,7 @@ export default function manifest (): Plugin {
 				action: { default_popup: 'popup.html' },
 				content_security_policy: {
 					// todo: localhost api indev
-					// extension_pages: 'default-src \'self\'; connect-src https://pronoundb.org;',
+					extension_pages: 'default-src \'self\'; connect-src https://pronoundb.org;',
 				},
 
 				// See https://bugzilla.mozilla.org/show_bug.cgi?id=1573659
