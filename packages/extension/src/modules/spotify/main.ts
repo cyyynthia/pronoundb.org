@@ -26,6 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import { h } from '../../utils/dom'
 import { fetchPronouns } from '../../utils/fetch'
 import { formatPronouns } from '../../utils/pronouns'
 
@@ -49,7 +50,7 @@ async function handleUserProfile (node: HTMLElement) {
 
 	if (!sep) return
 
-	const pronounsNode = document.createElement('span')
+	const pronounsNode = h('span', { class: 'encore-text encore-text-body-small' })
 
 	pronounsNode.textContent = formatPronouns(pronouns.sets.en)
 
