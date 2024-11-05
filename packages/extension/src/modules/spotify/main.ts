@@ -125,5 +125,5 @@ export function inject () {
 	}
 
 	const observer = new MutationObserver(handleMutations)
-	observer.observe(document.body, { childList: true, subtree: true })
+	observer.observe(document, { childList: true, subtree: true })
 }
