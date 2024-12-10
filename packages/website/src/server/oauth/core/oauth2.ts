@@ -38,7 +38,7 @@ export type OAuth2Params = {
 	oauthUsePkce?: boolean
 	clientId: string
 	clientSecret: string
-	oauthNoAuthorizationHeader?: boolean
+	oauthNoBodyCredentials?: boolean
 
 	authorizationUrl: string
 	tokenUrl: string
@@ -103,8 +103,6 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
 	const cleanRedirectUrl = new URL(url.pathname, site)
 	const parameters: Record<string, string> = {
 		state: state,
-		client_id: oauth.clientId,
-		client_secret: oauth.clientSecret,
 		redirect_uri: cleanRedirectUrl.href,
 		scope: oauth.scopes.join(' '),
 		grant_type: 'authorization_code',
@@ -116,14 +114,18 @@ export async function callback ({ url, params, cookies, site }: APIContext, oaut
 		challenges.delete(fullState)
 	}
 
+	if (!oauth.oauthNoBodyCredentials) {
+		Object.assign(parameters, {
+			client_id: oauth.clientId,
+			client_secret: oauth.clientSecret,
+		})
+	}
+
 	const headers: HeadersInit = {
 		Accept: 'application/json',
 		'Content-Type': 'application/x-www-form-urlencoded',
 		'User-Agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
-	}
-
-	if (!oauth.oauthNoAuthorizationHeader) {
-		headers.Authorization = `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`
+		Authorization: `Basic ${Buffer.from(`${oauth.clientId}:${oauth.clientSecret}`).toString('base64')}`,
 	}
 
 	const res = await fetch(oauth.tokenUrl, {

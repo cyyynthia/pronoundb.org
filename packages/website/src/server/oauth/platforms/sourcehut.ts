@@ -32,7 +32,7 @@ import type { FlashMessage } from '@server/flash.ts'
 export const oauthVersion = 2
 export const clientId = import.meta.env.OAUTH_SOURCEHUT_CLIENT
 export const clientSecret = import.meta.env.OAUTH_SOURCEHUT_SECRET
-export const oauthNoAuthorizationHeader = true
+export const oauthNoBodyCredentials = true
 
 export const authorizationUrl = 'https://meta.sr.ht/oauth2/authorize'
 export const tokenUrl = 'https://meta.sr.ht/oauth2/access-token'
