@@ -46,11 +46,11 @@ async function handleUserProfile (node: HTMLElement) {
 
 	if (!pronouns || !pronouns.sets.en) return
 
-	const sep = followers.querySelector(':first-child')
+	const sep = followers.querySelector('[data-separator="true"]')
 
 	if (!sep) return
 
-	const pronounsNode = h('span', { class: 'encore-text encore-text-body-small' })
+	const pronounsNode = h('span', { class: 'encore-text encore-text-body-small encore-internal-color-text-subdued' })
 
 	pronounsNode.textContent = formatPronouns(pronouns.sets.en)
 
@@ -84,6 +84,7 @@ async function handleSmallUserProfile (node: HTMLElement) {
 	profileContainer.textContent += ` • ${formatPronouns(pronouns.sets.en)}`
 }
 
+
 function handleMutations (mutations: MutationRecord[]) {
 	for (const { addedNodes } of mutations) {
 		for (const node of addedNodes) {
@@ -110,7 +111,7 @@ function handleMutations (mutations: MutationRecord[]) {
 
 
 export function inject () {
-	const userProfile = document.querySelector('div > span.encore-text.encore-text-body-small')
+	const userProfile = document.querySelector('div > span.encore-text.encore-text-body-small')?.parentElement
 
 	if (userProfile) {
 		handleUserProfile(userProfile.parentElement as HTMLElement)
