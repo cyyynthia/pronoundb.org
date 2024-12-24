@@ -26,66 +26,44 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { APIContext } from 'astro'
+import type { ExternalAccount } from '@server/database/database.ts'
+import type { FlashMessage } from '@server/flash.ts'
 
-import { authenticate } from '@server/auth.js'
-import { ApiCallVersionCounter } from '@server/metrics.js'
+export const oauthVersion = 2
+export const clientId = import.meta.env.OAUTH_SOURCEHUT_CLIENT
+export const clientSecret = import.meta.env.OAUTH_SOURCEHUT_SECRET
+export const oauthNoBodyCredentials = true
 
-function getCorsHeaders (request: APIContext['request']) {
-	const origin = request.headers.get('origin')
-	const isFirefox = request.headers.get('origin')?.startsWith('moz-extension://')
+export const authorizationUrl = 'https://meta.sr.ht/oauth2/authorize'
+export const tokenUrl = 'https://meta.sr.ht/oauth2/access-token'
+export const scopes = [ 'meta.sr.ht/PROFILE:RO' ]
 
-	return isFirefox
-		? {
-			vary: 'origin',
-			'Access-Control-Allow-Methods': 'GET',
-			'Access-Control-Allow-Origin': origin!,
-			'Access-Control-Allow-Headers': 'X-PronounDB-Source',
-			'Access-Control-Allow-Credentials': 'true',
-			'Access-Control-Max-Age': '7200',
-		}
-		: {
-			vary: 'origin',
-			'Access-Control-Allow-Methods': 'GET',
-			'Access-Control-Allow-Origin': '*',
-			'Access-Control-Allow-Headers': 'X-PronounDB-Source',
-			'Access-Control-Max-Age': '7200',
-		}
-}
-
-export async function GET (ctx: APIContext) {
-	ApiCallVersionCounter.inc({ version: 2 })
-
-	const headers = getCorsHeaders(ctx.request)
-
-	const user = await authenticate(ctx, true)
-	if (!user) {
-		return new Response(null, {
-			status: 404,
-			headers: headers,
-		})
-	}
-
-	const body = JSON.stringify({
-		decoration: user.decoration,
-		sets: user.pronouns,
-	})
-
-	return new Response(body, {
+export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
+	const res = await fetch('https://meta.sr.ht/query', {
 		headers: {
-			...headers,
+			Authorization: `Bearer ${token}`,
+			'User-Agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
 			'Content-Type': 'application/json',
 		},
+		method: 'POST',
+		body: JSON.stringify({
+			query: `
+				{
+					me {
+						username
+						canonicalName
+					}
+				}
+			`,
+		}),
 	})
-}
 
-export function OPTIONS ({ request }: APIContext) {
-	return new Response(null, {
-		status: 204,
-		headers: getCorsHeaders(request),
-	})
-}
+	if (!res.ok) return null
+	const { data: { me: { username, canonicalName } } } = await res.json()
 
-export function ALL () {
-	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
+	return {
+		platform: 'sourcehut',
+		accountId: username,
+		accountName: canonicalName,
+	}
 }

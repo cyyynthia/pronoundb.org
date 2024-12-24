@@ -26,66 +26,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { APIContext } from 'astro'
-
-import { authenticate } from '@server/auth.js'
-import { ApiCallVersionCounter } from '@server/metrics.js'
-
-function getCorsHeaders (request: APIContext['request']) {
-	const origin = request.headers.get('origin')
-	const isFirefox = request.headers.get('origin')?.startsWith('moz-extension://')
-
-	return isFirefox
-		? {
-			vary: 'origin',
-			'Access-Control-Allow-Methods': 'GET',
-			'Access-Control-Allow-Origin': origin!,
-			'Access-Control-Allow-Headers': 'X-PronounDB-Source',
-			'Access-Control-Allow-Credentials': 'true',
-			'Access-Control-Max-Age': '7200',
-		}
-		: {
-			vary: 'origin',
-			'Access-Control-Allow-Methods': 'GET',
-			'Access-Control-Allow-Origin': '*',
-			'Access-Control-Allow-Headers': 'X-PronounDB-Source',
-			'Access-Control-Max-Age': '7200',
-		}
-}
-
-export async function GET (ctx: APIContext) {
-	ApiCallVersionCounter.inc({ version: 2 })
-
-	const headers = getCorsHeaders(ctx.request)
-
-	const user = await authenticate(ctx, true)
-	if (!user) {
-		return new Response(null, {
-			status: 404,
-			headers: headers,
-		})
-	}
-
-	const body = JSON.stringify({
-		decoration: user.decoration,
-		sets: user.pronouns,
-	})
-
-	return new Response(body, {
-		headers: {
-			...headers,
-			'Content-Type': 'application/json',
-		},
-	})
-}
-
-export function OPTIONS ({ request }: APIContext) {
-	return new Response(null, {
-		status: 204,
-		headers: getCorsHeaders(request),
-	})
-}
-
-export function ALL () {
-	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
-}
+export const name = 'SourceHut'
+export const color = '#212529'
+export { default as icon } from 'simple-icons/icons/sourcehut.svg?raw'
