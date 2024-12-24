@@ -26,66 +26,32 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { APIContext } from 'astro'
+import type { ExternalAccount } from '@server/database/database.ts'
+import type { FlashMessage } from '@server/flash.ts'
 
-import { authenticate } from '@server/auth.js'
-import { ApiCallVersionCounter } from '@server/metrics.js'
+export const oauthVersion = 2
+export const clientId = import.meta.env.OAUTH_OSU_CLIENT
+export const clientSecret = import.meta.env.OAUTH_OSU_SECRET
 
-function getCorsHeaders (request: APIContext['request']) {
-	const origin = request.headers.get('origin')
-	const isFirefox = request.headers.get('origin')?.startsWith('moz-extension://')
+export const authorizationUrl = 'https://osu.ppy.sh/oauth/authorize'
+export const tokenUrl = 'https://osu.ppy.sh/oauth/token'
+export const scopes = [ 'identify' ]
 
-	return isFirefox
-		? {
-			vary: 'origin',
-			'Access-Control-Allow-Methods': 'GET',
-			'Access-Control-Allow-Origin': origin!,
-			'Access-Control-Allow-Headers': 'X-PronounDB-Source',
-			'Access-Control-Allow-Credentials': 'true',
-			'Access-Control-Max-Age': '7200',
-		}
-		: {
-			vary: 'origin',
-			'Access-Control-Allow-Methods': 'GET',
-			'Access-Control-Allow-Origin': '*',
-			'Access-Control-Allow-Headers': 'X-PronounDB-Source',
-			'Access-Control-Max-Age': '7200',
-		}
-}
-
-export async function GET (ctx: APIContext) {
-	ApiCallVersionCounter.inc({ version: 2 })
-
-	const headers = getCorsHeaders(ctx.request)
-
-	const user = await authenticate(ctx, true)
-	if (!user) {
-		return new Response(null, {
-			status: 404,
-			headers: headers,
-		})
-	}
-
-	const body = JSON.stringify({
-		decoration: user.decoration,
-		sets: user.pronouns,
-	})
-
-	return new Response(body, {
+export async function getSelf (token: string): Promise<ExternalAccount | FlashMessage | null> {
+	const res = await fetch('https://osu.ppy.sh/api/v2/me', {
 		headers: {
-			...headers,
-			'Content-Type': 'application/json',
+			Accept: 'application/json',
+			Authorization: `Bearer ${token}`,
+			'User-Agent': 'PronounDB Authentication Agent/2.0 (+https://pronoundb.org)',
 		},
 	})
-}
 
-export function OPTIONS ({ request }: APIContext) {
-	return new Response(null, {
-		status: 204,
-		headers: getCorsHeaders(request),
-	})
-}
+	if (!res.ok) return null
+	const data = await res.json()
 
-export function ALL () {
-	return new Response(JSON.stringify({ statusCode: 405, error: 'Method not allowed' }), { status: 405 })
+	return {
+		platform: 'osu',
+		accountId: data.id,
+		accountName: data.username,
+	}
 }

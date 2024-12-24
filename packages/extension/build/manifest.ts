@@ -86,6 +86,8 @@ export default function manifest (): Plugin {
 							'https://*.github.com/*',
 							'https://*.modrinth.com/*',
 							'https://*.open.spotify.com/*',
+							'https://*.osu.ppy.sh/*',
+							'https://*.sr.ht/*',
 							'https://*.twitch.tv/*',
 							'https://*.twitter.com/*',
 							'https://*.x.com/*',
