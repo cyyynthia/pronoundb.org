@@ -9,7 +9,8 @@ services:
       - 5432:5432
     volumes:
       - pg-data:/var/lib/postgresql/data
-
+      - ./init:/docker-entrypoint-initdb.d:ro
+      
 volumes:
   pg-data:
     driver: local
