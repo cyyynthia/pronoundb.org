@@ -25,7 +25,7 @@
 -- OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- PronounDB Database Schema
--- This script creates all tables and indexes for the PronounDB application
+-- This script creates all tables for the PronounDB application
 -- Database: PostgreSQL
 
 -- =============================================================================
@@ -39,7 +39,7 @@ CREATE TABLE users (
 );
 
 COMMENT ON TABLE users IS 'Stores user profiles and their decoration settings';
-COMMENT ON COLUMN users.id IS 'UUIDv7 unique identifier for the user';
+COMMENT ON COLUMN users.id IS 'UUID unique identifier for the user';
 COMMENT ON COLUMN users.decoration IS 'Currently selected decoration for the user';
 COMMENT ON COLUMN users.available_decorations IS 'Array of decoration IDs available to the user';
 
@@ -53,7 +53,7 @@ CREATE TABLE pronouns (
     sets TEXT[] NOT NULL,
     
     PRIMARY KEY (user_id, locale),
-    CONSTRAINT fk_user
+    CONSTRAINT fk_pronouns_user
         FOREIGN KEY (user_id)
             REFERENCES users(id)
             ON DELETE CASCADE
@@ -75,7 +75,7 @@ CREATE TABLE accounts (
     user_id UUID NOT NULL,
 
     PRIMARY KEY (platform, account_id),
-    CONSTRAINT fk_user
+    CONSTRAINT fk_accounts_user
         FOREIGN KEY (user_id)
             REFERENCES users(id)
             ON DELETE CASCADE
