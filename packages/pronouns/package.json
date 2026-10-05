@@ -40,10 +40,6 @@
 		"./styles.css": {
 			"import": "./styles.css",
 			"require": "./styles.css"
-		},
-		"./legacy": {
-			"import": "./dist/legacy.js",
-			"types": "./dist/legacy.d.ts"
 		}
 	}
 }

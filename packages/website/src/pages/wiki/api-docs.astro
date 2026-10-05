@@ -172,7 +172,6 @@ const flash = handleFlash(Astro)
 		<p class='mb-4'>Looks up the data saved for a given PronounDB user. Will return a 404 Not Found error if the user does not exist.</p>
 	</ApiRequest>
 
-
 	<ApiRequest
 		method='GET'
 		path={[ '/shields/', '[pronoundbId]', '.json?capitalize=', '[capitalize]', '&locale=', '[locale]' ]}
@@ -231,12 +230,6 @@ const flash = handleFlash(Astro)
 			</li>
 		))}
 	</ul>
-
-	<h2 class='text-2xl font-bold mb-2' id='legacy-v1'>Legacy API v1</h2>
-	<p class='mb-4'>
-		If you need it, the <Link href='/wiki/legacy-api-docs'>documentation for API v1</Link> is still available.
-		Beware, API v1 is <b>deprecated</b> and scheduled for removal on <b>June 1st, 2024</b>
-	</p>
 </Layout>
 
 <style>
