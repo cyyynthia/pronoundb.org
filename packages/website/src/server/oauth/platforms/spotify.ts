@@ -29,6 +29,8 @@
 import type { ExternalAccount } from '@server/database/database.ts'
 import type { FlashMessage } from '@server/flash.ts'
 
+export const disabled = true
+
 export const oauthVersion = 2
 export const clientId = import.meta.env.OAUTH_SPOTIFY_CLIENT
 export const clientSecret = import.meta.env.OAUTH_SPOTIFY_SECRET

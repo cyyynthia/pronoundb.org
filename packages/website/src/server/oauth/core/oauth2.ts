@@ -45,6 +45,8 @@ export type OAuth2Params = {
 	scopes: string[]
 
 	getSelf: (token: string) => Promise<ExternalAccount | FlashMessage | null>
+
+	disabled?: boolean
 }
 
 const states = new Set<string>()

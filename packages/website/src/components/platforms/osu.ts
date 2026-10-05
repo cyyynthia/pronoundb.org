@@ -29,3 +29,6 @@
 export const name = 'osu!'
 export const color = '#F372AD'
 export { default as icon } from 'simple-icons/icons/osu.svg?raw'
+
+// getting an osu app is non trivial and I'm lazy
+export const supported = false

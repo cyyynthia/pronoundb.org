@@ -43,7 +43,7 @@ const platforms = import.meta.glob<Params>('../../../server/oauth/platforms/*.ts
 
 export async function GET (ctx: APIContext) {
 	const platform = platforms[`../../../server/oauth/platforms/${ctx.params.platform}.ts`] as Params
-	if (!platform) return new Response('400: Invalid provider', { status: 400 })
+	if (!platform || platform.disabled) return new Response('400: Invalid provider', { status: 400 })
 
 	const token = ctx.cookies.get('token')?.value
 	const intent = ctx.cookies.get('intent')?.value ?? 'login'

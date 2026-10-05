@@ -45,6 +45,8 @@ export type OAuth1Params = {
 	scopes: string[]
 
 	getSelf: (token: string, tokenSecret: string) => Promise<ExternalAccount | FlashMessage | null>
+
+	disabled?: boolean
 }
 
 type OAuthToken = {
