@@ -1,6 +1,9 @@
 # Contribution Guidelines
 Thanks for your interest in contributing! First, make sure to read the [Code of Conduct](https://github.com/cyyynthia/pronoundb.org/blob/mistress/CODE_OF_CONDUCT.md) of the project.
 
+> [!IMPORTANT]
+> This project stands against "Generative AI". Its use is prohibited and will result in an immediate, permanent ban.
+
 ## Issues
 ### Do
  - Report issues with any of the components of pronoundb.org (API, Website, Extension, ...)
