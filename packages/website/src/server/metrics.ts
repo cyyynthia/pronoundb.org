@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* oxlint-disable no-new */
+
 import { register, collectDefaultMetrics, Counter, Histogram, Gauge, Summary } from 'prom-client'
 import { countUsers, countAccountsPerPlatform } from '@server/database/count.js'
 import { providers } from './oauth/providers.js'

@@ -1,0 +1,19 @@
+{
+	"private": true,
+	"type": "module",
+	"devDependencies": {
+		"typescript": "^5.6.3"
+	},
+	"devEngines": {
+		"packageManager": {
+			"name": "pnpm",
+			"version": "12.9.1",
+			"onFail": "error"
+		},
+		"runtime": {
+			"name": "node",
+			"version": "^26",
+			"onFail": "warn"
+		}
+	}
+}

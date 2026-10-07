@@ -43,14 +43,14 @@ await client.connect()
 let count = 0
 for await (const account of client.db().collection('accounts').find()) {
 	const newId = transformId(account._id.toString())
-	await sql.begin(async (sql) => {
-		await sql`
+	await sql.begin(async (tx) => {
+		await tx`
 			INSERT INTO users (id, decoration, available_decorations)
 			VALUES (${newId}, ${account.decoration}, ${account.availableDecorations})
 		`
 
 		for (const acc of account.accounts) {
-			await sql`
+			await tx`
 				INSERT INTO accounts (platform, account_id, account_name, user_id)
 				VALUES (${acc.platform}, ${acc.id}, ${acc.name}, ${newId})
 			`
@@ -58,7 +58,7 @@ for await (const account of client.db().collection('accounts').find()) {
 
 		for (const locale in account.sets) {
 			if (locale in account.sets) {
-				await sql`
+				await tx`
 					INSERT INTO pronouns (user_id, locale, sets)
 					VALUES (${newId}, ${locale}, ${account.sets[locale]})
 				`
