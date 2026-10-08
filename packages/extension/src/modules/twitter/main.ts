@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { topics } from '../../icons/twitter.ts'
+import { messageBubble } from '../../icons/twitter.ts'
 
 import { formatPronouns } from '../../utils/pronouns.ts'
 import { fetchPronouns } from '../../utils/fetch.ts'
@@ -119,12 +119,13 @@ async function injectProfileHeader () {
 			return
 		}
 
-		const template = header.children[header.children.length - 1]
+		const template = header.children[header.children.length - 1].children[0]
+		const classes = template.className.split(' ').slice(0, -1).join(' ')
 		header.appendChild(
 			h(
 				'span',
-				{ class: template.className, style: template.getAttribute('style'), 'data-pronoundb': 'true' },
-				topics({ class: template.children[0]?.getAttribute('class') ?? '' }),
+				{ class: classes, style: template.getAttribute('style'), 'data-pronoundb': 'true' },
+				messageBubble({ class: template.children[0]?.getAttribute('class') ?? '' }),
 				formattedPronouns
 			)
 		)
@@ -392,7 +393,7 @@ async function injectProfilePopOut (popout: HTMLElement) {
 						marginRight: '4px',
 					}),
 				},
-				topics({
+				messageBubble({
 					style: css({
 						color: 'inherit',
 						fill: 'currentColor',
