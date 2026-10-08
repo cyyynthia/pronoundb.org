@@ -26,15 +26,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { whisper } from '../../icons/twitch'
+import { whisper } from '../../icons/twitch.ts'
 
-import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../../utils/pronouns'
-import { fetchPronouns } from '../../utils/fetch'
-import { fetchReactProp } from '../../utils/proxy'
-import { h, css } from '../../utils/dom'
-import { LRUMap } from '../../utils/lru/lru'
+import { formatPronouns, formatPronounsShort, formatPronounsLong } from '../../utils/pronouns.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { fetchReactProp } from '../../utils/proxy.ts'
+import { h, css } from '../../utils/dom.ts'
+import { LRUMap } from '../../utils/lru/lru.js'
 
-import badgeComponent from './components/badge'
+import badgeComponent from './components/badge.ts'
 
 export const name = 'Twitch'
 export const color = '#9146FF'

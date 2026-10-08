@@ -35,7 +35,7 @@ type Manifest = Omit<chrome.runtime.ManifestV3, 'background'> // Firefox backgro
 
 let missingTarget = !process.env.PDB_BROWSER_TARGET
 process.env.PDB_BROWSER_TARGET = process.env.PDB_BROWSER_TARGET || 'chrome'
-process.env.PDB_EXT_VERSION = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf8')).version
+process.env.PDB_EXT_VERSION = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'package.json'), 'utf8')).version
 
 export default function manifest (): Plugin {
 	let isDev = false
@@ -84,9 +84,9 @@ export default function manifest (): Plugin {
 						matches: [
 							'https://*.discord.com/*',
 							'https://*.github.com/*',
-							'https://*.modrinth.com/*',
-							'https://*.open.spotify.com/*',
-							'https://*.osu.ppy.sh/*',
+							//'https://*.modrinth.com/*',
+							//'https://*.open.spotify.com/*',
+							//'https://*.osu.ppy.sh/*',
 							'https://*.sr.ht/*',
 							'https://*.twitch.tv/*',
 							'https://*.twitter.com/*',

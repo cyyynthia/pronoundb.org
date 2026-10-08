@@ -26,11 +26,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { JSX } from 'preact'
+import type { TargetedEvent, JSX } from 'preact'
 import { h } from 'preact'
 import { useCallback } from 'preact/hooks'
 
-type InputInputEvent = JSX.TargetedEvent<HTMLInputElement, Event>
+type InputInputEvent = TargetedEvent<HTMLInputElement, Event>
 
 type CheckboxProps = {
 	name: string

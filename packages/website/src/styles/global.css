@@ -28,33 +28,35 @@
 
 @import 'tailwindcss';
 
-@font-face {
-	font-family: 'Quicksand';
-	font-style: normal;
-	font-display: swap;
-	src: url(../../assets/fonts/quicksand-regular.woff2) format('woff2');
-}
-
-@font-face {
-	font-family: 'Quicksand';
-	font-style: normal;
-	font-weight: 600;
-	font-display: swap;
-	src: url(../../assets/fonts/quicksand-semibold.woff2) format('woff2');
-}
-
-@font-face {
-	font-family: 'Quicksand';
-	font-style: normal;
-	font-weight: 700;
-	font-display: swap;
-	src: url(../../assets/fonts/quicksand-bold.woff2) format('woff2');
-}
-
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
+@utility container {
+  @media (width >= --theme(--breakpoint-xs)) {
+    max-width: none;
+  }
+  @media (width >= 640px) {
+    max-width: 640px;
+  }
+  @media (width >= 768px) {
+    max-width: 768px;
+  }
+  @media (width >= 1024px) {
+    max-width: 1024px;
+  }
+  @media (width >= 1280px) {
+    max-width: 1280px;
+  }
+  @media (width >= 1360px) {
+    max-width: 1360px;
+  }
+}
+
 @theme {
-  --font-sans: 'Quicksand', sans-serif;
+  --font-*: initial;
+  --font-sans: Quicksand, sans-serif;
+  --font-mono: JetBrains Mono, monospace;
+
+  --breakpoint-xs: 420px;
 
   --color-pink: #f49898;
   --color-pink-dark: #bb6570;
@@ -82,49 +84,19 @@
   --color-gray-800: #262626;
   --color-gray-900: #171717;
   --color-gray-950: #0a0a0a;
-}
 
-@utility link {
-  @apply text-blue-800 hover:underline dark:text-cyan-200;
-}
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-emerald-950: #022c22;
 
-@utility checkbox {
-  @apply relative m-1 cursor-pointer;
-
-  & input {
-    @apply z-10 cursor-pointer appearance-none bg-transparent border-0 shadow-none absolute w-full h-full p-1 -top-1 -left-1 box-content;
-  }
-
-  & div {
-    @apply w-8 h-3 rounded-lg relative bg-gray-300;
-  }
-
-  & div::before {
-    content: '';
-    filter: brightness(0.7);
-    @apply w-4 h-4 rounded-full absolute -left-0.5 -top-0.5 bg-gray-300;
-  }
-
-  & input:checked + div {
-    @apply bg-pink;
-  }
-
-  & input:checked + div::before {
-    @apply bg-pink left-auto -right-0.5;
-  }
-}
-
-@layer base {
-	html, body {
-		@apply !font-sans text-black bg-white h-full;
-		width: 360px;
-		height: 480px;
-		max-width: 360px;
-		max-height: 480px;
-		overflow: hidden;
-	}
-
-	main {
-		overflow-y: auto;
-	}
+  --color-deep-blue: #130e85;
+  --color-red-orange: #ff6046;
 }

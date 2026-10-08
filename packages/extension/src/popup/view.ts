@@ -27,6 +27,6 @@
  */
 
 import { h, render } from 'preact'
-import Popup from './components/Popup'
+import Popup from './components/Popup.tsx'
 
 render(h(Popup, null), document.querySelector('#app')!)

@@ -27,7 +27,7 @@
  */
 
 import { getDecorationExtension } from '@pronoundb/pronouns/decorations'
-import { h, css, svg } from '../../utils/dom'
+import { h, css, svg } from '../../utils/dom.ts'
 
 type Place = 'profile' | 'tweet' | 'popout' | 'other'
 

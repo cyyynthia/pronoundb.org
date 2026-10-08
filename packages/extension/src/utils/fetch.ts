@@ -27,10 +27,10 @@
  */
 
 import type { UserData, Sets } from '@pronoundb/pronouns/sets'
-import type { Deferred } from './deferred'
+import type { Deferred } from './deferred.ts'
 import { PronounSets } from '@pronoundb/pronouns/sets'
-import { createDeferred } from './deferred'
-import { LRUMap } from './lru/lru'
+import { createDeferred } from './deferred.ts'
+import { LRUMap } from './lru/lru.js'
 
 function cleanPayload (payload: UserData) {
 	if (!payload || !payload.sets) return payload

@@ -26,10 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { formatPronouns } from '../../utils/pronouns'
-import { fetchPronouns } from '../../utils/fetch'
-import { fetchReactProp } from '../../utils/proxy'
-import { h, css } from '../../utils/dom'
+import { formatPronouns } from '../../utils/pronouns.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { fetchReactProp } from '../../utils/proxy.ts'
+import { h, css } from '../../utils/dom.ts'
 
 export const name = 'Discord'
 export const color = '#5865F2'

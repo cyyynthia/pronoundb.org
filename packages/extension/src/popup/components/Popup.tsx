@@ -26,15 +26,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { ExtensionModule } from '../../modules'
+import type { ExtensionModule } from '../../modules/index.ts'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 import { Endpoints } from '../../constants.js'
-import { Header, Footer } from './Layout'
-import { ViewState } from './Views'
-import * as Views from './Views'
+import { Header, Footer } from './Layout.tsx'
+import { ViewState } from './Views.tsx'
+import * as Views from './Views.tsx'
 
-import { getModule } from '../../modules'
+import { getModule } from '../../modules/index.ts'
 
 function Main ({ view }: { view: ViewState }) {
 	const [ mdl, setMdl ] = useState<false | null | ExtensionModule>(false)
@@ -55,7 +55,7 @@ function Main ({ view }: { view: ViewState }) {
 
 export default function Popup () {
 	const [ selfPronouns, setSelfPronouns ] = useState(null)
-	const [ view, setView ] = useState(ViewState.MAIN)
+	const [ view, setView ] = useState<ViewState>(ViewState.MAIN)
 	const openSettings = useCallback(() => { setView(ViewState.SETTINGS) }, [])
 	const closeSettings = useCallback(() => { setView(ViewState.MAIN) }, [])
 

@@ -26,8 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { createDeferred } from './utils/deferred'
-import { fetchPropUnchecked, fetchReactProp } from './utils/proxy'
+import { createDeferred } from './utils/deferred.ts'
+import { fetchPropUnchecked, fetchReactProp } from './utils/proxy.ts'
 
 const injectModules = import.meta.glob<Function>('./modules/**/inject.ts', { eager: true, import: 'default' })
 

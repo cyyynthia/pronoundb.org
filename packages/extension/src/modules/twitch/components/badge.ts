@@ -28,8 +28,8 @@
 
 import type { UserData } from '@pronoundb/pronouns/sets'
 import { getDecorationExtension } from '@pronoundb/pronouns/decorations'
-import { formatPronounsShort } from '../../../utils/pronouns'
-import { h, css, svg } from '../../../utils/dom'
+import { formatPronounsShort } from '../../../utils/pronouns.ts'
+import { h, css, svg } from '../../../utils/dom.ts'
 
 const BADGE_WRAPPER = css({
 	display: 'inline-flex',

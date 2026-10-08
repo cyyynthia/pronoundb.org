@@ -26,14 +26,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { topics } from '../../icons/twitter'
+import { topics } from '../../icons/twitter.ts'
 
-import { formatPronouns } from '../../utils/pronouns'
-import { fetchPronouns } from '../../utils/fetch'
-import { fetchReactProp } from '../../utils/proxy'
-import { css, h } from '../../utils/dom'
+import { formatPronouns } from '../../utils/pronouns.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { fetchReactProp } from '../../utils/proxy.ts'
+import { css, h } from '../../utils/dom.ts'
 
-import { clearAvatar, decorateAvatar } from './avatar'
+import { clearAvatar, decorateAvatar } from './avatar.ts'
 
 // Never change this to X
 export const name = 'Twitter'

@@ -36,20 +36,20 @@ import { join } from 'path'
 let finalLicensePath = ''
 export let baseLicensePath = join('assets', 'third-party-licenses.txt')
 
-const LICENSE = join(__dirname, '..', '..', '..', 'LICENSE')
+const LICENSE = join(import.meta.dirname, '..', '..', '..', 'LICENSE')
 
 const TP_LICENSES = [
 	{
 		target: 'js-lru (https://github.com/rsms/js-lru)',
-		license: join(__dirname, '..', 'src', 'utils', 'lru', 'LICENSE'),
+		license: join(import.meta.dirname, '..', 'src', 'utils', 'lru', 'LICENSE'),
 	},
 	{
 		target: 'tailwindcss (https://tailwindcss.com)',
-		license: join(__dirname, '..', 'node_modules', 'tailwindcss', 'LICENSE'),
+		license: join(import.meta.dirname, '..', 'node_modules', 'tailwindcss', 'LICENSE'),
 	},
 	{
 		target: 'Quicksand Font Family (https://github.com/andrew-paglinawan/QuicksandFamily)',
-		license: join(__dirname, '..', 'assets', 'fonts', 'quicksand-license.txt'),
+		license: join(import.meta.dirname, '..', 'assets', 'fonts', 'quicksand-license.txt'),
 	},
 ]
 

@@ -1,13 +1,15 @@
 {
-	"extends": "../../tsconfig.json",
+	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"types": [ "vite/client" ],
 		"lib": [ "esnext", "dom", "dom.iterable" ],
-		"moduleResolution": "bundler",
 
 		"jsx": "preserve",
 		"jsxFactory": "h",
-		"jsxFragmentFactory": "Fragment"
+		"jsxFragmentFactory": "Fragment",
+
+		"noUncheckedIndexedAccess": false,
+		"noPropertyAccessFromIndexSignature": false
 	},
-	"include": [ "./src/**/*", "vite.config.mts" ]
+	"include": [ "./src/**/*", "vite.config.ts" ]
 }

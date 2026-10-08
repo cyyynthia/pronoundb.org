@@ -39,11 +39,11 @@ const trimmedSvg = starSvg.replace(/<!--(.|\n)+-->/, '')
 const { stars } = Astro.props
 ---
 <div class='flex gap-0.5 items-center'>
-	<div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 1, mid: stars === 0.5 } ]} set:html={trimmedSvg}/>
-	<div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 2, mid: stars === 1.5 } ]} set:html={trimmedSvg}/>
-	<div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 3, mid: stars === 2.5 } ]} set:html={trimmedSvg}/>
-	<div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 4, mid: stars === 3.5 } ]} set:html={trimmedSvg}/>
-	<div class:list={[ 'flex-shrink-0 w-3.5 h-3.5', { full: stars >= 5, mid: stars === 4.5 } ]} set:html={trimmedSvg}/>
+	<div class:list={[ 'shrink-0 w-3.5 h-3.5', { full: stars >= 1, mid: stars === 0.5 } ]} set:html={trimmedSvg}/>
+	<div class:list={[ 'shrink-0 w-3.5 h-3.5', { full: stars >= 2, mid: stars === 1.5 } ]} set:html={trimmedSvg}/>
+	<div class:list={[ 'shrink-0 w-3.5 h-3.5', { full: stars >= 3, mid: stars === 2.5 } ]} set:html={trimmedSvg}/>
+	<div class:list={[ 'shrink-0 w-3.5 h-3.5', { full: stars >= 4, mid: stars === 3.5 } ]} set:html={trimmedSvg}/>
+	<div class:list={[ 'shrink-0 w-3.5 h-3.5', { full: stars >= 5, mid: stars === 4.5 } ]} set:html={trimmedSvg}/>
 </div>
 
 <style>

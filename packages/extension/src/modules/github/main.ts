@@ -26,11 +26,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { commentDiscussion } from '../../icons/octicons'
+import { commentDiscussion } from '../../icons/octicons.ts'
 
-import { formatPronouns } from '../../utils/pronouns'
-import { fetchPronouns } from '../../utils/fetch'
-import { h } from '../../utils/dom'
+import { formatPronouns } from '../../utils/pronouns.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { h } from '../../utils/dom.ts'
 
 export const name = 'GitHub'
 export const color = '#211F1F'

@@ -53,7 +53,7 @@ const flash = handleFlash(Astro)
 		<Fragment>API v2 Documentation</Fragment>
 	</PageHeader>
 
-	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 border rounded border-pink dark:border-pink-dark'>
+	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 border rounded-sm border-pink dark:border-pink-dark'>
 		<div class='w-6 h-6 shrink-0 text-pink dark:text-pink-dark' set:html={globeIcon}/>
 		<div>
 			<p class="mb-2">
@@ -205,7 +205,7 @@ const flash = handleFlash(Astro)
 
 	<h2 class='text-2xl font-bold mb-2' id='sets'>Supported sets</h2>
 	<p class='mb-2'>Each locale has a list of pronouns set available to it.</p>
-	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
+	<div class='flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded-sm text-blue-600 border-blue-600 dark:text-blue-400 dark:border-blue-400'>
 		<div class='w-6 h-6 shrink-0' set:html={infoIcon}/>
 		<p>Only the "en" locale is supported at this time.</p>
 	</div>
@@ -233,6 +233,8 @@ const flash = handleFlash(Astro)
 </Layout>
 
 <style>
+	@reference "../../styles/global.css";
+
 	code {
 		@apply px-1 bg-gray-200 dark:bg-gray-700
 	}

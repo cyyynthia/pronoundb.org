@@ -89,5 +89,5 @@ function svgGroup (elements: SvgElement[]): Children[] {
 }
 
 export function svg (def: SvgDefinition): SVGSVGElement {
-	return <SVGSVGElement> h('svg', { viewBox: def.v }, svgGroup(def.p))
+	return h('svg', { viewBox: def.v }, svgGroup(def.p)) as SVGSVGElement
 }

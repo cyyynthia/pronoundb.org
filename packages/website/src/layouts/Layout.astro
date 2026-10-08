@@ -33,6 +33,8 @@ import Footer from '@components/Footer.astro'
 import alertSvg from 'feather-icons/dist/icons/alert-circle.svg?raw'
 import checkSvg from 'feather-icons/dist/icons/check-circle.svg?raw'
 
+import '../styles/global.css'
+
 export interface Props {
 	title?: string
 	description?: string
@@ -56,6 +58,7 @@ const [ flashIcon, flashColor ] = flash?.id.startsWith('S_')
     <meta charset='utf8'/>
     <meta name='theme-color' content='#f49898'/>
     <meta name='viewport' content='width=device-width, initial-scale=1'/>
+    <meta name='generator' content={Astro.generator} />
 
     <title>{title}</title>
     <meta name='description' content={description}/>
@@ -76,7 +79,7 @@ const [ flashIcon, flashColor ] = flash?.id.startsWith('S_')
 		<Header/>
 		<main class='container flex-1 mx-auto p-4'>
 			{flash && (
-				<div class={`flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded ${flashColor}`}>
+				<div class={`flex flex-none gap-4 items-center mb-4 px-4 py-2 font-semibold border rounded-sm ${flashColor}`}>
 					<div class='w-6 h-6 shrink-0' set:html={flashIcon}/>
 					<p>{flash.message}</p>
 				</div>

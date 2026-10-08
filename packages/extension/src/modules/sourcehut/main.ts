@@ -26,9 +26,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { h } from '../../utils/dom'
-import { fetchPronouns } from '../../utils/fetch'
-import { formatPronouns } from '../../utils/pronouns'
+import { h } from '../../utils/dom.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { formatPronouns } from '../../utils/pronouns.ts'
 
 export const name = 'SourceHut'
 export const color = '#212529'

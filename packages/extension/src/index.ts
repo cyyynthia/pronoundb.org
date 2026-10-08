@@ -26,8 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { initializeRuntime } from './runtime'
-import { getModule } from './modules'
+import { initializeRuntime } from './runtime.ts'
+import { getModule } from './modules/index.ts'
 
 getModule().then((currentMdl) => {
 	if (currentMdl) {

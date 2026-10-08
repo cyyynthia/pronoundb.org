@@ -34,8 +34,8 @@ import {
 } from '@pronoundb/pronouns/formatter'
 
 let pronounsCase = 'lower'
-chrome.storage.sync.get([ 'pronouns.case' ], ({ 'pronouns.case': pCase }) => (pronounsCase = pCase ?? 'lower'))
-chrome.storage.onChanged.addListener((changes) => (pronounsCase = changes['pronouns.case']?.newValue || pronounsCase))
+chrome.storage.sync.get([ 'pronouns.case' ], ({ 'pronouns.case': pCase }) => pronounsCase = ((pCase ?? 'lower')) as string)
+chrome.storage.onChanged.addListener((changes) => pronounsCase = ((changes['pronouns.case']?.newValue || pronounsCase)) as string)
 
 export function formatPronouns (sets: Sets) {
 	return _formatPronouns(sets, pronounsCase === 'pascal', 'en')

@@ -26,9 +26,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { css, h } from '../../utils/dom'
-import { fetchPronouns } from '../../utils/fetch'
-import { formatPronouns } from '../../utils/pronouns'
+import { css, h } from '../../utils/dom.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { formatPronouns } from '../../utils/pronouns.ts'
+
+export const disabled = true;
 
 export const name = 'osu!'
 export const color = '#F372AD'

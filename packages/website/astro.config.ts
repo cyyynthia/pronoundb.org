@@ -31,17 +31,18 @@
 import 'dotenv/config'
 
 import { defineConfig } from 'astro/config'
-import tailwind from '@astrojs/tailwind'
 import node from '@astrojs/node'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
 	site: process.env.NODE_ENV === 'development'
 		? 'http://localhost:4321/'
 		: 'https://pronoundb.org/',
 	output: 'server',
-	integrations: [ tailwind() ],
 	adapter: node({ mode: 'standalone' }),
+	compressHTML: true,
 	vite: {
+		plugins: [ tailwindcss() ],
 		ssr: {
 			noExternal: [ '@pronoundb/pronouns/styles.css' ]
 		},

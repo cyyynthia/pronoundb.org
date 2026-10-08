@@ -1,14 +1,17 @@
 {
 	"extends": "astro/tsconfigs/strictest",
 	"compilerOptions": {
-		"moduleResolution": "nodenext",
 		"types": [ "astro/client" ],
-		"baseUrl": ".",
 		"paths": {
-			"@assets/*": [ "src/assets/*" ],
-			"@components/*": [ "src/components/*" ],
-			"@layouts/*": [ "src/layouts/*" ],
-			"@server/*": [ "src/server/*" ]
+			"@assets/*": [ "./src/assets/*" ],
+			"@components/*": [ "./src/components/*" ],
+			"@layouts/*": [ "./src/layouts/*" ],
+			"@server/*": [ "./src/server/*" ]
 		}
-	}
+	},
+	"include": [
+		".astro/types.d.ts",
+		"astro.config.ts",
+		"src"
+	]
 }

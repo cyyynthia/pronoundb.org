@@ -41,7 +41,7 @@ export interface Props {
 const { element } = Astro.props
 ---
 {typeof element === 'string'
-	? <Fragment set:html={DecorationElements[`../../assets/decorations/${element}`]()}/>
+	? <Fragment set:html={DecorationElements[`../../assets/decorations/${element}`]?.()}/>
 	: (
 		<svg viewBox={element.v}>
 			<DecorationSvgGroup elements={element.p}/>

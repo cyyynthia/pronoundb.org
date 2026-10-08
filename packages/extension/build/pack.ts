@@ -30,7 +30,7 @@ import type { Plugin } from 'vite'
 import { join, relative } from 'path'
 import { createWriteStream } from 'fs'
 import { readdir, stat } from 'fs/promises'
-import archiver from 'archiver'
+import { ZipArchive } from 'archiver'
 
 type File = { name: string, path: string }
 
@@ -58,7 +58,7 @@ export default function pack (): Plugin {
 		writeBundle: async (opts) => {
 			if (skip) return
 
-			const archive = archiver('zip', { zlib: { level: 9 } })
+			const archive = new ZipArchive({ zlib: { level: 9 } })
 			archive.pipe(createWriteStream(`${opts.dir}.zip`))
 
 			for await (const file of readdirRecursive(opts.dir!)) archive.file(file.path, { name: file.name })
@@ -66,11 +66,11 @@ export default function pack (): Plugin {
 
 			if (process.env.PDB_BROWSER_TARGET === 'firefox') {
 				// Prepare a source file archive, required by MAO review policies
-				const srcArchive = archiver('zip', { zlib: { level: 9 } })
+				const srcArchive = new ZipArchive({ zlib: { level: 9 } })
 				srcArchive.pipe(createWriteStream(join(opts.dir!, '..', 'source.zip')))
 
 				// Add individual base source files
-				const baseDir = join(__dirname, '..')
+				const baseDir = join(import.meta.dirname, '..')
 				const rootDir = join(baseDir, '..', '..')
 				srcArchive.file(join(baseDir, 'Mozilla-Addons-Note.md'), { name: 'README.md' })
 				srcArchive.file(join(rootDir, 'pnpm-lock.yaml'), { name: 'pnpm-lock.yaml' })

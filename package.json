@@ -2,7 +2,11 @@
 	"private": true,
 	"type": "module",
 	"devDependencies": {
-		"typescript": "^5.6.3"
+		"@tsconfig/node-lts": "^24.0.1",
+		"@tsconfig/node-ts": "^23.6.4",
+		"@tsconfig/strictest": "^2.0.8",
+		"@types/node": "^26.6.4",
+		"typescript": "^7.0.2"
 	},
 	"devEngines": {
 		"packageManager": {

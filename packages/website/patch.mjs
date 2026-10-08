@@ -33,23 +33,15 @@
 // - Disables static assets handling (handled by nginx)
 // - Turns most significant dynamic imports static
 
-import { readFileSync, writeFileSync, readdirSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 
 const ASTRO_SERVER = new URL('./dist/server/', import.meta.url)
 const ENTRY_FILE = new URL('./entry.mjs', ASTRO_SERVER)
-const CHUNKS = new URL('./chunks/', ASTRO_SERVER)
 
 // Process entrypoint
 let entry = readFileSync(ENTRY_FILE, 'utf8')
-entry = entry.replace(/const (_page\d+) = \(\) => import\(('[^']+')\);/g, 'import * as _$1 from $2; const $1 = () => _$1; // [Cynthia\'s patch]')
+entry = entry
+	.replace(/var (_page\d+) = \(\) => import\(("[^"]+")\);/g, 'import * as _$1 from $2; var $1 = () => _$1; // [Cynthia\'s patch]')
+	.replace('staticHandler(req, res, () => appHandler(req, res))', '/* [Cynthia\'s patch] */ appHandler(req, res)')
+
 writeFileSync(ENTRY_FILE, entry)
-
-// Process chunks
-for (const chunk of readdirSync(CHUNKS)) {
-	if (!chunk.endsWith('.mjs')) continue
-
-	const path = new URL(chunk, CHUNKS)
-	let code = readFileSync(path, 'utf8');
-	code = code.replace('staticHandler(req, res, () => appHandler(req, res))', 'appHandler(req, res)')
-	writeFileSync(path, code)
-}

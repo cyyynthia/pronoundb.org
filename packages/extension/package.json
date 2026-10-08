@@ -6,6 +6,7 @@
 	"author": "Cynthia <cynthia@cynthia.dev>",
 	"license": "BSD-3-Clause",
 	"private": true,
+	"type": "module",
 	"scripts": {
 		"dev:chrome": "PDB_BROWSER_TARGET=chrome vite build --watch --mode dev",
 		"dev:firefox": "PDB_BROWSER_TARGET=firefox vite build --watch --mode dev",
@@ -16,23 +17,23 @@
 		"test-headed": "playwright test --headed"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.48.2",
-		"@preact/preset-vite": "^2.9.1",
-		"@prefresh/vite": "^2.4.6",
+		"@playwright/test": "^1.63.0",
+		"@preact/preset-vite": "^2.10.6",
+		"@prefresh/vite": "^4.0.1",
 		"@pronoundb/pronouns": "workspace:*",
-		"@types/archiver": "^6.0.3",
-		"@types/chrome": "^0.0.279",
-		"@types/node": "^22.8.1",
-		"@types/ws": "^8.5.12",
-		"archiver": "^7.0.1",
+		"@tailwindcss/vite": "^4.3.3",
+		"@types/archiver": "^8.0.0",
+		"@types/chrome": "^0.3.4",
+		"@types/ws": "^8.18.2",
+		"archiver": "^8.0.0",
 		"feather-icons": "^4.29.2",
-		"postcss": "^8.4.47",
-		"preact": "^10.24.3",
-		"rollup-plugin-license": "^3.5.3",
-		"simple-icons": "^13.15.0",
-		"tailwindcss": "^3.4.14",
-		"vite": "^5.4.10",
-		"vite-plugin-magical-svg": "^1.3.0",
-		"ws": "^8.18.0"
+		"postcss": "^8.5.29",
+		"preact": "^11.0.0",
+		"rollup-plugin-license": "^3.7.1",
+		"simple-icons": "^16.34.0",
+		"tailwindcss": "^4.3.3",
+		"vite": "^8.3.3",
+		"vite-plugin-magical-svg": "^1.10.3",
+		"ws": "^8.22.0"
 	}
 }

@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { fetchReactProp } from '../../utils/proxy'
+import { fetchReactProp } from '../../utils/proxy.ts'
 
 export default function () {
 	window.addEventListener('message', async (e) => {

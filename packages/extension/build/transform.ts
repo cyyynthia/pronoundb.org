@@ -38,7 +38,7 @@ export default function transform (): Plugin {
 		transform: (code) =>
 			!isDev && code.includes('dangerouslySetInnerHTML')
 				? code
-					.replace(/\|\|\w\.__html===\w\.innerHTML\)\|\|\(\w\.innerHTML=\w\.__html/, '')
+					.replace(/\|\|\w\.__html===?\w\.innerHTML\)\|\|\(\w\.innerHTML=\w\.__html/, '')
 					.replace(/&&\(\w\.innerHTML=""\)/, '')
 				: void 0,
 
@@ -47,7 +47,7 @@ export default function transform (): Plugin {
 			const chunks = Object.values(bundle).filter((c) => c.type === 'chunk')
 			for (const file in bundle) {
 				if (file in bundle) {
-					const chunk = bundle[file]
+					const chunk = bundle[file]!
 					if (chunk.type === 'chunk') {
 						chunk.code = chunk.code.replace(
 							/window\.__BUILD_CHUNK__\.([a-z]+)/g,
@@ -56,7 +56,6 @@ export default function transform (): Plugin {
 
 						chunk.code = chunk.code.replace(
 							/window\.__BUILD_STYLESHEET__\.([a-z]+)/g,
-							// @ts-expect-error
 							(_, chk) => JSON.stringify(chunks.find((c) => c.name === `styles/${chk}`)?.viteMetadata?.importedCss.values().next().value),
 						)
 					}

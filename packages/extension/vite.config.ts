@@ -31,21 +31,22 @@ import { defineConfig } from 'vite'
 import { join } from 'path'
 import { existsSync } from 'fs'
 import { readdir } from 'fs/promises'
+import tailwindcss from '@tailwindcss/vite'
 import preact from '@preact/preset-vite'
 import magicalSvg from 'vite-plugin-magical-svg'
 import licensePlugin from 'rollup-plugin-license'
 
-import { baseLicensePath, finishLicense, renderLicense } from './build/license'
-import transform from './build/transform'
-import manifest from './build/manifest'
-import pack from './build/pack'
+import { baseLicensePath, finishLicense, renderLicense } from './build/license.ts'
+import transform from './build/transform.ts'
+import manifest from './build/manifest.ts'
+import pack from './build/pack.ts'
 
 function finalizeBuild (): Plugin {
 	return {
 		enforce: 'post',
 		name: 'finalize-build',
 		generateBundle: function (_opts, bundle) {
-			bundle['src/popup/index.html'].fileName = 'popup.html'
+			bundle['src/popup/index.html']!.fileName = 'popup.html'
 			if (bundle['src/background.html']) bundle['src/background.html'].fileName = 'background.html'
 		},
 	}
@@ -56,8 +57,8 @@ function tweakConfig (): Plugin {
 		name: 'pdb-config-tweak',
 		config: (cfg) => {
 			if (cfg.build?.watch) {
-				if (!cfg.build.rollupOptions) cfg.build.rollupOptions = {}
-				cfg.build.rollupOptions.output = {
+				if (!cfg.build.rolldownOptions) cfg.build.rolldownOptions = {}
+				cfg.build.rolldownOptions.output = {
 					entryFileNames: 'assets/[name].js',
 					chunkFileNames: 'assets/[name].chk.js',
 					assetFileNames: 'assets/[name].[ext]',
@@ -71,47 +72,48 @@ function tweakConfig (): Plugin {
 }
 
 const input: Record<string, string> = {
-	extension: join(__dirname, 'src', 'index.ts'),
-	wrapper: join(__dirname, 'src', 'wrapper.ts'),
-	runtime: join(__dirname, 'src', 'runtime.ts'),
-	worker: join(__dirname, 'src', 'worker.ts'),
-	popup: join(__dirname, 'src', 'popup', 'index.html'),
-	'styles/pdblib': join(__dirname, '..', 'pronouns', 'styles.css'),
+	extension: join(import.meta.dirname, 'src', 'index.ts'),
+	wrapper: join(import.meta.dirname, 'src', 'wrapper.ts'),
+	runtime: join(import.meta.dirname, 'src', 'runtime.ts'),
+	worker: join(import.meta.dirname, 'src', 'worker.ts'),
+	popup: join(import.meta.dirname, 'src', 'popup', 'index.html'),
+	'styles/pdblib': join(import.meta.dirname, '..', 'pronouns', 'styles.css'),
 }
 
-const modulesDir = join(__dirname, 'src', 'modules')
+const modulesDir = join(import.meta.dirname, 'src', 'modules')
 for (const dir of await readdir(modulesDir)) {
 	const stylesheet = join(modulesDir, dir, 'style.css')
 	if (existsSync(stylesheet)) input[`styles/${dir}`] = stylesheet
 }
 
 if (process.env.PDB_BROWSER_TARGET === 'firefox') {
-	delete input.worker
-	delete input.runtime
-	input.background = join(__dirname, 'src', 'background.html')
+	delete input['worker']
+	delete input['runtime']
+	input['background'] = join(import.meta.dirname, 'src', 'background.html')
 }
 
 const outDir = process.env.PDB_BROWSER_TARGET === 'firefox' ? 'dist/firefox' : 'dist/chrome'
 
 export default defineConfig({
 	build: {
-		target: 'es2020',
 		outDir: outDir,
 		assetsInlineLimit: 0,
-		rollupOptions: { input: input },
+		rolldownOptions: { input: input },
 		modulePreload: { polyfill: false },
 	},
 	envPrefix: [ 'VITE', 'PDB' ],
 	plugins: [
+		tailwindcss(),
 		preact(),
 		transform(),
 		magicalSvg({ target: 'preact' }),
+		// @ts-expect-error -- dw about it
 		licensePlugin({
 			thirdParty: {
 				includePrivate: false,
-				allow: '(MIT OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
+				allow: '(MIT OR BSD-3-Clause OR Apache-2.0 OR MPL-2.0 OR CC0-1.0)',
 				output: {
-					file: join(__dirname, outDir, baseLicensePath),
+					file: join(import.meta.dirname, outDir, baseLicensePath),
 					template: renderLicense,
 				},
 			},
@@ -121,5 +123,11 @@ export default defineConfig({
 		tweakConfig(),
 		manifest(),
 		pack(),
+		{
+			configResolved (config) {
+				// Rolldown preload shit pollutes the build and breaks wrapper.js -- force disable
+				;(config.plugins as Plugin[]).splice(config.plugins.findIndex((p) => p.name === 'native:import-analysis-build'), 1)
+			},
+		}
 	],
 })

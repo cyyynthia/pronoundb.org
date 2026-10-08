@@ -26,7 +26,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { queryRuntime } from '../runtime'
+import { queryRuntime } from '../runtime.ts'
 
 export type QueryElement = string | { $find: string, $in: string[] }
 

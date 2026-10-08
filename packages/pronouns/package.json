@@ -11,7 +11,7 @@
 		"build": "tsc"
 	},
 	"dependencies": {
-		"@types/chrome": "^0.0.279"
+		"@types/chrome": "^0.3.4"
 	},
 	"exports": {
 		"./sets": {

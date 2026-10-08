@@ -54,4 +54,6 @@ chrome.runtime.onMessage.addListener((request, _, cb) => {
 
 		return true
 	}
+
+	return false
 })

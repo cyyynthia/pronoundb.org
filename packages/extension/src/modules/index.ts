@@ -33,6 +33,7 @@ export type ExtensionModule = {
 	name: string
 	color: string
 	match: RegExp
+	disabled?: boolean
 	Icon: ComponentType<any>
 	inject: () => void
 }
@@ -40,7 +41,7 @@ export type ExtensionModule = {
 const modules: ExtensionModule[] = []
 const rawModules = import.meta.glob<ExtensionModule>('./**/main.ts', { eager: true })
 for (const mdl in rawModules) {
-	if (mdl in rawModules) {
+	if (mdl in rawModules && !rawModules[mdl].disabled) {
 		modules.push({ ...rawModules[mdl], id: mdl.slice(2, -8) })
 	}
 }

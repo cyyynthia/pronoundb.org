@@ -26,8 +26,48 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-module.exports = {
-	plugins: {
-		tailwindcss: {},
-	},
+import { defineCollection } from 'astro:content'
+import { glob } from 'astro/loaders'
+import { z } from 'astro/zod'
+
+const atLeastOneKey = (obj: any) => !obj || Object.keys(obj).length !== 0
+
+const decorations = defineCollection({
+	loader: glob({ pattern: '*.json', base: './src/content/decorations' }),
+	schema: z.object({
+		version: z.number(),
+		limited: z.boolean().optional(),
+		collection: z.string().optional(),
+		name: z.string(),
+		color: z.string().optional(),
+		border: z.union([
+			z.object({
+				type: z.literal('solid'),
+				color: z.string(),
+			}),
+			z.object({
+				type: z.union([ z.literal('linear-gradient'), z.literal('conic-gradient') ]),
+				angle: z.number().optional(),
+				colors: z.array(
+					z.object({
+						c: z.string(),
+						o: z.string(),
+					})
+				),
+			}),
+		]),
+		elements: z.object({
+			top_left: z.string().optional(),
+			bottom_right: z.string().optional(),
+		}).optional().refine(atLeastOneKey),
+		animation: z.object({
+			border: z.string().optional(),
+			top_left: z.string().optional(),
+			bottom_right: z.string().optional(),
+		}).optional().refine(atLeastOneKey),
+	}),
+})
+
+export const collections = {
+	decorations: decorations,
 }

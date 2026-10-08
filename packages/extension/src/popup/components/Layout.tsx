@@ -30,8 +30,8 @@ import type { UserData } from '@pronoundb/pronouns/sets'
 import { h } from 'preact'
 import { useMemo } from 'preact/hooks'
 
-import { ViewState } from './Views'
-import { formatPronouns } from '../../utils/pronouns'
+import { ViewState } from './Views.tsx'
+import { formatPronouns } from '../../utils/pronouns.ts'
 
 import Settings from 'feather-icons/dist/icons/settings.svg'
 import ArrowLeft from 'feather-icons/dist/icons/arrow-left.svg'
@@ -100,7 +100,7 @@ export function Footer ({ selfPronouns }: FooterProps) {
 				<div class='ml-auto flex gap-3'>
 					<a class='hover:underline' href='https://pronoundb.org' target='_blank' rel='noreferrer'>Website</a>
 					<a class='hover:underline' href='https://github.com/cyyynthia/pronoundb.org' target='_blank' rel='noreferrer'>GitHub</a>
-					<a class='hover:underline' href='https://ko-fi.com/cyyynthia' target='_blank' rel='noreferrer'>Donate</a>
+					<a class='hover:underline' href='https://github.com/sponsors/cyyynthia' target='_blank' rel='noreferrer'>Donate</a>
 				</div>
 			</div>
 		</footer>

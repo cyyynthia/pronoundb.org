@@ -26,13 +26,15 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { QueryElement } from '../../utils/proxy'
-import { messageCircle } from '../../icons/feather'
+import type { QueryElement } from '../../utils/proxy.ts'
+import { messageCircle } from '../../icons/feather.ts'
 
-import { formatPronouns } from '../../utils/pronouns'
-import { fetchPronouns } from '../../utils/fetch'
-import { fetchVueProp } from '../../utils/proxy'
-import { h, css } from '../../utils/dom'
+import { formatPronouns } from '../../utils/pronouns.ts'
+import { fetchPronouns } from '../../utils/fetch.ts'
+import { fetchVueProp } from '../../utils/proxy.ts'
+import { h, css } from '../../utils/dom.ts'
+
+export const disabled = true;
 
 export const name = 'Modrinth'
 export const color = '#30B27B'

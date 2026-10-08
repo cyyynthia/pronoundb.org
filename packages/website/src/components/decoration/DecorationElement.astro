@@ -42,7 +42,7 @@ type DecorationMaybeString = Omit<Decoration, 'elements'> & {
 }
 
 export interface Props {
-	decoration: CollectionEntry<'decorations'> | null
+	decoration: CollectionEntry<'decorations'> | null | undefined
 	background?: string
 }
 

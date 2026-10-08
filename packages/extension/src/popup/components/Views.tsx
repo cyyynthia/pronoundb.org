@@ -26,23 +26,26 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import type { ExtensionModule } from '../../modules'
+import type { ExtensionModule } from '../../modules/index.ts'
 import { h } from 'preact'
 import { useCallback, useEffect, useState } from 'preact/hooks'
 
-import Checkbox from './form/Checkbox'
-import Select from './form/Select'
-import modules from '../../modules'
+import Checkbox from './form/Checkbox.tsx'
+import Select from './form/Select.tsx'
+import modules from '../../modules/index.ts'
 
-export const enum ViewState {
-	MAIN,
-	PRONOUNS,
-	SETTINGS
-}
+/** @enum */
+export const ViewState = {
+	MAIN: 1,
+	PRONOUNS: 2,
+	SETTINGS: 3,
+} as const
+
+export type ViewState = typeof ViewState[keyof typeof ViewState]
 
 export function Unsupported () {
 	return (
-		<main class='flex-grow p-4 flex flex-col items-center'>
+		<main class='grow p-4 flex flex-col items-center'>
 			<p class='font-semibold text-xl text-center m-4 p-4 mt-0 pt-0 border-b border-gray-200'>This website is not supported by PronounDB</p>
 		</main>
 	)
@@ -59,11 +62,11 @@ export function Main ({ module }: { module: ExtensionModule }) {
 
 	useEffect(() => {
 		chrome.storage.sync.get([ enabledKey ])
-			.then((s) => setEnabled(s[enabledKey] ?? true))
+			.then((s) => setEnabled(!!(s[enabledKey] ?? true)))
 	}, [])
 
 	return (
-		<main class='flex-grow border-t-8 px-4 py-2 -m-px' style={{ borderColor: module.color }}>
+		<main class='grow border-t-8 px-4 py-2 -m-px' style={{ borderColor: module.color }}>
 			<div class='flex gap-2 items-center mb-3'>
 				{h(module.Icon, { class: 'w-6 h-6 fill-current' })}
 				<h2 class='text-xl font-semibold tracking-wide'>{module.name}</h2>
@@ -90,7 +93,7 @@ export function Settings () {
 	}, [])
 
 	return (
-		<main class='flex-grow px-4 py-2'>
+		<main class='grow px-4 py-2'>
 			<div class='flex gap-2 items-center mb-2'>
 				<h2 class='text-xl font-semibold tracking-wide'>Appearance</h2>
 			</div>

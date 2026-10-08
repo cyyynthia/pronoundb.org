@@ -84,7 +84,7 @@ if (exampleBody) httpRequest += `\nContent-Type: application/json\n\n${JSON.stri
 let httpResponse = `HTTP/2 ${exampleStatus}`
 if (exampleResponse) httpResponse += `\nContent-Type: application/json\n\n${JSON.stringify(exampleResponse, null, '\t')}`
 ---
-<section class='w-full lg:grid lg:grid-cols-2 bg-gray-600 dark:bg-gray-700 text-white font-mono rounded mb-8'>
+<section class='w-full lg:grid lg:grid-cols-2 bg-gray-600 dark:bg-gray-700 text-white font-mono rounded-sm mb-8'>
 	<section class='mb-4 lg:border-r lg:mb-0 border-gray-500 py-2 px-4'>
 		<div class='font-bold flex gap-3 items-center pt-1 pb-2 border-b border-gray-500'>
 			<span class:list={[ COLORS[method], 'text-black px-4' ]}>{method}</span>
@@ -112,6 +112,8 @@ if (exampleResponse) httpResponse += `\nContent-Type: application/json\n\n${JSON
 </section>
 
 <style>
+	@reference "../styles/global.css";
+
 	section :global(.astro-code) {
 		@apply rounded px-4 py-2;
 		background: #303030 !important;
