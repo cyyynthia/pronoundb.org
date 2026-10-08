@@ -23,7 +23,7 @@ https://pronoundb.org/supported.
 ## Structure
  - The website (backend & frontend) is built with [astro](https://astro.build) and [tailwindcss](https://tailwindcss.com)
  - Data is stored using [postgresql](https://www.postgresql.org/)
- - May contains stains of coffee and a few cookie crumbs :whistle:
+ - May contain stains of coffee and a few cookie crumbs :whistle:
 
 For more details about how it works internally, and for clues on how to get started with modifying the code, check
 [HACKING.md](HACKING.md)
